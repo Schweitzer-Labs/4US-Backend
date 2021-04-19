@@ -17,11 +17,12 @@ else ifeq ($(RUNENV), backup)
 endif
 
 ifeq ($(SRCDIR),)
-       export SRCDIR   := src
+       export SRCDIR   := services/contribute/src
 endif
 
 
-export BUILDDIR        := .aws-sam/build
+export SAMDIR          := .aws-sam
+export BUILDDIR        := $(SAMDIR)/build
 export STACK           := purple-4us
 
 export STACKNAME       := $(STACK)-$(RUNENV)
@@ -41,7 +42,7 @@ export TEMPLATE        := $(BUILDDIR)/template.yaml
 
 # Make targets
 
-build: $(SRCDIR)/contribute/app.js
+build: $(SRCDIR)/app.js
 	@sam build
 
 check: build
@@ -51,7 +52,7 @@ clean:
 	@rm -f $(TEMPLATE)
 
 realclean: clean
-	@rm -rf $(BUILDDIR)
+	@rm -rf $(SAMDIR)
 
 local: $(TEMPLATE)
 	@sam local start-api
