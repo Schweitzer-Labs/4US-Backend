@@ -12,6 +12,13 @@ Parameters:
   LambdaSecurityGroup:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>
     Default: /cfn/ec2/securitygroup/lambda
+  LambdaRunEnvironment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - qa
+      - prod
  
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -76,3 +83,6 @@ Resources:
             Path: /contribute
             Method: post
             RestApiId: !Ref DonorGateway
+      Environment:
+        Variables:
+          runenv: !Ref LambdaRunEnvironment
