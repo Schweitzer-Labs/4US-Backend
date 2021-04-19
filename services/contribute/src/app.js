@@ -1,16 +1,14 @@
-// const axios = require('axios')
-// const url = 'http://checkip.amazonaws.com/';
 const Joi = require("joi");
 const { Stripe } = require("stripe");
-
-const stripeApiKey =
-  "sk_test_51HsJE2EUhH8cxK5gaCBDDbs6B5mYGjrctrlX73pJ1iaNIEcphQg5L4Qkrri73owunIkrgDn0yQI5ibbgleYAe7hx00JMRiXEzd";
+const config = require("./config.js");
+const { configKey } = require("./enums");
 
 const stripeUserId = "acct_1IPBGPRDfW8UMKAc";
 
-const stripe = new Stripe(stripeApiKey, {
-  apiVersion: "2020-08-27",
-});
+require('dotenv').config()
+
+const runenv = process.env.RUNENV
+
 
 const executePayment = async (
   stripeAccount,
@@ -20,6 +18,12 @@ const executePayment = async (
   cardExpirationYear,
   cardCVC
 ) => {
+  const stripeApiKey = await config.get(runenv, configKey.stripeApiKey);
+
+  const stripe = new Stripe(stripeApiKey, {
+    apiVersion: "2020-08-27",
+  });
+
   const methodRes = await stripe.paymentMethods.create({
     type: "card",
     card: {
@@ -59,7 +63,6 @@ let response;
 
 exports.lambdaHandler = async (event, context) => {
   const res = contribSchema.validate(JSON.parse(event.body));
-
   if (res.error) {
     return {
       statusCode: 400,
@@ -78,7 +81,7 @@ exports.lambdaHandler = async (event, context) => {
   } = res.value;
 
   try {
-    const res = await executePayment(
+    await executePayment(
       stripeUserId,
       amount,
       cardNumber,
@@ -86,7 +89,7 @@ exports.lambdaHandler = async (event, context) => {
       cardExpirationYear,
       cardCVC
     );
-    console.log(res);
+
     response = {
       statusCode: 200,
       body: JSON.stringify({
