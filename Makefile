@@ -2,18 +2,18 @@
 SHELL                  := bash
 export CREPES          := $(PWD)/bin/crepes.py
 
-ifeq ($(REGION), )
-       export REGION   := us-east-1
+ifeq ($(RUNENV), )
+       export RUNENV	:= prod
 endif
 
-ifeq ($(REGION), us-east-1)
-       export ENVNAME  := production
-else ifeq ($(REGION), us-west-2)
-       export ENVNAME  := staging
-else ifeq ($(REGION), us-west-1)
-       export ENVNAME  := devops
-else ifeq ($(REGION), us-east-2)
-       export ENVNAME  := backup
+ifeq ($(RUNENV), prod)
+       export REGION:= us-east-1
+else ifeq ($(RUNENV), qa)
+       export REGION  := us-west-2
+else ifeq ($(RUNENV), dev)
+       export REGION  := us-west-1
+else ifeq ($(RUNENV), backup)
+       export REGION  := us-east-2
 endif
 
 ifeq ($(SRCDIR),)
@@ -21,10 +21,10 @@ ifeq ($(SRCDIR),)
 endif
 
 
-export BUILDDIR                := .aws-sam/build
+export BUILDDIR        := .aws-sam/build
 export STACK           := purple-4us
 
-export STACKNAME       := $(STACK)-$(ENVNAME)
+export STACKNAME       := $(STACK)-$(RUNENV)
 
 export DATE            := $(shell date)
 export NONCE           := $(shell uuidgen | cut -d\- -f1)
@@ -32,9 +32,9 @@ export NONCE           := $(shell uuidgen | cut -d\- -f1)
 export ENDPOINT        := https://cloudformation-fips.$(REGION).amazonaws.com
 export BUCKET          := 4us-cfn-templates-$(REGION)
 
-export STACK_PARAMS    += Nonce=$(NONCE)
+export STACK_PARAMS    += LambdaRunEnvironment=$(RUNENV)
 
-export TEMPLATE                := $(BUILDDIR)/template.yaml
+export TEMPLATE        := $(BUILDDIR)/template.yaml
 
 
 .PHONY: build buildstacks check local package deploy clean realclean
@@ -48,13 +48,13 @@ check: build
 	@echo npm something something
 
 clean:
-	@rm $(TEMPLATE)
+	@rm -f $(TEMPLATE)
 
 realclean: clean
 	@rm -rf $(BUILDDIR)
 
 local: $(TEMPLATE)
-	@sam local invoke
+	@sam local start-api
 
 package: check
 	@aws cloudformation package \
@@ -66,7 +66,6 @@ package: check
 		--output-template-file $(PACKAGE)
 
 deploy: check
-	@echo "Actual command to deploy the packaged template:"
 	sam deploy \
 		--region $(REGION) \
 		--template-file $(TEMPLATE) \
