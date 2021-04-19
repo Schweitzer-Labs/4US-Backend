@@ -5,6 +5,11 @@ const { configKey } = require("./enums");
 
 const stripeUserId = "acct_1IPBGPRDfW8UMKAc";
 
+require('dotenv').config()
+
+const runenv = process.env.RUNENV
+
+
 const executePayment = async (
   stripeAccount,
   amount,
@@ -13,7 +18,7 @@ const executePayment = async (
   cardExpirationYear,
   cardCVC
 ) => {
-  const stripeApiKey = await config.get("dev", configKey.stripeApiKey);
+  const stripeApiKey = await config.get(runenv, configKey.stripeApiKey);
 
   const stripe = new Stripe(stripeApiKey, {
     apiVersion: "2020-08-27",
