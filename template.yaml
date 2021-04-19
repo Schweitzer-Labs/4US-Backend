@@ -9,9 +9,6 @@ Description: >
 Globals:
   Function:
     Timeout: 10
-    Environment:
-      Variables:
-        ENVIRONMENT: data-table
 
 Resources:
   DonorGateway:
