@@ -12,11 +12,11 @@
     "stripe": "^8.144.0"
   },
   "scripts": {
-    "test": "mocha tests/unit/",
+    "test": "mocha tests/unit/ --timeout 10000",
     "integ-test": "mocha tests/integration/"
   },
   "devDependencies": {
-    "aws-sdk": "^2.815.0",
+    "aws-sdk": "^2.888.0",
     "chai": "^4.2.0",
     "mocha": "^8.2.1",
     "prettier": "^2.2.1"
