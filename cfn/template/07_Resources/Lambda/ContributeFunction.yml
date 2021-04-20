@@ -1,0 +1,16 @@
+ContributeFunction:
+  Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  Properties:
+    CodeUri: services/contribute/
+    Handler: app.lambdaHandler
+    Runtime: nodejs12.x
+    Events:
+      Contribute:
+        Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        Properties:
+          Path: /contribute
+          Method: post
+          RestApiId: !Ref DonorGateway
+    Environment:
+      Variables:
+        runenv: !Ref LambdaRunEnvironment

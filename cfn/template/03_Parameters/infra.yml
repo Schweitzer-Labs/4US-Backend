@@ -1,0 +1,13 @@
+PrivateSubnets:
+  Type: AWS::SSM::Parameter::Value<List<AWS::EC2::Subnet::Id>>
+  Default: /cfn/ec2/subnets/private/all
+LambdaSecurityGroup:
+  Type: AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>
+  Default: /cfn/ec2/securitygroup/lambda
+LambdaRunEnvironment:
+  Type: String
+  Default: dev
+  AllowedValues:
+    - dev
+    - qa
+    - prod

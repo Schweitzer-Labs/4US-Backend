@@ -1,0 +1,7 @@
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Function:
+  Timeout: 10
+  VpcConfig:
+    SecurityGroupIds:
+      - !Ref LambdaSecurityGroup
+    SubnetIds: !Ref PrivateSubnets
