@@ -1,6 +1,6 @@
 
 SHELL                  := bash
-export CREPES          := $(PWD)/bin/crepes.py
+export CREPES          := cfn/bin/crepes.py
 
 ifeq ($(RUNENV), )
        export RUNENV	:= prod
@@ -17,32 +17,40 @@ else ifeq ($(RUNENV), backup)
 endif
 
 ifeq ($(SRCDIR),)
-       export SRCDIR   := services/contribute/src
+       export SRCDIR	:= services/contribute/src
 endif
 
 
-export SAMDIR          := .aws-sam
-export BUILDDIR        := $(SAMDIR)/build
-export STACK           := purple-4us
+export SAMDIR		:= .aws-sam
+export BUILDDIR		:= $(SAMDIR)/build
+export STACK		:= purple-4us
 
-export STACKNAME       := $(STACK)-$(RUNENV)
+export STACKNAME	:= $(STACK)-$(RUNENV)
 
-export DATE            := $(shell date)
-export NONCE           := $(shell uuidgen | cut -d\- -f1)
+export DATE		:= $(shell date)
+export NONCE		:= $(shell uuidgen | cut -d\- -f1)
 
-export ENDPOINT        := https://cloudformation-fips.$(REGION).amazonaws.com
-export BUCKET          := 4us-cfn-templates-$(REGION)
+export ENDPOINT		:= https://cloudformation-fips.$(REGION).amazonaws.com
+export BUCKET		:= 4us-cfn-templates-$(REGION)
 
-export STACK_PARAMS    += LambdaRunEnvironment=$(RUNENV)
+export STACK_PARAMS	+= LambdaRunEnvironment=$(RUNENV)
 
-export TEMPLATE        := $(BUILDDIR)/template.yaml
+export TEMPLATE		:= template.yml
+export PACKAGE		:= $(SAMDIR)/template.yaml
 
+CFNDIR			:= cfn/templates
+SRCS			:= $(shell find cfn/template/0* -name '*.yml' -o -name '*.txt')
 
-.PHONY: build buildstacks check local package deploy clean realclean
+.PHONY: dep build buildstacks check local package deploy clean realclean
 
 # Make targets
+dep:
+	@pip3 install jinja2 cfn_tools
 
-build: $(SRCDIR)/app.js
+$(TEMPLATE): $(SRCS)
+	@$(CREPES) --region $(REGION) --output $(TEMPLATE) $(CFNDIR)
+
+build: $(TEMPLATE) $(SRCDIR)/app.js
 	@sam build
 
 check: build
@@ -66,10 +74,11 @@ package: check
 		--s3-prefix $(STACKNAME) \
 		--output-template-file $(PACKAGE)
 
-deploy: check
-	sam deploy \
+deploy: package
+	@aws cloudformation deploy \
+		--endpoint-url $(ENDPOINT) \
 		--region $(REGION) \
-		--template-file $(TEMPLATE) \
+		--template-file $(PACKAGE) \
 		--stack-name $(STACKNAME) \
 		--s3-bucket $(BUCKET) \
 		--s3-prefix $(STACKNAME) \
@@ -77,6 +86,4 @@ deploy: check
 		       CAPABILITY_NAMED_IAM \
 		       CAPABILITY_AUTO_EXPAND \
 		--parameter-overrides \
-			$(STACK_PARAMS) \
-		--no-confirm-changeset \
-		--no-fail-on-empty-changeset
+			$(STACK_PARAMS)
