@@ -57,7 +57,7 @@ check: build
 	@echo npm something something
 
 clean:
-	@rm -f $(TEMPLATE)
+	@rm -f $(TEMPLATE) $(PACKAGE)
 
 realclean: clean
 	@rm -rf $(SAMDIR)
