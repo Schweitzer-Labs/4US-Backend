@@ -3,12 +3,11 @@ const { Stripe } = require("stripe");
 const config = require("./config.js");
 const { configKey } = require("./enums");
 
-const stripeUserId = "acct_1IPBGPRDfW8UMKAc";
+const stripeUserId = "acct_1IdcwgRFrwYoR1VI";
 
 require('dotenv').config()
 
 const runenv = process.env.RUNENV
-
 
 const executePayment = async (
   stripeAccount,
