@@ -16,8 +16,8 @@ else ifeq ($(RUNENV), backup)
        export REGION  := us-east-2
 endif
 
-ifeq ($(SRCDIR),)
-       export SRCDIR	:= services/contribute/src
+ifeq ($(CONTRIB_DIR),)
+       export CONTRIB_DIR	:= services/contribute/
 endif
 
 
@@ -47,7 +47,7 @@ IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
 # Make targets
-build: $(TEMPLATE) $(SRCDIR)/app.js
+build: $(TEMPLATE) $(CONTRIB_DIR)/app.js
 	@sam build
 
 dep:

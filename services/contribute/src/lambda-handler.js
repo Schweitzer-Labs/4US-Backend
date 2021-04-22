@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const { Stripe } = require("stripe");
-const config = require("./config.js");
-const { configKey } = require("./enums");
+const config = require("./src/config.js");
+const { configKey } = require("./src/enums");
 
 const stripeUserId = "acct_1IPBGPRDfW8UMKAc";
 
@@ -61,7 +61,7 @@ const contribSchema = Joi.object({
 
 let response;
 
-exports.lambdaHandler = async (event, context) => {
+module.exports = async (event, context) => {
   const res = contribSchema.validate(JSON.parse(event.body));
   if (res.error) {
     return {
