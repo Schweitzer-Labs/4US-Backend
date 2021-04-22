@@ -11,6 +11,10 @@ LambdaRunEnvironment:
     - dev
     - qa
     - prod
+# Needs to be moved to SSM
+HostedZone:
+  Type: String
+  Default: Z0505014WPG6KZLWPQJF
 CertificateManagerCertificate:
 {% if REGION == 'us-east-1' %}
   Type: AWS::SSM::Parameter::Value<String>

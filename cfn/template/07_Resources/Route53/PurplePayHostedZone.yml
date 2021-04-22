@@ -1,6 +1,0 @@
-PurplePayHostedZone:
-  Type: AWS::Route53::HostedZone
-  DeletionPolicy: Retain
-  Properties:
-    Name: purplepay.us
-    Id: Z0505014WPG6KZLWPQJF
