@@ -1,0 +1,7 @@
+{% for site in ('dev', 'qa') %}
+FirewallAssociation:
+  Type: AWS::WAFv2::WebACLAssociation
+  Properties:
+    ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${ {{ site }}DonorGateway }/stages/{{ site }}
+    WebACLArn: !GetAtt RegionalFirewall.Arn
+{% endfor %}
