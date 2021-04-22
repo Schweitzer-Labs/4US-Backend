@@ -1,0 +1,6 @@
+OAIPurplePay:
+  Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+  Condition: Production
+  Properties:
+    CloudFrontOriginAccessIdentityConfig:
+      Comment: OAI for PurplePay
