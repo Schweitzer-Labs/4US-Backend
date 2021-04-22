@@ -23,7 +23,6 @@ module.exports = async (event, context) => {
 
   try {
     const id = await createStripeConnectUser(code);
-    console.log(id)
     return {
       statusCode: 200,
       body: JSON.stringify({
