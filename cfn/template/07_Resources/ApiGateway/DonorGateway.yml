@@ -8,7 +8,7 @@ DonorGateway:
       EndpointConfiguration: REGIONAL
       Route53:
         EvaluateTargetHealth: true
-        HostedZoneId: !Ref PurplePayHostedZone
+        HostedZoneId: !Ref HostedZone
     Models:
       Contribution:
         type: object
