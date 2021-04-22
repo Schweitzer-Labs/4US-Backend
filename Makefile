@@ -35,7 +35,7 @@ export STACK_PARAMS	:= Nonce=$(NONCE)
 STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
 
 export TEMPLATE		:= template.yml
-export PACKAGE		:= $(SAMDIR)/template.yaml
+export PACKAGE		:= $(SAMDIR)/CloudFormation-template.yml
 
 CFNDIR			:= $(PWD)/cfn/template
 SRCS			:= $(shell find cfn/template/0* -name '*.yml' -o -name '*.txt')
@@ -72,7 +72,7 @@ local: $(TEMPLATE)
 package: build check
 	@aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
-		--template-file $(TEMPLATE) \
+		--template-file $(BUILDDIR)/template.yaml \
 		--region $(REGION) \
 		--s3-bucket $(BUCKET) \
 		--s3-prefix $(STACKNAME) \
