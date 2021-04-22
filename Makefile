@@ -1,19 +1,13 @@
 
-SHELL                  := bash
-export CREPES          := $(PWD)/cfn/bin/crepes.py
+SHELL			:= bash
+export CREPES		:= $(PWD)/cfn/bin/crepes.py
 
 ifeq ($(RUNENV), )
-       export RUNENV	:= prod
+       export RUNENV	:= dev
 endif
 
-ifeq ($(RUNENV), prod)
-       export REGION:= us-east-1
-else ifeq ($(RUNENV), qa)
-       export REGION  := us-west-2
-else ifeq ($(RUNENV), dev)
-       export REGION  := us-west-1
-else ifeq ($(RUNENV), backup)
-       export REGION  := us-east-2
+ifeq ($(REGION), )
+       export REGION	:= us-east-1
 endif
 
 ifeq ($(SRCDIR),)
