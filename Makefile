@@ -1,6 +1,6 @@
 
 SHELL                  := bash
-export CREPES          := cfn/bin/crepes.py
+export CREPES          := $(PWD)/cfn/bin/crepes.py
 
 ifeq ($(RUNENV), )
        export RUNENV	:= prod
@@ -21,7 +21,7 @@ ifeq ($(SRCDIR),)
 endif
 
 
-export SAMDIR		:= .aws-sam
+export SAMDIR		:= $(PWD)/.aws-sam
 export BUILDDIR		:= $(SAMDIR)/build
 export STACK		:= purple-4us
 
@@ -33,28 +33,34 @@ export NONCE		:= $(shell uuidgen | cut -d\- -f1)
 export ENDPOINT		:= https://cloudformation-fips.$(REGION).amazonaws.com
 export BUCKET		:= 4us-cfn-templates-$(REGION)
 
-export STACK_PARAMS	+= LambdaRunEnvironment=$(RUNENV)
+export STACK_PARAMS	:= Nonce=$(NONCE)
+STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
 
 export TEMPLATE		:= template.yml
 export PACKAGE		:= $(SAMDIR)/template.yaml
 
-CFNDIR			:= cfn/templates
+CFNDIR			:= $(PWD)/cfn/template
 SRCS			:= $(shell find cfn/template/0* -name '*.yml' -o -name '*.txt')
 
-.PHONY: dep build buildstacks check local package deploy clean realclean
+IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
+
+.PHONY: dep build buildstacks check local import package deploy clean realclean
 
 # Make targets
+build: $(TEMPLATE) $(SRCDIR)/app.js
+	@sam build
+
 dep:
 	@pip3 install jinja2 cfn_tools
 
 $(TEMPLATE): $(SRCS)
 	@$(CREPES) --region $(REGION) --output $(TEMPLATE) $(CFNDIR)
 
-build: $(TEMPLATE) $(SRCDIR)/app.js
-	@sam build
 
-check: build
-	@echo npm something something
+check: $(TEMPLATE)
+	@echo "Validating template"
+	@aws cloudformation validate-template --template-body file://$^
+
 
 clean:
 	@rm -f $(TEMPLATE) $(PACKAGE)
@@ -65,7 +71,7 @@ realclean: clean
 local: $(TEMPLATE)
 	@sam local start-api
 
-package: check
+package: build check
 	@aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
 		--template-file $(TEMPLATE) \
@@ -87,3 +93,7 @@ deploy: package
 		       CAPABILITY_AUTO_EXPAND \
 		--parameter-overrides \
 			$(STACK_PARAMS)
+
+	
+import: build
+	@$(MAKE) -C $(CFNDIR) import
