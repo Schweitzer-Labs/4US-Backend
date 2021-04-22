@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const { Stripe } = require("stripe");
-const config = require("./src/config.js");
-const { configKey } = require("./src/enums");
+const config = require("./config.js");
+const { configKey } = require("./enums");
 
 const stripeUserId = "acct_1IPBGPRDfW8UMKAc";
 
