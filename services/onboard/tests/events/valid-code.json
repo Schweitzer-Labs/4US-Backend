@@ -1,5 +1,5 @@
 {
-  "body": "{\n    \"cardNumber\": \"4242424242424242\",\n    \"cardExpirationMonth\": 12,\n    \"cardExpirationYear\": 2023,\n    \"cardCVC\": \"123\",\n    \"amount\": 400\n}",
+  "body": "{}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "POST",

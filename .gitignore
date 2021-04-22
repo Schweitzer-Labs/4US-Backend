@@ -131,6 +131,9 @@ $RECYCLE.BIN/
 
 .aws-sam
 
+# IDE
+*/.idea
+*/.stack-work
 
 
 # End of https://www.gitignore.io/api/osx,node,linux,windows
