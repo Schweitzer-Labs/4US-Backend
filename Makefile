@@ -51,7 +51,7 @@ build: $(TEMPLATE) $(SRCDIR)/app.js
 	@sam build
 
 dep:
-	@pip3 install jinja2 cfn_tools boto3
+	@pip3 install jinja2 cfn_flip boto3
 
 $(TEMPLATE): $(SRCS)
 	@$(CREPES) --region $(REGION) --output $(TEMPLATE) $(CFNDIR)
