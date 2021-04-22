@@ -1,4 +1,4 @@
-LambdaParameterStoreLookupRole:
+LambdaRole:
   Type: AWS::IAM::Role
   Properties:
     AssumeRolePolicyDocument:
@@ -7,20 +7,32 @@ LambdaParameterStoreLookupRole:
         - Effect: Allow
           Principal:
             Service:
-              - 'lambda.amazonaws.com'
+              - lambda.amazonaws.com
           Action:
-            - 'sts:AssumeRole'
+            - sts:AssumeRole
     ManagedPolicyArns:
-      - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
     Policies:
-      -
-        PolicyName: 'ParameterStoreBlogDevParameterAccess'
+      - PolicyName: PermissionsToAWSServices
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
-            -
+            - Sid: ParameterStoreParameterAccess
               Effect: Allow
               Action:
                 - 'ssm:GetParameter*'
               Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:*'
-
+            - Sid: VPCNetworkInterfaces
+              Effect: Allow
+              Resource: '*'
+              Action:
+                - ec2:CreateNetworkInterface
+                - ec2:DescribeNetworkInterfaces
+                - ec2:DeleteNetworkInterface
+            - Sid: LogEvents
+              Effect: Allow
+              Resource: '*'
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
