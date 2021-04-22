@@ -1,7 +1,15 @@
-DonorGateway:
+{% for site in ('dev', 'qa') %}
+{{ site }}DonorGateway:
   Type: AWS::Serverless::Api
   Properties:
-    StageName: Dev
+    StageName: {{ site }}
+    Domain:
+      CertificateArn: !Ref CertificateManagerCertificate
+      DomainName: !Sub api-{{ site }}.${Domain}
+      EndpointConfiguration: REGIONAL
+      Route53:
+        EvaluateTargetHealth: true
+        HostedZoneId: !Ref PurplePayHostedZone
     Models:
       Contribution:
         type: object
@@ -36,3 +44,4 @@ DonorGateway:
             type: string
           amount:
             type: integer
+{% endfor %}
