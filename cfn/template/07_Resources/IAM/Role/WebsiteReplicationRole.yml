@@ -1,0 +1,12 @@
+{% for site in ('dev', 'qa') %}
+{{ site }}WebsiteReplicationRole:
+  Type: AWS::IAM::Role
+  Condition: Production
+  Properties:
+    AssumeRolePolicyDocument:
+      Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: s3.amazonaws.com
+{% endfor %}
