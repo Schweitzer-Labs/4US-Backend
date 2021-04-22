@@ -1,0 +1,47 @@
+{% for site in ('dev', 'qa') %}
+{{ site }}DonorGateway:
+  Type: AWS::Serverless::Api
+  Properties:
+    StageName: {{ site }}
+    Domain:
+      CertificateArn: !Ref CertificateManagerCertificate
+      DomainName: !Sub api-{{ site }}.${Domain}
+      EndpointConfiguration: REGIONAL
+      Route53:
+        EvaluateTargetHealth: true
+        HostedZoneId: !Ref PurplePayHostedZone
+    Models:
+      Contribution:
+        type: object
+        required:
+          - cardNumber
+          - cardExpirationMonth
+          - cardExpirationYear
+        properties:
+          firstName:
+            type: string
+          lastName:
+            type: integer
+          addressLine1:
+            type: string
+          addressLine2:
+            type: string
+          city:
+            type: integer
+          state:
+            type: string
+          postalCode:
+            type: string
+          cardNumber:
+            type: string
+          cardExpirationMonth:
+            type: string
+          cardExpirationYear:
+            type: string
+          cardCVC:
+            type: string
+          refCode:
+            type: string
+          amount:
+            type: integer
+{% endfor %}

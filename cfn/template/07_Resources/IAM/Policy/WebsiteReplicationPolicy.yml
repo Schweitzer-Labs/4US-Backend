@@ -1,0 +1,36 @@
+{% for site in ('dev', 'qa') %}
+{{ site }}WebsiteReplicationPolicy:
+  Type: AWS::IAM::Policy
+  Description: Replication Policy for {{ site | lower }}
+  Condition: Production
+  Properties:
+    PolicyName: {{ site }}WebsiteReplicationPolicy
+    Roles:
+      - !Ref {{ site }}WebsiteReplicationRole
+    PolicyDocument:
+      Statement:
+        - Effect: Allow
+          Resource: !GetAtt {{ site }}WebsiteBucket.Arn
+          Action:
+            - s3:GetReplicationConfiguration
+            - s3:ListBucket
+        - Effect: Allow
+          Resource: 
+            !Join
+              - '/'
+              - - !GetAtt {{ site }}WebsiteBucket.Arn
+                - '*'
+          Action:
+            - s3:GetObjectVersion
+            - s3:GetObjectVersionAcl
+        - Effect: Allow
+          Resource: 
+            !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref {{ site }}WebsiteBucket
+                - !Sub -${AWS::Region}/*
+          Action:
+            - s3:ReplicateObject
+            - s3:ReplicateDelete
+{% endfor %}

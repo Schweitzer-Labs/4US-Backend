@@ -1,0 +1,41 @@
+# Custom resource for getting latest version of a lambda,
+# as required by CloudFront.
+# taken from: https://gist.github.com/jed/56b1f58297d374572bc51c59394c7e7f
+LambdaEdgeFunctionVersion:
+  Type: Custom::LatestLambdaVersion
+  Condition: Production
+  Properties:
+    ServiceToken: !GetAtt PublishLambdaEdgeVersion.Arn
+    FunctionName: !Ref LambdaEdgeFunction
+    Nonce: !Ref Nonce
+
+PublishLambdaEdgeVersion:
+  Type: AWS::Lambda::Function
+  Condition: Production
+  Properties:
+    FunctionName: PublishLambdaEdgeFunctionVersion
+    Description: !Sub Publish Lambda@Edge version for ${Domain}
+    Handler: index.handler
+    Runtime: nodejs12.x
+    Role: !GetAtt PublishEdgeLambdaVersionRole.Arn
+    VpcConfig:
+      SecurityGroupIds:
+        - !Ref LambdaSecurityGroup
+      SubnetIds: !Ref PrivateSubnets
+    Code:
+      ZipFile: |
+        const {Lambda} = require('aws-sdk');
+        const {send, SUCCESS, FAILED} = require('cfn-response');
+        const lambda = new Lambda();
+
+        exports.handler = (event, context) => {
+          const {RequestType, ResourceProperties: {FunctionName}} = event;
+
+          if (RequestType == 'Delete') return send(event, context, SUCCESS)
+
+          lambda.publishVersion({FunctionName}, (err, {FunctionArn}) => {
+            err
+              ? send(event, context, FAILED, err)
+              : send(event, context, SUCCESS, {FunctionArn})
+          });
+        }

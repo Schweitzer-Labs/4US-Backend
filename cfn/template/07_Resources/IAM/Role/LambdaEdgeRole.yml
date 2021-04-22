@@ -1,0 +1,14 @@
+LambdaEdgeRole:
+  Type: AWS::IAM::Role
+  Condition: Production
+  Properties:
+    RoleName: LambdaEdgeRole
+    AssumeRolePolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service:
+              - edgelambda.amazonaws.com
+              - lambda.amazonaws.com

@@ -1,0 +1,29 @@
+PrivateSubnets:
+  Type: AWS::SSM::Parameter::Value<List<AWS::EC2::Subnet::Id>>
+  Default: /cfn/ec2/subnets/private/all
+LambdaSecurityGroup:
+  Type: AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>
+  Default: /cfn/ec2/securitygroup/lambda
+LambdaRunEnvironment:
+  Type: String
+  Default: dev
+  AllowedValues:
+    - dev
+    - qa
+    - prod
+CertificateManagerCertificate:
+{% if REGION == 'us-east-1' %}
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /cfn/purplepay/ACM/Certificate
+{% else %}
+  Type: String
+  Default: none
+{% endif %}
+CachePolicy:
+{% if REGION == 'us-east-1' %}
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /cfn/CloudFront/CachePolicy
+{% else %}
+  Type: String
+  Default: non
+{% endif %}
