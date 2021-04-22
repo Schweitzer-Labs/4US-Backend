@@ -4,9 +4,7 @@
   "path": "/path/to/resource",
   "httpMethod": "POST",
   "isBase64Encoded": true,
-  "queryStringParameters": {
-    "code": "ac_JLXigtJ05kC92md4xQaTzyyvkRyKfriC"
-  },
+  "queryStringParameters": {},
   "multiValueQueryStringParameters": {
     "foo": [
       "bar"

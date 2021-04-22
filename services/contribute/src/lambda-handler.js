@@ -3,7 +3,7 @@ const { Stripe } = require("stripe");
 const config = require("./config.js");
 const { configKey } = require("./enums");
 
-const stripeUserId = "acct_1IPBGPRDfW8UMKAc";
+const stripeUserId = "acct_1Ij6xZRFpH0mHOCa";
 
 require('dotenv').config()
 

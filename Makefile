@@ -14,6 +14,10 @@ ifeq ($(CONTRIB_DIR),)
        export CONTRIB_DIR	:= services/contribute/
 endif
 
+ifeq ($(ONBOARD_DIR),)
+       export ONBOARD_DIR	:= services/onboard/
+endif
+
 
 export SAMDIR		:= $(PWD)/.aws-sam
 export BUILDDIR		:= $(SAMDIR)/build
