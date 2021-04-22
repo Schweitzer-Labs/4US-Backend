@@ -61,7 +61,7 @@ const contribSchema = Joi.object({
 
 let response;
 
-exports.lambdaHandler = async (event, context) => {
+module.exports = async (event, context) => {
   const res = contribSchema.validate(JSON.parse(event.body));
   if (res.error) {
     return {

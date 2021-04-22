@@ -1,0 +1,6 @@
+Domain:
+  Type: String
+  Default: purplepay.us
+DonorUrl:
+  Type: String
+  Default: donor

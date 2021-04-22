@@ -1,55 +1,63 @@
 
-SHELL                  := bash
-export CREPES          := $(PWD)/bin/crepes.py
+SHELL			:= bash
+export CREPES		:= $(PWD)/cfn/bin/crepes.py
 
 ifeq ($(RUNENV), )
-       export RUNENV	:= prod
+       export RUNENV	:= dev
 endif
 
-ifeq ($(RUNENV), prod)
-       export REGION:= us-east-1
-else ifeq ($(RUNENV), qa)
-       export REGION  := us-west-2
-else ifeq ($(RUNENV), dev)
-       export REGION  := us-west-1
-else ifeq ($(RUNENV), backup)
-       export REGION  := us-east-2
+ifeq ($(REGION), )
+       export REGION	:= us-east-1
 endif
 
-ifeq ($(SRCDIR),)
-       export SRCDIR   := services/contribute/src
+ifeq ($(CONTRIB_DIR),)
+       export CONTRIB_DIR	:= services/contribute/
 endif
 
 
-export SAMDIR          := .aws-sam
-export BUILDDIR        := $(SAMDIR)/build
-export STACK           := purple-4us
+export SAMDIR		:= $(PWD)/.aws-sam
+export BUILDDIR		:= $(SAMDIR)/build
+export STACK		:= purple-4us
 
-export STACKNAME       := $(STACK)-$(RUNENV)
+export STACKNAME	:= $(STACK)-$(RUNENV)
 
-export DATE            := $(shell date)
-export NONCE           := $(shell uuidgen | cut -d\- -f1)
+export DATE		:= $(shell date)
+export NONCE		:= $(shell uuidgen | cut -d\- -f1)
 
-export ENDPOINT        := https://cloudformation-fips.$(REGION).amazonaws.com
-export BUCKET          := 4us-cfn-templates-$(REGION)
+export ENDPOINT		:= https://cloudformation-fips.$(REGION).amazonaws.com
+export BUCKET		:= 4us-cfn-templates-$(REGION)
 
-export STACK_PARAMS    += LambdaRunEnvironment=$(RUNENV)
+export STACK_PARAMS	:= Nonce=$(NONCE)
+STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
 
-export TEMPLATE        := $(BUILDDIR)/template.yaml
+export TEMPLATE		:= template.yml
+export PACKAGE		:= $(SAMDIR)/template.yaml
 
+CFNDIR			:= $(PWD)/cfn/template
+SRCS			:= $(shell find cfn/template/0* -name '*.yml' -o -name '*.txt')
 
-.PHONY: build buildstacks check local package deploy clean realclean
+IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
+
+.PHONY: dep build buildstacks check local import package deploy clean realclean
 
 # Make targets
-
-build: $(SRCDIR)/app.js
+build: $(TEMPLATE) $(CONTRIB_DIR)/app.js
 	@sam build
 
-check: build
-	@echo npm something something
+dep:
+	@pip3 install jinja2 cfn_flip boto3
+
+$(TEMPLATE): $(SRCS)
+	@$(CREPES) --region $(REGION) --output $(TEMPLATE) $(CFNDIR)
+
+
+check: $(TEMPLATE)
+	@echo "Validating template"
+	@aws cloudformation validate-template --template-body file://$^
+
 
 clean:
-	@rm -f $(TEMPLATE)
+	@rm -f $(TEMPLATE) $(PACKAGE)
 
 realclean: clean
 	@rm -rf $(SAMDIR)
@@ -57,7 +65,7 @@ realclean: clean
 local: $(TEMPLATE)
 	@sam local start-api
 
-package: check
+package: build check
 	@aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
 		--template-file $(TEMPLATE) \
@@ -66,10 +74,11 @@ package: check
 		--s3-prefix $(STACKNAME) \
 		--output-template-file $(PACKAGE)
 
-deploy: check
-	sam deploy \
+deploy: package
+	@aws cloudformation deploy \
+		--endpoint-url $(ENDPOINT) \
 		--region $(REGION) \
-		--template-file $(TEMPLATE) \
+		--template-file $(PACKAGE) \
 		--stack-name $(STACKNAME) \
 		--s3-bucket $(BUCKET) \
 		--s3-prefix $(STACKNAME) \
@@ -77,6 +86,8 @@ deploy: check
 		       CAPABILITY_NAMED_IAM \
 		       CAPABILITY_AUTO_EXPAND \
 		--parameter-overrides \
-			$(STACK_PARAMS) \
-		--no-confirm-changeset \
-		--no-fail-on-empty-changeset
+			$(STACK_PARAMS)
+
+	
+import: build
+	@$(MAKE) -C $(CFNDIR) import
