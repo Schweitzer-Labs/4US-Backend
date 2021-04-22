@@ -1,5 +1,4 @@
-{% for site in ('dev', 'qa') %}
-{{ site }}ContributeFunction:
+ContributeFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
     CodeUri: services/contribute/
@@ -11,8 +10,7 @@
         Properties:
           Path: /contribute
           Method: post
-          RestApiId: !Ref {{ site }}DonorGateway
+          RestApiId: !Ref DonorGateway
     Environment:
       Variables:
         runenv: !Ref LambdaRunEnvironment
-{% endfor %}

@@ -1,11 +1,10 @@
-{% for site in ('dev', 'qa') %}
-{{ site }}DonorGateway:
+DonorGateway:
   Type: AWS::Serverless::Api
   Properties:
-    StageName: {{ site }}
+    StageName: !Ref LambdaRunEnvironment
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
-      DomainName: !Sub api-{{ site }}.${Domain}
+      DomainName: !Sub api-${LambdaRunEnvironment}.${Domain}
       EndpointConfiguration: REGIONAL
       Route53:
         EvaluateTargetHealth: true
@@ -44,4 +43,3 @@
             type: string
           amount:
             type: integer
-{% endfor %}
