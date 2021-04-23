@@ -1,5 +1,5 @@
 Production:
-  !Equals [!Ref LambdaRunEnvironment, production]
+  !Equals [!Ref LambdaRunEnvironment, prod]
 QA:
   !Equals [!Ref LambdaRunEnvironment, qa]
 Dev:
