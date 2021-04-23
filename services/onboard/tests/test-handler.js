@@ -10,6 +10,8 @@ describe("Tests contribute lambda", function () {
   it("Fails to process query string containing invalid code", async () => {
     const result = await lambdaHandler(invalidCode, context);
     expect(result.statusCode).to.equal(400);
+    const body = JSON.parse(result.body)
+    expect(body.message).to.equal("Code is not valid");
   });
 
   it("Fails to process payload missing a query string", async () => {

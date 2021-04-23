@@ -3,7 +3,7 @@ const createStripeConnectUser = require("./createStripeConnectUser")
 
 const onboardingSchema = Joi.object({
   code: Joi.string().required(),
-});
+}).required();
 
 module.exports = async (event, context) => {
   const res = onboardingSchema.validate(event.queryStringParameters);
