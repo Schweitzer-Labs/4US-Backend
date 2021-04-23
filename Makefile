@@ -2,8 +2,17 @@
 SHELL			:= bash
 export CREPES		:= $(PWD)/cfn/bin/crepes.py
 
+# Allowed values are: prod, qa, dev
 ifeq ($(RUNENV), )
        export RUNENV	:= dev
+endif
+
+ifeq ($(RUNENV), prod)
+	export SITE	:= policapital
+	export STACK	:= $(SITE)-backend
+else
+	export SITE	:= purple
+	export STACK	:= $(SITE)-4us
 endif
 
 ifeq ($(REGION), )
@@ -21,7 +30,6 @@ endif
 
 export SAMDIR		:= $(PWD)/.aws-sam
 export BUILDDIR		:= $(SAMDIR)/build
-export STACK		:= purple-4us
 
 export STACKNAME	:= $(STACK)-$(RUNENV)
 
@@ -52,7 +60,7 @@ dep:
 	@pip3 install jinja2 cfn_flip boto3
 
 $(TEMPLATE): $(SRCS)
-	@$(CREPES) --region $(REGION) --output $(TEMPLATE) $(CFNDIR)
+	@$(CREPES) --region $(REGION) --runenv $(RUNENV) --output $(TEMPLATE) $(CFNDIR)
 
 
 check: $(TEMPLATE)
