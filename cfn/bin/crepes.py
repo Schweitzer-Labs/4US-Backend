@@ -17,15 +17,13 @@ parser.add_argument('--output', dest='outfile', type=str, help='output CloudForm
 parser.add_argument('--import', dest='imports', type=str, help='import a subset of existing resources into the stack')
 parser.add_argument('--runenv', dest='runenv', type=str, help='lambda run environment (prod/qa/dev)')
 
+#
+# Set Global Variables
+#
 # Parse command line arguments and process the information
 args = parser.parse_args()
 src = os.path.dirname(args.directory)
 stack = os.path.basename(args.directory)
-
-imports = {}
-if args.imports:
-    with open(os.path.join('ImportedResources', args.region) + '.yml') as f:
-        imports = load_yaml(f.read())
 
 regsplit = args.region.split('-')
 regcode = regsplit[0] + regsplit[1][0] + regsplit[2] # us-east-2 ==> use2
@@ -37,10 +35,13 @@ ec2 = boto3.client('ec2')
 zones = ec2.describe_availability_zones()['AvailabilityZones']
 AZs = [z['ZoneName'] for z in zones]
 
+imports = {}
+
 #
 # Helper functions
 #
 # Read raw yaml file and process as a Jinja template
+#
 def process_jinja_template(filename):
     with open(filename) as f:
         contents = f.read()
@@ -107,11 +108,15 @@ def importify(resource, obj):
 
 # Main loop
 def main():
+    global imports
+
+    if args.imports: # process the ImportedResources file
+        imports = load_yaml(process_jinja_template(os.path.join('ImportedResources', args.region) + '.yml'))
 
     # Assemble the stack into a dict and convert that to yaml
     stack = assemble(args.directory)
 
-    if args.imports:
+    if args.imports: # trim the stack based on the ImportedResources
         imports_list = [importify(res, stack['Resources'][res]) for res in stack['Resources']]
 
         print(dump_json(imports_list))
