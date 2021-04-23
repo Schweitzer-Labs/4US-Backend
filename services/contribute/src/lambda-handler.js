@@ -68,10 +68,11 @@ const contribSchema = Joi.object({
 let response;
 
 module.exports = async (event, context) => {
-  console.log("contribute called")
+  console.log("Contribute called")
+  console.log("Function env: ", process.env)
   const res = contribSchema.validate(JSON.parse(event.body));
   if (res.error) {
-    console.log("validation failed")
+    console.log("Validation failed")
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -81,7 +82,7 @@ module.exports = async (event, context) => {
     };
   }
 
-  console.log("validation succeeded")
+  console.log("Validation succeeded")
 
   const {
     amount,
@@ -93,7 +94,7 @@ module.exports = async (event, context) => {
   } = res.value;
 
   try {
-    console.log("payment initiated")
+    console.log("Payment initiated")
     await executePayment(
       stripeUserId,
       amount,
@@ -103,7 +104,7 @@ module.exports = async (event, context) => {
       cardCVC
     );
 
-    console.log("payment succeeded")
+    console.log("Payment succeeded")
 
     response = {
       statusCode: 200,
@@ -113,12 +114,12 @@ module.exports = async (event, context) => {
       headers
     };
   } catch (err) {
-    console.error("payment failed")
+    console.error("Payment failed")
     console.error(err)
     return {
       statusCode: 401,
       body: JSON.stringify({
-        message: "payment failed",
+        message: "Payment failed",
       }),
       headers
     };
