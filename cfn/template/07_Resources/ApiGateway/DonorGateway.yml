@@ -7,11 +7,15 @@ DonorGateway:
       AllowOrigin: "'*'"
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
-      DomainName: !Sub api-${LambdaRunEnvironment}.${Domain}
+      DomainName: !Sub api{% if RUNENV != 'prod' %}-${LambdaRunEnvironment}{% endif %}.${Domain}
       EndpointConfiguration: REGIONAL
       Route53:
         EvaluateTargetHealth: true
         HostedZoneId: !Ref HostedZone
+    MethodSettings:
+      - LoggingLevel: INFO
+        ResourcePath: '/*'
+        HttpMethod: '*'
     Models:
       Contribution:
         type: object
