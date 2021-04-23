@@ -8,6 +8,13 @@ require('dotenv').config()
 
 const runenv = process.env.RUNENV
 
+const headers = {
+  "Access-Control-Allow-Headers" : "Content-Type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+}
+
+
 const executePayment = async (
   stripeAccount,
   amount,
@@ -70,6 +77,7 @@ module.exports = async (event, context) => {
       body: JSON.stringify({
         message: res.error.message,
       }),
+      headers
     };
   }
 
@@ -102,6 +110,7 @@ module.exports = async (event, context) => {
       body: JSON.stringify({
         message: "success",
       }),
+      headers
     };
   } catch (err) {
     console.error("payment failed")
@@ -111,6 +120,7 @@ module.exports = async (event, context) => {
       body: JSON.stringify({
         message: "payment failed",
       }),
+      headers
     };
   }
 
