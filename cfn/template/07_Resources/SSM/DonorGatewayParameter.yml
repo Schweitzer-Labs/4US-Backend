@@ -1,16 +1,8 @@
-ProductionDonorGatewayId:
+DonorGatewayId:
   Type: AWS::SSM::Parameter
   Condition: Production
   Properties:
-    Name: /cfn/apigateway/policapital/donor
-    Type: String
-    Description: ID for Donor API Gateway
-    Value: !Ref DonorGateway
-NonProductionDonorGatewayId:
-  Type: AWS::SSM::Parameter
-  Condition: NonProduction
-  Properties:
-    Name: /cfn/apigateway/purple/donor
+    Name: /cfn/apigateway/{% if RUNENV == 'prod' %}policapital{% else %}purple{% endif %}/donor
     Type: String
     Description: ID for Donor API Gateway
     Value: !Ref DonorGateway
