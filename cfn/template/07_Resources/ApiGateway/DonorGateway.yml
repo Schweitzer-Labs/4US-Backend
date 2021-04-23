@@ -2,6 +2,9 @@ DonorGateway:
   Type: AWS::Serverless::Api
   Properties:
     StageName: !Ref LambdaRunEnvironment
+    Cors:
+      AllowMethods: "'POST, GET'"
+      AllowOrigin: "'*'"
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub api-${LambdaRunEnvironment}.${Domain}
