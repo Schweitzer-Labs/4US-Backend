@@ -14,4 +14,4 @@ ContributeFunction:
           RestApiId: !Ref DonorGateway
     Environment:
       Variables:
-        runenv: !Ref LambdaRunEnvironment
+        RUNENV: !Ref LambdaRunEnvironment
