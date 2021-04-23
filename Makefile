@@ -14,6 +14,10 @@ ifeq ($(CONTRIB_DIR),)
        export CONTRIB_DIR	:= services/contribute/
 endif
 
+ifeq ($(ONBOARD_DIR),)
+       export ONBOARD_DIR	:= services/onboard/
+endif
+
 
 export SAMDIR		:= $(PWD)/.aws-sam
 export BUILDDIR		:= $(SAMDIR)/build
@@ -31,7 +35,7 @@ export STACK_PARAMS	:= Nonce=$(NONCE)
 STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
 
 export TEMPLATE		:= template.yml
-export PACKAGE		:= $(SAMDIR)/template.yaml
+export PACKAGE		:= $(SAMDIR)/CloudFormation-template.yml
 
 CFNDIR			:= $(PWD)/cfn/template
 SRCS			:= $(shell find cfn/template/0* -name '*.yml' -o -name '*.txt')
@@ -41,7 +45,7 @@ IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
 # Make targets
-build: $(TEMPLATE) $(CONTRIB_DIR)/app.js
+build: $(TEMPLATE) $(CONTRIB_DIR)/app.js $(ONBOARD_DIR)/app.js
 	@sam build
 
 dep:
@@ -68,7 +72,7 @@ local: $(TEMPLATE)
 package: build check
 	@aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
-		--template-file $(TEMPLATE) \
+		--template-file $(BUILDDIR)/template.yaml \
 		--region $(REGION) \
 		--s3-bucket $(BUCKET) \
 		--s3-prefix $(STACKNAME) \

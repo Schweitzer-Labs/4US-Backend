@@ -1,7 +1,7 @@
-ContributeFunction:
+OnboardFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
-    CodeUri: services/contribute/
+    CodeUri: services/onboard/
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
     Role: !GetAtt LambdaRole.Arn
@@ -9,8 +9,8 @@ ContributeFunction:
       Contribute:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
-          Path: /contribute
-          Method: post
+          Path: /onboard
+          Method: get
           RestApiId: !Ref DonorGateway
     Environment:
       Variables:

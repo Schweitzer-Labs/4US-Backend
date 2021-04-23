@@ -1,5 +1,0 @@
-FirewallAssociation:
-  Type: AWS::WAFv2::WebACLAssociation
-  Properties:
-    ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${ {{ site }}DonorGateway }/stages/${LambdaRunEnvironment}
-    WebACLArn: !GetAtt RegionalFirewall.Arn

@@ -3,7 +3,6 @@ const { Stripe } = require("stripe");
 const config = require("./config.js");
 const { configKey } = require("./enums");
 
-const stripeUserId = "acct_1IdcwgRFrwYoR1VI";
 
 require('dotenv').config()
 
@@ -56,6 +55,7 @@ const contribSchema = Joi.object({
   cardExpirationYear: Joi.number().required(),
   cardCVC: Joi.string().required(),
   amount: Joi.number().required(),
+  stripeUserId: Joi.string().required(),
 });
 
 let response;
@@ -77,6 +77,7 @@ module.exports = async (event, context) => {
     cardExpirationMonth,
     cardExpirationYear,
     cardCVC,
+    stripeUserId,
   } = res.value;
 
   try {

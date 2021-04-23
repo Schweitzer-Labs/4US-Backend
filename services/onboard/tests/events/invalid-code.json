@@ -1,11 +1,11 @@
 {
-  "body": "{\n    \"cardNumber\": \"4242424242424242\",\n  \"stripeUserId\": \"acct_1IdcwgRFrwYoR1VI\",\n   \"cardExpirationMonth\": 12,\n    \"cardExpirationYear\": 2023,\n    \"cardCVC\": \"123\",\n    \"amount\": 400\n}",
+  "body": "{}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "POST",
   "isBase64Encoded": true,
   "queryStringParameters": {
-    "code": "ac_JLXigtJ05kC92md4xQaTzyyvkRyKfriC"
+    "code": "ac_JLobokAehLDUp5AhY4HOPcqDuZYmG7xJ"
   },
   "multiValueQueryStringParameters": {
     "foo": [
