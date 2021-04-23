@@ -1,0 +1,12 @@
+Domain:
+  Type: String
+  Default: {% if RUNENV == 'prod' %}policapital.net{% else %}purplepay.us{% endif %}
+SubDomain:
+  Type: String
+  Default: donor
+HostedZone:
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /cfn/route53/hostedzone/{% if RUNENV == 'prod' %}policapital{% else %}purplepay{% endif %}
+CertificateManagerCertificate:
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /cfn/ACM/Certificate/{% if RUNENV == 'prod' %}policapital{% else %}purplepay{% endif %}
