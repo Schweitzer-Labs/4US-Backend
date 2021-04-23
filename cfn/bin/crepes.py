@@ -15,6 +15,7 @@ parser.add_argument('directory', metavar='dir', type=str, help='src directory')
 parser.add_argument('--region', dest='region', type=str, default='us-west-1', help='AWS Region')
 parser.add_argument('--output', dest='outfile', type=str, help='output CloudFormation YAML file')
 parser.add_argument('--import', dest='imports', type=str, help='import a subset of existing resources into the stack')
+parser.add_argument('--runenv', dest='runenv', type=str, help='lambda run environment (prod/qa/dev)')
 
 # Parse command line arguments and process the information
 args = parser.parse_args()
@@ -28,6 +29,7 @@ if args.imports:
 
 regsplit = args.region.split('-')
 regcode = regsplit[0] + regsplit[1][0] + regsplit[2] # us-east-2 ==> use2
+runenv = args.runenv or 'dev'
 
 # Find AWS metadata for this stack deployment
 ec2 = boto3.setup_default_session(region_name=args.region)
@@ -44,7 +46,7 @@ def process_jinja_template(filename):
         contents = f.read()
 
     template = Template(contents)
-    return template.render(AZs=AZs, REGION=args.region, REGCODE=regcode)
+    return template.render(AZs=AZs, REGION=args.region, REGCODE=regcode, RUNENV=runenv)
 
 # Assemble all the components of a stack into a single cloudformation::stack object
 def assemble(stack):
