@@ -1,3 +1,1 @@
-4us-serverless
-
-SAM Template for 4us-serverless
+Backend AWS services (Lambda and ApiGateway) for policapital.net
