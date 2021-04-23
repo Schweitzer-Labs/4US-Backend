@@ -135,6 +135,9 @@ $RECYCLE.BIN/
 */.idea
 */.stack-work
 
+# Vim
+.*.swp
+
 =======
 template.yml
 
