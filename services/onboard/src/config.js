@@ -14,6 +14,7 @@ module.exports = {
         const res = await ps
           .getParameter({
             Name: fullKey,
+            WithDecryption: true,
           })
           .promise();
         return res.Parameter.Value;
