@@ -4,10 +4,7 @@ DonorGateway:
     StageName: !Ref LambdaRunEnvironment
     Cors:
       AllowMethods: "'POST, GET'"
-      AllowHeaders: "'X-Forwarded-For'"
-      AllowOrigin: "'www.example.com'"
-      MaxAge: "'600'"
-      AllowCredentials: True
+      AllowOrigin: "'*'"
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub api-${LambdaRunEnvironment}.${Domain}
