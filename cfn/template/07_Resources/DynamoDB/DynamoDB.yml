@@ -1,0 +1,4 @@
+DynamoDBTable:
+  Type: AWS::Serverless::SimpleTable
+  Properties:
+    TableName: !Sub candidate-records-${LambdaRunEnvironment}
