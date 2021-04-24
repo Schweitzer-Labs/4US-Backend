@@ -9,10 +9,8 @@ endif
 
 ifeq ($(RUNENV), prod)
 	export SITE	:= policapital
-	export STACK	:= $(SITE)-backend
 else
-	export SITE	:= purple
-	export STACK	:= $(SITE)-4us
+	export SITE	:= purplepay
 endif
 
 ifeq ($(REGION), )
@@ -27,6 +25,8 @@ ifeq ($(ONBOARD_DIR),)
        export ONBOARD_DIR	:= services/onboard/
 endif
 
+
+export STACK		:= $(SITE)-backend
 
 export SAMDIR		:= $(PWD)/.aws-sam
 export BUILDDIR		:= $(SAMDIR)/build
