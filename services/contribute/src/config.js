@@ -11,7 +11,7 @@ module.exports = {
     switch (name) {
       case configKey.stripeApiKey:
         const fullKey = `/${env}${name}`;
-        console.error('Config look up initiated on key: ', fullKey)
+        console.log('Config look up initiated on key: ', fullKey)
         const res = await ps
           .getParameter({
             Name: fullKey,
