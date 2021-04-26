@@ -1,6 +1,7 @@
 OnboardFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
+    FunctionName: !Sub ${StackName}-OnboardingFunction
     Description: Backend to onboard a committee to the Policapital platform
     CodeUri: services/onboard/
     Handler: app.lambdaHandler
@@ -12,7 +13,7 @@ OnboardFunction:
         Properties:
           Path: /onboard
           Method: get
-          RestApiId: !Ref DonorGateway
+          RestApiId: !Ref DonationGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

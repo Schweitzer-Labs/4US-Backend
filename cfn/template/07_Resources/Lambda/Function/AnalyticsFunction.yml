@@ -1,7 +1,7 @@
 AnalyticsFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
-    Description: Log Analytic data on Donor activity
+    Description: Log Analytic data on Donation activity
     CodeUri: services/analytics/
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
@@ -12,7 +12,7 @@ AnalyticsFunction:
         Properties:
           Path: /analytics
           Method: post
-          RestApiId: !Ref DonorGateway
+          RestApiId: !Ref DonationGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

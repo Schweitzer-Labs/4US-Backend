@@ -1,7 +1,0 @@
-DonorGatewayId:
-  Type: AWS::SSM::Parameter
-  Properties:
-    Name: /cfn/apigateway/{% if RUNENV == 'prod' %}policapital{% else %}purplepay{% endif %}/donor
-    Type: String
-    Description: ID for Donor API Gateway
-    Value: !Ref DonorGateway
