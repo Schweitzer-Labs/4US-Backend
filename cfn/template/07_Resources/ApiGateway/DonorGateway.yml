@@ -5,6 +5,7 @@ DonorGateway:
     Cors:
       AllowMethods: "'POST, GET'"
       AllowOrigin: "'*'"
+      AllowHeaders: "'Content-Type'"
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub api{% if RUNENV != 'prod' %}-${LambdaRunEnvironment}{% endif %}.${Domain}

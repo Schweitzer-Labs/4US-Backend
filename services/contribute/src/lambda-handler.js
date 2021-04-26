@@ -69,10 +69,10 @@ let response;
 
 module.exports = async (event, context) => {
   console.log("Contribute called")
-  console.log("Function env: ", process.env)
-  const res = contribSchema.validate(JSON.parse(event.body));
+  const res = contribSchema.validate(JSON.parse(event.body), {allowUnknown: true});
   if (res.error) {
     console.log("Validation failed")
+    console.log(event.body)
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -105,6 +105,7 @@ module.exports = async (event, context) => {
     );
 
     console.log("Payment succeeded")
+    console.log(event.body)
 
     response = {
       statusCode: 200,
@@ -115,6 +116,7 @@ module.exports = async (event, context) => {
     };
   } catch (err) {
     console.error("Payment failed")
+    console.log(event.body)
     console.error(err)
     return {
       statusCode: 401,
