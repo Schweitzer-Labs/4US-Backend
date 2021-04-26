@@ -1,0 +1,22 @@
+{
+  "name": "analytics",
+  "version": "1.0.0",
+  "description": "Analytics lambda",
+  "main": "app.js",
+  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
+  "author": "SAM CLI",
+  "license": "MIT",
+  "dependencies": {
+    "joi": "^17.4.0",
+    "ua-parser-js": "^0.7.28"
+  },
+  "scripts": {
+    "test": "mocha tests/ --timeout 10000",
+    "integ-test": "mocha tests/integration/"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "prettier": "^2.2.1"
+  }
+}
