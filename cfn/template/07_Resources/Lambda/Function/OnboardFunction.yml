@@ -1,7 +1,7 @@
 OnboardFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
-    FunctionName: !Sub ${StackName}-OnboardingFunction
+    FunctionName: !Sub ${AWS::StackName}-OnboardingFunction
     Description: Backend to onboard a committee to the Policapital platform
     CodeUri: services/onboard/
     Handler: app.lambdaHandler
