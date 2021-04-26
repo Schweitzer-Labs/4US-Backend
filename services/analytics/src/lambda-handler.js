@@ -11,6 +11,7 @@ const analyticsSchema = Joi.object({
   userAgent: Joi.string().required(),
   referrer: Joi.string(),
   event: Joi.string().required(),
+  src: Joi.string().required(),
 }).required();
 
 module.exports = async (event, context) => {
@@ -22,19 +23,21 @@ module.exports = async (event, context) => {
       body: JSON.stringify({
         message: res.error.message,
       }),
-      resHeaders
+      headers: resHeaders
     };
   }
 
   const {
     userAgent,
     referrer,
+    src
   } = res.value
 
   console.log({
     headers: event.headers,
     userAgent: parseUa(userAgent),
     referrer,
+    src,
     event: res.value.event
   })
 
@@ -43,6 +46,6 @@ module.exports = async (event, context) => {
     body: JSON.stringify({
       message: "success",
     }),
-    resHeaders
+    headers: resHeaders
   };
 }

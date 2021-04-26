@@ -7,7 +7,7 @@ OnboardFunction:
     Runtime: nodejs12.x
     Role: !GetAtt LambdaRole.Arn
     Events:
-      Contribute:
+      Onboard:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
           Path: /onboard
