@@ -16,6 +16,9 @@ parser.add_argument('--region', dest='region', type=str, default='us-west-1', he
 parser.add_argument('--output', dest='outfile', type=str, help='output CloudFormation YAML file')
 parser.add_argument('--import', dest='imports', type=str, help='import a subset of existing resources into the stack')
 parser.add_argument('--runenv', dest='runenv', type=str, help='lambda run environment (prod/qa/dev)')
+parser.add_argument('--domain', dest='domain', type=str, help="domain name (e.g. 'example' from 'www.example.com')")
+parser.add_argument('--subdomain', dest='subdomain', type=str, help="subdomain (e.g. 'www' from 'www.example.com')")
+parser.add_argument('--tld', dest='tld', type=str, help="tld (e.g. 'com' from 'www.example.com')")
 
 #
 # Set Global Variables
@@ -28,6 +31,9 @@ stack = os.path.basename(args.directory)
 regsplit = args.region.split('-')
 regcode = regsplit[0] + regsplit[1][0] + regsplit[2] # us-east-2 ==> use2
 runenv = args.runenv or 'dev'
+subdomain = args.subdomain or ''
+domain = args.domain or ''
+tld = args.tld or ''
 
 # Find AWS metadata for this stack deployment
 ec2 = boto3.setup_default_session(region_name=args.region)
@@ -47,7 +53,7 @@ def process_jinja_template(filename):
         contents = f.read()
 
     template = Template(contents)
-    return template.render(AZs=AZs, REGION=args.region, REGCODE=regcode, RUNENV=runenv)
+    return template.render(AZs=AZs, REGION=args.region, REGCODE=regcode, RUNENV=runenv, SUBDOMAIN=subdomain, DOMAIN=domain, TLD=tld)
 
 # Assemble all the components of a stack into a single cloudformation::stack object
 def assemble(stack):
