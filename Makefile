@@ -60,7 +60,7 @@ IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
 # Make targets
-build: $(TEMPLATE) $(CONTRIB_DIR)/app.js $(ONBOARD_DIR)/app.js $(ANALYTICS_DIR)/app.js
+build: clean $(TEMPLATE) $(CONTRIB_DIR)/app.js $(ONBOARD_DIR)/app.js $(ANALYTICS_DIR)/app.js
 	@sam build
 
 dep:
