@@ -1,6 +1,0 @@
-Domain:
-  Type: String
-  Default: {% if RUNENV == 'prod' %}policapital.net{% else %}purplepay.us{% endif %}
-SubDomain:
-  Type: String
-  Default: donor
