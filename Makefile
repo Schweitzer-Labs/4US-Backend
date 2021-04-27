@@ -8,9 +8,11 @@ ifeq ($(RUNENV), )
 endif
 
 ifeq ($(RUNENV), prod)
-	export SITE	:= policapital
+	export DOMAIN	:= policapital
+	export TLD	:= net
 else
-	export SITE	:= purplepay
+	export DOMAIN	:= purplepay
+	export TLD	:= us
 endif
 
 ifeq ($(REGION), )
@@ -29,8 +31,9 @@ ifeq ($(ANALYTICS_DIR),)
        export ANALYTICS_DIR	:= services/analytics/
 endif
 
+export SUBDOMAIN        := donate
 
-export STACK		:= $(SITE)-backend
+export STACK		:= $(DOMAIN)-backend
 
 export SAMDIR		:= $(PWD)/.aws-sam
 export BUILDDIR		:= $(SAMDIR)/build
@@ -64,7 +67,13 @@ dep:
 	@pip3 install jinja2 cfn_flip boto3
 
 $(TEMPLATE): $(SRCS)
-	@$(CREPES) --region $(REGION) --runenv $(RUNENV) --output $(TEMPLATE) $(CFNDIR)
+	@$(CREPES) $(CFNDIR) \
+		--region $(REGION) \
+		--subdomain $(SUBDOMAIN) \
+                --domain $(DOMAIN) \
+                --tld $(TLD) \
+		--runenv $(RUNENV) \
+		--output $(TEMPLATE)
 
 
 check: $(TEMPLATE)
