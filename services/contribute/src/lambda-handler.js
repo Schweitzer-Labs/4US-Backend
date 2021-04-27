@@ -2,6 +2,7 @@ const Joi = require("joi");
 const { Stripe } = require("stripe");
 const config = require("./config.js");
 const { configKey } = require("./enums");
+const stripCardInfo = require("./strip-card-info");
 
 
 require('dotenv').config()
@@ -51,6 +52,7 @@ const executePayment = async (
     },
   });
 
+
   const { id: stripeTxnId } = res;
 
   return stripeTxnId;
@@ -69,10 +71,11 @@ let response;
 
 module.exports = async (event, context) => {
   console.log("Contribute called")
+  const parsedBody = JSON.parse(event.body);
   const res = contribSchema.validate(JSON.parse(event.body), {allowUnknown: true});
   if (res.error) {
     console.log("Validation failed")
-    console.log(event.body)
+    console.log(res.error)
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -81,6 +84,7 @@ module.exports = async (event, context) => {
       headers
     };
   }
+  const strippedPayload = stripCardInfo(parsedBody)
 
   console.log("Validation succeeded")
 
@@ -95,7 +99,7 @@ module.exports = async (event, context) => {
 
   try {
     console.log("Payment initiated")
-    await executePayment(
+    const stripePaymentIntentId = await executePayment(
       stripeUserId,
       amount,
       cardNumber,
@@ -105,7 +109,10 @@ module.exports = async (event, context) => {
     );
 
     console.log("Payment succeeded")
-    console.log(event.body)
+    console.log({
+      ...strippedPayload,
+      stripePaymentIntentId
+    })
 
     response = {
       statusCode: 200,
@@ -116,7 +123,7 @@ module.exports = async (event, context) => {
     };
   } catch (err) {
     console.error("Payment failed")
-    console.log(event.body)
+    console.log(strippedPayload)
     console.error(err)
     return {
       statusCode: 401,
@@ -129,3 +136,5 @@ module.exports = async (event, context) => {
 
   return response;
 };
+
+
