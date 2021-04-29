@@ -1,0 +1,7 @@
+DynamoDBId:
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/${Domain}/dynamodb
+    Type: String
+    Description: SSM Parameter to store the ID for the DynamoDB
+    Value: !Ref DonationGateway
