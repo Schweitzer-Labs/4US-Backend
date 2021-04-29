@@ -1,4 +1,6 @@
-DynamoDBTable:
+CommitteeEventsTable:
   Type: AWS::Serverless::SimpleTable
   Properties:
-    TableName: !Sub candidate-records-${LambdaRunEnvironment}
+    TableName: !Sub committee-events-${LambdaRunEnvironment}-${Domain}
+    SSESpecification:
+      SSEEnabled: true
