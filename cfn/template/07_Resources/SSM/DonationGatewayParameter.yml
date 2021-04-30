@@ -1,7 +1,7 @@
 DonationGatewayId:
   Type: AWS::SSM::Parameter
   Properties:
-    Name: !Sub /cfn/apigateway/${Domain}/${SubDomain}
+    Name: !Sub /dev/${Domain}/apigateway
     Type: String
     Description: SSM Parameter to store the ID for Donation API Gateway
     Value: !Ref DonationGateway
