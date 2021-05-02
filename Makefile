@@ -31,8 +31,8 @@ ifeq ($(ANALYTICS_DIR),)
        export ANALYTICS_DIR	:= services/analytics
 endif
 
-ifeq ($(NOTIFIER_DIR),)
-       export NOTIFIER_DIR	:= services/notifier
+ifeq ($(RECORDER_DIR),)
+       export RECORDER_DIR	:= services/recorder
 endif
 
 
@@ -67,10 +67,10 @@ IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
 ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
 ANALYTICS_APP		:= $(ANALYTICS_DIR)/app.js
-NOTIFIER_APP		:= $(NOTIFIER_DIR)/app.js
+RECORDER_APP		:= $(RECORDER_DIR)/app.js
 
 # Make targets
-build: clean $(TEMPLATE) $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(NOTIFIER_APP)
+build: clean $(TEMPLATE) $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP)
 	@sam build
 
 dep:
