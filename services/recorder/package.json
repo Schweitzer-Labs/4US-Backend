@@ -1,0 +1,16 @@
+{
+  "name": "recorder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Seemant Kulleen <seemant@schweitzerlabs.com>",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.897.0",
+    "dotenv": "^8.2.0",
+    "js-yaml": "^4.1.0"
+  }
+}
