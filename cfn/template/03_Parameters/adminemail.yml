@@ -1,0 +1,3 @@
+AdminEmail:
+  Type: String
+  Default: awsadmin@schweitzerlabs.com
