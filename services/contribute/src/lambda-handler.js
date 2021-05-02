@@ -108,11 +108,10 @@ module.exports = async (event, context) => {
       cardCVC
     );
 
-    console.log("Payment succeeded")
-    console.log({
+    console.log("Payment succeeded", {
       ...strippedPayload,
       stripePaymentIntentId
-    })
+    });
 
     response = {
       statusCode: 200,
