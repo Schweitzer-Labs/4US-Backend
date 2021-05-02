@@ -1,20 +1,7 @@
 ContributionRecords:
-  Type: AWS::DynamoDB::Table
+  Type: AWS::Serverless::SimpleTable
   Properties:
     TableName: !Sub contribution-transactions-${LambdaRunEnvironment}
     SSESpecification:
       SSEEnabled: true
-    ProvisionedThroughput:
-      ReadCapacityUnits: 5
-      WriteCapacityUnits: 5
-    AttributeDefinitions:
-      - AttributeName: email
-        AttributeType: S
-      - AttributeName: committee
-        AttributeType: S
-    KeySchema:
-      - AttributeName: committee
-        KeyType: HASH
-      - AttributeName: email
-        KeyType: RANGE
 
