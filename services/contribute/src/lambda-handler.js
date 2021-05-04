@@ -74,8 +74,7 @@ module.exports = async (event, context) => {
   const parsedBody = JSON.parse(event.body);
   const res = contribSchema.validate(JSON.parse(event.body), {allowUnknown: true});
   if (res.error) {
-    console.log("Validation failed")
-    console.log(res.error)
+    console.log("Validation failed", res.error)
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -108,8 +107,7 @@ module.exports = async (event, context) => {
       cardCVC
     );
 
-    console.log("Payment succeeded")
-    console.log({
+    console.log("Payment succeeded", {
       ...strippedPayload,
       stripePaymentIntentId
     })
@@ -122,8 +120,7 @@ module.exports = async (event, context) => {
       headers
     };
   } catch (err) {
-    console.error("Payment failed")
-    console.log(strippedPayload)
+    console.error("Payment failed", strippedPayload)
     console.error(err)
     return {
       statusCode: 401,
