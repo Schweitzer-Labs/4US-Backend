@@ -20,34 +20,43 @@ const writeDB = async (items) => {
     };
     try {
       let data = await ddb.putItem(params).promise();
-      return ("Success", data)
+      return {'message': "Success"}
     } catch(err) {
-      return("Error", err);
+      return new Error("DynamoDB putItem failed", err)
     };
+}
+
+const extractMessage = (message) => {
+  return message
+        .split('{')[1]
+        .split('}')[0]
+        .split(',')
+        .map(d => d.trim())
+        .join('\n')
+}
+
+const ddbRecord = (message, id) => {
+  let record = { 'id': { 'S': id } };
+
+  for (const attr in message) {
+    const attrType = attr == 'amount' ? 'N' : 'S'
+    record[attr] = {}
+    record[attr][attrType] = message[attr].toString()
+  }
+  return record;
 }
 
 
 module.exports = async (event, context) => {
-  const payload = Buffer.from(event.awslogs.data, 'base64');
-  const logEvents = JSON.parse(zlib.unzipSync(payload).toString()).logEvents;
-  
-  console.log(logEvents);
+  const payload   = Buffer.from(event.awslogs.data, 'base64')
+  const logEvent  = JSON.parse(zlib.unzipSync(payload).toString()).logEvents[0]
 
-  const msg = logEvents[0].message.split('{')[1].split('}')[0].split(',').map(d => d.trim()).join('\n');
+  const message = extractMessage(logEvent.message)
+  const yaml    = YAML.load(message)
+  const row     = ddbRecord(yaml, logEvent.id)
 
-  const message = YAML.load(msg);
-
-  let ddbItems = { 'id': { 'S': logEvents[0].id } };
-  for (const attr in message) {
-    if(attr == 'amount') {
-      ddbItems[attr] = { 'N': message[attr].toString() }
-    } else {
-      ddbItems[attr] = { 'S': message[attr].toString() }
-    }
-  }
-
-  console.log("Writing", ddbItems);
-  let result = await writeDB(ddbItems);
+  console.log("Writing to DDB", row);
+  let result = await writeDB(row);
   console.log("Result", result);
   return;
 };
