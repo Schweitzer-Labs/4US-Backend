@@ -1,7 +1,7 @@
 DonationGatewayId:
   Type: AWS::SSM::Parameter
   Properties:
-    Name: !Sub /${LambdaRunEnvironment}/${Domain}/apigateway
+    Name: !Sub /${LambdaRunEnvironment}/${Domain}/apigateway/${SubDomain}
     Type: String
     Description: SSM Parameter to store the ID for Donation API Gateway
     Value: !Ref DonationGateway
