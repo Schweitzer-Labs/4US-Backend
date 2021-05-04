@@ -59,9 +59,14 @@ IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
+
+compile: $(CONTRIB_DIR)
+		cd $^ && npm run compile
+
 # Make targets
-build: clean $(TEMPLATE) $(CONTRIB_DIR)/app.js $(ONBOARD_DIR)/app.js $(ANALYTICS_DIR)/app.js
+build: clean compile $(TEMPLATE) $(CONTRIB_DIR)/app.js $(ONBOARD_DIR)/app.js $(ANALYTICS_DIR)/app.js
 	@sam build
+
 
 dep:
 	@pip3 install jinja2 cfn_flip boto3
