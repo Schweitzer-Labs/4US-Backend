@@ -1,1 +1,1 @@
-exports.lambdaHandler = require('./src/lambda-handler')
+exports.lambdaHandler = require('./dist/lambda-handler')

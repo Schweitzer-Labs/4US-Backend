@@ -1,8 +1,8 @@
-const Joi = require("joi");
-const { Stripe } = require("stripe");
-const config = require("./config.js");
-const { configKey } = require("./enums");
-const stripCardInfo = require("./strip-card-info");
+import * as Joi from "joi";
+import { Stripe } from "stripe";
+import config from "./config";
+import keys from "./enums";
+import stripCardInfo from "./strip-card-info";
 
 
 require('dotenv').config()
@@ -24,7 +24,7 @@ const executePayment = async (
   cardExpirationYear,
   cardCVC
 ) => {
-  const stripeApiKey = await config.get(runenv, configKey.stripeApiKey);
+  const stripeApiKey = await config.get(runenv, keys.stripeApiKey);
 
   const stripe = new Stripe(stripeApiKey, {
     apiVersion: "2020-08-27",
@@ -69,7 +69,7 @@ const contribSchema = Joi.object({
 
 let response;
 
-module.exports = async (event, context) => {
+export default async (event, context) => {
   console.log("Contribute called")
   const parsedBody = JSON.parse(event.body);
   const res = contribSchema.validate(JSON.parse(event.body), {allowUnknown: true});

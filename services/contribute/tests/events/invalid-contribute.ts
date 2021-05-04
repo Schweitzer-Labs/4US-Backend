@@ -1,4 +1,4 @@
-{
+export default {
   "body": "{\"cardExpirationMonth\": 12,\n    \"cardExpirationYear\": 2023,\n    \"cardCVC\": \"123\",\n    \"amount\": 400\n}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",

@@ -1,4 +1,4 @@
-{
+export default {
   "body": "{\n    \"cardNumber\": \"4242424242424242\",\n  \"stripeUserId\": \"acct_1IdcwgRFrwYoR1VI\",\n   \"cardExpirationMonth\": 12,\n    \"cardExpirationYear\": 2023,\n    \"cardCVC\": \"123\",\n    \"amount\": 400\n}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",

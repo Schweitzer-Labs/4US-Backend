@@ -1,15 +1,16 @@
-const { configKey } = require("./enums");
-const AWS = require("aws-sdk");
+import config from "./enums";
+import * as AWS from "aws-sdk";
+
 AWS.config.update({
   region: "us-east-1",
 });
 
 const ps = new AWS.SSM();
 
-module.exports = {
+export default {
   get: async (env, name) => {
     switch (name) {
-      case configKey.stripeApiKey:
+      case config.stripeApiKey:
         const fullKey = `/${env}${name}`;
         console.log('Config look up initiated on key: ', fullKey)
         const res = await ps

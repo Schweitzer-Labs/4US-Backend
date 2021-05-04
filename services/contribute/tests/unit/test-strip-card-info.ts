@@ -1,8 +1,6 @@
-"use strict";
+import { expect } from "chai";
+import stripCardInfo from "../../src/strip-card-info";
 
-const stripCardInfo = require("../../src/strip-card-info");
-const chai = require("chai");
-const expect = chai.expect;
 
 const validPayload = {
   amount: 400,
@@ -13,14 +11,14 @@ const validPayload = {
   stripeUserId: "acct_1IdcwgRFrwYoR1VI"
 }
 
-const invalidPayload = {
+const invalidPayload: any = {
   amount: 400,
   cardNumber: "4",
 }
 
 describe("Test config loader", function () {
   it("Strips card expiration month, year, and cvv from payload", async () => {
-    const val = await stripCardInfo(validPayload)
+    const val: any = await stripCardInfo(validPayload)
     expect(val.cardExpirationMonth).to.be.undefined
     expect(val.cardExpirationYear).to.be.undefined
     expect(val.cardCVC).to.be.undefined
@@ -32,7 +30,7 @@ describe("Test config loader", function () {
   });
 
   it("Allows invalid object to pass", async () => {
-    const val = await stripCardInfo(invalidPayload)
+    const val: any = await stripCardInfo(invalidPayload)
     expect(val.cardNumberLastFourDigits.length).to.equal(1)
   });
 });

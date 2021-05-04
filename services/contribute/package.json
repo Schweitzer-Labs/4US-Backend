@@ -13,13 +13,17 @@
     "stripe": "^8.144.0"
   },
   "scripts": {
-    "test": "mocha tests/unit/ --timeout 10000",
-    "integ-test": "mocha tests/integration/"
+    "test": "ts-mocha tests/unit/*.ts --timeout 10000",
+    "integ-test": "mocha tests/integration/",
+    "compile": "tsc src/*.ts --outDir dist"
   },
   "devDependencies": {
+    "@types/mocha": "^8.2.2",
     "aws-sdk": "^2.888.0",
     "chai": "^4.2.0",
     "mocha": "^8.2.1",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   }
 }
