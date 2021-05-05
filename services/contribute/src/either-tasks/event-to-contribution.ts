@@ -1,10 +1,11 @@
 import * as Joi from "joi";
-import headers from "./headers";
-import { APIGatewayEvent, APIGatewayProxyEvent } from "aws-lambda";
-import { ApplicationError } from "./application-error";
+import { APIGatewayProxyEvent } from "aws-lambda";
 import { StatusCodes } from "http-status-codes";
 import { TaskEither, left, right } from "fp-ts/TaskEither";
-import { Contribution } from "./execute-payment";
+import { pipe } from "fp-ts/function";
+import { taskEither } from "fp-ts";
+import { Contribution } from "./contribution-to-payment";
+import { ApplicationError } from "../utils/application-error";
 const contribSchema = Joi.object({
   cardNumber: Joi.string().required(),
   cardExpirationMonth: Joi.number().required(),
@@ -43,3 +44,12 @@ export const objectToContribution = (
     return right(res.value);
   }
 };
+
+export const eventToContribution = (
+  event: any
+): TaskEither<ApplicationError, Contribution> =>
+  pipe(
+    taskEither.of<ApplicationError, APIGatewayProxyEvent>(event),
+    taskEither.chain(eventToObject),
+    taskEither.chain(objectToContribution)
+  );

@@ -1,13 +1,9 @@
 import { expect } from "chai";
-
-
-import config from "../../src/config";
-import keys from "../../src/enums";
-
+import { getStripeApiKey } from "../../src/utils/config";
 
 describe("Test config loader", function () {
   it("Loads config from parameter store", async () => {
-    const val = await config.get("dev", keys.stripeApiKey);
+    const val = await getStripeApiKey("dev");
     expect(val).to.be.an("string");
   });
 });

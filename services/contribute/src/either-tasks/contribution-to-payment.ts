@@ -1,14 +1,8 @@
-import config from "./config";
-import keys from "./enums";
 import { Stripe } from "stripe";
-import * as dotenv from "dotenv";
-import { ApplicationError } from "./application-error";
 import { StatusCodes } from "http-status-codes";
-import stripCardInfo from "./strip-card-info";
-
-dotenv.config();
-
-const runenv = process.env.RUNENV;
+import { TaskEither, tryCatch } from "fp-ts/TaskEither";
+import { stripCardInfo } from "../utils/strip-card-info";
+import { ApplicationError } from "../utils/application-error";
 
 export interface Contribution {
   stripeAccount: string;
@@ -19,11 +13,9 @@ export interface Contribution {
   cardCVC: string;
 }
 
-export const processPaymentFromContribution = async (
+export const processPaymentFromContribution = (stripe: Stripe) => async (
   contribution: Contribution
-): Promise<string> => {
-  const stripeApiKey = await config.get(runenv, keys.stripeApiKey);
-
+): Promise<any> => {
   const {
     stripeAccount,
     amount,
@@ -32,10 +24,6 @@ export const processPaymentFromContribution = async (
     cardExpirationYear,
     cardCVC,
   } = contribution;
-
-  const stripe = new Stripe(stripeApiKey, {
-    apiVersion: "2020-08-27",
-  });
 
   try {
     const methodRes = await stripe.paymentMethods.create({
@@ -73,3 +61,11 @@ export const processPaymentFromContribution = async (
     throw new ApplicationError("Payment failed", StatusCodes.UNAUTHORIZED);
   }
 };
+
+export const contributionToPayment = (stripe: Stripe) => (
+  contribution: Contribution
+): TaskEither<ApplicationError, object> =>
+  tryCatch<ApplicationError, any>(
+    () => processPaymentFromContribution(stripe)(contribution),
+    (reason) => new ApplicationError("Payment failed", StatusCodes.UNAUTHORIZED)
+  );
