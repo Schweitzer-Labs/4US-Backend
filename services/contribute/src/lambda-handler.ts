@@ -1,137 +1,52 @@
-import * as Joi from "joi";
-import { Stripe } from "stripe";
-import config from "./config";
-import keys from "./enums";
-import stripCardInfo from "./strip-card-info";
+import headers from "./headers";
+import { APIGatewayProxyEvent } from "aws-lambda";
+import { pipe } from "fp-ts/function";
+import { eventToObject, objectToContribution } from "./validators";
+import {
+  Contribution,
+  processPaymentFromContribution,
+} from "./process-payment-from-contribution";
+import { task, taskEither } from "fp-ts";
+import { ApplicationError } from "./application-error";
+import { TaskEither, tryCatch } from "fp-ts/TaskEither";
+import { StatusCodes } from "http-status-codes";
 
+const eventToContribution = (
+  event: APIGatewayProxyEvent
+): TaskEither<ApplicationError, Contribution> =>
+  pipe(
+    taskEither.of<ApplicationError, APIGatewayProxyEvent>(event),
+    taskEither.chain(eventToObject),
+    taskEither.chain(objectToContribution)
+  );
 
-require('dotenv').config()
+const contributionToPayment = (
+  contribution: Contribution
+): TaskEither<ApplicationError, object> =>
+  tryCatch<ApplicationError, any>(
+    () => processPaymentFromContribution(contribution),
+    (reason) => new ApplicationError("Payment failed", StatusCodes.UNAUTHORIZED)
+  );
 
-const runenv = process.env.RUNENV
-
-const headers = {
-  "Access-Control-Allow-Headers" : "Content-Type",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-}
-
-
-const executePayment = async (
-  stripeAccount,
-  amount,
-  cardNumber,
-  cardExpirationMonth,
-  cardExpirationYear,
-  cardCVC
-) => {
-  const stripeApiKey = await config.get(runenv, keys.stripeApiKey);
-
-  const stripe = new Stripe(stripeApiKey, {
-    apiVersion: "2020-08-27",
-  });
-
-  const methodRes = await stripe.paymentMethods.create({
-    type: "card",
-    card: {
-      number: cardNumber,
-      exp_month: cardExpirationMonth,
-      exp_year: cardExpirationYear,
-      cvc: cardCVC,
-    },
-  });
-
-  const paymentMethodId = methodRes.id;
-
-  const res = await stripe.paymentIntents.create({
-    amount,
-    currency: "usd",
-    payment_method: paymentMethodId,
-    confirm: true,
-    transfer_data: {
-      destination: stripeAccount,
-    },
-  });
-
-
-  const { id: stripeTxnId } = res;
-
-  return stripeTxnId;
+const successResponse = (payload) => {
+  return {
+    statusCode: StatusCodes.OK,
+    body: JSON.stringify({
+      message: "success",
+    }),
+    headers,
+  };
 };
 
-const contribSchema = Joi.object({
-  cardNumber: Joi.string().required(),
-  cardExpirationMonth: Joi.number().required(),
-  cardExpirationYear: Joi.number().required(),
-  cardCVC: Joi.string().required(),
-  amount: Joi.number().required(),
-  stripeUserId: Joi.string().required(),
-});
+const eventToPayment = (event: APIGatewayProxyEvent) =>
+  pipe(
+    taskEither.of<ApplicationError, APIGatewayProxyEvent>(event),
+    taskEither.chain(eventToContribution),
+    taskEither.chain(contributionToPayment),
+    taskEither.fold(
+      (error) => task.of(error.toResponse()),
+      (result) => task.of(successResponse(result))
+    )
+  );
 
-let response;
-
-export default async (event, context) => {
-  console.log("Contribute called")
-  const parsedBody = JSON.parse(event.body);
-  const res = contribSchema.validate(JSON.parse(event.body), {allowUnknown: true});
-  if (res.error) {
-    console.log("Validation failed", res.error)
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: res.error.message,
-      }),
-      headers
-    };
-  }
-  const strippedPayload = stripCardInfo(parsedBody)
-
-  console.log("Validation succeeded")
-
-  const {
-    amount,
-    cardNumber,
-    cardExpirationMonth,
-    cardExpirationYear,
-    cardCVC,
-    stripeUserId,
-  } = res.value;
-
-  try {
-    console.log("Payment initiated")
-    const stripePaymentIntentId = await executePayment(
-      stripeUserId,
-      amount,
-      cardNumber,
-      cardExpirationMonth,
-      cardExpirationYear,
-      cardCVC
-    );
-
-    console.log("Payment succeeded", {
-      ...strippedPayload,
-      stripePaymentIntentId
-    })
-
-    response = {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "success",
-      }),
-      headers
-    };
-  } catch (err) {
-    console.error("Payment failed", strippedPayload)
-    console.error(err)
-    return {
-      statusCode: 401,
-      body: JSON.stringify({
-        message: "Payment failed",
-      }),
-      headers
-    };
-  }
-
-  return response;
-};
-
-
+export default (event: APIGatewayProxyEvent) => eventToPayment(event)();
