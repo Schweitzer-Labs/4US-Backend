@@ -1,6 +1,6 @@
 const payloadVersion = '1.0.0';
-var zlib = require('zlib');
-var YAML = require('js-yaml');
+const zlib = require('zlib');
+const YAML = require('yaml');
 
 require('dotenv').config()
 
@@ -44,10 +44,20 @@ const ddbRecord = (message) => {
   return record;
 }
 
+const decode = (payload) => {
+  return Buffer.from(payload, 'base64')
+}
+
+const decompress = (payload) => {
+  const unzipped = zlib.unzipSync(payload)
+  return unzipped.toString()
+}
+
 
 module.exports = async (event, context) => {
-  const payload   = Buffer.from(event.awslogs.data, 'base64')
-  const logEvent  = JSON.parse(zlib.unzipSync(payload).toString()).logEvents[0]
+  const logStream = JSON.parse(decompress(decode(event.awslogs.data)));
+
+  const logEvent  = logStream.logEvents[0]
 
   const message = extractMessage(logEvent.message)
   const yaml    = YAML.load(message)
