@@ -4,8 +4,6 @@ var YAML = require('js-yaml');
 
 require('dotenv').config()
 
-const runenv = process.env.RUNENV
-
 const AWS = require('aws-sdk');
 AWS.config.update({region: process.env.REGION});
 
@@ -35,8 +33,8 @@ const extractMessage = (message) => {
         .join('\n')
 }
 
-const ddbRecord = (message, id) => {
-  let record = { 'id': { 'S': id } };
+const ddbRecord = (message) => {
+  let record = {}
 
   for (const attr in message) {
     const attrType = attr == 'amount' ? 'N' : 'S'
@@ -53,7 +51,8 @@ module.exports = async (event, context) => {
 
   const message = extractMessage(logEvent.message)
   const yaml    = YAML.load(message)
-  const row     = ddbRecord(yaml, logEvent.id)
+  yaml.id = logEvent.id
+  const row     = ddbRecord(yaml)
 
   console.log("Writing to DDB", row);
   let result = await writeDB(row);
