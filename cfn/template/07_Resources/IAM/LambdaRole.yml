@@ -36,3 +36,16 @@ LambdaRole:
                 - logs:CreateLogGroup
                 - logs:CreateLogStream
                 - logs:PutLogEvents
+            - Sid: DynamoDBWriter
+              Effect: Allow
+              Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ContributionRecords}
+              Action: dynamodb:putItem
+            - Sid: DynamoDBStreamReader
+              Effect: Allow
+              Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ContributionRecords}/stream/*
+              Action:
+                - dynamodb:GetRecords
+                - dynamodb:GetShardIterator
+                - dynamodb:DescribeStream
+                - dynamodb:ListShards
+                - dynamodb:ListStreams

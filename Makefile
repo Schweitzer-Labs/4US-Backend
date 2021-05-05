@@ -20,16 +20,21 @@ ifeq ($(REGION), )
 endif
 
 ifeq ($(CONTRIB_DIR),)
-       export CONTRIB_DIR	:= services/contribute/
+       export CONTRIB_DIR	:= services/contribute
 endif
 
 ifeq ($(ONBOARD_DIR),)
-       export ONBOARD_DIR	:= services/onboard/
+       export ONBOARD_DIR	:= services/onboard
 endif
 
 ifeq ($(ANALYTICS_DIR),)
-       export ANALYTICS_DIR	:= services/analytics/
+       export ANALYTICS_DIR	:= services/analytics
 endif
+
+ifeq ($(RECORDER_DIR),)
+       export RECORDER_DIR	:= services/recorder
+endif
+
 
 export SUBDOMAIN        := donate
 
@@ -59,12 +64,16 @@ IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
-
 compile: $(CONTRIB_DIR)
 		cd $^ && npm run compile
 
+CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
+ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
+ANALYTICS_APP		:= $(ANALYTICS_DIR)/app.js
+RECORDER_APP		:= $(RECORDER_DIR)/app.js
+
 # Make targets
-build: clean compile $(TEMPLATE) $(CONTRIB_DIR)/app.js $(ONBOARD_DIR)/app.js $(ANALYTICS_DIR)/app.js
+build: clean compile $(TEMPLATE) $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP)
 	@sam build
 
 
