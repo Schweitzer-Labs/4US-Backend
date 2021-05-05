@@ -1,0 +1,18 @@
+ContributionRecords:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: !Sub contribution-transactions-${LambdaRunEnvironment}
+    SSESpecification:
+      SSEEnabled: true
+    ProvisionedThroughput:
+      WriteCapacityUnits: 5
+      ReadCapacityUnits: 5
+    AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+    KeySchema:
+      - KeyType: HASH
+        AttributeName: id
+    StreamSpecification:
+      StreamViewType: NEW_IMAGE
+

@@ -110,7 +110,7 @@ module.exports = async (event, context) => {
     console.log("Payment succeeded", {
       ...strippedPayload,
       stripePaymentIntentId
-    })
+    });
 
     response = {
       statusCode: 200,

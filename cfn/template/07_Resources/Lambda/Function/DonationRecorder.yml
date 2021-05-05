@@ -1,0 +1,20 @@
+DonationRecorder:
+  Type: AWS::Serverless::Function
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-DonationRecorder
+    Description: Save transaction into DynamoDB whenever CloudWatch events are triggered for contribution transations
+    CodeUri: services/recorder
+    Handler: app.lambdaHandler
+    Runtime: nodejs12.x
+    Role: !GetAtt LambdaRole.Arn
+    Events:
+      ContribTxn:
+        Type: CloudWatchLogs
+        Properties:
+          LogGroupName: !Sub /aws/lambda/${ContributeFunction}
+          FilterPattern:
+            "INFO Payment succeeded"
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        DDBTABLE: !Ref ContributionRecords
