@@ -1,11 +1,24 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: process.env.REGION });
-
+const ses = new AWS.SES({ region: process.env.REGION });
 
 module.exports = async (event, context) => {
-  console.log(event);
+  let ddbrecord = event.Records[0].dynamodb;
+  console.log("ddbrecord", ddbrecord);
 
-  ddbrecord = event.Records[0].dynamodb
+  let params = {
+    Destination: {
+      ToAddresses: ['seemant@schweitzerlabs.com'],
+    },
+    Message: {
+      Body: {
+        Text: { Data: "Ping" },
+      },
 
-  console.log("ddbrecord", ddbrecord)
+      Subject: { Data: "New Contribution received" },
+    },
+    Source: "notification@policapital.net",
+  };
+ 
+  return ses.sendEmail(params).promise()
 };
