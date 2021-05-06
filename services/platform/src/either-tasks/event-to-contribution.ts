@@ -6,6 +6,7 @@ import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { Contribution } from "./contribution-to-payment";
 import { ApplicationError } from "../utils/application-error";
+
 const contribSchema = Joi.object({
   cardNumber: Joi.string().required(),
   cardExpirationMonth: Joi.number().required(),
@@ -16,7 +17,7 @@ const contribSchema = Joi.object({
 });
 
 export const eventToObject = (
-  event: APIGatewayProxyEvent
+  event: any
 ): TaskEither<ApplicationError, object> => {
   try {
     return right(JSON.parse(event.body));

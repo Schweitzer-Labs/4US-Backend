@@ -17,10 +17,11 @@
   "scripts": {
     "test": "ts-mocha tests/unit/*.ts --timeout 10000",
     "integ-test": "mocha tests/integration/",
-    "compile": "tsc src/*.ts --outDir dist"
+    "compile": "npm install && tsc src/*.ts --outDir dist"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.76",
+    "@types/chai": "^4.2.17",
     "@types/mocha": "^8.2.2",
     "@types/stripe": "^8.0.417",
     "aws-sdk": "^2.888.0",

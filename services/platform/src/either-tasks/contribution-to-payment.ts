@@ -67,5 +67,5 @@ export const contributionToPayment = (stripe: Stripe) => (
 ): TaskEither<ApplicationError, object> =>
   tryCatch<ApplicationError, any>(
     () => processPaymentFromContribution(stripe)(contribution),
-    (reason) => new ApplicationError("Payment failed", StatusCodes.UNAUTHORIZED)
+    (error) => new ApplicationError("Payment failed", StatusCodes.UNAUTHORIZED)
   );

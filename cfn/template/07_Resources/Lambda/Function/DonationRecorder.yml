@@ -3,7 +3,7 @@ DonationRecorder:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-DonationRecorder
     Description: Save transaction into DynamoDB whenever CloudWatch events are triggered for contribution transations
-    CodeUri: services/recorder
+    CodeUri: services/policapital/recorder
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
     Role: !GetAtt LambdaRole.Arn

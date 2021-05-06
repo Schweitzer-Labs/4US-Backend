@@ -6,7 +6,7 @@ import { eventToPayment } from "./either-tasks/event-to-payment";
 
 dotenv.config();
 
-const runenv = process.env.RUNENV;
+const runenv: any = process.env.RUNENV;
 let stripe: Stripe;
 let stripeApiKey: string;
 

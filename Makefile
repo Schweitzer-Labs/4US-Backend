@@ -20,19 +20,23 @@ ifeq ($(REGION), )
 endif
 
 ifeq ($(CONTRIB_DIR),)
-       export CONTRIB_DIR	:= services/contribute
+       export CONTRIB_DIR	:= services/policapital/contribute
 endif
 
 ifeq ($(ONBOARD_DIR),)
-       export ONBOARD_DIR	:= services/onboard
+       export ONBOARD_DIR	:= services/policapital/onboard
 endif
 
 ifeq ($(ANALYTICS_DIR),)
-       export ANALYTICS_DIR	:= services/analytics
+       export ANALYTICS_DIR	:= services/policapital/analytics
 endif
 
 ifeq ($(RECORDER_DIR),)
-       export RECORDER_DIR	:= services/recorder
+       export RECORDER_DIR	:= services/policapital/recorder
+endif
+
+ifeq ($(PLATFORM_DIR),)
+       export PLATFORM_DIR	:= services/platform
 endif
 
 
@@ -65,7 +69,7 @@ IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
 compile: $(CONTRIB_DIR)
-		cd $^ && npm run compile
+		cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
 
 CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
 ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
