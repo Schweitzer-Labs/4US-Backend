@@ -57,7 +57,7 @@ module.exports = async (event, context) => {
   const logEvent = logStream.logEvents[0];
 
   const message = extractMessage(logEvent.message);
-  const yaml = YAML.load(message);
+  const yaml = YAML.parse(message);
   yaml.id = logEvent.id;
   const row = ddbRecord(yaml);
 
