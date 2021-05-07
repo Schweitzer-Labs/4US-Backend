@@ -35,6 +35,9 @@ ifeq ($(RECORDER_DIR),)
        export RECORDER_DIR	:= services/recorder
 endif
 
+ifeq ($(EMAILER_DIR),)
+       export EMAILER_DIR	:= services/emailer
+endif
 
 export SUBDOMAIN        := donate
 
@@ -62,15 +65,18 @@ SRCS			:= $(shell find cfn/template/0* -name '*.yml' -o -name '*.txt')
 
 IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 
-.PHONY: dep build buildstacks check local import package deploy clean realclean
-
 CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
 ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
 ANALYTICS_APP		:= $(ANALYTICS_DIR)/app.js
 RECORDER_APP		:= $(RECORDER_DIR)/app.js
+EMAILER_APP		:= $(EMAILER_DIR)/app.js
+
+JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
+
+.PHONY: dep build buildstacks check local import package deploy clean realclean
 
 # Make targets
-build: clean $(TEMPLATE) $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP)
+build: clean $(TEMPLATE) $(JS_APPS)
 	@sam build
 
 dep:

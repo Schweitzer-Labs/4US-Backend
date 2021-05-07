@@ -1,0 +1,20 @@
+DonationEmailerFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-DonationEmailer
+    Description: Receive DynamoDB events and sends an email containing the transaction details
+    CodeUri: services/emailer
+    Handler: app.lambdaHandler
+    Runtime: nodejs12.x
+    Role: !GetAtt LambdaSESRole.Arn
+    Events:
+      ContributionMade:
+        Type: DynamoDB
+        Properties:
+          BatchSize: 1
+          StartingPosition: LATEST
+          Stream: !GetAtt ContributionRecords.StreamArn
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        DDBTABLE: !Ref ContributionRecords
