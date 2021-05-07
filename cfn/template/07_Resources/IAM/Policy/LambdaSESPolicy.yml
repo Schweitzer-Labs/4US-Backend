@@ -1,0 +1,16 @@
+LambdaSESPolicy:
+  Type: AWS::IAM::Policy
+  Properties:
+    Roles:
+      - !Ref LambdaSESRole
+    PolicyName: SendSESEmails
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Sid: SendSESNotifications
+          Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+            - ses:SendTemplatedEmail
+          Resource: '*'
