@@ -1,7 +1,8 @@
 import headers from "./headers";
+import {HttpStatus} from "aws-sdk/clients/lambda";
 
 export class ApplicationError {
-  constructor(public readonly message, public readonly statusCode) {}
+  constructor(public readonly message: string, public readonly statusCode: HttpStatus) {}
   toResponse() {
     return {
       statusCode: this.statusCode,

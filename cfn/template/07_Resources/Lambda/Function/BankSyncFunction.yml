@@ -4,7 +4,7 @@ BankSyncFunction:
     FunctionName: !Sub ${AWS::StackName}-BankSyncFunction
     Description: Synchronizes platform bank accounts with external data
     CodeUri: services/platform/
-    Handler: app.bankSync
+    Handler: bankSync.handler
     Runtime: nodejs12.x
     Role: !GetAtt LambdaRole.Arn
     Events:

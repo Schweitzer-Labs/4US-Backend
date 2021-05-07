@@ -8,11 +8,11 @@ import { task, taskEither } from "fp-ts";
 
 describe("Tests event to contribution monad", function () {
   it("Stops a contribution call with an invalid payload", async () => {
-    const res: boolean = await pipe(
+    const res: any = await pipe(
       eventToContribution(invalidContributeEvent),
       taskEither.fold(
         (err) => task.of(err.statusCode),
-        (succ) => task.of(true)
+        (succ) => task.of("success")
       )
     )();
     expect(res).to.equal(400);
@@ -28,26 +28,3 @@ describe("Tests event to contribution monad", function () {
     expect(res).to.equal("123");
   });
 });
-
-// describe("Tests ", function () {
-//   it("Stops a contribution call with an invalid payload", async () => {
-//     const res: boolean = await pipe(
-//       eventToContribution(invalidContributeEvent),
-//       taskEither.fold(
-//         (err) => task.of(err.statusCode),
-//         (succ) => task.of(true)
-//       )
-//     )();
-//     expect(res).to.equal(400);
-//   });
-//   it("Allows a contribution call with an valid payload", async () => {
-//     const res = await pipe(
-//       eventToContribution(validContributeEvent),
-//       taskEither.fold(
-//         (err) => task.of(err.message),
-//         (succ) => task.of(succ.cardCVC)
-//       )
-//     )();
-//     expect(res).to.equal("123");
-//   });
-// });

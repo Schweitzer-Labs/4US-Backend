@@ -1,10 +1,13 @@
 import headers from "./headers";
 
 export class ApplicationError {
-  constructor(public readonly message, public readonly statusCode) {}
+  constructor(
+    public readonly message: string,
+    public readonly statusCode?: string
+  ) {}
   toResponse() {
     return {
-      statusCode: this.statusCode,
+      statusCode: this.statusCode || 500,
       body: JSON.stringify({
         message: this.message,
       }),
