@@ -6,7 +6,7 @@ DonationRecorder:
     CodeUri: services/recorder
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
-    Role: !GetAtt LambdaRole.Arn
+    Role: !GetAtt LambdaDynamoDBRole.Arn
     Events:
       ContribTxn:
         Type: CloudWatchLogs
