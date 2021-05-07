@@ -4,32 +4,32 @@ const ses = new AWS.SES({ region: process.env.REGION });
 
 module.exports = async (event, context) => {
   const ddbrecord = event.Records[0].dynamodb;
-  const timestamp = ddbrecord.ApproximateCreationDateTime
-  const newrecord = ddbrecord.NewImage;
-  const firstName = newrecord.firstName.S
-      , lastName = newrecord.lastName.S
-      , amount = newrecord.amount.N
+  const timestamp = ddbrecord.ApproximateCreationDateTime * 1000 // convert to milliseconds
+      , newrecord = ddbrecord.NewImage
+      , donorName = [newrecord.firstName.S, newrecord.lastName.S].join(' ')
+  ;
+  const fromAddress = 'notification@policapital.net';
 
   console.log("ddb record", ddbrecord);
   console.log("new record", newrecord);
-  console.log("name", firstName, lastName);
 
-  let templateData = {};
-  templateData.committee = newrecord.committee.S;
-  templateData.timestamp = timestamp;
-  templateData.donor = [firstName, lastName].join(' ')
-  templateData.email = newrecord.email.S;
-  templateData.address1 = newrecord.addressLine1.S;
-  templateData.address2 = newrecord.addressLine2.S;
-  templateData.city = newrecord.city.S;
-  templateData.state = newrecord.state.S.toUpperCase();
-  templateData.pin = newrecord.postalCode.S;
-  templateData.amount = amount;
-
+  let templateData = {
+    committee: newrecord.committee.S,
+    timestamp: new Date(timestamp).toLocaleString('en-US'),
+    donor    : donorName,
+    email    : newrecord.email.S,
+    address1 : newrecord.addressLine1.S,
+    address2 : newrecord.addressLine2.S,
+    city     : newrecord.city.S,
+    state    : newrecord.state.S.toUpperCase(),
+    zip      : newrecord.postalCode.S,
+    amount   : newrecord.amount.N / 100,
+    stripe   : newrecord.stripePaymentIntentId.S
+  };
 
   let params = {
-      Source: "notification@policapital.net",
-      Template: 'ContributionNotification',
+      Source: fromAddress,
+      Template: 'ContributionBackendNotification',
       Destination: {
         ToAddresses: ['seemant@schweitzerlabs.com'],
       },
