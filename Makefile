@@ -39,6 +39,9 @@ ifeq ($(PLATFORM_DIR),)
        export PLATFORM_DIR	:= services/platform
 endif
 
+ifeq ($(EMAILER_DIR),)
+       export EMAILER_DIR	:= services/emailer
+endif
 
 export SUBDOMAIN        := donate
 
@@ -66,18 +69,22 @@ SRCS			:= $(shell find cfn/template/0* -name '*.yml' -o -name '*.txt')
 
 IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 
+CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
+ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
+ANALYTICS_APP		:= $(ANALYTICS_DIR)/app.js
+RECORDER_APP		:= $(RECORDER_DIR)/app.js
+EMAILER_APP		:= $(EMAILER_DIR)/app.js
+
+JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
+
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
 compile: $(CONTRIB_DIR)
 		cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
 
-CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
-ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
-ANALYTICS_APP		:= $(ANALYTICS_DIR)/app.js
-RECORDER_APP		:= $(RECORDER_DIR)/app.js
 
 # Make targets
-build: clean compile $(TEMPLATE) $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP)
+build: clean $(TEMPLATE) $(JS_APPS)
 	@sam build
 
 

@@ -1,4 +1,4 @@
-DonationRecorder:
+DonationRecorderFunction:
   Type: AWS::Serverless::Function
   Properties:
     FunctionName: !Sub ${AWS::StackName}-DonationRecorder
@@ -6,7 +6,7 @@ DonationRecorder:
     CodeUri: services/policapital/recorder
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
-    Role: !GetAtt LambdaRole.Arn
+    Role: !GetAtt LambdaDynamoDBRole.Arn
     Events:
       ContribTxn:
         Type: CloudWatchLogs
