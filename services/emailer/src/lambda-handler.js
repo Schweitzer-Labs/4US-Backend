@@ -3,22 +3,39 @@ AWS.config.update({ region: process.env.REGION });
 const ses = new AWS.SES({ region: process.env.REGION });
 
 module.exports = async (event, context) => {
-  let ddbrecord = event.Records[0].dynamodb;
-  console.log("ddbrecord", ddbrecord);
+  const ddbrecord = event.Records[0].dynamodb;
+  const timestamp = ddbrecord.ApproximateCreationDateTime
+  const newrecord = ddbrecord.NewImage;
+  const firstName = newrecord.firstName.S
+      , lastName = newrecord.lastName.S
+      , amount = newrecord.amount.N
+
+  console.log("ddb record", ddbrecord);
+  console.log("new record", newrecord);
+  console.log("name", firstName, lastName);
+
+  let templateData = {};
+  templateData.committee = newrecord.committee.S;
+  templateData.timestamp = timestamp;
+  templateData.donor = [firstName, lastName].join(' ')
+  templateData.email = newrecord.email.S;
+  templateData.address1 = newrecord.addressLine1.S;
+  templateData.address2 = newrecord.addressLine2.S;
+  templateData.city = newrecord.city.S;
+  templateData.state = newrecord.state.S.toUpperCase();
+  templateData.pin = newrecord.postalCode.S;
+  templateData.amount = amount;
+
 
   let params = {
-    Destination: {
-      ToAddresses: ['seemant@schweitzerlabs.com'],
-    },
-    Message: {
-      Body: {
-        Text: { Data: "Ping" },
+      Source: "notification@policapital.net",
+      Template: 'ContributionNotification',
+      Destination: {
+        ToAddresses: ['seemant@schweitzerlabs.com'],
       },
+      TemplateData: JSON.stringify(templateData)
+    };
 
-      Subject: { Data: "New Contribution received" },
-    },
-    Source: "notification@policapital.net",
-  };
- 
-  return ses.sendEmail(params).promise()
+  console.log("sending email");
+  return ses.sendTemplatedEmail(params).promise()
 };
