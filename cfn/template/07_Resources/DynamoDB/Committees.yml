@@ -1,0 +1,17 @@
+Committees:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: !Sub committees-${LambdaRunEnvironment}
+    SSESpecification:
+      SSEEnabled: true
+    ProvisionedThroughput:
+      WriteCapacityUnits: 1
+      ReadCapacityUnits: 1
+    AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+    KeySchema:
+      - KeyType: HASH
+        AttributeName: id
+    StreamSpecification:
+      StreamViewType: NEW_IMAGE
