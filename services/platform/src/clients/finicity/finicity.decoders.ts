@@ -1,6 +1,14 @@
 import * as t from "io-ts";
 import * as D from "io-ts/Decoder";
 
+export const FinicityConfig = D.struct({
+  partnerId: D.string,
+  partnerSecret: D.string,
+  appKey: D.string,
+});
+
+export type FinicityConfig = D.TypeOf<typeof FinicityConfig>;
+
 const FinicityTransactionRequired = t.type({
   id: t.number,
   amount: t.number,

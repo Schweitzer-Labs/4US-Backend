@@ -1,10 +1,16 @@
 import headers from "./headers";
+import { HttpStatus } from "aws-sdk/clients/lambda";
+import { StatusCodes } from "http-status-codes";
 
-export class ApplicationError {
+export class ApplicationError extends Error {
   constructor(
     public readonly message: string,
-    public readonly statusCode?: string
-  ) {}
+    public readonly data: any,
+    public readonly statusCode?: StatusCodes
+  ) {
+    super();
+    console.error(message, data);
+  }
   toResponse() {
     return {
       statusCode: this.statusCode || 500,
