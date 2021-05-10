@@ -18,3 +18,4 @@ DonationEmailerFunction:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
         DDBTABLE: !Ref ContributionRecords
+        POS_TEMPLATE: !Ref PosTemplate
