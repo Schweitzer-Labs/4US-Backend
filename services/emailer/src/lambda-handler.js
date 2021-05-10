@@ -14,26 +14,26 @@ module.exports = async (event, context) => {
   console.log("new record", newrecord);
 
   let templateData = {
-    committee: newrecord.committee.S,
-    timestamp: new Date(timestamp).toLocaleString('en-US'),
-    donor    : donorName,
-    email    : newrecord.email.S,
-    address1 : newrecord.addressLine1.S,
-    address2 : newrecord.addressLine2.S,
-    city     : newrecord.city.S,
-    state    : newrecord.state.S.toUpperCase(),
-    zip      : newrecord.postalCode.S,
-    amount   : newrecord.amount.N / 100,
-    stripe   : newrecord.stripePaymentIntentId.S
+    committee: newrecord.committee.S
+    , timestamp: new Date(timestamp).toLocaleString('en-US')
+    , donor    : donorName
+    , email    : newrecord.email.S
+    , address1 : newrecord.addressLine1.S
+    , address2 : newrecord.addressLine2.S
+    , city     : newrecord.city.S
+    , state    : newrecord.state.S.toUpperCase()
+    , zip      : newrecord.postalCode.S
+    , amount   : newrecord.amount.N / 100
+    , stripe   : newrecord.stripePaymentIntentId
   };
 
   let params = {
-      Source: fromAddress,
-      Template: 'ContributionBackendNotification',
-      Destination: {
-        ToAddresses: ['seemant@schweitzerlabs.com'],
-      },
-      TemplateData: JSON.stringify(templateData)
+      Source: fromAddress
+      , Template: process.env.POS_TEMPLATE
+      , Destination: {
+          ToAddresses: ['seemant@schweitzerlabs.com'],
+        },
+        TemplateData: JSON.stringify(templateData)
     };
 
   console.log("sending email");
