@@ -1,0 +1,3 @@
+PosTemplate:
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /{{ RUNENV }}/{{ DOMAIN }}/{{ SUBDOMAIN }}/ses/donation_backend
