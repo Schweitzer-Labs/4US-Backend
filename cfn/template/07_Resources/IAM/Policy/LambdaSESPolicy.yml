@@ -14,3 +14,15 @@ LambdaSESPolicy:
             - ses:SendRawEmail
             - ses:SendTemplatedEmail
           Resource: '*'
+        - Sid: SendSNSNotifications
+          Effect: Allow
+          Action:
+            - sns:Publish
+          Resource: '*'
+        - Sid: EncryptSNSMessage
+          Effect: Allow
+          Action:
+            - kms:Decrypt
+            - kms:Encrypt
+            - kms:GenerateDataKey
+          Resource: '*'
