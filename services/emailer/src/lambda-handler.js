@@ -1,41 +1,69 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: process.env.REGION });
-const ses = new AWS.SES({ region: process.env.REGION });
+const sns = new AWS.SNS({ apiVersion: '2010-03-31'})
+    , ses = new AWS.SES({ region: process.env.REGION })
+;
+const from_address = 'notification@policapital.net';
 
-module.exports = async (event, context) => {
-  const ddbrecord = event.Records[0].dynamodb;
-  const timestamp = ddbrecord.ApproximateCreationDateTime * 1000 // convert to milliseconds
-      , newrecord = ddbrecord.NewImage
-      , donorName = [newrecord.firstName.S, newrecord.lastName.S].join(' ')
+/*
+ * Helper Functions
+ */
+const informAdmins = (message) => {
+  const params = {
+        Message: message
+      , TopicArn: process.env.SNS_Topic
+    }
   ;
-  const fromAddress = 'notification@policapital.net';
+  const resp = await sns.publish(params).promise();
+  console.log("send SNS", resp);
+} // informAdmins()
 
-  console.log("ddb record", ddbrecord);
-  console.log("new record", newrecord);
 
-  let templateData = {
-    committee: newrecord.committee.S
-    , timestamp: new Date(timestamp).toLocaleString('en-US')
-    , donor    : donorName
-    , email    : newrecord.email.S
-    , address1 : newrecord.addressLine1.S
-    , address2 : newrecord.addressLine2.S
-    , city     : newrecord.city.S
-    , state    : newrecord.state.S.toUpperCase()
-    , zip      : newrecord.postalCode.S
-    , amount   : newrecord.amount.N / 100
-    , stripe   : newrecord.stripePaymentIntentId
-  };
+const emailDonor = (address, message) => {
+  const params = {
+        Source      : from_address
+      , Template    : process.env.POS_TEMPLATE
+      , Destination : {
+          ToAddresses: [address]
+        }
+      , TemplateData: message
+      , ConfigurationSetName: 'SNSDebugging'
+    }
+  ;
+  const resp = await ses.sendTemplatedEmail(params).promise();
+  console.log("sent SES", resp);
+} // emailDonor()
 
-  let params = {
-      Source: fromAddress
-      , Template: process.env.POS_TEMPLATE
-      , Destination: {
-          ToAddresses: ['seemant@schweitzerlabs.com'],
-        },
-        TemplateData: JSON.stringify(templateData)
-    };
 
-  console.log("sending email");
-  return ses.sendTemplatedEmail(params).promise()
+/*
+ * Main Function
+ */
+module.exports = async (event, context) => {
+  const ddb_record = event.Records[0].dynamodb.NewImage
+      , time_stamp = ddb_record.ApproximateCreationDateTime * 1000 //convert to milliseconds
+  ;
+  console.log("new record", ddb_record);
+
+  const data = {
+        committee  : ddb_record.committee.S
+      , time_stamp : new Date(time_stamp).toLocaleString('en-US')
+      , donor      : [ddb_record.firstName.S, ddb_record.lastName.S].join(' ')
+      , email      : ddb_record.email.S
+      , occupation : ddb_record.occupation.S
+      , employer   : ddb_record.employer.S
+      , address1   : ddb_record.addressLine1.S
+      , address2   : ddb_record.addressLine2.S
+      , city       : ddb_record.city.S
+      , state      : ddb_record.state.S.toUpperCase()
+      , zip        : ddb_record.postalCode.S
+      , phone      : ddb_record.phoneNumber.S
+      , amount     : (ddb_record.amount.N / 100).toFixed(2)
+      , transaction: ddb_record.stripePaymentIntentId.S
+      , refcode    : ddb_record.refCode.S || 'N/A'
+      , card       : ddb_record.cardNumberLastFourDigits.S
+    }
+  ;
+  const message = JSON.stringify(data);
+  informAdmins(message);
+  emailDonor(data.email, message);
 };
