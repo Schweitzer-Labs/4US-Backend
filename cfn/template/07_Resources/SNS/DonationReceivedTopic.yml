@@ -1,0 +1,34 @@
+DonationReceivedTopic:
+  Type: AWS::SNS::Topic
+  Properties:
+    DisplayName: New Contribution Received
+    TopicName: Contribution-Received
+    KmsMasterKeyId: !Ref SNSKey
+    Subscription:
+      - Endpoint: !Ref AdminEmail
+        Protocol: email
+
+DonationReceivedTopicPolicy:
+  Type: AWS::SNS::TopicPolicy
+  Properties:
+    Topics: 
+      - !Ref DonationReceivedTopic
+    PolicyDocument:
+      Version: '2008-10-17'
+      Statement:
+        - Effect: Allow
+          Principal: '*'
+          Action:
+            - SNS:GetTopicAttributes
+            - SNS:SetTopicAttributes
+            - SNS:AddPermission
+            - SNS:RemovePermission
+            - SNS:DeleteTopic
+            - SNS:Subscribe
+            - SNS:ListSubscriptionsByTopic
+            - SNS:Publish
+            - SNS:Receive
+          Resource: !Ref DonationReceivedTopic
+          Condition:
+            StringEquals:
+              AWS:SourceOwner: !Sub ${AWS::AccountId}
