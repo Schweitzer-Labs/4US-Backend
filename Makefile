@@ -77,7 +77,7 @@ JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAI
 
 # Make targets
 build: clean $(TEMPLATE) $(JS_APPS)
-	@sam build
+	@sam build --cached
 
 dep:
 	@pip3 install jinja2 cfn_flip boto3
