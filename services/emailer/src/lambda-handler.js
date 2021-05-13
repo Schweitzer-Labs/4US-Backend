@@ -39,14 +39,17 @@ const emailDonor = async (address, message) => {
  * Main Function
  */
 module.exports = async (event, context) => {
-    const ddb_record = event.Records[0].dynamodb.NewImage
-        , time_stamp = ddb_record.ApproximateCreationDateTime * 1000 //milliseconds
+    const ddb_stream = event.Records[0].dynamodb
+	, ddb_record = ddb_stream.NewImage
+        , time_stamp = ddb_stream.ApproximateCreationDateTime * 1000 //milliseconds
     ;
-    // console.log("new record", ddb_record);
+	  const date = new Date(time_stamp);
+    console.log(date);
+
     const data = {
           committee  : ddb_record.committee.S
-        , date       : new Date(time_stamp).toLocaleString('en-US')
-        , time       : new Date(time_stamp).toLocaleString('en-US')
+        , date       : date.toLocaleString('en-US')
+        , time       : date.toLocaleString('en-US')
         , donor      : [ddb_record.firstName.S, ddb_record.lastName.S].join(' ')
         , email      : ddb_record.email.S
         , occupation : ddb_record.occupation.S
@@ -58,7 +61,7 @@ module.exports = async (event, context) => {
         , zip        : ddb_record.postalCode.S
         , phone      : ddb_record.phoneNumber.S
         , amount     : (ddb_record.amount.N / 100).toFixed(2)
-        , transaction: ddb_record.stripePaymentIntentId.S
+        , transaction: ddb_record.stripePaymentIntentId.S.slice(-8)
         , refcode    : ddb_record.refCode.S || 'N/A'
         , card       : ddb_record.cardNumberLastFourDigits.S
       }
