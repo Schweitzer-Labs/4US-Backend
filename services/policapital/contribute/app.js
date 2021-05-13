@@ -1,1 +1,1 @@
-exports.lambdaHandler = require('./dist/lambda-handler')
+exports.lambdaHandler = require("./dist/lambda-handler").default;

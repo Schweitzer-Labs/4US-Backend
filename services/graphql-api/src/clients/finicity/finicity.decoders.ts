@@ -1,13 +1,13 @@
 import * as t from "io-ts";
 import * as D from "io-ts/Decoder";
 
-export const FinicityConfig = D.struct({
-  partnerId: D.string,
-  partnerSecret: D.string,
-  appKey: D.string,
+export const FinicityConfig = t.type({
+  partnerId: t.string,
+  partnerSecret: t.string,
+  appKey: t.string,
 });
 
-export type FinicityConfig = D.TypeOf<typeof FinicityConfig>;
+export type FinicityConfig = t.TypeOf<typeof FinicityConfig>;
 
 const FinicityTransactionRequired = t.type({
   id: t.number,
@@ -53,4 +53,4 @@ export const GetFinicityTransactionsResponse = t.intersection([
   GetFinicityTransactionsResponseOptional,
 ]);
 
-export type FinicityTransaction = D.TypeOf<typeof FinicityTransaction>;
+export type FinicityTransaction = t.TypeOf<typeof FinicityTransaction>;

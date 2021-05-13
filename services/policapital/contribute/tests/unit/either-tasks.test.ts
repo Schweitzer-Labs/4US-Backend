@@ -6,7 +6,7 @@ import validContributeEvent from "../events/valid-contribute";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 
-describe("Tests event to contribution monad", function () {
+describe("Tests event to contribution pipe", function () {
   it("Stops a contribution call with an invalid payload", async () => {
     const res: number = await pipe(
       eventToContribution(invalidContributeEvent),
@@ -17,7 +17,7 @@ describe("Tests event to contribution monad", function () {
     )();
     expect(res).to.equal(400);
   });
-  it("Allows a contribution call with an valid payload", async () => {
+  it("Allows a contribution call with a valid payload", async () => {
     const res = await pipe(
       eventToContribution(validContributeEvent),
       taskEither.fold(

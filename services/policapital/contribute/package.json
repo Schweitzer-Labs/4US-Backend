@@ -16,7 +16,6 @@
   },
   "scripts": {
     "test": "ts-mocha tests/unit/*.ts --timeout 10000",
-    "integ-test": "mocha tests/integration/",
     "compile": "npm install && tsc src/*.ts --outDir dist"
   },
   "devDependencies": {

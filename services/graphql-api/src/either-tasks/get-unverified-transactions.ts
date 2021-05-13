@@ -5,5 +5,5 @@ import { ApplicationError } from "../utils/application-error";
 export const getUnverifiedTransactions = (esClient: Client) => (
   committee: any
 ): TaskEither<ApplicationError, any> => {
-  return left(new ApplicationError("not yet implemented"));
+  return left(new ApplicationError("not yet implemented", {}));
 };

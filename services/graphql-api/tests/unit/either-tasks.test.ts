@@ -5,6 +5,7 @@ import invalidContributeEvent from "../events/invalid-contribute";
 import validContributeEvent from "../events/valid-contribute";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
+import { StatusCodes } from "http-status-codes";
 
 describe("Tests event to contribution monad", function () {
   it("Stops a contribution call with an invalid payload", async () => {
@@ -12,7 +13,7 @@ describe("Tests event to contribution monad", function () {
       eventToContribution(invalidContributeEvent),
       taskEither.fold(
         (err) => task.of(err.statusCode),
-        (succ) => task.of("success")
+        (succ) => task.of(StatusCodes.OK)
       )
     )();
     expect(res).to.equal(400);

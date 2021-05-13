@@ -36,7 +36,7 @@ ifeq ($(RECORDER_DIR),)
 endif
 
 ifeq ($(PLATFORM_DIR),)
-       export PLATFORM_DIR	:= services/platform
+       export PLATFORM_DIR	:= services/graphql-api
 endif
 
 ifeq ($(EMAILER_DIR),)
@@ -79,13 +79,12 @@ JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAI
 
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
+# Make targets
+build: clean compile $(TEMPLATE) $(JS_APPS)
+	@sam build
+
 compile: $(CONTRIB_DIR)
 		cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
-
-
-# Make targets
-build: clean $(TEMPLATE) $(JS_APPS)
-	@sam build
 
 
 dep:

@@ -4,12 +4,13 @@ import { DynamoDB } from "aws-sdk";
 import { TaskEither, left, right, tryCatch } from "fp-ts/TaskEither";
 import { isLeft } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { task, taskEither } from "fp-ts";
+import { taskEither } from "fp-ts";
 import { Committee, DDBCommitteeRes } from "./committees.decoders";
 
 const getCommitteesRes = (dynamoDB: DynamoDB) => async (): Promise<any> => {
   return await dynamoDB
     .executeStatement({
+      //@ ToDo make table name configurable.
       Statement: 'SELECT * FROM "committees-dev"',
     })
     .promise();

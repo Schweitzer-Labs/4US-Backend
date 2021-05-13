@@ -1,0 +1,19 @@
+GraphQLFunction:
+  Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-GraphQLFunction
+    Description: GraphQL API for Committees
+    CodeUri: services/graphql-api/
+    Handler: app.lambdaHandler
+    Runtime: nodejs12.x
+    Role: !GetAtt LambdaBasicRole.Arn
+    Events:
+      GraphQLAny:
+        Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        Properties:
+          Path: /graphql
+          Method: ANY
+          RestApiId: !Ref DonationGateway
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
