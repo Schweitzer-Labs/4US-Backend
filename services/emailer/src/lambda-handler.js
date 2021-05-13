@@ -1,7 +1,7 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: process.env.REGION });
 const sns = new AWS.SNS({ apiVersion: '2010-03-31'})
-    , ses = new AWS.SES({ region: process.env.REGION })
+    , ses = new AWS.SES()
 ;
 const from_address = 'notification@policapital.net';
 
@@ -10,10 +10,9 @@ const from_address = 'notification@policapital.net';
  */
 const informAdmins = async (message) => {
     const params = {
-          Message: message
-        , TopicArn: process.env.SNS_TOPIC
-      }
-    ;
+        Message: message
+      , TopicArn: process.env.SNS_TOPIC
+    };
     const resp = await sns.publish(params).promise();
     console.log("send SNS", resp);
   } // informAdmins()
@@ -21,15 +20,14 @@ const informAdmins = async (message) => {
 
 const emailDonor = async (address, message) => {
     const params = {
-          Source      : from_address
-        , Template    : process.env.POS_TEMPLATE
-        , Destination : {
-            ToAddresses: [address]
-          }
-        , TemplateData: message
-        , ConfigurationSetName: 'SNSDebugging'
-      }
-    ;
+        Source      : from_address
+      , Template    : process.env.POS_TEMPLATE
+      , Destination : {
+          ToAddresses: [address]
+        }
+      , TemplateData: message
+      , ConfigurationSetName: 'SNSDebugging'
+    };
     const resp = await ses.sendTemplatedEmail(params).promise();
     console.log("sent SES", resp);
   } // emailDonor()
@@ -39,33 +37,29 @@ const emailDonor = async (address, message) => {
  * Main Function
  */
 module.exports = async (event, context) => {
-    const ddb_stream = event.Records[0].dynamodb
-	, ddb_record = ddb_stream.NewImage
-        , time_stamp = ddb_stream.ApproximateCreationDateTime * 1000 //milliseconds
+    const stream   = event.Records[0].dynamodb
+        , record   = stream.NewImage
+        , date     = new Date(stream.ApproximateCreationDateTime * 1000)
+        , timeopts = { timeZone: 'America/New_York', timeStyle: 'short', dateStyle: 'long' }
     ;
-	  const date = new Date(time_stamp);
-    console.log(date);
-
     const data = {
-          committee  : ddb_record.committee.S
-        , date       : date.toLocaleString('en-US')
-        , time       : date.toLocaleString('en-US')
-        , donor      : [ddb_record.firstName.S, ddb_record.lastName.S].join(' ')
-        , email      : ddb_record.email.S
-        , occupation : ddb_record.occupation.S
-        , employer   : ddb_record.employer.S
-        , address1   : ddb_record.addressLine1.S
-        , address2   : ddb_record.addressLine2.S
-        , city       : ddb_record.city.S
-        , state      : ddb_record.state.S.toUpperCase()
-        , zip        : ddb_record.postalCode.S
-        , phone      : ddb_record.phoneNumber.S
-        , amount     : (ddb_record.amount.N / 100).toFixed(2)
-        , transaction: ddb_record.stripePaymentIntentId.S.slice(-8)
-        , refcode    : ddb_record.refCode.S || 'N/A'
-        , card       : ddb_record.cardNumberLastFourDigits.S
-      }
-    ;
+        committee  : record.committee.S
+      , timestamp  : date.toLocaleString('en-US', timeopts)
+      , donor      : [record.firstName.S, ddb_record.lastName.S].join(' ')
+      , email      : record.email.S
+      , occupation : record.occupation.S
+      , employer   : record.employer.S
+      , address1   : record.addressLine1.S
+      , address2   : record.addressLine2.S
+      , city       : record.city.S
+      , state      : record.state.S.toUpperCase()
+      , zip        : record.postalCode.S
+      , phone      : record.phoneNumber.S
+      , amount     : (record.amount.N / 100).toFixed(2)
+      , transaction: record.stripePaymentIntentId.S.slice(-8)
+      , refcode    : record.refCode.S || 'N/A'
+      , card       : record.cardNumberLastFourDigits.S
+    };
     const message = JSON.stringify(data);
     await informAdmins(message);
     await emailDonor(data.email, message);
