@@ -45,7 +45,8 @@ module.exports = async (event, context) => {
     // console.log("new record", ddb_record);
     const data = {
           committee  : ddb_record.committee.S
-        , timestamp  : new Date(time_stamp).toLocaleString('en-US')
+        , date       : new Date(time_stamp).toLocaleString('en-US')
+        , time       : new Date(time_stamp).toLocaleString('en-US')
         , donor      : [ddb_record.firstName.S, ddb_record.lastName.S].join(' ')
         , email      : ddb_record.email.S
         , occupation : ddb_record.occupation.S
