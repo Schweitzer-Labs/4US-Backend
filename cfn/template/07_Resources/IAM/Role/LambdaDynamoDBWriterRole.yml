@@ -1,4 +1,4 @@
-LambdaDynamoDBRole:
+LambdaDynamoDBWriterRole:
   Type: AWS::IAM::Role
   Properties:
     AssumeRolePolicyDocument:
