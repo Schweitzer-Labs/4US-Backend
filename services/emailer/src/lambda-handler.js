@@ -8,30 +8,49 @@ const from_address = 'notification@policapital.net';
 /*
  * Helper Functions
  */
+const getCommitteeEmail = async (committee) => {
+    const emails = {
+          'angel-cruz' : 'seemant@schweitzerlabs.com'
+        , 'john-safford' : 'awsadmin@schweitzerlabs.com'
+      }
+    ;
+    console.log(committee, emails[committee]);
+    return emails[committee];
+} // getCommitteeEmail()
+
 const informAdmins = async (message) => {
     const params = {
-        Message: message
+        Message: JSON.stringify(message)
       , TopicArn: process.env.SNS_TOPIC
     };
     const resp = await sns.publish(params).promise();
     console.log("send SNS", resp);
-  } // informAdmins()
-;
+}; // informAdmins()
 
-const emailDonor = async (address, message) => {
+
+const sendEmail = async (address, message, template) => {
     const params = {
         Source      : from_address
-      , Template    : process.env.POS_TEMPLATE
+      , Template    : template
       , Destination : {
           ToAddresses: [address]
         }
-      , TemplateData: message
+      , TemplateData: JSON.stringify(message)
       , ConfigurationSetName: 'SNSDebugging'
     };
     const resp = await ses.sendTemplatedEmail(params).promise();
     console.log("sent SES", resp);
-  } // emailDonor()
-;
+    return resp;
+}; // sendEmail()
+
+const emailDonor = async (message) => {
+    await sendEmail(message.email, message, process.env.POS_TEMPLATE);
+}; // emailDonor()
+
+const emailCommittee = async (message) => {
+    const address = await getCommitteeEmail(message.committee);
+    await sendEmail(address, message, process.env.POS_REGISTER);
+}; // emailCommittee()
 
 /*
  * Main Function
@@ -56,12 +75,13 @@ module.exports = async (event, context) => {
       , zip        : record.postalCode.S
       , phone      : record.phoneNumber.S
       , amount     : (record.amount.N / 100).toFixed(2)
-      , transaction: record.stripePaymentIntentId.S.slice(-8)
+      , transaction: record.stripePaymentIntentId.S
+      , receipt    : record.stripePaymentIntentId.S.slice(-8)
       , refcode    : record.refCode.S || 'N/A'
       , card       : record.cardNumberLastFourDigits.S
     };
-    const message = JSON.stringify(data);
-    await informAdmins(message);
-    await emailDonor(data.email, message);
+    await informAdmins(data);
+    await emailDonor(data)
+    await emailCommittee(data);
   }
 ;
