@@ -45,7 +45,7 @@ module.exports = async (event, context) => {
     const data = {
         committee  : record.committee.S
       , timestamp  : date.toLocaleString('en-US', timeopts)
-      , donor      : [record.firstName.S, ddb_record.lastName.S].join(' ')
+      , donor      : [record.firstName.S, record.lastName.S].join(' ')
       , email      : record.email.S
       , occupation : record.occupation.S
       , employer   : record.employer.S
