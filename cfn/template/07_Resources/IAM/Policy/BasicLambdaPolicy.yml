@@ -5,7 +5,7 @@ LambdaBasicPolicy:
     PolicyName: PermissionsToAWSServices
     Roles:
       - !Ref LambdaBasicRole
-      - !Ref LambdaDynamoDBRole
+      - !Ref LambdaDynamoDBWriterRole
       - !Ref LambdaSESRole
     PolicyDocument:
       Version: '2012-10-17'
