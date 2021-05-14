@@ -3,11 +3,19 @@ const { Stripe } = require("stripe");
 const config = require("./config.js");
 const { configKey } = require("./enums");
 const stripCardInfo = require("./strip-card-info");
-
+const { v4: uuidv4 } = require('uuid');
 
 require('dotenv').config()
 
-const runenv = process.env.RUNENV
+const runenv = process.env.RUNENV;
+
+const AWS = require("aws-sdk");
+AWS.config.update({ region: process.env.REGION });
+
+
+const ddb = new AWS.DynamoDB({ apiVersion: "2012-08-10" })
+    , tableName = process.env.DDBTABLE
+;
 
 const headers = {
   "Access-Control-Allow-Headers" : "Content-Type",
@@ -67,6 +75,33 @@ const contribSchema = Joi.object({
   stripeUserId: Joi.string().required(),
 });
 
+const writeDB = async (items) => {
+  let params = {
+    TableName: tableName,
+    Item: items,
+  };
+  try {
+    let data = await ddb.putItem(params).promise();
+    return { message: "Success" };
+  } catch (err) {
+    throw (err);
+  }
+};
+
+const ddbRecord = (message) => {
+  console.log(message);
+  let record = {};
+
+  for (const attr in message) {
+    const attrType = attr === "amount" ? "N" : "S";
+    record[attr] = {};
+    record[attr][attrType] = message[attr].toString();
+  }
+  return record;
+};
+
+
+
 let response;
 
 module.exports = async (event, context) => {
@@ -107,10 +142,28 @@ module.exports = async (event, context) => {
       cardCVC
     );
 
+
     console.log("Payment succeeded", {
       ...strippedPayload,
       stripePaymentIntentId
     });
+
+    const row = {
+        ...strippedPayload
+      , stripePaymentIntentId
+      , id: uuidv4()
+    };
+
+    try {
+      const record = ddbRecord(row);
+      console.log("writing", record);
+      let written = await writeDB(record);
+      console.log("Transaction recorded", written);
+
+    } catch (err) {
+      console.error("Failed to record transaction", row);
+      console.error(err);
+    }
 
     response = {
       statusCode: 200,
@@ -133,5 +186,3 @@ module.exports = async (event, context) => {
 
   return response;
 };
-
-
