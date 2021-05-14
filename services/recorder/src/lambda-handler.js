@@ -22,15 +22,6 @@ const writeDB = async (items) => {
   }
 };
 
-const extractMessage = (message) => {
-  return message
-    .split("{")[1]
-    .split("}")[0]
-    .split(",")
-    .map((d) => d.trim())
-    .join("\n");
-};
-
 const ddbRecord = (message) => {
   let record = {};
 
@@ -40,6 +31,16 @@ const ddbRecord = (message) => {
     record[attr][attrType] = message[attr].toString();
   }
   return record;
+};
+
+
+const extractMessage = (message) => {
+  return message
+    .split("{")[1]
+    .split("}")[0]
+    .split(",")
+    .map((d) => d.trim())
+    .join("\n");
 };
 
 const decode = (payload) => {
@@ -52,6 +53,9 @@ const decompress = (payload) => {
 };
 
 module.exports = async (event, context) => {
+  console.log("noop");
+  return;
+
   const logStream = JSON.parse(decompress(decode(event.awslogs.data)));
 
   const logEvent = logStream.logEvents[0];
