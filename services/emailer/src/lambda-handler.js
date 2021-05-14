@@ -10,8 +10,8 @@ const from_address = 'notification@policapital.net';
  */
 const getCommitteeEmail = async (committee) => {
     const emails = {
-          'angel-cruz' : 'seemant@schweitzerlabs.com'
-        , 'john-safford' : 'awsadmin@schweitzerlabs.com'
+          'angel-cruz'   : ['seemant@schweitzerlabs.com', 'evan@schweitzerlabs.com']
+        , 'john-safford' : ['awsadmin@schweitzerlabs.com']
       }
     ;
     console.log(committee, emails[committee]);
@@ -27,13 +27,12 @@ const informAdmins = async (message) => {
     console.log("send SNS", resp);
 }; // informAdmins()
 
-
-const sendEmail = async (address, message, template) => {
+const sendEmail = async (addresses, message, template) => {
     const params = {
         Source      : from_address
       , Template    : template
       , Destination : {
-          ToAddresses: [address]
+          ToAddresses: addresses
         }
       , TemplateData: JSON.stringify(message)
       , ConfigurationSetName: 'SNSDebugging'
@@ -44,7 +43,7 @@ const sendEmail = async (address, message, template) => {
 }; // sendEmail()
 
 const emailDonor = async (message) => {
-    await sendEmail(message.email, message, process.env.POS_TEMPLATE);
+    await sendEmail([message.email], message, process.env.POS_TEMPLATE);
 }; // emailDonor()
 
 const emailCommittee = async (message) => {
@@ -83,5 +82,4 @@ module.exports = async (event, context) => {
     await informAdmins(data);
     await emailDonor(data)
     await emailCommittee(data);
-  }
-;
+};
