@@ -1,7 +1,6 @@
-DynamoDBWriterPolicy:
-  Type: AWS::IAM::Policy
+DynamoDBWriterManagedPolicy:
+  Type: AWS::IAM::ManagedPolicy
   Properties:
-    PolicyName: PermissionsToWriteDDBRecords
     Roles:
       - !Ref LambdaDynamoDBWriterRole
     PolicyDocument:
