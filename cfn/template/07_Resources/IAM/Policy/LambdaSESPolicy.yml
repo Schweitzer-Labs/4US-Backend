@@ -1,9 +1,8 @@
-LambdaSESPolicy:
-  Type: AWS::IAM::Policy
+LambdaSESManagedPolicy:
+  Type: AWS::IAM::ManagedPolicy
   Properties:
     Roles:
       - !Ref LambdaSESRole
-    PolicyName: SendSESEmails
     PolicyDocument:
       Version: 2012-10-17
       Statement:
@@ -13,16 +12,4 @@ LambdaSESPolicy:
             - ses:SendEmail
             - ses:SendRawEmail
             - ses:SendTemplatedEmail
-          Resource: '*'
-        - Sid: SendSNSNotifications
-          Effect: Allow
-          Action:
-            - sns:Publish
-          Resource: '*'
-        - Sid: EncryptSNSMessage
-          Effect: Allow
-          Action:
-            - kms:Decrypt
-            - kms:Encrypt
-            - kms:GenerateDataKey
           Resource: '*'
