@@ -1,23 +1,22 @@
+import "reflect-metadata";
 import { ApolloServer, gql } from "apollo-server-lambda";
+import { buildSchema } from "type-graphql";
+import { Container } from "typedi";
+import { GraphQLSchema } from "graphql";
+import { AppResolver } from "./app.resolver";
 
-// Construct a schema, using GraphQL schema language
-const typeDefs = gql`
-  type Query {
-    transactions: [Transaction!]!
-  }
-`;
-
-// Provide resolver functions for your schema fields
-const resolvers = {
-  Query: {
-    hello: () => "Hello me!",
-  },
-};
+let schema: GraphQLSchema;
 
 const createHandler = async () => {
+  if (!schema) {
+    schema = await buildSchema({
+      resolvers: [AppResolver],
+      container: Container,
+    });
+  }
+
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
     playground: true,
     introspection: true,
   });
@@ -26,5 +25,7 @@ const createHandler = async () => {
 };
 
 export default (event, context, callback) => {
-  createHandler().then((handler: any) => handler(event, context, callback));
+  createHandler().then((handler: any) => {
+    return handler(event, context, callback);
+  });
 };

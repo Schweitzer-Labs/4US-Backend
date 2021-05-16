@@ -24,7 +24,8 @@
     "node-fetch": "^2.6.1",
     "reflect-metadata": "^0.1.13",
     "stripe": "^8.144.0",
-    "type-graphql": "^1.1.1"
+    "type-graphql": "^1.1.1",
+    "typedi": "^0.10.0"
   },
   "scripts": {
     "test": "ts-mocha tests/**/*.ts --timeout 10000",
@@ -36,11 +37,13 @@
     "@types/chai": "^4.2.17",
     "@types/elasticsearch": "^5.0.37",
     "@types/http-aws-es": "^6.0.0",
+    "@types/lambda-tester": "^3.6.1",
     "@types/mocha": "^8.2.2",
     "@types/node-fetch": "^2.5.10",
     "@types/stripe": "^8.0.417",
     "aws-sdk": "^2.902.0",
     "chai": "^4.2.0",
+    "lambda-tester": "^4.0.1",
     "mocha": "^8.2.1",
     "prettier": "^2.2.1",
     "ts-node": "^9.1.1",
