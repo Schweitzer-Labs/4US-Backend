@@ -1,0 +1,13 @@
+{
+  "name": "recorder",
+  "version": "1.0.0",
+  "description": "Create Messages to email contribution info to donor, committee and 4US",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Seemant Kulleen <seemant@schweitzerlabs.com>",
+  "license": "MIT"
+}
