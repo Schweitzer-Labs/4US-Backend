@@ -1,5 +1,4 @@
 import * as t from "io-ts";
-import * as D from "io-ts/Decoder";
 
 export const FinicityConfig = t.type({
   partnerId: t.string,

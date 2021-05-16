@@ -12,17 +12,7 @@ import * as dotenv from "dotenv";
 @Resolver()
 export class AppResolver {
   private readonly esClient: Client;
-  constructor() {
-    dotenv.config();
-    const esHost =
-      process.env.ES_HOST || "http://docker.for.mac.localhost:9200";
-
-    this.esClient = new Client({
-      node: [
-        "https://search-dev-purplepay-ovi7jfjjjejvjfwxmxi4ecw3ea.us-east-1.es.amazonaws.com/",
-      ],
-    });
-  }
+  constructor() {}
 
   @Query((returns) => Committee)
   async committee(@Arg("committeeId") id: string): Promise<Committee> {

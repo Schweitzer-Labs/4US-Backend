@@ -1,9 +1,9 @@
 import { expect } from "chai";
-import { getAllCommittees } from "../../src/clients/committees/committees.client";
 import { DynamoDB } from "aws-sdk";
 import * as AWS from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
+import { getAllCommittees } from "../../src/repositories/committee/committee.repository";
 
 let dynamoDB: DynamoDB;
 describe("Committee Store", function () {
@@ -16,13 +16,13 @@ describe("Committee Store", function () {
   });
   it("Queries committee table", async () => {
     const res = await pipe(
-      getAllCommittees(dynamoDB),
+      getAllCommittees("dev")(dynamoDB),
       taskEither.fold(
-        () => task.of([]),
-        (res) => task.of(res)
+        () => task.of("error"),
+        (res) => task.of("success")
       )
     )();
 
-    expect(res[0].committeeName).to.equal("Test Candidate");
+    expect(res).to.equal("success");
   });
 });
