@@ -1,0 +1,20 @@
+LambdaSQSManagedPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  Properties:
+    Roles:
+      - !Ref LambdaDonationReceiverRole
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Sid: SendSQSNotifications
+          Effect: Allow
+          Action:
+            - sqs:*
+          Resource: '*'
+        - Sid: EncryptSQSMessage
+          Effect: Allow
+          Action:
+            - kms:Decrypt
+            - kms:Encrypt
+            - kms:GenerateDataKey
+          Resource: '*'
