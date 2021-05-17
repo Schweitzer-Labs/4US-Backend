@@ -1,47 +1,55 @@
 import { data } from "./contributions.data";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
+import { v4 as uuidv4 } from "uuid";
 import {
   boolToDDBBool,
   numberToDDBNumber,
   stringToDDBString,
 } from "./seed.utils";
 
-const first25 = data.slice(0, 25);
-
-const run = (env: string) => async (dynamoDB: DynamoDB) => {
-  const items = first25.map((txn) => ({
+const run = async (dynamoDB: DynamoDB, sequence: number) => {
+  const list = data.slice(25 * sequence - 25, 25 * sequence);
+  const tableName = "transactions-dev";
+  const committeeId = "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4";
+  const now = new Date().getTime().toString();
+  const items = list.map((txn) => ({
     PutRequest: {
       Item: {
-        amount: numberToDDBNumber("amount", txn.amount),
-        timestampInitiated: stringToDDBString(
-          "timestampInitiated",
-          new Date().getTime().toString()
-        ),
-        paymentMethod: stringToDDBString("paymentMethod", txn.paymentMethod),
-        ruleVerified: boolToDDBBool("ruleVerified", false),
-        bankVerified: boolToDDBBool("bankVerified", false),
-        firstName: stringToDDBString("firstName", txn.firstName),
-        lastName: stringToDDBString("lastName", txn.lastName),
-        employer: stringToDDBString("employer", txn.employer),
-        addressLine1: stringToDDBString("addressLine1", txn.addressLine1),
-        addressLine2: stringToDDBString("addressLine2", txn.addressLine2),
-        city: stringToDDBString("city", txn.city),
-        state: stringToDDBString("state", txn.state),
-        postalCode: stringToDDBString("postalCode", txn.postalCode + ""),
-        refCode: stringToDDBString("refCode", txn.refCode),
-        entityType: stringToDDBString("entityType", txn.contributorType),
+        ...stringToDDBString("id", uuidv4()),
+        ...boolToDDBBool("bankVerified", false),
+        ...boolToDDBBool("ruleVerified", true),
+        ...stringToDDBString("initiatedTimestamp", now),
+        ...stringToDDBString("ruleVerifiedTimestamp", now),
+        ...stringToDDBString("committeeId", committeeId),
+        ...numberToDDBNumber("amount", txn.amount),
+        ...stringToDDBString("firstName", txn.firstName),
+        ...stringToDDBString("lastName", txn.lastName),
+        ...stringToDDBString("employer", txn.employer),
+        ...stringToDDBString("addressLine1", txn.addressLine1),
+        ...stringToDDBString("addressLine2", txn.addressLine2),
+        ...stringToDDBString("city", txn.city),
+        ...stringToDDBString("state", txn.state),
+        ...stringToDDBString("postalCode", txn.postalCode + ""),
+        ...stringToDDBString("refCode", txn.refCode),
+        ...stringToDDBString("paymentMethod", txn.paymentMethod),
+        ...stringToDDBString("contributorType", txn.contributorType),
+        ...stringToDDBString("direction", "in"),
       },
     },
   }));
 
-  const payload = {
-    "committees-dev": items,
-  };
+  const res = await dynamoDB
+    .batchWriteItem({
+      RequestItems: {
+        [tableName]: items,
+      },
+    })
+    .promise();
 
-  dynamoDB.batchWriteItem(payload).promise();
+  console.log(res);
 
-  return "sadf";
+  return res;
 };
 
 AWS.config.apiVersions = {
@@ -50,4 +58,7 @@ AWS.config.apiVersions = {
 AWS.config.update({ region: "us-east-1" });
 const dynamoDB = new DynamoDB();
 
-run("dev")(dynamoDB);
+run(dynamoDB, 1).then(console.log).catch(console.log);
+run(dynamoDB, 2).then(console.log).catch(console.log);
+run(dynamoDB, 3).then(console.log).catch(console.log);
+run(dynamoDB, 4).then(console.log).catch(console.log);
