@@ -4,6 +4,8 @@ import * as AWS from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import { getAllCommittees } from "../../src/repositories/committee/committee.repository";
+import { isLeft } from "fp-ts/Either";
+import { ApplicationError } from "../../src/utils/application-error";
 
 let dynamoDB: DynamoDB;
 describe("Committee Store", function () {
@@ -15,14 +17,19 @@ describe("Committee Store", function () {
     dynamoDB = new DynamoDB();
   });
   it("Queries committee table", async () => {
-    const res = await pipe(
-      getAllCommittees("dev")(dynamoDB),
-      taskEither.fold(
-        () => task.of("error"),
-        (res) => task.of("success")
-      )
-    )();
+    // const res = await pipe(
+    //   getAllCommittees("dev")(dynamoDB),
+    //   taskEither.fold(
+    //     () => task.of("error"),
+    //     (res) => task.of("success")
+    //   )
+    // )();
 
-    expect(res).to.equal("success");
+    const res = await getAllCommittees("dev")(dynamoDB)();
+    if (isLeft(res)) {
+      throw res.left;
+    }
+
+    expect(res.right.length).to.equal(0);
   });
 });
