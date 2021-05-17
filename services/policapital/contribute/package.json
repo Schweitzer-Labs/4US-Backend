@@ -7,6 +7,7 @@
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
+    "@types/uuid": "^8.3.0",
     "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "fp-ts": "^2.10.5",

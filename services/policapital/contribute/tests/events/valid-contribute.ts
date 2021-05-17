@@ -1,25 +1,24 @@
 export default {
-  "body": "{\n    \"cardNumber\": \"4242424242424242\",\n  \"stripeUserId\": \"acct_1IdcwgRFrwYoR1VI\",\n   \"cardExpirationMonth\": 12,\n    \"cardExpirationYear\": 2023,\n    \"cardCVC\": \"123\",\n    \"amount\": 400\n}",
-  "resource": "/{proxy+}",
-  "path": "/path/to/resource",
-  "httpMethod": "POST",
-  "isBase64Encoded": true,
-  "queryStringParameters": {
-    "code": "ac_JLXigtJ05kC92md4xQaTzyyvkRyKfriC"
+  body: '{"email":"test-again@schweitzerlabs.com","phoneNumber":"5551231234","firstName":"Test","lastName":"Man","employer":"","occupation":"","addressLine1":"123 Cleveland Park","addressLine2":"","city":"Ridgewood","state":"ny","postalCode":"11385","amount":112,"cardNumber":"4242424242424242","cardExpirationMonth":12,"cardExpirationYear":2023,"cardCVC":"2023","paymentMethod":"credit","contributorType":"ind","companyName":"","refCode":"","stripeUserId":"acct_1IjTcsRC8iiQex3V","attestsToBeingAdultCitizen":true,"committee":"angel-cruz"}',
+  resource: "/{proxy+}",
+  path: "/path/to/resource",
+  httpMethod: "POST",
+  isBase64Encoded: true,
+  queryStringParameters: {
+    code: "ac_JLXigtJ05kC92md4xQaTzyyvkRyKfriC",
   },
-  "multiValueQueryStringParameters": {
-    "foo": [
-      "bar"
-    ]
+  multiValueQueryStringParameters: {
+    foo: ["bar"],
   },
-  "pathParameters": {
-    "proxy": "/path/to/resource"
+  pathParameters: {
+    proxy: "/path/to/resource",
   },
-  "stageVariables": {
-    "baz": "qux"
+  stageVariables: {
+    baz: "qux",
   },
-  "headers": {
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+  headers: {
+    Accept:
+      "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     "Accept-Encoding": "gzip, deflate, sdch",
     "Accept-Language": "en-US,en;q=0.8",
     "Cache-Control": "max-age=0",
@@ -29,95 +28,61 @@ export default {
     "CloudFront-Is-SmartTV-Viewer": "false",
     "CloudFront-Is-Tablet-Viewer": "false",
     "CloudFront-Viewer-Country": "US",
-    "Host": "1234567890.execute-api.us-east-1.amazonaws.com",
+    Host: "1234567890.execute-api.us-east-1.amazonaws.com",
     "Upgrade-Insecure-Requests": "1",
     "User-Agent": "Custom User Agent String",
-    "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
+    Via: "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
     "X-Amz-Cf-Id": "cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA==",
     "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
     "X-Forwarded-Port": "443",
-    "X-Forwarded-Proto": "https"
+    "X-Forwarded-Proto": "https",
   },
-  "multiValueHeaders": {
-    "Accept": [
-      "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+  multiValueHeaders: {
+    Accept: [
+      "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     ],
-    "Accept-Encoding": [
-      "gzip, deflate, sdch"
-    ],
-    "Accept-Language": [
-      "en-US,en;q=0.8"
-    ],
-    "Cache-Control": [
-      "max-age=0"
-    ],
-    "CloudFront-Forwarded-Proto": [
-      "https"
-    ],
-    "CloudFront-Is-Desktop-Viewer": [
-      "true"
-    ],
-    "CloudFront-Is-Mobile-Viewer": [
-      "false"
-    ],
-    "CloudFront-Is-SmartTV-Viewer": [
-      "false"
-    ],
-    "CloudFront-Is-Tablet-Viewer": [
-      "false"
-    ],
-    "CloudFront-Viewer-Country": [
-      "US"
-    ],
-    "Host": [
-      "0123456789.execute-api.us-east-1.amazonaws.com"
-    ],
-    "Upgrade-Insecure-Requests": [
-      "1"
-    ],
-    "User-Agent": [
-      "Custom User Agent String"
-    ],
-    "Via": [
-      "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)"
-    ],
-    "X-Amz-Cf-Id": [
-      "cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA=="
-    ],
-    "X-Forwarded-For": [
-      "127.0.0.1, 127.0.0.2"
-    ],
-    "X-Forwarded-Port": [
-      "443"
-    ],
-    "X-Forwarded-Proto": [
-      "https"
-    ]
+    "Accept-Encoding": ["gzip, deflate, sdch"],
+    "Accept-Language": ["en-US,en;q=0.8"],
+    "Cache-Control": ["max-age=0"],
+    "CloudFront-Forwarded-Proto": ["https"],
+    "CloudFront-Is-Desktop-Viewer": ["true"],
+    "CloudFront-Is-Mobile-Viewer": ["false"],
+    "CloudFront-Is-SmartTV-Viewer": ["false"],
+    "CloudFront-Is-Tablet-Viewer": ["false"],
+    "CloudFront-Viewer-Country": ["US"],
+    Host: ["0123456789.execute-api.us-east-1.amazonaws.com"],
+    "Upgrade-Insecure-Requests": ["1"],
+    "User-Agent": ["Custom User Agent String"],
+    Via: ["1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)"],
+    "X-Amz-Cf-Id": ["cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA=="],
+    "X-Forwarded-For": ["127.0.0.1, 127.0.0.2"],
+    "X-Forwarded-Port": ["443"],
+    "X-Forwarded-Proto": ["https"],
   },
-  "requestContext": {
-    "accountId": "123456789012",
-    "resourceId": "123456",
-    "stage": "prod",
-    "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
-    "requestTime": "09/Apr/2015:12:34:56 +0000",
-    "requestTimeEpoch": 1428582896000,
-    "identity": {
-      "cognitoIdentityPoolId": null,
-      "accountId": null,
-      "cognitoIdentityId": null,
-      "caller": null,
-      "accessKey": null,
-      "sourceIp": "127.0.0.1",
-      "cognitoAuthenticationType": null,
-      "cognitoAuthenticationProvider": null,
-      "userArn": null,
-      "userAgent": "Custom User Agent String",
-      "user": null
+  requestContext: {
+    accountId: "123456789012",
+    resourceId: "123456",
+    stage: "prod",
+    requestId: "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
+    requestTime: "09/Apr/2015:12:34:56 +0000",
+    requestTimeEpoch: 1428582896000,
+    identity: {
+      cognitoIdentityPoolId: null,
+      accountId: null,
+      cognitoIdentityId: null,
+      caller: null,
+      accessKey: null,
+      sourceIp: "127.0.0.1",
+      cognitoAuthenticationType: null,
+      cognitoAuthenticationProvider: null,
+      userArn: null,
+      userAgent: "Custom User Agent String",
+      user: null,
     },
-    "path": "/prod/path/to/resource",
-    "resourcePath": "/{proxy+}",
-    "httpMethod": "POST",
-    "apiId": "1234567890",
-    "protocol": "HTTP/1.1"
-  }
-}
+    path: "/prod/path/to/resource",
+    resourcePath: "/{proxy+}",
+    httpMethod: "POST",
+    apiId: "1234567890",
+    protocol: "HTTP/1.1",
+  },
+};
