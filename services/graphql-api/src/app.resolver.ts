@@ -11,7 +11,6 @@ import * as dotenv from "dotenv";
 @Service()
 @Resolver()
 export class AppResolver {
-  private readonly esClient: Client;
   constructor() {}
 
   @Query((returns) => Committee)
@@ -23,35 +22,12 @@ export class AppResolver {
   async transactions(
     @Arg("committeeId") committeeId: string
   ): Promise<Transaction[]> {
-    const res = await this.esClient.search({
-      size: 5000,
-      index: "transaction_complete",
-      body: {
-        query: {
-          bool: {
-            must: [{ match: { committeeId } }],
-          },
-        },
-      },
-    });
-    return res.body.hits.hits.map(({ _source }) => _source);
+    return [];
   }
 
   @Query((returns) => [Donor])
   async donors(@Arg("committeeId") committeeId: string): Promise<Donor[]> {
-    const res = await this.esClient.search({
-      size: 5000,
-      index: "donor",
-      body: {
-        query: {
-          bool: {
-            must: [{ match: { committeeId } }],
-          },
-        },
-      },
-    });
-
-    return res.body.hits.hits.map(({ _source }) => _source);
+    return [];
   }
 
   @Query((returns) => [Donor])
