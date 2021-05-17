@@ -16,5 +16,5 @@ DonationEmailerFunction:
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
-        POS_TEMPLATE: !Ref POSTemplate
-        POS_REGISTER: !Ref POSNotification
+        POS_RECEIPT: !Ref POSReceipt
+        POS_RECORD: !Ref POSRecord
