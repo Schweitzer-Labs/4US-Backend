@@ -9,15 +9,12 @@ DonationEmailerFunction:
     Role: !GetAtt LambdaSESRole.Arn
     Events:
       ContributionMade:
-        Type: DynamoDB
+        Type: SQS
         Properties:
           BatchSize: 1
-          StartingPosition: LATEST
-          Stream: !GetAtt ContributionRecords.StreamArn
+          Queue: !GetAtt EmailQueue.Arn
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
-        DDBTABLE: !Ref ContributionRecords
-        SNS_TOPIC: !Ref DonationReceivedTopic
         POS_TEMPLATE: !Ref POSTemplate
         POS_REGISTER: !Ref POSNotification
