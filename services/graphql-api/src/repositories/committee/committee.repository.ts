@@ -14,7 +14,7 @@ const getCommitteesRes =
     return await dynamoDB
       .executeStatement({
         //@ ToDo make table name configurable.
-        Statement: `SELECT * FROM "committes-${env}"`,
+        Statement: `SELECT * FROM "committees-${env}"`,
       })
       .promise();
   };
