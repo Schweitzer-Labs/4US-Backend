@@ -5,41 +5,39 @@ const sqs = new AWS.SQS({ apiVersion: '2012-11-05'})
 /*
  * Helper Functions
  */
-const getCommitteeEmail = async (committee) => {
+const getCommitteeDetails = async (committee) => {
     const emails = {
           'angel-cruz'   : ['seemant@schweitzerlabs.com', 'evan@schweitzerlabs.com']
         , 'john-safford' : ['awsadmin@schweitzerlabs.com']
       }
     ;
-    return emails[committee].join(',');
-}; // getCommitteeEmail()
+    console.log(emails[committee]);
+    return { emails: emails[committee], timezone: "America/New_York" };
+}; // getCommitteeDetails()
 
-const queueEmail = async (message, recip) => {
-    let dest = recip == 'committee'
-      ? await getCommitteeEmail(message.committee)
-      : message.email
+const sendQueue = async (message) => {
+    const {emails, timezone} = await getCommitteeDetails(message.committee)
+      , params = {
+          MessageAttributes: {
+            committee: {
+                  DataType: "String"
+                , StringValue: emails.join(',')
+              }
+            , tzcommittee: {
+                  DataType: "String"
+                , StringValue: timezone
+              }
+          }
+        , MessageBody: JSON.stringify(message)
+        , MessageDeduplicationId: message.id
+        , MessageGroupId: message.committee
+        , QueueUrl: process.env.SQSQUEUE
+      }
     ;
-    let params = {
-      MessageAttributes: {
-        recipient: {
-          DataType: "String",
-          StringValue: recip
-        },
-        email: {
-          DataType: "String",
-          StringValue: dest
-        },
-      },
-      MessageBody: JSON.stringify(message),
-      MessageDeduplicationId: message.id,
-      MessageGroupId: message.committee,
-      QueueUrl: process.env.SQSQUEUE
-    };
-
     console.log("sending to", params.QueueUrl);
     const resp = await sqs.sendMessage(params).promise();
     console.log("sending SQS", resp);
-}; // queueEmail()
+}; // sendQueue()
 
 /*
  * Main Function
@@ -48,14 +46,14 @@ module.exports = async (event, context) => {
     const stream   = event.Records[0].dynamodb
         , record   = stream.NewImage
         , date     = new Date(stream.ApproximateCreationDateTime * 1000)
-        , timeopts = { timeZone: 'America/New_York', timeStyle: 'short', dateStyle: 'long' }
     ;
     console.log("stream", stream);
     const data = {
         id         : stream.id
       , committee  : record.committee.S
-      , timestamp  : date.toLocaleString('en-US', timeopts)
+      , timestamp  : date
       , donor      : [record.firstName.S, record.lastName.S].join(' ')
+      , timezone   : "America/New_York"
       , email      : record.email.S
       , occupation : record.occupation.S
       , employer   : record.employer.S
@@ -72,6 +70,5 @@ module.exports = async (event, context) => {
       , card       : record.cardNumberLastFourDigits.S
     };
 
-    await queueEmail(data, "donor");
-    await queueEmail(data, "committee");
+    await sendQueue(data);
 };
