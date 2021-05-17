@@ -13,7 +13,7 @@ const notifyAdmins = async (message) => {
         Message: JSON.stringify(message)
       , TopicArn: process.env.SNS_TOPIC
     };
-    const resp = await sns.publish(params).promise();
+    // const resp = await sns.publish(params).promise();
     console.log("send SNS", resp);
 }; // notifyAdmins()
 
@@ -54,6 +54,7 @@ const emailCommittee = async (message, attrs) => {
  * Main Function
  */
 module.exports = async (event, context) => {
+<<<<<<< HEAD
     for (const record of event.Records) {
         let data  = JSON.parse(record.body)
           , attrs = record.messageAttributes
@@ -64,5 +65,15 @@ module.exports = async (event, context) => {
         await emailCommittee(data, attrs);
     };
 
+=======
+    for (const receipt in event.Records) {
+        let data = receipt.body;
+        console.log(receipt.messageAttributes, data);
+
+        emailDonor(data);
+        emailCommittee(data);
+    };
+
+>>>>>>> sprint-3
     return;
 };
