@@ -11,7 +11,7 @@ const informAdmins = async (message) => {
         Message: JSON.stringify(message)
       , TopicArn: process.env.SNS_TOPIC
     };
-    const resp = await sns.publish(params).promise();
+    // const resp = await sns.publish(params).promise();
     console.log("send SNS", resp);
 }; // informAdmins()
 
@@ -31,26 +31,22 @@ const sendEmail = async (addresses, message, template) => {
 }; // sendEmail()
 
 const emailDonor = async (message) => {
-    await sendEmail([message.email], message, process.env.POS_TEMPLATE);
 }; // emailDonor()
 
 const emailCommittee = async (message) => {
-    const address = await getCommitteeEmail(message.committee);
-    await sendEmail(address, message, process.env.POS_REGISTER);
 }; // emailCommittee()
 
 /*
  * Main Function
  */
 module.exports = async (event, context) => {
-    event.Records.forEach((receipt) => {
-      let data = receipt.body;
-      console.log(receipt.messageAttributes, data);
-    });
-    //let timeopts = { timeZone: 'America/New_York', timeStyle: 'short', dateStyle: 'long' }
-    return;
+    for (const record of event.Records) {
+        let data = record.body;
+        console.log(record, record.messageAttributes, data);
 
-    await informAdmins(data);
-    await emailDonor(data)
-    await emailCommittee(data);
+        emailDonor(data);
+        emailCommittee(data);
+    };
+
+    return;
 };
