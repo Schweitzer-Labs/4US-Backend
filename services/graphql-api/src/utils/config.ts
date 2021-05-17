@@ -1,0 +1,31 @@
+import * as AWS from "aws-sdk";
+AWS.config.update({
+  region: "us-east-1",
+});
+
+const ps = new AWS.SSM();
+
+enum ConfigKeys {
+  stripeApiKey = "/lambda/stripe/apikey",
+}
+
+const getConfig = async (env: string, name: string): Promise<string> => {
+  switch (name) {
+    case ConfigKeys.stripeApiKey:
+      const fullKey = `/${env}${name}`;
+      console.log("Config look up initiated on key: ", fullKey);
+      const res = await ps
+        .getParameter({
+          Name: fullKey,
+          WithDecryption: true,
+        })
+        .promise();
+      return res.Parameter.Value;
+    default:
+      console.error("Config not found");
+      throw new Error("Config not found");
+  }
+};
+
+export const getStripeApiKey = async (env: string) =>
+  await getConfig(env, ConfigKeys.stripeApiKey);

@@ -1,0 +1,130 @@
+export const validGraphQLProxyEvent = {
+  "body":"{\"operationName\":null,\"variables\":{},\"query\":\"{\\n  transactions(committeeId: \\\"0aab3c20-a05a-465a-a3ae-93df7bb1dc88\\\") {\\n    amount\\n  }\\n}\\n\"}",
+  "headers":{
+    "Accept":"*/*",
+    "Accept-Encoding":"gzip, deflate, br",
+    "Accept-Language":"en-US,en;q=0.9",
+    "Cache-Control":"no-cache",
+    "Connection":"keep-alive",
+    "Content-Length":"118",
+    "Content-Type":"application/json",
+    "Host":"127.0.0.1:3000",
+    "Origin":"http://127.0.0.1:3000",
+    "Pragma":"no-cache",
+    "Referer":"http://127.0.0.1:3000/graphql",
+    "Sec-Ch-Ua":"\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
+    "Sec-Ch-Ua-Mobile":"?0",
+    "Sec-Fetch-Dest":"empty",
+    "Sec-Fetch-Mode":"cors",
+    "Sec-Fetch-Site":"same-origin",
+    "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36",
+    "X-Forwarded-Port":"3000",
+    "X-Forwarded-Proto":"http"
+  },
+  "httpMethod":"POST",
+  "isBase64Encoded":false,
+  "multiValueHeaders":{
+    "Accept":[
+      "*/*"
+    ],
+    "Accept-Encoding":[
+      "gzip, deflate, br"
+    ],
+    "Accept-Language":[
+      "en-US,en;q=0.9"
+    ],
+    "Cache-Control":[
+      "no-cache"
+    ],
+    "Connection":[
+      "keep-alive"
+    ],
+    "Content-Length":[
+      "118"
+    ],
+    "Content-Type":[
+      "application/json"
+    ],
+    "Host":[
+      "127.0.0.1:3000"
+    ],
+    "Origin":[
+      "http://127.0.0.1:3000"
+    ],
+    "Pragma":[
+      "no-cache"
+    ],
+    "Referer":[
+      "http://127.0.0.1:3000/graphql"
+    ],
+    "Sec-Ch-Ua":[
+      "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\""
+    ],
+    "Sec-Ch-Ua-Mobile":[
+      "?0"
+    ],
+    "Sec-Fetch-Dest":[
+      "empty"
+    ],
+    "Sec-Fetch-Mode":[
+      "cors"
+    ],
+    "Sec-Fetch-Site":[
+      "same-origin"
+    ],
+    "User-Agent":[
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"
+    ],
+    "X-Forwarded-Port":[
+      "3000"
+    ],
+    "X-Forwarded-Proto":[
+      "http"
+    ]
+  },
+  "multiValueQueryStringParameters":null,
+  "path":"/graphql",
+  "pathParameters":null,
+  "queryStringParameters":null,
+  "requestContext":{
+    "accountId":"123456789012",
+    "apiId":"1234567890",
+    "domainName":"127.0.0.1:3000",
+    "extendedRequestId":null,
+    "httpMethod":"POST",
+    "identity":{
+      "accountId":null,
+      "apiKey":null,
+      "caller":null,
+      "cognitoAuthenticationProvider":null,
+      "cognitoAuthenticationType":null,
+      "cognitoIdentityPoolId":null,
+      "sourceIp":"127.0.0.1",
+      "user":null,
+      "userAgent":"Custom User Agent String",
+      "userArn":null
+    },
+    "path":"/graphql",
+    "protocol":"HTTP/1.1",
+    "requestId":"cb7f536d-fa2a-4a36-b273-85e3535569b6",
+    "requestTime":"14/May/2021:11:25:21 +0000",
+    "requestTimeEpoch":1620991521,
+    "resourceId":"123456",
+    "resourcePath":"/graphql",
+    "stage":"dev"
+  },
+  "resource":"/graphql",
+  "stageVariables":null,
+  "version":"1.0"
+}
+
+export const validGraphQLProxyContext = {
+  "callbackWaitsForEmptyEventLoop":true,
+  "functionVersion":"$LATEST",
+  "functionName":"GraphQLFunction",
+  "memoryLimitInMB":"128",
+  "logGroupName":"aws/lambda/GraphQLFunction",
+  "logStreamName":"$LATEST",
+  "invokedFunctionArn":"",
+  "awsRequestId":"fa054914-e37c-4c6c-9bcb-09d7b983f1df"
+}

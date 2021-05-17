@@ -5,8 +5,8 @@ Committees:
     SSESpecification:
       SSEEnabled: true
     ProvisionedThroughput:
-      WriteCapacityUnits: 1
-      ReadCapacityUnits: 1
+      WriteCapacityUnits: 5
+      ReadCapacityUnits: 5
     AttributeDefinitions:
       - AttributeName: id
         AttributeType: S

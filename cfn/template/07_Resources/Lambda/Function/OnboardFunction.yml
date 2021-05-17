@@ -3,7 +3,7 @@ OnboardFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-OnboardingFunction
     Description: Backend to onboard a committee to the Policapital platform
-    CodeUri: services/onboard/
+    CodeUri: services/policapital/onboard/
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
     Role: !GetAtt LambdaBasicRole.Arn

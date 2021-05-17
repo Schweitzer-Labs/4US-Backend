@@ -3,7 +3,7 @@ AnalyticsFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-AnalyticsFunction
     Description: Log Analytic data on Donation activity
-    CodeUri: services/analytics/
+    CodeUri: services/policapital/analytics/
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
     Role: !GetAtt LambdaBasicRole.Arn
