@@ -1,23 +1,11 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: process.env.REGION });
-const sns = new AWS.SNS({ apiVersion: '2010-03-31'})
-    , ses = new AWS.SES()
-;
+const ses = new AWS.SES();
 const from_address = 'notification@policapital.net';
 
 /*
  * Helper Functions
  */
-const getCommitteeEmail = async (committee) => {
-    const emails = {
-          'angel-cruz'   : ['seemant@schweitzerlabs.com', 'evan@schweitzerlabs.com']
-        , 'john-safford' : ['awsadmin@schweitzerlabs.com']
-      }
-    ;
-    console.log(committee, emails[committee]);
-    return emails[committee];
-} // getCommitteeEmail()
-
 const informAdmins = async (message) => {
     const params = {
         Message: JSON.stringify(message)
@@ -55,30 +43,13 @@ const emailCommittee = async (message) => {
  * Main Function
  */
 module.exports = async (event, context) => {
-    const stream   = event.Records[0].dynamodb
-        , record   = stream.NewImage
-        , date     = new Date(stream.ApproximateCreationDateTime * 1000)
-        , timeopts = { timeZone: 'America/New_York', timeStyle: 'short', dateStyle: 'long' }
-    ;
-    const data = {
-        committee  : record.committee.S
-      , timestamp  : date.toLocaleString('en-US', timeopts)
-      , donor      : [record.firstName.S, record.lastName.S].join(' ')
-      , email      : record.email.S
-      , occupation : record.occupation.S
-      , employer   : record.employer.S
-      , address1   : record.addressLine1.S
-      , address2   : record.addressLine2.S
-      , city       : record.city.S
-      , state      : record.state.S.toUpperCase()
-      , zip        : record.postalCode.S
-      , phone      : record.phoneNumber.S
-      , amount     : (record.amount.N / 100).toFixed(2)
-      , transaction: record.stripePaymentIntentId.S
-      , receipt    : record.stripePaymentIntentId.S.slice(-8)
-      , refcode    : record.refCode.S || 'N/A'
-      , card       : record.cardNumberLastFourDigits.S
-    };
+    event.Records.forEach((receipt) => {
+      let data = receipt.body;
+      console.log(receipt.messageAttributes, data);
+    });
+    //let timeopts = { timeZone: 'America/New_York', timeStyle: 'short', dateStyle: 'long' }
+    return;
+
     await informAdmins(data);
     await emailDonor(data)
     await emailCommittee(data);
