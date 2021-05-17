@@ -142,3 +142,8 @@ $RECYCLE.BIN/
 template.yml
 
 # End of https://www.gitignore.io/api/osx,node,linux,windows
+
+# TS build
+*/dist
+
+**/dist

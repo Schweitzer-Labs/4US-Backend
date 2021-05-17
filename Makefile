@@ -20,19 +20,23 @@ ifeq ($(REGION), )
 endif
 
 ifeq ($(CONTRIB_DIR),)
-       export CONTRIB_DIR	:= services/contribute
+       export CONTRIB_DIR	:= services/policapital/contribute
 endif
 
 ifeq ($(ONBOARD_DIR),)
-       export ONBOARD_DIR	:= services/onboard
+       export ONBOARD_DIR	:= services/policapital/onboard
 endif
 
 ifeq ($(ANALYTICS_DIR),)
-       export ANALYTICS_DIR	:= services/analytics
+       export ANALYTICS_DIR	:= services/policapital/analytics
 endif
 
 ifeq ($(RECORDER_DIR),)
-       export RECORDER_DIR	:= services/recorder
+       export RECORDER_DIR	:= services/policapital/recorder
+endif
+
+ifeq ($(PLATFORM_DIR),)
+       export PLATFORM_DIR	:= services/graphql-api
 endif
 
 ifeq ($(EMAILER_DIR),)
@@ -76,8 +80,12 @@ JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAI
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
 # Make targets
-build: clean $(TEMPLATE) $(JS_APPS)
+build: clean compile $(TEMPLATE) $(JS_APPS)
 	@sam build --cached
+
+compile: $(CONTRIB_DIR)
+	cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
+
 
 dep:
 	@pip3 install jinja2 cfn_flip boto3
