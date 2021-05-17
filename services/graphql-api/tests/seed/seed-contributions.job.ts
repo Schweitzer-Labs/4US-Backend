@@ -16,7 +16,7 @@ const run = (env: string) => async (dynamoDB: DynamoDB) => {
         amount: numberToDDBNumber("amount", txn.amount),
         timestampInitiated: stringToDDBString(
           "timestampInitiated",
-          new Date().toString()
+          new Date().getTime().toString()
         ),
         paymentMethod: stringToDDBString("paymentMethod", txn.paymentMethod),
         ruleVerified: boolToDDBBool("ruleVerified", false),
@@ -38,6 +38,8 @@ const run = (env: string) => async (dynamoDB: DynamoDB) => {
   const payload = {
     "committees-dev": items,
   };
+
+  dynamoDB.batchWriteItem(payload).promise();
 
   return "sadf";
 };
