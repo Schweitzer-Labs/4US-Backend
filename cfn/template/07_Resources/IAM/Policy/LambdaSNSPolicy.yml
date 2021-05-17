@@ -1,4 +1,4 @@
-LambdaSESManagedPolicy:
+LambdaSNSManagedPolicy:
   Type: AWS::IAM::ManagedPolicy
   Properties:
     Roles:
@@ -6,10 +6,8 @@ LambdaSESManagedPolicy:
     PolicyDocument:
       Version: 2012-10-17
       Statement:
-        - Sid: SendSESNotifications
+        - Sid: SendSNSNotifications
           Effect: Allow
           Action:
-            - ses:SendEmail
-            - ses:SendRawEmail
-            - ses:SendTemplatedEmail
+            - sns:Publish
           Resource: '*'

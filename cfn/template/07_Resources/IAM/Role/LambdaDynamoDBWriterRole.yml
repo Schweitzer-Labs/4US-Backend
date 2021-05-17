@@ -1,4 +1,4 @@
-LambdaDynamoDBRole:
+LambdaDynamoDBWriterRole:
   Type: AWS::IAM::Role
   Properties:
     AssumeRolePolicyDocument:
@@ -10,5 +10,3 @@ LambdaDynamoDBRole:
               - lambda.amazonaws.com
           Action:
             - sts:AssumeRole
-    ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

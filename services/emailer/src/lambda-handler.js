@@ -1,41 +1,56 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: process.env.REGION });
-const ses = new AWS.SES({ region: process.env.REGION });
+const ses = new AWS.SES();
+const from_address = 'notification@policapital.net';
 
-module.exports = async (event, context) => {
-  const ddbrecord = event.Records[0].dynamodb;
-  const timestamp = ddbrecord.ApproximateCreationDateTime * 1000 // convert to milliseconds
-      , newrecord = ddbrecord.NewImage
-      , donorName = [newrecord.firstName.S, newrecord.lastName.S].join(' ')
-  ;
-  const fromAddress = 'notification@policapital.net';
-
-  console.log("ddb record", ddbrecord);
-  console.log("new record", newrecord);
-
-  let templateData = {
-    committee: newrecord.committee.S,
-    timestamp: new Date(timestamp).toLocaleString('en-US'),
-    donor    : donorName,
-    email    : newrecord.email.S,
-    address1 : newrecord.addressLine1.S,
-    address2 : newrecord.addressLine2.S,
-    city     : newrecord.city.S,
-    state    : newrecord.state.S.toUpperCase(),
-    zip      : newrecord.postalCode.S,
-    amount   : newrecord.amount.N / 100,
-    stripe   : newrecord.stripePaymentIntentId.S
-  };
-
-  let params = {
-      Source: fromAddress,
-      Template: 'ContributionBackendNotification',
-      Destination: {
-        ToAddresses: ['seemant@schweitzerlabs.com'],
-      },
-      TemplateData: JSON.stringify(templateData)
+/*
+ * Helper Functions
+ */
+const informAdmins = async (message) => {
+    const params = {
+        Message: JSON.stringify(message)
+      , TopicArn: process.env.SNS_TOPIC
     };
+    const resp = await sns.publish(params).promise();
+    console.log("send SNS", resp);
+}; // informAdmins()
 
-  console.log("sending email");
-  return ses.sendTemplatedEmail(params).promise()
+const sendEmail = async (addresses, message, template) => {
+    const params = {
+        Source      : from_address
+      , Template    : template
+      , Destination : {
+          ToAddresses: addresses
+        }
+      , TemplateData: JSON.stringify(message)
+      , ConfigurationSetName: 'SNSDebugging'
+    };
+    const resp = await ses.sendTemplatedEmail(params).promise();
+    console.log("sent SES", resp);
+    return resp;
+}; // sendEmail()
+
+const emailDonor = async (message) => {
+    await sendEmail([message.email], message, process.env.POS_TEMPLATE);
+}; // emailDonor()
+
+const emailCommittee = async (message) => {
+    const address = await getCommitteeEmail(message.committee);
+    await sendEmail(address, message, process.env.POS_REGISTER);
+}; // emailCommittee()
+
+/*
+ * Main Function
+ */
+module.exports = async (event, context) => {
+    event.Records.forEach((receipt) => {
+      let data = receipt.body;
+      console.log(receipt.messageAttributes, data);
+    });
+    //let timeopts = { timeZone: 'America/New_York', timeStyle: 'short', dateStyle: 'long' }
+    return;
+
+    await informAdmins(data);
+    await emailDonor(data)
+    await emailCommittee(data);
 };

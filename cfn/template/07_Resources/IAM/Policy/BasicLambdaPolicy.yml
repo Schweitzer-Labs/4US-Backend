@@ -1,12 +1,12 @@
-LambdaBasicPolicy:
-  Type: AWS::IAM::Policy
+LambdaBasicManagedPolicy:
+  Type: AWS::IAM::ManagedPolicy
   Description: Policy for all Lambdas in {{ DOMAIN }}.{{ TLD }}
   Properties:
-    PolicyName: PermissionsToAWSServices
     Roles:
       - !Ref LambdaBasicRole
-      - !Ref LambdaDynamoDBRole
+      - !Ref LambdaDynamoDBWriterRole
       - !Ref LambdaSESRole
+      - !Ref LambdaDonationReceiverRole
     PolicyDocument:
       Version: '2012-10-17'
       Statement:
@@ -22,7 +22,7 @@ LambdaBasicPolicy:
             - ec2:CreateNetworkInterface
             - ec2:DescribeNetworkInterfaces
             - ec2:DeleteNetworkInterface
-        - Sid: LogEvents
+        - Sid: BasicExecutionPolicy
           Effect: Allow
           Resource: '*'
           Action:

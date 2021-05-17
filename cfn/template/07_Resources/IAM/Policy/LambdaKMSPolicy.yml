@@ -1,15 +1,16 @@
-LambdaSESManagedPolicy:
+LambdaKMSManagedPolicy:
   Type: AWS::IAM::ManagedPolicy
   Properties:
     Roles:
       - !Ref LambdaSESRole
+      - !Ref LambdaDonationReceiverRole
     PolicyDocument:
       Version: 2012-10-17
       Statement:
-        - Sid: SendSESNotifications
+        - Sid: EncryptSNSMessage
           Effect: Allow
           Action:
-            - ses:SendEmail
-            - ses:SendRawEmail
-            - ses:SendTemplatedEmail
+            - kms:Decrypt
+            - kms:Encrypt
+            - kms:GenerateDataKey
           Resource: '*'

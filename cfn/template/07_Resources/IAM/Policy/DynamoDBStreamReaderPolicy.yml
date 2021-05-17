@@ -1,9 +1,9 @@
-DynamoDBStreamReaderPolicy:
-  Type: AWS::IAM::Policy
+DynamoDBStreamReaderManagedPolicy:
+  Type: AWS::IAM::ManagedPolicy
   Properties:
     Roles:
       - !Ref LambdaSESRole
-    PolicyName: ReadDyanmoDBStream
+      - !Ref LambdaDonationReceiverRole
     PolicyDocument:
       Version: 2012-10-17
       Statement:

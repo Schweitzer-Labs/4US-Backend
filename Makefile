@@ -81,10 +81,10 @@ JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAI
 
 # Make targets
 build: clean compile $(TEMPLATE) $(JS_APPS)
-	@sam build
+	@sam build --cached
 
 compile: $(CONTRIB_DIR)
-		cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
+	cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
 
 
 dep:

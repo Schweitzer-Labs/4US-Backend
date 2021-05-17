@@ -1,6 +1,0 @@
-CommitteeEventsTable:
-#  Type: AWS::Serverless::SimpleTable
-#  Properties:
-#    TableName: !Sub committee-events-${LambdaRunEnvironment}-${Domain}
-#    SSESpecification:
-#      SSEEnabled: true

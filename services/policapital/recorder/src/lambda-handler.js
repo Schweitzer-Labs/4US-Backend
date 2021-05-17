@@ -1,68 +1,74 @@
-const payloadVersion = "1.0.0";
-const zlib = require("zlib");
-const YAML = require("yaml");
-
-require("dotenv").config();
-
 const AWS = require("aws-sdk");
 AWS.config.update({ region: process.env.REGION });
+const sqs = new AWS.SQS({ apiVersion: '2012-11-05'})
+;
+/*
+ * Helper Functions
+ */
+const getCommitteeDetails = async (committee) => {
+    const emails = {
+          'angel-cruz'   : ['seemant@schweitzerlabs.com', 'evan@schweitzerlabs.com']
+        , 'john-safford' : ['awsadmin@schweitzerlabs.com']
+      }
+    ;
+    console.log(emails[committee]);
+    return { emails: emails[committee], timezone: "America/New_York" };
+}; // getCommitteeDetails()
 
-const ddb = new AWS.DynamoDB({ apiVersion: "2012-08-10" }),
-  tableName = process.env.DDBTABLE;
-const writeDB = async (items) => {
-  let params = {
-    TableName: tableName,
-    Item: items,
-  };
-  try {
-    let data = await ddb.putItem(params).promise();
-    return { message: "Success" };
-  } catch (err) {
-    return new Error("DynamoDB putItem failed", err);
-  }
-};
+const sendQueue = async (message) => {
+    const {emails, timezone} = await getCommitteeDetails(message.committee)
+      , params = {
+          MessageAttributes: {
+            committee: {
+                  DataType: "String"
+                , StringValue: emails.join(',')
+              }
+            , tzcommittee: {
+                  DataType: "String"
+                , StringValue: timezone
+              }
+          }
+        , MessageBody: JSON.stringify(message)
+        , MessageDeduplicationId: message.id
+        , MessageGroupId: message.committee
+        , QueueUrl: process.env.SQSQUEUE
+      }
+    ;
+    console.log("sending to", params.QueueUrl);
+    const resp = await sqs.sendMessage(params).promise();
+    console.log("sending SQS", resp);
+}; // sendQueue()
 
-const extractMessage = (message) => {
-  return message
-    .split("{")[1]
-    .split("}")[0]
-    .split(",")
-    .map((d) => d.trim())
-    .join("\n");
-};
-
-const ddbRecord = (message) => {
-  let record = {};
-
-  for (const attr in message) {
-    const attrType = attr === "amount" ? "N" : "S";
-    record[attr] = {};
-    record[attr][attrType] = message[attr].toString();
-  }
-  return record;
-};
-
-const decode = (payload) => {
-  return Buffer.from(payload, "base64");
-};
-
-const decompress = (payload) => {
-  const unzipped = zlib.unzipSync(payload);
-  return unzipped.toString();
-};
-
+/*
+ * Main Function
+ */
 module.exports = async (event, context) => {
-  const logStream = JSON.parse(decompress(decode(event.awslogs.data)));
+    const stream   = event.Records[0].dynamodb
+        , record   = stream.NewImage
+        , date     = new Date(stream.ApproximateCreationDateTime * 1000)
+    ;
+    console.log("stream", stream);
+    const data = {
+        id         : stream.id
+      , committee  : record.committee.S
+      , timestamp  : date
+      , donor      : [record.firstName.S, record.lastName.S].join(' ')
+      , timezone   : "America/New_York"
+      , email      : record.email.S
+      , occupation : record.occupation.S
+      , employer   : record.employer.S
+      , address1   : record.addressLine1.S
+      , address2   : record.addressLine2.S
+      , city       : record.city.S
+      , state      : record.state.S.toUpperCase()
+      , zip        : record.postalCode.S
+      , phone      : record.phoneNumber.S
+      , amount     : (record.amount.N / 100).toFixed(2)
+      , transaction: record.stripePaymentIntentId.S
+      , receipt    : record.stripePaymentIntentId.S.slice(-8)
+      , refcode    : record.refCode.S || 'N/A'
+      , card       : record.cardNumberLastFourDigits.S
+    };
 
-  const logEvent = logStream.logEvents[0];
-
-  const message = extractMessage(logEvent.message);
-  const yaml = YAML.parse(message);
-  yaml.id = logEvent.id;
-  const row = ddbRecord(yaml);
-
-  console.log("Writing to DDB", row);
-  let result = await writeDB(row);
-  console.log("Result", result);
-  return;
+    await sendQueue(data);
 };

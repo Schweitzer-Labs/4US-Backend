@@ -1,0 +1,21 @@
+DonationReceiverFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-DonationReceiver
+    Description: Receive DynamoDB events and queues notifications with transaction details
+    CodeUri: services/recorder
+    Handler: app.lambdaHandler
+    Runtime: nodejs12.x
+    Role: !GetAtt LambdaDonationReceiverRole.Arn
+    Events:
+      ContributionRecorded:
+        Type: DynamoDB
+        Properties:
+          BatchSize: 1
+          StartingPosition: LATEST
+          Stream: !GetAtt ContributionRecords.StreamArn
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        DDBTABLE: !Ref ContributionRecords
+        SQSQUEUE: !Ref EmailQueue
