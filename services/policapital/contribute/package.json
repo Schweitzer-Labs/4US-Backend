@@ -18,7 +18,7 @@
   },
   "scripts": {
     "test": "ts-mocha tests/unit/*.ts --timeout 10000",
-    "sed": "",
+    "test-contrib": "ts-mocha tests/integration/test-handler.ts --timeout 10000",
     "compile": "npm install && tsc src/*.ts --outDir dist"
   },
   "devDependencies": {
