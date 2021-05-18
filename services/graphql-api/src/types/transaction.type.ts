@@ -68,4 +68,6 @@ export class Transaction implements ITransaction {
   emailAddress?: string;
   @Field()
   attestsToBeingAnAdultCitizen?: boolean;
+  @Field()
+  transactionType?: string;
 }
