@@ -41,3 +41,30 @@ export const extractDDBString = (obj: { S: string }): string => {
 export const extractDDBBool = (obj: { BOOL: boolean }): boolean => {
   return obj?.BOOL;
 };
+
+export const toFilterExpression = (name: string, value?: any): string[] =>
+  typeof value === "undefined" ? [] : [`${name} = :${name}`];
+
+export const toExpressionAttributeValueString = (
+  name: string,
+  value?: string
+): object =>
+  typeof value === "undefined"
+    ? {}
+    : {
+        [`:${name}`]: {
+          S: value,
+        },
+      };
+
+export const toExpressionAttributeValueBool = (
+  name: string,
+  value?: boolean
+): object =>
+  typeof value === "undefined"
+    ? {}
+    : {
+        [`:${name}`]: {
+          BOOL: value,
+        },
+      };

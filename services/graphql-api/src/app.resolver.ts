@@ -11,6 +11,7 @@ import * as dotenv from "dotenv";
 import { searchTransactions } from "./queries/search-transactions.query";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
+import { TransactionsArg } from "./args/transactions.arg";
 
 dotenv.config();
 
@@ -35,17 +36,15 @@ export class AppResolver {
 
   @Query((returns) => [Transaction])
   async transactions(
-    @Arg("committeeId") committeeId: string
+    @Args() transactionArgs: TransactionsArg
   ): Promise<Transaction[]> {
-    const res = await pipe(
-      searchTransactions(runenv)(this.dynamoDB)(committeeId),
+    return await pipe(
+      searchTransactions(runenv)(this.dynamoDB)(transactionArgs),
       taskEither.fold(
         (err) => task.of([]),
         (succ) => task.of(succ)
       )
     )();
-
-    return res;
   }
 
   @Query((returns) => [Donor])

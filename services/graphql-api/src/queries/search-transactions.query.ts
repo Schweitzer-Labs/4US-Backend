@@ -4,42 +4,57 @@ import { ApplicationError } from "../utils/application-error";
 import { pipe } from "fp-ts/function";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../repositories/ddb.utils";
+import {
+  toExpressionAttributeValueBool,
+  toExpressionAttributeValueString,
+  toFilterExpression,
+  validateDDBResponse,
+} from "../repositories/ddb.utils";
 import {
   ddbResponseToTransactions,
   DDBTransactionsRes,
   ITransaction,
 } from "./search-transactions.decoder";
+import { TransactionsArg } from "../args/transactions.arg";
 
 const getTransactionsRes =
   (env = "dev") =>
   (dynamoDB: DynamoDB) =>
-  (committeeId: string) =>
+  ({
+    committeeId,
+    transactionType,
+    bankVerified,
+    ruleVerified,
+  }: TransactionsArg) =>
   async (): Promise<any> => {
     const transactionsTable = `transactions-${env}`;
+    const filterExpressionString = [
+      ...toFilterExpression("transactionType", transactionType),
+      ...toFilterExpression("bankVerified", bankVerified),
+      ...toFilterExpression("ruleVerified", ruleVerified),
+    ].join(" AND ");
 
-    const query = `SELECT * FROM "${transactionsTable}" WHERE committeeId='${committeeId}'`;
-    const params = {};
-    const otherRes = await dynamoDB
+    const FilterExpression =
+      filterExpressionString === ""
+        ? {}
+        : { FilterExpression: filterExpressionString };
+
+    const res = await dynamoDB
       .query({
         TableName: transactionsTable,
-        KeyConditionExpression: "committeeId = ':committeeId'",
-        // FilterExpression: "",
+        KeyConditionExpression: "committeeId = :committeeId",
+        ...FilterExpression,
         ExpressionAttributeValues: {
-          committeeId: { S: committeeId },
-          // amount: { N: "100" },
+          ":committeeId": { S: committeeId },
+          ...toExpressionAttributeValueString(
+            "transactionType",
+            transactionType
+          ),
+          ...toExpressionAttributeValueBool("bankVerified", bankVerified),
+          ...toExpressionAttributeValueBool("ruleVerified", ruleVerified),
         },
       })
       .promise();
-
-    const res = await dynamoDB
-      .executeStatement({
-        //@ ToDo make table name configurable.
-        Statement: query,
-      })
-      .promise();
-
-    console.log(otherRes);
 
     return res;
   };
@@ -47,10 +62,12 @@ const getTransactionsRes =
 export const searchTransactions =
   (env: string) =>
   (dynamoDB: DynamoDB) =>
-  (committeeId: string): TaskEither<ApplicationError, ITransaction[]> =>
+  (
+    transactionsArg: TransactionsArg
+  ): TaskEither<ApplicationError, ITransaction[]> =>
     pipe(
       tryCatch<ApplicationError, any>(
-        () => getTransactionsRes(env)(dynamoDB)(committeeId)(),
+        () => getTransactionsRes(env)(dynamoDB)(transactionsArg)(),
         (e) =>
           new ApplicationError(
             "Get transaction request failed",
