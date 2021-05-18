@@ -1,10 +1,6 @@
 import { DynamoDB } from "aws-sdk";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import {
-  Committee,
-  DDBCommitteeRes,
-} from "../repositories/committee/committees.decoders";
 import { pipe } from "fp-ts/function";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
@@ -21,12 +17,16 @@ const getTransactionsRes =
   (committeeId: string) =>
   async (): Promise<any> => {
     const transactionsTable = `transactions-${env}`;
-    return await dynamoDB
+
+    const query = `SELECT * FROM "${transactionsTable}" WHERE committeeId='${committeeId}'`;
+
+    const res = await dynamoDB
       .executeStatement({
         //@ ToDo make table name configurable.
-        Statement: `SELECT * FROM "${transactionsTable}" WHERE committeeId = ${committeeId}`,
+        Statement: query,
       })
       .promise();
+    return res;
   };
 
 export const searchTransactions =
@@ -38,7 +38,7 @@ export const searchTransactions =
         () => getTransactionsRes(env)(dynamoDB)(committeeId)(),
         (e) =>
           new ApplicationError(
-            "Get committees request failed",
+            "Get transaction request failed",
             e,
             StatusCodes.INTERNAL_SERVER_ERROR
           )

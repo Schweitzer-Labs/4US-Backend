@@ -21,7 +21,6 @@ describe("GraphQL Endpoint Lambda", function () {
       validGraphQLProxyContext
     );
     const body = JSON.parse(res.body);
-    console.log(body.errors[0].extensions);
-    expect(body.data.transactions[0].amount).to.be.a("number");
+    expect(body.data.transactions.length).to.equal(0);
   });
 });

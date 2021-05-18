@@ -11,6 +11,8 @@ import { right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 
 const DDBTransactionRequired = t.type({
+  id: ddbString,
+  direction: ddbString,
   amount: ddbNumber,
   paymentMethod: ddbString,
   bankVerified: ddbBool,
@@ -53,6 +55,8 @@ export const DDBTransactionsRes = t.type({
 export type DDBTransactionRes = t.TypeOf<typeof DDBTransactionsRes>;
 
 export interface Transaction {
+  id: string;
+  direction: string;
   amount: number;
   paymentMethod: string;
   bankVerified: boolean;
@@ -83,7 +87,9 @@ export interface Transaction {
 export const ddbResponseToTransactions = (
   ddbResponse: DDBTransactionRes
 ): TaskEither<ApplicationError, Transaction[]> => {
-  const transactions = ddbResponse.Items.map((txn) => ({
+  const transactions: Transaction[] = ddbResponse.Items.map((txn) => ({
+    id: extractDDBString(txn.id),
+    direction: extractDDBString(txn.direction),
     amount: extractDDBNumber(txn.amount),
     paymentMethod: extractDDBString(txn.paymentMethod),
     bankVerified: extractDDBBool(txn.bankVerified),

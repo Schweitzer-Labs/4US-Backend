@@ -1,5 +1,5 @@
 export const validGraphQLProxyEvent = {
-  "body":"{\"operationName\":null,\"variables\":{},\"query\":\"{\\n  transactions(committeeId: \\\"0aab3c20-a05a-465a-a3ae-93df7bb1dc88\\\") {\\n    amount\\n  }\\n}\\n\"}",
+  "body":"{\"operationName\":null,\"variables\":{},\"query\":\"{\\n  transactions(committeeId: \\\"907b427a-f8a9-450b-9d3c-33d8ec4a4cc4\\\") {\\n    amount\\n  }\\n}\\n\"}",
   "headers":{
     "Accept":"*/*",
     "Accept-Encoding":"gzip, deflate, br",

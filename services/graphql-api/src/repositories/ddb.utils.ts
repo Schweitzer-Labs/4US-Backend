@@ -8,11 +8,11 @@ export const ddbString = t.type({
 });
 
 export const ddbBool = t.type({
-  BOOL: t.string,
+  BOOL: t.boolean,
 });
 
 export const ddbNumber = t.type({
-  N: t.number,
+  N: t.string,
 });
 
 export const ddbStringList = t.type({
@@ -22,22 +22,22 @@ export const ddbStringList = t.type({
 export const validateDDBResponse =
   <T>(type: t.Type<T>) =>
   (res: any): TaskEither<ApplicationError, T> => {
-    const eitherCommitteesRes = type.decode(res);
-    if (isLeft(eitherCommitteesRes)) {
+    const eitherRes = type.decode(res);
+    if (isLeft(eitherRes)) {
       return left(new ApplicationError("Invalid response", {}));
     } else {
-      return right(eitherCommitteesRes.right);
+      return right(eitherRes.right);
     }
   };
 
-export const extractDDBNumber = (obj: { N: number }): number => {
-  return obj?.N;
+export const extractDDBNumber = (obj: { N: string }): number => {
+  return parseInt(obj?.N);
 };
 
 export const extractDDBString = (obj: { S: string }): string => {
   return obj?.S;
 };
 
-export const extractDDBBool = (obj: { BOOL: string }): boolean => {
-  return obj?.BOOL === "true" || false;
+export const extractDDBBool = (obj: { BOOL: boolean }): boolean => {
+  return obj?.BOOL;
 };

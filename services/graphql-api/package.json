@@ -29,6 +29,7 @@
   },
   "scripts": {
     "test": "ts-mocha tests/**/*.ts --timeout 10000",
+    "test-graphql": "ts-mocha tests/integration/graphql-api.test.ts --timeout 10000",
     "integ-test": "mocha tests/integration/",
     "compile": "npm install && tsc"
   },
