@@ -31,8 +31,8 @@ ifeq ($(ANALYTICS_DIR),)
        export ANALYTICS_DIR	:= services/policapital/analytics
 endif
 
-ifeq ($(RECORDER_DIR),)
-       export RECORDER_DIR	:= services/policapital/recorder
+ifeq ($(RECEIVER_DIR),)
+       export RECORDER_DIR	:= services/policapital/receiver
 endif
 
 ifeq ($(PLATFORM_DIR),)
