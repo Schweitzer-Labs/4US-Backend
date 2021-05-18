@@ -8,7 +8,7 @@ import { validateDDBResponse } from "../repositories/ddb.utils";
 import {
   ddbResponseToTransactions,
   DDBTransactionsRes,
-  Transaction,
+  ITransaction,
 } from "./search-transactions.decoder";
 
 const getTransactionsRes =
@@ -32,7 +32,7 @@ const getTransactionsRes =
 export const searchTransactions =
   (env: string) =>
   (dynamoDB: DynamoDB) =>
-  (committeeId: string): TaskEither<ApplicationError, Transaction[]> =>
+  (committeeId: string): TaskEither<ApplicationError, ITransaction[]> =>
     pipe(
       tryCatch<ApplicationError, any>(
         () => getTransactionsRes(env)(dynamoDB)(committeeId)(),

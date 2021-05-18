@@ -54,7 +54,7 @@ export const DDBTransactionsRes = t.type({
 
 export type DDBTransactionRes = t.TypeOf<typeof DDBTransactionsRes>;
 
-export interface Transaction {
+export interface ITransaction {
   id: string;
   direction: string;
   amount: number;
@@ -86,8 +86,8 @@ export interface Transaction {
 
 export const ddbResponseToTransactions = (
   ddbResponse: DDBTransactionRes
-): TaskEither<ApplicationError, Transaction[]> => {
-  const transactions: Transaction[] = ddbResponse.Items.map((txn) => ({
+): TaskEither<ApplicationError, ITransaction[]> => {
+  const transactions: ITransaction[] = ddbResponse.Items.map((txn) => ({
     id: extractDDBString(txn.id),
     direction: extractDDBString(txn.direction),
     amount: extractDDBNumber(txn.amount),
