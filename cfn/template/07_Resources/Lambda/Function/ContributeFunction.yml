@@ -17,4 +17,4 @@ ContributeFunction:
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
-        DDBTABLE: !Ref ContributionRecords
+        DDBTABLE: !Ref Contributions
