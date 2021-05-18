@@ -8,10 +8,14 @@ Transactions:
       WriteCapacityUnits: 1
       ReadCapacityUnits: 1
     AttributeDefinitions:
+      - AttributeName: committeeId
+        AttributeType: S
       - AttributeName: id
         AttributeType: S
     KeySchema:
       - KeyType: HASH
+        AttributeName: committeeId
+      - KeyType: RANGE
         AttributeName: id
     StreamSpecification:
       StreamViewType: NEW_IMAGE

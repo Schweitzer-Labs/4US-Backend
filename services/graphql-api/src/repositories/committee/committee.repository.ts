@@ -5,6 +5,7 @@ import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { Committee, DDBCommitteeRes } from "./committees.decoders";
 import { validateDDBResponse } from "../ddb.utils";
+import { StatusCodes } from "http-status-codes";
 
 const getCommitteesRes =
   (env = "dev") =>
@@ -43,7 +44,12 @@ export const getAllCommittees =
     pipe(
       tryCatch<ApplicationError, any>(
         () => getCommitteesRes(env)(dynamoDB)(),
-        (e) => new ApplicationError("Get committees request failed", e)
+        (e) =>
+          new ApplicationError(
+            "Get committees request failed",
+            e,
+            StatusCodes.INTERNAL_SERVER_ERROR
+          )
       ),
       taskEither.chain(validateDDBResponse(DDBCommitteeRes)),
       taskEither.chain(ddbResponseToCommittees)

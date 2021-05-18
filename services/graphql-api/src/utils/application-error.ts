@@ -1,5 +1,4 @@
 import headers from "./headers";
-import { HttpStatus } from "aws-sdk/clients/lambda";
 import { StatusCodes } from "http-status-codes";
 
 export class ApplicationError extends Error {

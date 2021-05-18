@@ -1,0 +1,13 @@
+DynamoDBGraphQLPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  Properties:
+    Roles:
+      - !Ref LambdaGraphQLRole
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+          Effect: Allow
+          Resource:
+            !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
+          Action:
+            - dynamodb:PartiQLSelect
