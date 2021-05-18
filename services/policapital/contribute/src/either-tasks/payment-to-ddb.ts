@@ -16,8 +16,8 @@ const savePayment =
   async (payment: Payment): Promise<any> => {
     return await dynamoDB
       .putItem({
-        TableName: `contribution-transactions-${env}`,
-        Item: encodePayment(payment),
+        TableName: process.env.DDBTABLE,
+        Item: DynamoDB.Converter.marshall({ id: uuidv4(), ...payment }),
       })
       .promise();
   };
