@@ -22,7 +22,7 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
         ...stringToDDBString("initiatedTimestamp", now),
         ...stringToDDBString("ruleVerifiedTimestamp", now),
         ...stringToDDBString("committeeId", committeeId),
-        ...numberToDDBNumber("amount", txn.amount),
+        ...numberToDDBNumber("amount", txn.amount * 100),
         ...stringToDDBString("firstName", txn.firstName),
         ...stringToDDBString("lastName", txn.lastName),
         ...stringToDDBString("employer", txn.employer),
@@ -35,6 +35,7 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
         ...stringToDDBString("paymentMethod", txn.paymentMethod),
         ...stringToDDBString("contributorType", txn.contributorType),
         ...stringToDDBString("direction", "in"),
+        ...stringToDDBString("transactionType", "contribution"),
       },
     },
   }));
@@ -46,8 +47,6 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
       },
     })
     .promise();
-
-  console.log(res);
 
   return res;
 };

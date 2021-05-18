@@ -40,6 +40,7 @@ const DDBTransactionOptional = t.partial({
   companyName: ddbString,
   phoneNumber: ddbString,
   emailAddress: ddbString,
+  transactionType: ddbString,
   attestsToBeingAnAdultCitizen: ddbBool,
 });
 
@@ -82,6 +83,7 @@ export interface ITransaction {
   phoneNumber?: string;
   emailAddress?: string;
   attestsToBeingAnAdultCitizen?: boolean;
+  transactionType?: string;
 }
 
 export const ddbResponseToTransactions = (
@@ -113,6 +115,7 @@ export const ddbResponseToTransactions = (
     companyName: extractDDBString(txn.companyName),
     phoneNumber: extractDDBString(txn.phoneNumber),
     emailAddress: extractDDBString(txn.emailAddress),
+    transactionType: extractDDBString(txn.transactionType),
     attestsToBeingAnAdultCitizen: extractDDBBool(
       txn.attestsToBeingAnAdultCitizen
     ),

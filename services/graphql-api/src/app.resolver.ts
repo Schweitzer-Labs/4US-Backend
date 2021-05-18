@@ -9,7 +9,6 @@ import { DynamoDB } from "aws-sdk";
 import * as AWS from "aws-sdk";
 import * as dotenv from "dotenv";
 import { searchTransactions } from "./queries/search-transactions.query";
-import { isLeft } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 
@@ -45,8 +44,6 @@ export class AppResolver {
         (succ) => task.of(succ)
       )
     )();
-
-    console.log(res);
 
     return res;
   }

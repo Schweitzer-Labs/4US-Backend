@@ -19,6 +19,18 @@ const getTransactionsRes =
     const transactionsTable = `transactions-${env}`;
 
     const query = `SELECT * FROM "${transactionsTable}" WHERE committeeId='${committeeId}'`;
+    const params = {};
+    const otherRes = await dynamoDB
+      .query({
+        TableName: transactionsTable,
+        KeyConditionExpression: "committeeId = ':committeeId'",
+        // FilterExpression: "",
+        ExpressionAttributeValues: {
+          committeeId: { S: committeeId },
+          // amount: { N: "100" },
+        },
+      })
+      .promise();
 
     const res = await dynamoDB
       .executeStatement({
@@ -26,6 +38,9 @@ const getTransactionsRes =
         Statement: query,
       })
       .promise();
+
+    console.log(otherRes);
+
     return res;
   };
 
