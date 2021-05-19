@@ -15,40 +15,24 @@ else
 	export TLD	:= us
 endif
 
+export SUBDOMAIN        := donate
+
 ifeq ($(REGION), )
        export REGION	:= us-east-1
 endif
 
-ifeq ($(CONTRIB_DIR),)
-       export CONTRIB_DIR	:= services/policapital/contribute
-endif
+export CONTRIB_DIR	:= services/policapital/contribute
+export ONBOARD_DIR	:= services/policapital/onboard
+export ANALYTICS_DIR	:= services/policapital/analytics
+export RECORDER_DIR	:= services/policapital/receiver
+export PLATFORM_DIR	:= services/graphql-api
+export EMAILER_DIR	:= services/emailer
 
-ifeq ($(ONBOARD_DIR),)
-       export ONBOARD_DIR	:= services/policapital/onboard
-endif
-
-ifeq ($(ANALYTICS_DIR),)
-       export ANALYTICS_DIR	:= services/policapital/analytics
-endif
-
-ifeq ($(RECEIVER_DIR),)
-       export RECORDER_DIR	:= services/policapital/receiver
-endif
-
-ifeq ($(PLATFORM_DIR),)
-       export PLATFORM_DIR	:= services/graphql-api
-endif
-
-ifeq ($(EMAILER_DIR),)
-       export EMAILER_DIR	:= services/emailer
-endif
-
-export SUBDOMAIN        := donate
 
 export STACK		:= $(DOMAIN)-backend
 
-export SAMDIR		:= $(PWD)/.aws-sam
-export BUILDDIR		:= $(SAMDIR)/build
+export SAM_DIR		:= $(PWD)/.aws-sam
+export BUILD_DIR	:= $(SAM_DIR)/build
 
 export STACKNAME	:= $(STACK)-$(RUNENV)
 
@@ -61,13 +45,19 @@ export BUCKET		:= 4us-cfn-templates-$(REGION)
 export STACK_PARAMS	:= Nonce=$(NONCE)
 STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
 
-export TEMPLATE		:= template.yml
-export PACKAGE		:= $(SAMDIR)/CloudFormation-template.yml
+export PACKAGE		:= $(SAM_DIR)/CloudFormation-template.yml
 
-CFNDIR			:= $(PWD)/cfn/template
-SRCS			:= $(shell find cfn/template/0* -name '*.yml' -o -name '*.txt')
+CFN_DIR			:= cfn/templates
 
-IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
+# stacks and templates
+BACKEND_STACK		:= backend
+BACKEND_TEMPLATE	:= $(BUILD_DIR)/$(BACKEND_STACK).yml
+CONTRIBUTOR_RECEIPT	:= contributor-receipt
+CONTRIBUTOR_TEMPLATE	:= $(BUILD_DIR)/$(CONTRIBUTOR_RECEIPT).yml
+COMMITTEE_RECEIPT	:= committee-receipt
+COMMITTEE_TEMPLATE	:= $(BUILD_DIR)/$(COMMITTEE_RECEIPT).yml
+
+IMPORTS			:= $(BUILD_DIR)/Imports-$(STACK).yml
 
 CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
 ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
@@ -80,8 +70,23 @@ JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAI
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
 # Make targets
-build: clean compile $(TEMPLATE) $(JS_APPS)
-	@sam build --cached
+all: build
+	$(MAKE) -C $(CFN_DIR)/$(BACKEND_STACK)
+
+mkbuilddir:
+	echo $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)
+
+build: clean mkbuilddir buildstacks buildsam
+
+buildsam: buildstacks compile $(JS_APPS)
+	sam build \
+		--cached \
+		--base-dir . \
+		--template-file $(BACKEND_TEMPLATE)
+
+buildstacks: mkbuilddir $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
+	echo Built all the stacks
 
 compile: $(CONTRIB_DIR)
 	cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
@@ -90,41 +95,34 @@ compile: $(CONTRIB_DIR)
 dep:
 	@pip3 install jinja2 cfn_flip boto3
 
-$(TEMPLATE): $(SRCS)
-	@$(CREPES) $(CFNDIR) \
-		--region $(REGION) \
-		--subdomain $(SUBDOMAIN) \
-                --domain $(DOMAIN) \
-                --tld $(TLD) \
-		--runenv $(RUNENV) \
-		--output $(TEMPLATE)
+$(BUILD_DIR)/%.yml: $(CFN_DIR)/%
+	$(MAKE) template=$@ -C $^ check
 
 
-check: $(TEMPLATE)
-	@echo "Validating template"
-	@aws cloudformation validate-template --template-body file://$^
+check: buildstacks
+	$(MAKE) -c $(CFN_DIR)/$(BACKEND_STACK) check
 
 
 clean:
-	@rm -f $(TEMPLATE) $(PACKAGE)
+	rm -f $(BUILD_DIR)/*.yml
 
 realclean: clean
-	@rm -rf $(SAMDIR)
+	@rm -rf $(SAM_DIR)
 
-local: $(TEMPLATE)
+local: build
 	@sam local start-api
 
-package: build check
-	@aws cloudformation package \
+package: build
+	aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
-		--template-file $(BUILDDIR)/template.yaml \
+		--template-file $(BUILD_DIR)/template.yaml \
 		--region $(REGION) \
 		--s3-bucket $(BUCKET) \
 		--s3-prefix $(STACKNAME) \
 		--output-template-file $(PACKAGE)
 
 deploy: package
-	@aws cloudformation deploy \
+	aws cloudformation deploy \
 		--endpoint-url $(ENDPOINT) \
 		--region $(REGION) \
 		--template-file $(PACKAGE) \
@@ -139,4 +137,4 @@ deploy: package
 
 	
 import: build
-	@$(MAKE) -C $(CFNDIR) import
+	@$(MAKE) -C $(CFN_DIR) import

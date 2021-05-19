@@ -1,22 +1,49 @@
-IMPORTS			:= $(BUILDDIR)/Imports-$(STACK).yml
 
-.PHONY: dep build buildstacks check local package deploy clean realclean
+SHELL			:= bash
 
-buildimports: $(IMPORTS)
+SRCS			:= $(shell find 0* -name '*.yml' -o -name '*.txt')
 
-$(IMPORTS): ImportedResources/$(REGION).yml $(SRCS)
+IMPORTED_RESOURCES	:= $(BUILD_DIR)/ImportedResources-$(STACK).yml
+IMPORTS			:= $(BUILD_DIR)/imports-template-$(STACK).yml
+
+.PHONY: build buildimports check import
+
+# Make targets
+build: $(template)
+
+buildimports: $(IMPORTED_RESOURCES)
+
+check: $(template)
+	@echo "Validating template"
+	@aws cloudformation validate-template --template-body file://$^
+
+$(template): $(SRCS)
+	@echo $@
+	@$(CREPES) . \
+		--region $(REGION) \
+		--subdomain $(SUBDOMAIN) \
+                --domain $(DOMAIN) \
+                --tld $(TLD) \
+		--runenv $(RUNENV) \
+		--output $@
+
+
+$(IMPORTED_RESOURCES): ImportedResources/$(REGION).yml $(SRCS)
 	@echo "Importing resources from $(REGION) into $(STACK) via $@"
-	@$(CREPES) . --region $(REGION) --import $@ --output $(TEMPLATE)
+	@$(CREPES) . \
+		--region $(REGION) \
+		--import $@ \
+		--output $(IMPORTS)
 
-import: $(IMPORTS)
+import: $(IMPORTED_RESOURCES)
 	@echo "Creating import changeset for CloudFormation template"
 	@aws cloudformation create-change-set \
 		--endpoint-url $(ENDPOINT) \
 		--stack-name $(STACKNAME) \
 		--change-set-name ImportChangeSet \
 		--change-set-type IMPORT \
-		--resources-to-import file://$(IMPORTS) \
-		--template-body file://$(TEMPLATE) \
+		--resources-to-import file://$(IMPORTED_RESOURCES) \
+		--template-body file://$(IMPORTS) \
 		--capabilities \
 			CAPABILITY_NAMED_IAM \
 		--region $(REGION)
