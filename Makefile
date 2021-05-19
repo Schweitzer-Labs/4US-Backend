@@ -4,7 +4,7 @@ export CREPES		:= $(PWD)/cfn/bin/crepes.py
 
 # Allowed values are: prod, qa, dev
 ifeq ($(RUNENV), )
-       export RUNENV	:= dev
+       export RUNENV	:= qa
 endif
 
 ifeq ($(RUNENV), prod)
