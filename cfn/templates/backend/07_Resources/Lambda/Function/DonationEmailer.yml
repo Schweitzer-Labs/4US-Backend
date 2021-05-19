@@ -6,7 +6,7 @@ DonationEmailerFunction:
     CodeUri: services/emailer
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
-    Role: !GetAtt LambdaSESRole.Arn
+    Role: !Sub ${IAM.Outputs.LambdaSESRoleArn}
     Events:
       ContributionMade:
         Type: SQS
