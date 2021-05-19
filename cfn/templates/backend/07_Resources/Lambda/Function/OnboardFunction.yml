@@ -6,7 +6,7 @@ OnboardFunction:
     CodeUri: services/policapital/onboard/
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
-    Role: !GetAtt LambdaBasicRole.Arn
+    Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}
     Events:
       Onboard:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api

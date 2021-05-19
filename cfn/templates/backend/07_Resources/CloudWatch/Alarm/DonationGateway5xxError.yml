@@ -1,8 +1,8 @@
 DonationGateway5xxErrorTopic:
   Type: AWS::SNS::Topic
   Properties:
-    DisplayName: !Sub Gateway5xxError-${Domain}-${LambdaRunEnvironment}
-    TopicName: !Sub Gateway-Errors-5xx-${Domain}-${LambdaRunEnvironment}
+    DisplayName: !Sub ${LambdaRunEnvironment}-${Domain}-Gateway5xxError
+    TopicName: !Sub ${LambdaRunEnvironment}-${Domain}-Gateway-Errors-5xx
     KmsMasterKeyId: !Ref SNSKey
     Subscription:
       - Endpoint: !Ref AdminEmail
@@ -11,7 +11,7 @@ DonationGateway5xxErrorTopic:
 DonationGateway5xxErrorAlarm:
   Type: AWS::CloudWatch::Alarm
   Properties:
-    AlarmName: DonationGateway5xxErrors
+    AlarmName: !Sub ${LambdaRunEnvironment}-${Domain}-DonationGateway5xxErrors
     AlarmDescription: !Sub Alarms when the ${Domain} Donation gateway returns a 5xx error.
     Dimensions:
       - Name: ApiName

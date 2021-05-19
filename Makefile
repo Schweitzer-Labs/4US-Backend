@@ -52,6 +52,8 @@ CFN_DIR			:= cfn/templates
 # stacks and templates
 BACKEND_STACK		:= backend
 BACKEND_TEMPLATE	:= $(BUILD_DIR)/$(BACKEND_STACK).yml
+IAM_STACK		:= iam
+IAM_TEMPLATE		:= $(BUILD_DIR)/$(IAM_STACK).yml
 CONTRIBUTOR_RECEIPT	:= contributor-receipt
 CONTRIBUTOR_TEMPLATE	:= $(BUILD_DIR)/$(CONTRIBUTOR_RECEIPT).yml
 COMMITTEE_RECEIPT	:= committee-receipt
@@ -66,6 +68,7 @@ RECORDER_APP		:= $(RECORDER_DIR)/app.js
 EMAILER_APP		:= $(EMAILER_DIR)/app.js
 
 JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
+CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(IAM_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
 
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
@@ -85,7 +88,7 @@ buildsam: buildstacks compile $(JS_APPS)
 		--base-dir . \
 		--template-file $(BACKEND_TEMPLATE)
 
-buildstacks: mkbuilddir $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
+buildstacks: mkbuilddir $(CFN_TEMPLATES)
 	echo Built all the stacks
 
 compile: $(CONTRIB_DIR)

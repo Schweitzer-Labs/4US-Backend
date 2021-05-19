@@ -1,7 +1,7 @@
 EmailQueue:
   Type: AWS::SQS::Queue
   Properties:
-    QueueName: "ContributionsEmailQueue.fifo"
+    QueueName: !Sub ${LambdaRunEnvironment}-${Domain}-ReceiptEmailQueue.fifo
     FifoQueue: true
     ContentBasedDeduplication: true
     VisibilityTimeout: 900
