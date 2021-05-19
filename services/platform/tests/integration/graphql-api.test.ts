@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import graphql from "../../src/graphql-api";
+import graphql from "../../src/committee-graphql-api";
 import { genGraphQLProxy } from "../utils/gen-proxy.util";
 
 const getAllTransactionsQuery = `

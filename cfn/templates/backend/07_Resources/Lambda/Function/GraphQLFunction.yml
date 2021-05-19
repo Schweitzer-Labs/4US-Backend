@@ -3,8 +3,8 @@ GraphQLFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-GraphQLFunction
     Description: GraphQL API for Committees
-    CodeUri: services/graphql-api/
-    Handler: app.lambdaHandler
+    CodeUri: services/platform/
+    Handler: app.committeeGraphQLHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaGraphQLRoleArn}
     Events:

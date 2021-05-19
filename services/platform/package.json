@@ -11,7 +11,6 @@
     "@types/graphql": "^14.5.0",
     "apollo-server": "^2.24.0",
     "apollo-server-lambda": "^2.24.0",
-    "aws-elasticsearch-js": "^1.0.3",
     "axios": "^0.21.1",
     "class-validator": "^0.13.1",
     "dotenv": "^8.2.0",
@@ -32,6 +31,7 @@
     "test-graphql": "ts-mocha tests/integration/graphql-api.test.ts --timeout 10000",
     "integ-test": "mocha tests/integration/",
     "seed-contrib": "ts-node tests/seed/seed-contributions.job.ts",
+    "test-contrib": "ts-mocha tests/integration/policapital-contribute.test.ts --timeout 10000",
     "compile": "npm install && tsc"
   },
   "devDependencies": {
