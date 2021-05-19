@@ -1,6 +1,0 @@
-POSReceipt:
-  Type: AWS::SSM::Parameter::Value<String>
-  Default: /{{ RUNENV }}/{{ DOMAIN }}/{{ SUBDOMAIN }}/ses/donor_receipt
-POSRecord:
-  Type: AWS::SSM::Parameter::Value<String>
-  Default: /{{ RUNENV }}/{{ DOMAIN }}/{{ SUBDOMAIN }}/ses/committee_receipt

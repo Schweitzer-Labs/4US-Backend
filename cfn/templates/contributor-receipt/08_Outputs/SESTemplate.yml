@@ -1,0 +1,3 @@
+SES:
+  Description: Name for the contributor receipt email template
+  Value: !Ref ContributorReceiptEmail
