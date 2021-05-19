@@ -7,6 +7,7 @@ LambdaBasicManagedPolicy:
       - !Ref LambdaDynamoDBWriterRole
       - !Ref LambdaSESRole
       - !Ref LambdaDonationReceiverRole
+      - !Ref LambdaGraphQLRole
     PolicyDocument:
       Version: '2012-10-17'
       Statement:
