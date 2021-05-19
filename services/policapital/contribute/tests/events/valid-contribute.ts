@@ -1,5 +1,5 @@
 export default {
-  body: '{"email":"evan@schweitzerlabs.com","phoneNumber":"5551231234","firstName":"May","lastName":"Monthman","employer":"General Mills","occupation":"President","addressLine1":"123 Cleveland Park","addressLine2":"","city":"Ridgewood","state":"ny","postalCode":"11385","amount":19335,"cardNumber":"4242424242424242","cardExpirationMonth":12,"cardExpirationYear":2023,"cardCVC":"2023","paymentMethod":"credit","contributorType":"ind","companyName":"","refCode":"","stripeUserId":"acct_1IjTcsRC8iiQex3V","attestsToBeingAdultCitizen":true,"committee":"angel-cruz"}',
+  body: '{"email":"evan@schweitzerlabs.com","phoneNumber":"5555555555","firstName":"May","lastName":"Monthman","employer":"General Mills","occupation":"President","addressLine1":"123 Cleveland Park","addressLine2":"","city":"Ridgewood","state":"ny","postalCode":"11385","amount":19335,"cardNumber":"4242424242424242","cardExpirationMonth":12,"cardExpirationYear":2023,"cardCVC":"2023","paymentMethod":"credit","contributorType":"ind","companyName":"","refCode":"","stripeUserId":"acct_1IjTcsRC8iiQex3V","attestsToBeingAdultCitizen":true,"committee":"angel-cruz"}',
   resource: "/{proxy+}",
   path: "/path/to/resource",
   httpMethod: "POST",

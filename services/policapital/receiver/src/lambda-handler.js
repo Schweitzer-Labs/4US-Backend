@@ -39,22 +39,23 @@ const sendQueue = async (message) => {
  */
 module.exports = async (event, context) => {
   for (const stream of event.Records) {
-    const record = stream.dynamodb
-      , data = AWS.DynamoDB.Converter.unmarshall(record.NewImage)
-      , timestamp = new Date(record.ApproximateCreationDateTime * 1000)
-    ;
-    console.log("data", data);
+    const record = stream.dynamodb,
+      data = AWS.DynamoDB.Converter.unmarshall(record.NewImage),
+      timestamp = new Date(record.ApproximateCreationDateTime * 1000);
+    const payload = {
+      ...data,
+      id: record.id,
+      timezone: "America/New_York",
+      amount: (data.amount / 100).toFixed(2),
+      timestamp,
+      state: data.state.toUpperCase(),
+      receipt: data.stripePaymentIntentId.slice(-8),
+      occupation: data.occupation || "",
+      employer: data.employer || "",
+      refCode: data.refCode || "N/A",
+    };
 
-    data.id = record.id;
-    data.timezone = 'America/New_York';
-    data.amount = (data.amount / 100).toFixed(2);
-    data.timestamp = timestamp;
-    data.state = data.state.toUpperCase();
-    data.receipt = data.stripePaymentIntentId.slice(-8);
-
-    data.occupation = data.occupation || '';
-    data.employer = data.employer || '';
-    data.refCode = data.refCode || 'N/A';
+    console.log("Sending contribution ddb record to stream", data);
 
     await sendQueue(data);
   }
