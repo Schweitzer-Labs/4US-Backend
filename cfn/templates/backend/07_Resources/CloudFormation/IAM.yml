@@ -1,0 +1,8 @@
+IAM:
+  Type: AWS::CloudFormation::Stack
+  Properties:
+    TemplateURL: iam.yml
+    TimeoutInMinutes: 60
+    Parameters:
+      Contributions: !Ref Contributions
+      Transactions: !Ref Transactions
