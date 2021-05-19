@@ -1,0 +1,8 @@
+LambdaRunEnvironment:
+  Type: String
+  Default: dev
+  AllowedValues:
+    - prod
+    - qa
+    - dev
+  NoEcho: true

@@ -1,0 +1,1 @@
+SES Email template for receipt sent to contributor

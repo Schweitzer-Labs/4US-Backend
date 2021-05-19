@@ -1,0 +1,12 @@
+TLD:
+  Type: String
+  Default: {{ TLD }}
+  NoEcho: true
+Domain:
+  Type: String
+  Default: {{ DOMAIN }}
+  NoEcho: true
+SubDomain:
+  Type: String
+  Default: {{ SUBDOMAIN }}
+  NoEcho: true

@@ -1,0 +1,3 @@
+SES:
+  Description: SES Template name for Committee Receipt
+  Value: !Ref CommitteeReceiptEmail
