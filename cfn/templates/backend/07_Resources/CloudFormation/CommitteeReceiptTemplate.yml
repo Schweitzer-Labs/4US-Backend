@@ -1,0 +1,5 @@
+CommitteeReceiptTemplate:
+  Type: AWS::CloudFormation::Stack
+  Properties:
+    TemplateURL: committee-receipt.yml
+    TimeoutInMinutes: 60

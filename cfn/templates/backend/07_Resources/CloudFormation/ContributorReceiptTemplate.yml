@@ -1,0 +1,5 @@
+ContributorReceiptTemplate:
+  Type: AWS::CloudFormation::Stack
+  Properties:
+    TemplateURL: contributor-receipt.yml
+    TimeoutInMinutes: 60
