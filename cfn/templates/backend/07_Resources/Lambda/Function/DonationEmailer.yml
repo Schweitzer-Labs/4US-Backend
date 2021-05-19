@@ -16,5 +16,5 @@ DonationEmailerFunction:
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
-        POS_RECEIPT: !Ref POSReceipt
-        POS_RECORD: !Ref POSRecord
+        POS_RECEIPT: !Sub ${ContributorReceiptTemplate.Outputs.SES}
+        POS_RECORD: !Sub ${CommitteeReceiptTemplate.Outputs.SES}
