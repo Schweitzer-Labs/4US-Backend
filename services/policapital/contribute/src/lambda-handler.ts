@@ -9,6 +9,7 @@ import { DynamoDB } from "aws-sdk";
 dotenv.config();
 
 const runenv: any = process.env.RUNENV;
+const contributionsTableName: any = process.env.CONTRIBUTIONS_DDB_TABLE_NAME;
 let stripe: Stripe;
 let stripeApiKey: string;
 let dynamoDB: DynamoDB;
@@ -28,5 +29,5 @@ export default async (event: APIGatewayProxyEvent) => {
     dynamoDB = new DynamoDB();
   }
 
-  return main(runenv)(stripe)(dynamoDB)(event)();
+  return main(runenv)(contributionsTableName)(stripe)(dynamoDB)(event)();
 };

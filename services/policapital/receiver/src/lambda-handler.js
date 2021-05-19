@@ -9,7 +9,6 @@ const getCommitteeDetails = async (committee) => {
     "angel-cruz": ["seemant@schweitzerlabs.com", "evan@schweitzerlabs.com"],
     "john-safford": ["awsadmin@schweitzerlabs.com"],
   };
-  console.log(emails[committee]);
   return { emails: emails[committee], timezone: "America/New_York" };
 }; // getCommitteeDetails()
 
@@ -31,9 +30,8 @@ const sendQueue = async (message) => {
       MessageGroupId: message.committee,
       QueueUrl: process.env.SQSQUEUE,
     };
-  console.log("sending to", params.QueueUrl);
   const resp = await sqs.sendMessage(params).promise();
-  console.log("sending SQS", resp);
+  console.log("sent SQS", resp);
 }; // sendQueue()
 
 /*
@@ -42,31 +40,23 @@ const sendQueue = async (message) => {
 module.exports = async (event, context) => {
   for (const stream of event.Records) {
     const record = stream.dynamodb,
-      row = record.NewImage,
-      date = new Date(record.ApproximateCreationDateTime * 1000);
-    console.log("record", record);
-
-    const data = {
+      data = AWS.DynamoDB.Converter.unmarshall(record.NewImage),
+      timestamp = new Date(record.ApproximateCreationDateTime * 1000);
+    const payload = {
+      ...data,
       id: record.id,
-      committee: row.committee.S,
-      timestamp: date,
-      donor: [row.firstName.S, row.lastName.S].join(" "),
       timezone: "America/New_York",
-      email: row.email.S,
-      occupation: row.occupation.S,
-      employer: row.employer.S,
-      address1: row.addressLine1.S,
-      address2: row.addressLine2.S,
-      city: row.city.S,
-      state: row.state.S.toUpperCase(),
-      zip: row.postalCode.S,
-      phone: row.phoneNumber.S,
-      amount: (row.amount.N / 100).toFixed(2),
-      transaction: row.stripePaymentIntentId.S,
-      receipt: row.stripePaymentIntentId.S.slice(-8),
-      refcode: row.refCode.S || "N/A",
-      card: row.cardNumberLastFourDigits.S,
+      amount: (data.amount / 100).toFixed(2),
+      timestamp,
+      state: data.state.toUpperCase(),
+      receipt: data.stripePaymentIntentId.slice(-8),
+      occupation: data.occupation || "",
+      employer: data.employer || "",
+      refCode: data.refCode || "N/A",
     };
+
+    console.log("Sending contribution ddb record to stream", data);
+
     await sendQueue(data);
   }
 };

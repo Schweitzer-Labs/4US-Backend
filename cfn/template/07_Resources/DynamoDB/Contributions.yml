@@ -1,7 +1,6 @@
-ContributionRecords:
+Contributions:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: !Sub contribution-transactions-${LambdaRunEnvironment}
     SSESpecification:
       SSEEnabled: true
     ProvisionedThroughput:

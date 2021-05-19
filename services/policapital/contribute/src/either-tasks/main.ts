@@ -11,6 +11,7 @@ import { paymentToDDB } from "./payment-to-ddb";
 
 export const main =
   (env: string) =>
+  (contributionsTableName: string) =>
   (stripe: Stripe) =>
   (dynamoDB: DynamoDB) =>
   (event: APIGatewayProxyEvent) =>
@@ -18,7 +19,7 @@ export const main =
       taskEither.of<ApplicationError, APIGatewayProxyEvent>(event),
       taskEither.chain(eventToContribution),
       taskEither.chain(contributionToPayment(stripe)),
-      taskEither.chain(paymentToDDB(env)(dynamoDB)),
+      taskEither.chain(paymentToDDB(contributionsTableName)(dynamoDB)),
       taskEither.fold(
         (error) => task.of(error.toResponse()),
         (result) => task.of(successResponse)

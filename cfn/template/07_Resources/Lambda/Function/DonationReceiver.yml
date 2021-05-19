@@ -3,7 +3,7 @@ DonationReceiverFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-DonationReceiver
     Description: Receive DynamoDB events and queues notifications with transaction details
-    CodeUri: services/policapital/recorder
+    CodeUri: services/policapital/receiver
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
     Role: !GetAtt LambdaDonationReceiverRole.Arn
@@ -13,9 +13,8 @@ DonationReceiverFunction:
         Properties:
           BatchSize: 1
           StartingPosition: LATEST
-          Stream: !GetAtt ContributionRecords.StreamArn
+          Stream: !GetAtt Contributions.StreamArn
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
-        DDBTABLE: !Ref ContributionRecords
         SQSQUEUE: !Ref EmailQueue

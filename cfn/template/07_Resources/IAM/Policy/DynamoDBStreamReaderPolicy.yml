@@ -9,7 +9,7 @@ DynamoDBStreamReaderManagedPolicy:
       Statement:
           Effect: Allow
           Resource:
-            !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ContributionRecords}/stream/*
+            !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Contributions}/stream/*
           Action:
             - dynamodb:GetRecords
             - dynamodb:GetShardIterator
