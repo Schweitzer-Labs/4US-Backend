@@ -1,11 +1,6 @@
-const Joi = require("joi");
-const parseUa = require("./parse-ua.js");
-
-const resHeaders = {
-  "Access-Control-Allow-Headers" : "Content-Type",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-}
+import Joi from 'joi'
+import {parseUA} from "./utils/parse-ua";
+import headers from "./utils/headers";
 
 const analyticsSchema = Joi.object({
   userAgent: Joi.string().required(),
@@ -14,8 +9,7 @@ const analyticsSchema = Joi.object({
   src: Joi.string().required(),
 }).required();
 
-module.exports = async (event, context) => {
-  console.log("function invoked")
+export default async (event, context) => {
   const res = analyticsSchema.validate(JSON.parse(event.body), {allowUnknown: true});
   if (res.error) {
     return {
@@ -23,7 +17,7 @@ module.exports = async (event, context) => {
       body: JSON.stringify({
         message: res.error.message,
       }),
-      headers: resHeaders
+      headers
     };
   }
 
@@ -33,19 +27,21 @@ module.exports = async (event, context) => {
     src
   } = res.value
 
-  console.log({
+  const logItem = {
     headers: event.headers,
-    userAgent: parseUa(userAgent),
+    userAgent: parseUA(userAgent),
     referrer,
     src,
     event: res.value.event
-  })
+  }
+
+  console.log(logItem)
 
   return {
     statusCode: 200,
     body: JSON.stringify({
       message: "success",
     }),
-    headers: resHeaders
+    headers
   };
 }

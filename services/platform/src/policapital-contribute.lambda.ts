@@ -14,7 +14,8 @@ let stripe: Stripe;
 let stripeApiKey: string;
 let dynamoDB: DynamoDB;
 
-export default async (event: APIGatewayProxyEvent) => {
+export default async (event: any) => {
+  console.log("contrib merged dep")
   if (!stripeApiKey || !stripe || !dynamoDB) {
     // Set up dependencies
     stripeApiKey = await getStripeApiKey(runenv);

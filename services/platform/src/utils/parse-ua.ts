@@ -1,5 +1,5 @@
 const parser = require('ua-parser-js');
 
-module.exports = (uaStr) => {
+export const parseUA = (uaStr) => {
   return parser(uaStr);
 }

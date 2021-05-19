@@ -3,12 +3,11 @@ import { ApolloServer, gql } from "apollo-server-lambda";
 import { buildSchema } from "type-graphql";
 import { Container } from "typedi";
 import { GraphQLSchema } from "graphql";
-import { AppResolver } from "./app.resolver";
+import { AppResolver } from "./resolvers/app.resolver";
 
 let schema: GraphQLSchema;
 
 const createHandler = async () => {
-  console.log("graphql merged dep")
   if (!schema) {
     schema = await buildSchema({
       resolvers: [AppResolver],

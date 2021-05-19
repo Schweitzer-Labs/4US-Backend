@@ -3,7 +3,7 @@ ContributeFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-DonationFunction
     Description: Process donations for a committee
-    CodeUri: services/plaftorm/
+    CodeUri: services/platform/
     Handler: app.policapitalContributeHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaDynamoDBWriterRoleArn}

@@ -1,5 +1,4 @@
-"use strict";
-
+import { expect } from "chai";
 const lambdaHandler = require("../src/lambda-handler.js");
 const invalidCode = require('./events/invalid-code.json')
 const missingQs = require('./events/missing-qs.json')

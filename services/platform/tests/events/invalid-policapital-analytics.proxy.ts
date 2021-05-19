@@ -1,11 +1,11 @@
-export default {
-  "body": "{\"cardExpirationMonth\": 12,\n    \"cardExpirationYear\": 2023,\n    \"cardCVC\": \"123\",\n    \"amount\": 400\n}",
+export const invalidPolicapitalAnalyticsProxy = {
+  "body": "{}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "POST",
   "isBase64Encoded": true,
   "queryStringParameters": {
-    "foo": "bar"
+    "code": "ac_JLobokAehLDUp5AhY4HOPcqDuZYmG7xJ"
   },
   "multiValueQueryStringParameters": {
     "foo": [

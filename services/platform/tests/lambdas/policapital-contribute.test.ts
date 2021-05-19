@@ -1,12 +1,12 @@
 import { expect } from "chai";
 
-import lambdaHandler from "../../src/policapital-contribute";
-import validContributeEvent from "../events/valid-contribute";
-import invalidContributeEvent from "../events/invalid-contribute";
+import lambdaHandler from "../../src/policapital-contribute.lambda";
+import {invalidPolicapitalContributeProxy} from "../events/invalid-policapital-contribute.proxy";
+import {validPolicapitalContributeProxy} from "../events/valid-policapital-contribute-proxy";
 
-describe("Tests contribute lambda", function () {
+describe("Policapital Contribute Lambda", function () {
   it("Stops a contribution call with an invalid payload", async () => {
-    const result = await lambdaHandler(invalidContributeEvent);
+    const result = await lambdaHandler(invalidPolicapitalContributeProxy);
     expect(result.statusCode).to.equal(400);
 
     let response = JSON.parse(result.body);
@@ -15,7 +15,7 @@ describe("Tests contribute lambda", function () {
   });
 
   it("Allows a contribution call with a valid payload", async () => {
-    const result = await lambdaHandler(validContributeEvent);
+    const result = await lambdaHandler(validPolicapitalContributeProxy);
     expect(result.statusCode).to.equal(200);
 
     let response = JSON.parse(result.body);

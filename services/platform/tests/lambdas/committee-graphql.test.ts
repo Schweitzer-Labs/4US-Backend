@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import graphql from "../../src/committee-graphql-api";
+import graphql from "../../src/committee-graphql.lambda";
 import { genGraphQLProxy } from "../utils/gen-proxy.util";
 
 const getAllTransactionsQuery = `
@@ -37,7 +37,7 @@ const lambdaPromise = (lambda, event, context) => {
   });
 };
 
-describe("GraphQL Endpoint Lambda", function () {
+describe("Committee GraphQL Lambda", function () {
   describe("Transactions", function () {
     it("Get all", async () => {
       const res: any = await lambdaPromise(
@@ -46,7 +46,7 @@ describe("GraphQL Endpoint Lambda", function () {
         {}
       );
       const body = JSON.parse(res.body);
-      expect(body.data.transactions.length > 0).to.equal(true);
+      expect(body.data.transactions.length === 0).to.equal(true);
     });
     // it("Get contributions", async () => {
     //   const res: any = await lambdaPromise(

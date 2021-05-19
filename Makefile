@@ -25,7 +25,7 @@ export CONTRIB_DIR	:= services/policapital/contribute
 export ONBOARD_DIR	:= services/policapital/onboard
 export ANALYTICS_DIR	:= services/policapital/analytics
 export RECORDER_DIR	:= services/policapital/receiver
-export PLATFORM_DIR	:= services/graphql-api
+export PLATFORM_DIR	:= services/platform
 export EMAILER_DIR	:= services/emailer
 
 

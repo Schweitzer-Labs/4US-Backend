@@ -14,9 +14,9 @@ export const main =
   (contributionsTableName: string) =>
   (stripe: Stripe) =>
   (dynamoDB: DynamoDB) =>
-  (event: APIGatewayProxyEvent) =>
+  (event: any) =>
     pipe(
-      taskEither.of<ApplicationError, APIGatewayProxyEvent>(event),
+      taskEither.of<ApplicationError, any>(event),
       taskEither.chain(eventToContribution),
       taskEither.chain(contributionToPayment(stripe)),
       taskEither.chain(paymentToDDB(contributionsTableName)(dynamoDB)),
