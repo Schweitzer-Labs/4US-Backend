@@ -3,3 +3,5 @@ CommitteeReceiptTemplate:
   Properties:
     TemplateURL: committee-receipt.yml
     TimeoutInMinutes: 60
+    Parameters:
+      LambdaRunEnvironment: !Ref LambdaRunEnvironment

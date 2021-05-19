@@ -3,3 +3,5 @@ ContributorReceiptTemplate:
   Properties:
     TemplateURL: contributor-receipt.yml
     TimeoutInMinutes: 60
+    Parameters:
+      LambdaRunEnvironment: !Ref LambdaRunEnvironment
