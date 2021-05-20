@@ -3,7 +3,7 @@ PolicapitalAnalyticsFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalAnalyticsFunction
     Description: Log Analytic data for Policapital Contribution activity
-    CodeUri: services/platform/
+    CodeUri: services/
     Handler: app.policapitalAnalyticsHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}

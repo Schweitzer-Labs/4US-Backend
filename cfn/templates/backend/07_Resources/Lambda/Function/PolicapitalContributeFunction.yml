@@ -3,7 +3,7 @@ PolicapitalContributeFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalContributeFunction
     Description: Process contributions for a policapital committee
-    CodeUri: services/platform/
+    CodeUri: services/
     Handler: app.policapitalContributeHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaDynamoDBWriterRoleArn}
