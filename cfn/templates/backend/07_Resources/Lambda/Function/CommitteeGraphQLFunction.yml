@@ -1,19 +1,19 @@
-OnboardFunction:
+CommitteeGraphQLFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-OnboardingFunction
-    Description: Backend to onboard a committee to the Policapital platform
-    CodeUri: services/policapital/onboard/
-    Handler: app.lambdaHandler
+    FunctionName: !Sub ${AWS::StackName}-GraphQLFunction
+    Description: GraphQL API for Committees
+    CodeUri: services/platform/
+    Handler: app.committeeGraphQLHandler
     Runtime: nodejs12.x
-    Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}
+    Role: !Sub ${IAM.Outputs.LambdaGraphQLRoleArn}
     Events:
-      Onboard:
+      GraphQLAny:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
-          Path: /onboard
-          Method: get
-          RestApiId: !Ref DonationGateway
+          Path: /graphql
+          Method: ANY
+          RestApiId: !Ref PolicapitalGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

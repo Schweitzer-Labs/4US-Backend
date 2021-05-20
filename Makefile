@@ -21,9 +21,9 @@ ifeq ($(REGION), )
        export REGION	:= us-east-1
 endif
 
-export CONTRIB_DIR	:= services/policapital/contribute
+export CONTRIB_DIR	:= services/platform
 export ONBOARD_DIR	:= services/policapital/onboard
-export ANALYTICS_DIR	:= services/policapital/analytics
+export ANALYTICS_DIR	:= services/platform
 export RECORDER_DIR	:= services/policapital/receiver
 export PLATFORM_DIR	:= services/platform
 export EMAILER_DIR	:= services/emailer
@@ -92,7 +92,7 @@ buildstacks: mkbuilddir $(CFN_TEMPLATES)
 	echo Built all the stacks
 
 compile: $(CONTRIB_DIR)
-	cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
+	cd $^ && npm run compile
 
 
 dep:

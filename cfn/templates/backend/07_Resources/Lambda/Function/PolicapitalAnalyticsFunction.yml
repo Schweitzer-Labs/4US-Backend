@@ -1,19 +1,19 @@
-AnalyticsFunction:
+PolicapitalAnalyticsFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-AnalyticsFunction
-    Description: Log Analytic data on Donation activity
-    CodeUri: services/policapital/analytics/
-    Handler: app.lambdaHandler
+    FunctionName: !Sub ${AWS::StackName}-PolicapitalAnalyticsFunction
+    Description: Log Analytic data for Policapital Contribution activity
+    CodeUri: services/platform/
+    Handler: app.policapitalAnalyticsHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}
     Events:
-      Analytics:
+      PolicapitalAnalytics:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
           Path: /analytics
           Method: post
-          RestApiId: !Ref DonationGateway
+          RestApiId: !Ref PolicapitalGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

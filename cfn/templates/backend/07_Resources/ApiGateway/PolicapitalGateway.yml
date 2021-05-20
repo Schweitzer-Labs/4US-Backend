@@ -1,4 +1,4 @@
-DonationGateway:
+PolicapitalGateway:
   Type: AWS::Serverless::Api
   Properties:
     StageName: !Ref LambdaRunEnvironment

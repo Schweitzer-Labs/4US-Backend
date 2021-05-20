@@ -1,20 +1,19 @@
-ContributeFunction:
+PolicapitalOnboardFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-DonationFunction
-    Description: Process donations for a committee
-    CodeUri: services/platform/
-    Handler: app.policapitalContributeHandler
+    FunctionName: !Sub ${AWS::StackName}-PolicapitalOnboardFunction
+    Description: Backend to onboard a committee to the Policapital platform
+    CodeUri: services/policapital/onboard/
+    Handler: app.lambdaHandler
     Runtime: nodejs12.x
-    Role: !Sub ${IAM.Outputs.LambdaDynamoDBWriterRoleArn}
+    Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}
     Events:
-      Contribute:
+      Onboard:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
-          Path: /contribute
-          Method: post
-          RestApiId: !Ref DonationGateway
+          Path: /onboard
+          Method: get
+          RestApiId: !Ref PolicapitalGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
-        CONTRIBUTIONS_DDB_TABLE_NAME: !Ref Contributions

@@ -1,14 +1,14 @@
-DonationReceiverFunction:
+TransactionEventDispatcherFunction:
   Type: AWS::Serverless::Function
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-DonationReceiver
+    FunctionName: !Sub ${AWS::StackName}-TransactionEventDispatcherFunction
     Description: Receive DynamoDB events and queues notifications with transaction details
     CodeUri: services/policapital/receiver
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaDonationReceiverRoleArn}
     Events:
-      ContributionRecorded:
+      TransactionRecorded:
         Type: DynamoDB
         Properties:
           BatchSize: 1

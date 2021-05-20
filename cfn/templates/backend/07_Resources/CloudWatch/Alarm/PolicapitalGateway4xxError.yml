@@ -1,4 +1,4 @@
-DonationGateway4xxErrorTopic:
+PolicapitalGateway4xxErrorTopic:
   Type: AWS::SNS::Topic
   Properties:
     DisplayName: !Sub ${LambdaRunEnvironment}-${Domain}-Gateway4xxError
@@ -8,16 +8,16 @@ DonationGateway4xxErrorTopic:
       - Endpoint: !Ref AdminEmail
         Protocol: email
 
-DonationGateway4xxErrorAlarm:
+PolicapitalGateway4xxErrorAlarm:
   Type: AWS::CloudWatch::Alarm
   Properties:
-    AlarmName: !Sub ${LambdaRunEnvironment}-${Domain}-DonationGateway4xxErrors
-    AlarmDescription: !Sub Alarms when the ${Domain} Donation gateway returns a 4xx error.
+    AlarmName: !Sub ${LambdaRunEnvironment}-${Domain}-PolicapitalGateway4xxErrors
+    AlarmDescription: !Sub Alarms when the ${Domain} Policapital gateway returns a 4xx error.
     Dimensions:
       - Name: ApiName
         Value: !Sub ${Domain}-backend-${LambdaRunEnvironment}
     AlarmActions:
-      - !Ref DonationGateway4xxErrorTopic
+      - !Ref PolicapitalGateway4xxErrorTopic
     MetricName: 4XXError
     Namespace: AWS/ApiGateway
     ComparisonOperator: GreaterThanOrEqualToThreshold

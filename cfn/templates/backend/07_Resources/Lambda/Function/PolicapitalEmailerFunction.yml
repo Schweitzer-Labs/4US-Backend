@@ -1,7 +1,7 @@
-DonationEmailerFunction:
+PolicapitalEmailerFunction:
   Type: AWS::Serverless::Function
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-DonationEmailer
+    FunctionName: !Sub ${AWS::StackName}-PolicapitalEmailerFunction
     Description: Receive DynamoDB events and sends email with the transaction details
     CodeUri: services/emailer
     Handler: app.lambdaHandler

@@ -1,4 +1,4 @@
-DonationGateway5xxErrorTopic:
+PolicapitalGateway5xxErrorTopic:
   Type: AWS::SNS::Topic
   Properties:
     DisplayName: !Sub ${LambdaRunEnvironment}-${Domain}-Gateway5xxError
@@ -8,16 +8,16 @@ DonationGateway5xxErrorTopic:
       - Endpoint: !Ref AdminEmail
         Protocol: email
 
-DonationGateway5xxErrorAlarm:
+PolicapitalGateway5xxErrorAlarm:
   Type: AWS::CloudWatch::Alarm
   Properties:
-    AlarmName: !Sub ${LambdaRunEnvironment}-${Domain}-DonationGateway5xxErrors
-    AlarmDescription: !Sub Alarms when the ${Domain} Donation gateway returns a 5xx error.
+    AlarmName: !Sub ${LambdaRunEnvironment}-${Domain}-PolicapitalGateway5xxErrors
+    AlarmDescription: !Sub Alarms when the ${Domain} Policapital gateway returns a 5xx error.
     Dimensions:
       - Name: ApiName
         Value: !Sub ${Domain}-backend-${LambdaRunEnvironment}
     AlarmActions:
-      - !Ref DonationGateway5xxErrorTopic
+      - !Ref PolicapitalGateway5xxErrorTopic
     MetricName: 5XXError
     Namespace: AWS/ApiGateway
     ComparisonOperator: GreaterThanOrEqualToThreshold
