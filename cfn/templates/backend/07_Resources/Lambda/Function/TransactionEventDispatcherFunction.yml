@@ -3,8 +3,8 @@ TransactionEventDispatcherFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-TransactionEventDispatcherFunction
     Description: Receive DynamoDB events and queues notifications with transaction details
-    CodeUri: services/policapital/receiver
-    Handler: app.lambdaHandler
+    CodeUri: services/platform
+    Handler: app.transactionEventDispatcher
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaDonationReceiverRoleArn}
     Events:

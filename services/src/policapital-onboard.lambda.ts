@@ -1,18 +1,14 @@
-const Joi = require("joi");
-const createStripeConnectUser = require("./createStripeConnectUser")
+import headers from "./utils/headers";
 
+import Joi from "joi";
+import {createStripeConnectUser} from "./utils/createStripeConnectUser"
 
-const headers = {
-  "Access-Control-Allow-Headers" : "Content-Type",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-}
 
 const onboardingSchema = Joi.object({
   code: Joi.string().required(),
 }).required();
 
-module.exports = async (event, context) => {
+export default async (event, context) => {
   const res = onboardingSchema.validate(event.queryStringParameters);
   if (res.error) {
     return {

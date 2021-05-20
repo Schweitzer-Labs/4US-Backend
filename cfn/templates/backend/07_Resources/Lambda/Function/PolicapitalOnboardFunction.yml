@@ -3,8 +3,8 @@ PolicapitalOnboardFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalOnboardFunction
     Description: Backend to onboard a committee to the Policapital platform
-    CodeUri: services/policapital/onboard/
-    Handler: app.lambdaHandler
+    CodeUri: services/platform/
+    Handler: app.policapitalOnboardHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}
     Events:

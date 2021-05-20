@@ -1,4 +1,4 @@
-const AWS = require("aws-sdk");
+import * as AWS from "aws-sdk";
 AWS.config.update({ region: process.env.REGION });
 const ses = new AWS.SES()
   , sns = new AWS.SNS()
@@ -13,7 +13,7 @@ const notifyAdmins = async (message) => {
         Message: JSON.stringify(message)
       , TopicArn: process.env.SNS_TOPIC
     };
-    // const resp = await sns.publish(params).promise();
+    const resp = await sns.publish(params).promise();
     console.log("send SNS", resp);
 }; // notifyAdmins()
 
@@ -53,7 +53,7 @@ const emailCommittee = async (message, attrs) => {
 /*
  * Main Function
  */
-module.exports = async (event, context) => {
+export default async (event, context) => {
     for (const record of event.Records) {
         let data  = JSON.parse(record.body)
           , attrs = record.messageAttributes

@@ -1,12 +1,10 @@
-{
+export const missingPolicapitalOnboardQS = {
   "body": "{}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "POST",
   "isBase64Encoded": true,
-  "queryStringParameters": {
-    "code": "ac_JLobokAehLDUp5AhY4HOPcqDuZYmG7xJ"
-  },
+  "queryStringParameters": {},
   "multiValueQueryStringParameters": {
     "foo": [
       "bar"

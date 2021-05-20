@@ -1,10 +1,12 @@
-{
+export const invalidPolicapitalOnboardCode = {
   "body": "{}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "POST",
   "isBase64Encoded": true,
-  "queryStringParameters": {},
+  "queryStringParameters": {
+    "code": "ac_JLobokAehLDUp5AhY4HOPcqDuZYmG7xJ"
+  },
   "multiValueQueryStringParameters": {
     "foo": [
       "bar"

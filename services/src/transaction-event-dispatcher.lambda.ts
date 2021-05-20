@@ -1,4 +1,4 @@
-const AWS = require("aws-sdk");
+import * as AWS from 'aws-sdk'
 AWS.config.update({ region: process.env.REGION });
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 /*
@@ -37,7 +37,7 @@ const sendQueue = async (message) => {
 /*
  * Main Function
  */
-module.exports = async (event, context) => {
+export default async (event, context) => {
   for (const stream of event.Records) {
     const record = stream.dynamodb,
       data = AWS.DynamoDB.Converter.unmarshall(record.NewImage),
@@ -55,8 +55,8 @@ module.exports = async (event, context) => {
       refCode: data.refCode || "N/A",
     };
 
-    console.log("Sending contribution ddb record to stream", data);
+    console.log("Sending contribution ddb record to stream", payload);
 
-    await sendQueue(data);
+    await sendQueue(payload);
   }
 };

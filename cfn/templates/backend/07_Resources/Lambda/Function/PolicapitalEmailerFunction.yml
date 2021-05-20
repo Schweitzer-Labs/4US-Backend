@@ -3,7 +3,7 @@ PolicapitalEmailerFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalEmailerFunction
     Description: Receive DynamoDB events and sends email with the transaction details
-    CodeUri: services/emailer
+    CodeUri: services/platform
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaSESRoleArn}
