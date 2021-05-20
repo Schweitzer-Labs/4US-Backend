@@ -3,7 +3,9 @@ PolicapitalAnalyticsFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalAnalyticsFunction
     Description: Log Analytic data for Policapital Contribution activity
-    CodeUri: services/
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
     Handler: app.policapitalAnalyticsHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}
@@ -13,7 +15,7 @@ PolicapitalAnalyticsFunction:
         Properties:
           Path: /analytics
           Method: post
-          RestApiId: !Ref PolicapitalGateway
+          RestApiId: !Ref DonationGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

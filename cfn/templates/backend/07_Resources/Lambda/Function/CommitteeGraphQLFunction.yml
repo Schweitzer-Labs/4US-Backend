@@ -1,9 +1,11 @@
 CommitteeGraphQLFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-GraphQLFunction
+    FunctionName: !Sub ${AWS::StackName}-CommitteeGraphQLFunction
     Description: GraphQL API for Committees
-    CodeUri: services/
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
     Handler: app.committeeGraphQLHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaGraphQLRoleArn}
@@ -13,7 +15,7 @@ CommitteeGraphQLFunction:
         Properties:
           Path: /graphql
           Method: ANY
-          RestApiId: !Ref PolicapitalGateway
+          RestApiId: !Ref DonationGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

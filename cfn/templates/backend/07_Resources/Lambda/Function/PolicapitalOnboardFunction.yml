@@ -3,7 +3,9 @@ PolicapitalOnboardFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalOnboardFunction
     Description: Backend to onboard a committee to the Policapital platform
-    CodeUri: services/
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
     Handler: app.policapitalOnboardHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}
@@ -13,7 +15,7 @@ PolicapitalOnboardFunction:
         Properties:
           Path: /onboard
           Method: get
-          RestApiId: !Ref PolicapitalGateway
+          RestApiId: !Ref DonationGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

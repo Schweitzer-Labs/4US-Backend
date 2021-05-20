@@ -55,9 +55,6 @@ const getTransactionsRes =
         },
       })
       .promise();
-
-    console.log(res);
-
     return res;
   };
 

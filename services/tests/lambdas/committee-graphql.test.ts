@@ -46,6 +46,7 @@ describe("Committee GraphQL Lambda", function () {
         {}
       );
       const body = JSON.parse(res.body);
+      console.log(body.data.transactions)
       expect(body.data.transactions.length === 0).to.equal(true);
     });
     // it("Get contributions", async () => {

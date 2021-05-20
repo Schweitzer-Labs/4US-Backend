@@ -3,7 +3,9 @@ PolicapitalContributeFunction:
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalContributeFunction
     Description: Process contributions for a policapital committee
-    CodeUri: services/
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
     Handler: app.policapitalContributeHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaDynamoDBWriterRoleArn}
@@ -13,7 +15,7 @@ PolicapitalContributeFunction:
         Properties:
           Path: /contribute
           Method: post
-          RestApiId: !Ref PolicapitalGateway
+          RestApiId: !Ref DonationGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

@@ -21,12 +21,12 @@ ifeq ($(REGION), )
        export REGION	:= us-east-1
 endif
 
-export CONTRIB_DIR	:= services/platform
-export ONBOARD_DIR	:= services/policapital/onboard
-export ANALYTICS_DIR	:= services/platform
-export RECORDER_DIR	:= services/policapital/receiver
-export PLATFORM_DIR	:= services/platform
-export EMAILER_DIR	:= services/emailer
+export CONTRIB_DIR	:= lambdas
+export ONBOARD_DIR	:= lambdas
+export ANALYTICS_DIR	:= lambdas
+export RECORDER_DIR	:= lambdas
+export PLATFORM_DIR	:= lambdas
+export EMAILER_DIR	:= lambdas
 
 
 export STACK		:= $(DOMAIN)-backend
@@ -91,8 +91,8 @@ buildsam: buildstacks compile $(JS_APPS)
 buildstacks: mkbuilddir $(CFN_TEMPLATES)
 	echo Built all the stacks
 
-compile: $(CONTRIB_DIR)
-	cd $^ && npm run compile
+compile:
+	cd services && npm run compile
 
 
 dep:
