@@ -1,6 +1,12 @@
 LambdaSESRole:
   Type: AWS::IAM::Role
   Properties:
+    ManagedPolicyArns:
+      - !Ref LambdaBasicPolicy
+      - !Ref DynamoDBStreamReaderPolicy
+      - !Ref LambdaKMSPolicy
+      - !Ref LambdaSESPolicy
+      - !Ref LambdaSQSPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:

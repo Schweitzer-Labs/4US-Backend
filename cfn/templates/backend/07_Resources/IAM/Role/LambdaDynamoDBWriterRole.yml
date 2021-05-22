@@ -1,6 +1,9 @@
 LambdaDynamoDBWriterRole:
   Type: AWS::IAM::Role
   Properties:
+    ManagedPolicyArns:
+      - !Ref LambdaBasicPolicy
+      - !Ref DynamoDBWriterPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:
