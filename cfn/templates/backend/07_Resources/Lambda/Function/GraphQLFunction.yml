@@ -6,7 +6,7 @@ GraphQLFunction:
     CodeUri: services/graphql-api/
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
-    Role: !Sub ${IAM.Outputs.LambdaGraphQLRoleArn}
+    Role: !GetAtt LambdaGraphQLRole.Arn
     Events:
       GraphQLAny:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api

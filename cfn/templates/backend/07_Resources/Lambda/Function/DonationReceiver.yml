@@ -6,7 +6,7 @@ DonationReceiverFunction:
     CodeUri: services/policapital/receiver
     Handler: app.lambdaHandler
     Runtime: nodejs12.x
-    Role: !Sub ${IAM.Outputs.LambdaDonationReceiverRoleArn}
+    Role: !GetAtt LambdaDonationReceiverRole.Arn
     Events:
       ContributionRecorded:
         Type: DynamoDB
