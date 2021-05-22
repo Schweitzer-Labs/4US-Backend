@@ -1,0 +1,22 @@
+PolicapitalContributeFunction:
+  Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-PolicapitalContributeFunction
+    Description: Process contributions for a policapital committee
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.policapitalContributeHandler
+    Runtime: nodejs12.x
+    Role: !GetAtt LambdaDynamoDBWriterRole.Arn
+    Events:
+      PolicapitalContribute:
+        Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        Properties:
+          Path: /contribute
+          Method: post
+          RestApiId: !Ref DonationGateway
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        CONTRIBUTIONS_DDB_TABLE_NAME: !Ref Contributions

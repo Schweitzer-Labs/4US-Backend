@@ -10,3 +10,5 @@ DynamoDBGraphQLPolicy:
             - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Committees}
           Action:
             - dynamodb:PartiQLSelect
+            - dynamodb:Query
+            - dynamodb:GetItem

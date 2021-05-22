@@ -1,0 +1,22 @@
+PolicapitalEmailerFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-PolicapitalEmailerFunction
+    Description: Receive DynamoDB events and sends email with the transaction details
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.policapitalEmailerHandler
+    Runtime: nodejs12.x
+    Role: !GetAtt LambdaSESRole.Arn
+    Events:
+      ContributionMade:
+        Type: SQS
+        Properties:
+          BatchSize: 1
+          Queue: !GetAtt EmailQueue.Arn
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        POS_RECEIPT: !Sub ${ContributorReceiptTemplate.Outputs.SES}
+        POS_RECORD: !Sub ${CommitteeReceiptTemplate.Outputs.SES}

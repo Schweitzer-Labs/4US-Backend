@@ -1,0 +1,22 @@
+TransactionEventDispatcherFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-TransactionEventDispatcherFunction
+    Description: Receive DynamoDB events and queues notifications with transaction details
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.transactionEventDispatcher
+    Runtime: nodejs12.x
+    Role: !GetAtt LambdaDonationReceiverRole.Arn
+    Events:
+      TransactionRecorded:
+        Type: DynamoDB
+        Properties:
+          BatchSize: 1
+          StartingPosition: LATEST
+          Stream: !GetAtt Contributions.StreamArn
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        SQSQUEUE: !Ref EmailQueue

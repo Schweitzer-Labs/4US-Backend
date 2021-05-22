@@ -1,0 +1,9 @@
+ServicesLayer:
+  Type: AWS::Serverless::LayerVersion
+  Properties:
+    LayerName: !Sub ${AWS::StackName}-ServicesLayer
+    ContentUri: ./services
+    CompatibleRuntimes:
+      - nodejs12.x
+  Metadata:
+    BuildMethod: nodejs12.x

@@ -44,12 +44,12 @@ else # demo
         export TLD      := com
 endif
 
-export CONTRIB_DIR	:= services/policapital/contribute
-export ONBOARD_DIR	:= services/policapital/onboard
-export ANALYTICS_DIR	:= services/policapital/analytics
-export RECORDER_DIR	:= services/policapital/receiver
-export PLATFORM_DIR	:= services/graphql-api
-export EMAILER_DIR	:= services/emailer
+export CONTRIB_DIR	:= lambdas
+export ONBOARD_DIR	:= lambdas
+export ANALYTICS_DIR	:= lambdas
+export RECORDER_DIR	:= lambdas
+export PLATFORM_DIR	:= lambdas
+export EMAILER_DIR	:= lambdas
 
 
 export STACK		:= $(RUNENV)-$(PRODUCT)-backend
@@ -114,8 +114,8 @@ buildsam: buildstacks compile $(JS_APPS)
 buildstacks: mkbuilddir $(CFN_TEMPLATES)
 	echo Built all the stacks
 
-compile: $(CONTRIB_DIR)
-	cd $^ && npm run compile && cd ../../../$(PLATFORM_DIR) && npm run compile
+compile:
+	cd services && npm run compile
 
 
 dep:
