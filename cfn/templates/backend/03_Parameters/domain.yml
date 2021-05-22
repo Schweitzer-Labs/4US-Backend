@@ -1,15 +1,16 @@
 TLD:
   Type: String
-  Default: {{ TLD }}
 Domain:
   Type: String
-  Default: {{ DOMAIN }}
+{% if SUBDOMAIN %}
 SubDomain:
   Type: String
-  Default: {{ SUBDOMAIN }}
+{% endif %}
+Product:
+  Type: String
 HostedZone:
   Type: AWS::SSM::Parameter::Value<String>
-  Default: /cfn/route53/hostedzone/{{ DOMAIN }}
+  Default: /{{ RUNENV }}/{{ PRODUCT }}/route53/hostedzone
 CertificateManagerCertificate:
   Type: AWS::SSM::Parameter::Value<String>
-  Default: /cfn/ACM/Certificate/{{ DOMAIN }}
+  Default: /{{ RUNENV }}/{{ PRODUCT }}/acm/certificate
