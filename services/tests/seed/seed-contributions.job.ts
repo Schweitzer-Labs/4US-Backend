@@ -2,7 +2,8 @@ import { data } from "./contributions.data";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
-import {ITransaction} from "../../src/queries/search-transactions.decoder";
+import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 
 const run = async (dynamoDB: DynamoDB, sequence: number) => {
   const list = data.slice(25 * sequence - 25, 25 * sequence);
@@ -12,8 +13,8 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
   const items = list.map((txn) => {
     const contribution: ITransaction = {
       committeeId,
-      id: uuidv4(),
-      direction: 'in',
+      id: genTxnId(),
+      direction: "in",
       amount: txn.amount,
       paymentMethod: txn.paymentMethod,
       bankVerified: false,
@@ -34,14 +35,14 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
       companyName: txn.companyName,
       attestsToBeingAnAdultCitizen: true,
       transactionType: "contribution",
-    }
+    };
     const marshalledContrib = DynamoDB.Converter.marshall(contribution);
-    console.log(marshalledContrib)
+
     return {
       PutRequest: {
-        Item: marshalledContrib
+        Item: marshalledContrib,
       },
-    }
+    };
   });
 
   const res = await dynamoDB

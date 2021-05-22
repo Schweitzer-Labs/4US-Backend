@@ -84,7 +84,6 @@ export class AppResolver {
       needsReviewCount: 0,
       donorMap: {},
     };
-    console.log(transactions[1]);
 
     const aggs: any = transactions.reduce((acc: any, txn) => {
       // Total Raised

@@ -15,8 +15,6 @@ const run =
           Item: marshalledCommittee,
         })
         .promise();
-
-      console.log(res);
     }
   };
 

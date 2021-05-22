@@ -6,7 +6,6 @@ const run = async (dynamoDB: DynamoDB) => {
   const tableName = "transactions-dev";
   const items = disbursementsData.map((txn) => {
     const marshalledContrib = DynamoDB.Converter.marshall(txn);
-    console.log(marshalledContrib);
     return {
       PutRequest: {
         Item: marshalledContrib,

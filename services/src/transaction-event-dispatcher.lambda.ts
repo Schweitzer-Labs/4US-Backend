@@ -1,5 +1,9 @@
 import * as AWS from "aws-sdk";
 import { DynamoDBStreamEvent } from "aws-lambda";
+import { SendMessageRequest } from "aws-sdk/clients/sqs";
+import { Transactions } from "./queries/search-transactions.decoder";
+import { isLeft } from "fp-ts/Either";
+import { ApplicationError } from "./utils/application-error";
 AWS.config.update({ region: process.env.REGION });
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 /*
@@ -15,9 +19,9 @@ const getCommitteeDetails = async (committee) => {
 
 const sendQueue = async (message) => {
   const { emails, timezone } = await getCommitteeDetails(message.committee),
-    params = {
+    params: SendMessageRequest = {
       MessageAttributes: {
-        committee: {
+        committeeEmailAddress: {
           DataType: "String",
           StringValue: emails.join(","),
         },
@@ -38,27 +42,21 @@ const sendQueue = async (message) => {
 /*
  * Main Function
  */
-export default async (event, context) => {
+export default async (event: DynamoDBStreamEvent, context) => {
   for (const stream of event.Records) {
-    console.log(stream);
-    const record = stream.dynamodb,
-      data = AWS.DynamoDB.Converter.unmarshall(record.NewImage),
-      timestamp = new Date(record.ApproximateCreationDateTime * 1000);
-    const payload = {
-      ...data,
-      id: record.id,
-      timezone: "America/New_York",
-      amount: (data.amount / 100).toFixed(2),
-      timestamp,
-      state: data.state.toUpperCase(),
-      receipt: data.stripePaymentIntentId.slice(-8),
-      occupation: data.occupation || "",
-      employer: data.employer || "",
-      refCode: data.refCode || "N/A",
-    };
+    const record = stream.dynamodb;
+    const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
 
-    console.log("Sending contribution ddb record to stream", payload);
-
-    await sendQueue(payload);
+    switch (stream.eventName) {
+      case "INSERT":
+        console.log("transaction inserted", JSON.stringify(event));
+        break;
+      // return await sendQueue(eitherTxn.right);
+      case "MODIFY":
+        console.log("transaction modified", JSON.stringify(event));
+        return;
+      default:
+        return;
+    }
   }
 };

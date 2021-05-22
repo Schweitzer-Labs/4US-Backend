@@ -62,7 +62,7 @@ describe("Committee GraphQL Lambda", function () {
         {}
       );
       const body = JSON.parse(res.body);
-      expect(body.data.transactions.length === 100).to.equal(true);
+      expect(body.data.transactions.length > 0).to.equal(true);
     });
   });
   describe("Committee", function () {
@@ -74,7 +74,6 @@ describe("Committee GraphQL Lambda", function () {
       );
 
       const body = JSON.parse(res.body);
-      console.log(body);
       expect(body.data.committee.id).to.equal(
         "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4"
       );
@@ -89,10 +88,7 @@ describe("Committee GraphQL Lambda", function () {
       );
 
       const body = JSON.parse(res.body);
-      console.log(body);
-      expect(body.data.aggregations.id).to.equal(
-        "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4"
-      );
+      expect(body.data.aggregations.balance).to.be.a("number");
     });
   });
 });
