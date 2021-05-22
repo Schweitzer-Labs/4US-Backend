@@ -15,7 +15,7 @@ TransactionEventDispatcherFunction:
         Properties:
           BatchSize: 1
           StartingPosition: LATEST
-          Stream: !GetAtt Contributions.StreamArn
+          Stream: !GetAtt Transactions.StreamArn
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
