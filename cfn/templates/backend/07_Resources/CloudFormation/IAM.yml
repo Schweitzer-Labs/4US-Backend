@@ -6,3 +6,4 @@ IAM:
     Parameters:
       Contributions: !Ref Contributions
       Transactions: !Ref Transactions
+      Committees: !Ref Committees

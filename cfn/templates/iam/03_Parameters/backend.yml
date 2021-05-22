@@ -3,3 +3,6 @@ Contributions:
 
 Transactions:
   Type: String
+
+Committees:
+  Type: String
