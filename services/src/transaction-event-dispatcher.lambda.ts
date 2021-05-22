@@ -38,7 +38,7 @@ const sendQueue = async (message) => {
 /*
  * Main Function
  */
-export default async (event: DynamoDBStreamEvent, context) => {
+export default async (event, context) => {
   for (const stream of event.Records) {
     console.log(stream);
     const record = stream.dynamodb,
