@@ -2,23 +2,46 @@
 SHELL			:= bash
 export CREPES		:= $(PWD)/cfn/bin/crepes.py
 
-# Allowed values are: prod, qa, dev
-ifeq ($(RUNENV), )
-       export RUNENV	:= dev
+# Allowed values are: prod, qa, demo
+ifeq ($(RUNENV),)
+	export RUNENV	:= qa
 endif
 
-ifeq ($(RUNENV), prod)
-	export DOMAIN	:= policapital
-	export TLD	:= net
-else
-	export DOMAIN	:= purplepay
-	export TLD	:= us
+ifeq ($(PRODUCT), )
+        export PRODUCT	:= p2
 endif
 
-export SUBDOMAIN        := donate
-
-ifeq ($(REGION), )
-       export REGION	:= us-east-1
+ifeq ($(RUNENV), qa)
+        export REGION   := us-west-2
+	ifeq ($(PRODUCT), 4us)
+		export DOMAIN   := 4us
+		export TLD      := net
+	else # PRODUCT = p2
+		export DOMAIN   := purplepay
+		export TLD      := us
+	endif
+else ifeq ($(RUNENV), prod)
+        export REGION   := us-east-1
+	ifeq ($(PRODUCT), 4us)
+		export DOMAIN   := 4us
+		export TLD      := net
+	else
+		export DOMAIN   := policapital
+		export TLD      := net
+	endif
+else ifeq ($(RUNENV), backup)
+        export REGION   := us-west-1
+	ifeq ($(PRODUCT), p2)
+		export DOMAIN   := 4us
+		export TLD      := net
+	else
+		export DOMAIN   := policapital
+		export TLD      := net
+	endif
+else # demo
+        export REGION   := us-east-2
+        export DOMAIN   := 4usdemo
+        export TLD      := com
 endif
 
 export CONTRIB_DIR	:= services/policapital/contribute
@@ -29,21 +52,23 @@ export PLATFORM_DIR	:= services/graphql-api
 export EMAILER_DIR	:= services/emailer
 
 
-export STACK		:= $(DOMAIN)-backend
+export STACK		:= $(RUNENV)-$(PRODUCT)-backend
 
 export SAM_DIR		:= $(PWD)/.aws-sam
-export BUILD_DIR	:= $(SAM_DIR)/build
-
-export STACKNAME	:= $(STACK)-$(RUNENV)
+export BUILD_DIR	:= $(PWD)/build
 
 export DATE		:= $(shell date)
 export NONCE		:= $(shell uuidgen | cut -d\- -f1)
 
 export ENDPOINT		:= https://cloudformation-fips.$(REGION).amazonaws.com
-export BUCKET		:= 4us-cfn-templates-$(REGION)
+export CFN_BUCKET	:= $(PRODUCT)-cfn-templates-$(REGION)
 
 export STACK_PARAMS	:= Nonce=$(NONCE)
-STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
+STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV) Product=$(PRODUCT)
+STACK_PARAMS		+= Domain=$(DOMAIN) TLD=$(TLD)
+ifneq ($(SUBDOMAIN),)
+	STACK_PARAMS	+= SubDomain=$(SUBDOMAIN)
+endif
 
 export PACKAGE		:= $(SAM_DIR)/CloudFormation-template.yml
 
@@ -52,8 +77,6 @@ CFN_DIR			:= cfn/templates
 # stacks and templates
 BACKEND_STACK		:= backend
 BACKEND_TEMPLATE	:= $(BUILD_DIR)/$(BACKEND_STACK).yml
-IAM_STACK		:= iam
-IAM_TEMPLATE		:= $(BUILD_DIR)/$(IAM_STACK).yml
 CONTRIBUTOR_RECEIPT	:= contributor-receipt
 CONTRIBUTOR_TEMPLATE	:= $(BUILD_DIR)/$(CONTRIBUTOR_RECEIPT).yml
 COMMITTEE_RECEIPT	:= committee-receipt
@@ -68,7 +91,7 @@ RECORDER_APP		:= $(RECORDER_DIR)/app.js
 EMAILER_APP		:= $(EMAILER_DIR)/app.js
 
 JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
-CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(IAM_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
+CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
 
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
@@ -118,10 +141,10 @@ local: build
 package: build
 	aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
-		--template-file $(BUILD_DIR)/template.yaml \
+		--template-file $(SAM_DIR)/build/template.yaml \
 		--region $(REGION) \
-		--s3-bucket $(BUCKET) \
-		--s3-prefix $(STACKNAME) \
+		--s3-bucket $(CFN_BUCKET) \
+		--s3-prefix $(STACK) \
 		--output-template-file $(PACKAGE)
 
 deploy: package
@@ -129,9 +152,9 @@ deploy: package
 		--endpoint-url $(ENDPOINT) \
 		--region $(REGION) \
 		--template-file $(PACKAGE) \
-		--stack-name $(STACKNAME) \
-		--s3-bucket $(BUCKET) \
-		--s3-prefix $(STACKNAME) \
+		--stack-name $(STACK) \
+		--s3-bucket $(CFN_BUCKET) \
+		--s3-prefix $(STACK) \
 		--capabilities \
 		       CAPABILITY_NAMED_IAM \
 		       CAPABILITY_AUTO_EXPAND \
