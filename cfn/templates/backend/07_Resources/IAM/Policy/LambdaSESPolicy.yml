@@ -1,8 +1,6 @@
-LambdaSESManagedPolicy:
+LambdaSESPolicy:
   Type: AWS::IAM::ManagedPolicy
   Properties:
-    Roles:
-      - !Ref LambdaSESRole
     PolicyDocument:
       Version: 2012-10-17
       Statement:
