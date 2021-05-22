@@ -21,10 +21,26 @@ const getContributionsQuery = `
   }
 `;
 
-const getDisbursementsQuery = `
+const getCommitteeQuery = `
   query {
-    transactions(committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4") {
-      lastName
+    committee(committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4") {
+      id
+      candidateFirstName
+    }
+  }
+`;
+
+const aggregationsQuery = `
+  query {
+    aggregations(committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4") {
+      balance,
+      totalRaised,
+      totalSpent,
+      totalDonors,
+      totalTransactions,
+      totalContributionsInProcessing,
+      totalDisbursementsInProcessing,
+      needsReviewCount
     }
   }
 `;
@@ -39,33 +55,44 @@ const lambdaPromise = (lambda, event, context) => {
 
 describe("Committee GraphQL Lambda", function () {
   describe("Transactions", function () {
-    it("Get all", async () => {
+    it("Get by Committee ID", async () => {
       const res: any = await lambdaPromise(
         graphql,
         genGraphQLProxy(getAllTransactionsQuery),
         {}
       );
       const body = JSON.parse(res.body);
-      console.log(body.data.transactions)
-      expect(body.data.transactions.length === 0).to.equal(true);
+      expect(body.data.transactions.length === 100).to.equal(true);
     });
-    // it("Get contributions", async () => {
-    //   const res: any = await lambdaPromise(
-    //     graphql,
-    //     genGraphQLProxy(getContributionsQuery),
-    //     {}
-    //   );
-    //   const body = JSON.parse(res.body);
-    //   expect(body.data.transactions.length > 0).to.equal(true);
-    // });
-    // it("Get disbursements", async () => {
-    //   const res: any = await lambdaPromise(
-    //     graphql,
-    //     genGraphQLProxy(getDisbursementsQuery),
-    //     {}
-    //   );
-    //   const body = JSON.parse(res.body);
-    //   expect(body.data.transactions.length > 0).to.equal(true);
-    // });
+  });
+  describe("Committee", function () {
+    it("Get by Committee ID", async () => {
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getCommitteeQuery),
+        {}
+      );
+
+      const body = JSON.parse(res.body);
+      console.log(body);
+      expect(body.data.committee.id).to.equal(
+        "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4"
+      );
+    });
+  });
+  describe("Aggregations", function () {
+    it("Get by Committee ID", async () => {
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(aggregationsQuery),
+        {}
+      );
+
+      const body = JSON.parse(res.body);
+      console.log(body);
+      expect(body.data.aggregations.id).to.equal(
+        "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4"
+      );
+    });
   });
 });

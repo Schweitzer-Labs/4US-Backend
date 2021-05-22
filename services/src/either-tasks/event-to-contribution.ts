@@ -14,6 +14,7 @@ const contribSchema = Joi.object({
   cardCVC: Joi.string().required(),
   amount: Joi.number().required(),
   stripeUserId: Joi.string().required(),
+  committee: Joi.string().required(),
 });
 
 export const eventToObject = (

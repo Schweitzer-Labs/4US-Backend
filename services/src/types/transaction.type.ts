@@ -18,6 +18,8 @@ export class Transaction implements ITransaction {
   @Field((type) => ID)
   id;
   @Field()
+  committeeId: string;
+  @Field()
   direction: string;
   @Field()
   amount: number;
@@ -29,45 +31,49 @@ export class Transaction implements ITransaction {
   ruleVerified: boolean;
   @Field()
   initiatedTimestamp: string;
-  @Field()
+  @Field({ nullable: true })
   bankVerifiedTimestamp?: string;
-  @Field()
+  @Field({ nullable: true })
   ruleVerifiedTimestamp?: string;
-  @Field()
+  @Field({ nullable: true })
   purposeCode?: string;
-  @Field()
+  @Field({ nullable: true })
   refCode?: string;
   // Donor Props
-  @Field()
+  @Field({ nullable: true })
   firstName?: string;
-  @Field()
+  @Field({ nullable: true })
   middleName?: string;
-  @Field()
+  @Field({ nullable: true })
   lastName?: string;
-  @Field()
-  addressLine1: string;
-  @Field()
+  @Field({ nullable: true })
+  addressLine1?: string;
+  @Field({ nullable: true })
   addressLine2?: string;
-  @Field()
+  @Field({ nullable: true })
   city?: string;
-  @Field()
+  @Field({ nullable: true })
   state?: string;
-  @Field()
+  @Field({ nullable: true })
   postalCode?: string;
-  @Field()
+  @Field({ nullable: true })
   employer?: string;
-  @Field()
+  @Field({ nullable: true })
   occupation?: string;
-  @Field()
+  @Field({ nullable: true })
   entityType?: string;
-  @Field()
+  @Field({ nullable: true })
   companyName?: string;
-  @Field()
+  @Field({ nullable: true })
   phoneNumber?: string;
-  @Field()
+  @Field({ nullable: true })
   emailAddress?: string;
-  @Field()
+  @Field({ nullable: true })
   attestsToBeingAnAdultCitizen?: boolean;
-  @Field()
+  @Field({ nullable: true })
   transactionType?: string;
+  @Field({ nullable: true })
+  stripePaymentIntentId?: string;
+  @Field({ nullable: true })
+  cardNumberLastFourDigits?: string;
 }

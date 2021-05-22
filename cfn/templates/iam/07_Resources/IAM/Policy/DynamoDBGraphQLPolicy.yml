@@ -8,6 +8,9 @@ DynamoDBGraphQLPolicy:
       Statement:
           Effect: Allow
           Resource:
-            !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
+            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
+            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Committees}
           Action:
             - dynamodb:PartiQLSelect
+            - dynamodb:Query
+            - dynamodb:GetItem

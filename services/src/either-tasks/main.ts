@@ -1,4 +1,3 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import { contributionToPayment } from "./contribution-to-payment";
@@ -10,8 +9,7 @@ import { DynamoDB } from "aws-sdk";
 import { paymentToDDB } from "./payment-to-ddb";
 
 export const main =
-  (env: string) =>
-  (contributionsTableName: string) =>
+  (transactionsTableName: string) =>
   (stripe: Stripe) =>
   (dynamoDB: DynamoDB) =>
   (event: any) =>
@@ -19,7 +17,7 @@ export const main =
       taskEither.of<ApplicationError, any>(event),
       taskEither.chain(eventToContribution),
       taskEither.chain(contributionToPayment(stripe)),
-      taskEither.chain(paymentToDDB(contributionsTableName)(dynamoDB)),
+      taskEither.chain(paymentToDDB(transactionsTableName)(dynamoDB)),
       taskEither.fold(
         (error) => task.of(error.toResponse()),
         (result) => task.of(successResponse)

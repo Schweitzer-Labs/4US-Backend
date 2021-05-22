@@ -1,4 +1,5 @@
-import * as AWS from 'aws-sdk'
+import * as AWS from "aws-sdk";
+import { DynamoDBStreamEvent } from "aws-lambda";
 AWS.config.update({ region: process.env.REGION });
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 /*
@@ -37,8 +38,9 @@ const sendQueue = async (message) => {
 /*
  * Main Function
  */
-export default async (event, context) => {
+export default async (event: DynamoDBStreamEvent, context) => {
   for (const stream of event.Records) {
+    console.log(stream);
     const record = stream.dynamodb,
       data = AWS.DynamoDB.Converter.unmarshall(record.NewImage),
       timestamp = new Date(record.ApproximateCreationDateTime * 1000);

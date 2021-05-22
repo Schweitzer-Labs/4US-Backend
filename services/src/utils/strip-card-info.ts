@@ -29,5 +29,5 @@ export interface StrippedContribution {
   contributorType?: string;
   cardNumberLastFourDigits: string;
   attestsToBeingAdultCitizen?: boolean;
-  paymentMethod?: string;
+  paymentMethod: string;
 }

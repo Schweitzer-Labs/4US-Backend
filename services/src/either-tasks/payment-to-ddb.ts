@@ -4,26 +4,48 @@ import { StatusCodes } from "http-status-codes";
 import { v4 as uuidv4 } from "uuid";
 import { Payment } from "./contribution-to-payment";
 import { DynamoDB } from "aws-sdk";
+import { ITransaction } from "../queries/search-transactions.decoder";
+import { now } from "../utils/time.utils";
 
 const savePayment =
-  (contributionsTableName: string) =>
+  (transactionsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (payment: Payment): Promise<any> => {
-    const payload = DynamoDB.Converter.marshall({ id: uuidv4(), ...payment });
+    const transaction: ITransaction = {
+      ...payment,
+      id: uuidv4(),
+      committeeId: payment.committee,
+      direction: "in",
+      bankVerified: false,
+      ruleVerified: false,
+      initiatedTimestamp: now(),
+      transactionType: "contribution",
+    };
+
+    console.log(
+      `Writing contribution to ${transactionsTableName}`,
+      transaction
+    );
+
+    const payload = DynamoDB.Converter.marshall(transaction);
     return await dynamoDB
       .putItem({
-        TableName: contributionsTableName,
+        TableName: transactionsTableName,
         Item: payload,
       })
       .promise();
   };
 
 export const paymentToDDB =
-  (contributionsTableName: string) =>
+  (transactionsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (payment: Payment): TaskEither<ApplicationError, any> =>
     tryCatch<ApplicationError, any>(
-      () => savePayment(contributionsTableName)(dynamoDB)(payment),
+      () => savePayment(transactionsTableName)(dynamoDB)(payment),
       (error) =>
-        new ApplicationError("Payment failed", error, StatusCodes.UNAUTHORIZED)
+        new ApplicationError(
+          "DDB Write failed",
+          error,
+          StatusCodes.UNAUTHORIZED
+        )
     );

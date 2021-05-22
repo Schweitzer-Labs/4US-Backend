@@ -5,6 +5,8 @@ import { stripCardInfo, StrippedContribution } from "../utils/strip-card-info";
 import { ApplicationError } from "../utils/application-error";
 
 export interface Contribution {
+  paymentMethod: string;
+  cardNumberLastFourDigits?: string;
   stripeAccount: string;
   amount: number;
   cardNumber: string;
@@ -25,7 +27,6 @@ export interface Contribution {
   refCode?: string;
   committee?: string;
   contributorType?: string;
-  paymentMethod?: string;
 }
 
 export interface Payment extends StrippedContribution {
@@ -79,7 +80,11 @@ export const processPaymentFromContribution =
       return payment;
     } catch (e) {
       console.error("Payment failed", stripCardInfo(contribution));
-      throw new ApplicationError("Payment failed", {}, StatusCodes.UNAUTHORIZED);
+      throw new ApplicationError(
+        "Payment failed",
+        {},
+        StatusCodes.UNAUTHORIZED
+      );
     }
   };
 

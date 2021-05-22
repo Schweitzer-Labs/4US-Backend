@@ -24,7 +24,7 @@ export const validateDDBResponse =
   (res: any): TaskEither<ApplicationError, T> => {
     const eitherRes = type.decode(res);
     if (isLeft(eitherRes)) {
-      return left(new ApplicationError("Invalid response", {}));
+      return left(new ApplicationError("Invalid ddb response", {}));
     } else {
       return right(eitherRes.right);
     }

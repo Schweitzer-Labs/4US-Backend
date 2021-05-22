@@ -9,13 +9,12 @@ import { DynamoDB } from "aws-sdk";
 dotenv.config();
 
 const runenv: any = process.env.RUNENV;
-const contributionsTableName: any = process.env.CONTRIBUTIONS_DDB_TABLE_NAME;
+const transactionsTableName: any = `transactions-${runenv}`;
 let stripe: Stripe;
 let stripeApiKey: string;
 let dynamoDB: DynamoDB;
 
 export default async (event: any) => {
-  console.log("contrib merged dep")
   if (!stripeApiKey || !stripe || !dynamoDB) {
     // Set up dependencies
     stripeApiKey = await getStripeApiKey(runenv);
@@ -30,5 +29,5 @@ export default async (event: any) => {
     dynamoDB = new DynamoDB();
   }
 
-  return main(runenv)(contributionsTableName)(stripe)(dynamoDB)(event)();
+  return main(transactionsTableName)(stripe)(dynamoDB)(event)();
 };

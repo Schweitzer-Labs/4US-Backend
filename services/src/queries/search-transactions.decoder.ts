@@ -12,6 +12,7 @@ import { ApplicationError } from "../utils/application-error";
 
 const DDBTransactionRequired = t.type({
   id: ddbString,
+  committeeId: ddbString,
   direction: ddbString,
   amount: ddbNumber,
   paymentMethod: ddbString,
@@ -57,6 +58,7 @@ export type DDBTransactionRes = t.TypeOf<typeof DDBTransactionsRes>;
 
 export interface ITransaction {
   id: string;
+  committeeId: string;
   direction: string;
   amount: number;
   paymentMethod: string;
@@ -71,7 +73,7 @@ export interface ITransaction {
   firstName?: string;
   middleName?: string;
   lastName?: string;
-  addressLine1: string;
+  addressLine1?: string;
   addressLine2?: string;
   city?: string;
   state?: string;
@@ -84,6 +86,8 @@ export interface ITransaction {
   emailAddress?: string;
   attestsToBeingAnAdultCitizen?: boolean;
   transactionType?: string;
+  stripePaymentIntentId?: string;
+  cardNumberLastFourDigits?: string;
 }
 
 export const ddbResponseToTransactions = (
@@ -91,6 +95,7 @@ export const ddbResponseToTransactions = (
 ): TaskEither<ApplicationError, ITransaction[]> => {
   const transactions: ITransaction[] = ddbResponse.Items.map((txn) => ({
     id: extractDDBString(txn.id),
+    committeeId: extractDDBString(txn.committeeId),
     direction: extractDDBString(txn.direction),
     amount: extractDDBNumber(txn.amount),
     paymentMethod: extractDDBString(txn.paymentMethod),

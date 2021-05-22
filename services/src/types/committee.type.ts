@@ -11,7 +11,7 @@ export class Committee {
   candidateFirstName: string;
 
   @Field((type) => String)
-  candidateMiddleName: string;
+  candidateMiddleName?: string;
 
   @Field((type) => String)
   candidateLastName: string;
@@ -41,5 +41,11 @@ export class Committee {
   county?: string;
 
   @Field((type) => String)
-  ruleVersion: string;
+  ruleVersion?: string;
+
+  @Field((type) => String)
+  tzDatabaseName?: string;
+
+  @Field((type) => String)
+  plan?: string;
 }

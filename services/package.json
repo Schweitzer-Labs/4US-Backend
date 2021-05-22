@@ -30,13 +30,14 @@
     "integ-test": "mocha tests/integration",
     "seed-contrib": "ts-node tests/seed/seed-contributions.job.ts",
     "test-contrib": "ts-mocha tests/lambdas/policapital-contribute.test.ts --timeout 10000",
+    "test-get-committee": "ts-mocha tests/integration/get-committee-by-id.test.ts --timeout 10000",
     "test-lambdas": "ts-mocha tests/lambdas/*.test.ts --timeout 10000",
     "compile": "npm install && tsc"
   },
   "devDependencies": {
-    "@types/graphql": "^14.5.0",
     "@types/aws-lambda": "^8.10.76",
     "@types/chai": "^4.2.17",
+    "@types/graphql": "^14.5.0",
     "@types/http-aws-es": "^6.0.0",
     "@types/lambda-tester": "^3.6.1",
     "@types/mocha": "^8.2.2",
@@ -45,7 +46,7 @@
     "aws-sdk": "^2.902.0",
     "chai": "^4.2.0",
     "mocha": "^8.2.1",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
   }
