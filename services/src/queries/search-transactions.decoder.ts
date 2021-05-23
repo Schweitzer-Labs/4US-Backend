@@ -9,6 +9,7 @@ const TransactionRequired = t.type({
   bankVerified: t.boolean,
   ruleVerified: t.boolean,
   initiatedTimestamp: t.string,
+  source: t.string,
 });
 
 const TransactionOptional = t.partial({

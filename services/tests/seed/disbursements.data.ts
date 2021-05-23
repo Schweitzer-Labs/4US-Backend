@@ -1,7 +1,7 @@
 import { ITransaction } from "../../src/queries/search-transactions.decoder";
-import { v4 as uuidv4 } from "uuid";
 import { now } from "../../src/utils/time.utils";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { Source } from "../../src/utils/enums/source.enum";
 
 export const disbursementsData: ITransaction[] = [
   {
@@ -14,6 +14,7 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
     id: genTxnId(),
@@ -25,6 +26,7 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
     id: genTxnId(),
@@ -36,6 +38,7 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
     id: genTxnId(),
@@ -47,6 +50,7 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
     id: genTxnId(),
@@ -58,6 +62,7 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
     id: genTxnId(),
@@ -69,5 +74,6 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
 ];

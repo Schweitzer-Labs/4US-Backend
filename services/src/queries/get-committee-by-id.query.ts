@@ -1,14 +1,11 @@
 import { DynamoDB } from "aws-sdk";
 import * as t from "io-ts";
-import { Field, ID } from "type-graphql";
-import { partial } from "io-ts";
 import { pipe } from "fp-ts/function";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../repositories/ddb.utils";
-import { DDBCommitteeRes } from "../repositories/committee/committees.decoders";
 
 const CommitteeRequired = t.type({
   id: t.string,

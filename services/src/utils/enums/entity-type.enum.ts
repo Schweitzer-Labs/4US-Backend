@@ -1,0 +1,15 @@
+export enum EntityType {
+  CAN = "can",
+  FAM = "fam",
+  IND = "ind",
+  SOLEP = "solep",
+  PART = "part",
+  CORP = "corp",
+  COMM = "comm",
+  UNION = "union",
+  ASSOC = "assoc",
+  LLC = "llc",
+  PAC = "pac",
+  PLC = "plc",
+  OTH = "oth",
+}
