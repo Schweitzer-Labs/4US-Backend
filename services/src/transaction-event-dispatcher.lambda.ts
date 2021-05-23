@@ -46,7 +46,7 @@ export default async (event: DynamoDBStreamEvent, context) => {
       timestamp = new Date(record.ApproximateCreationDateTime * 1000);
     const payload = {
       ...data,
-      id: record.id,
+      id: stream.eventID,
       timezone: "America/New_York",
       amount: (data.amount / 100).toFixed(2),
       timestamp,
