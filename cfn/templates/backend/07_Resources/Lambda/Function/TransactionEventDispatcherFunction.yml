@@ -6,7 +6,7 @@ TransactionEventDispatcherFunction:
     CodeUri: lambdas/
     Layers:
       - !Ref ServicesLayer
-    Handler: app.transactionEventDispatcher
+    Handler: app.transactionEventDispatcherHandler
     Runtime: nodejs12.x
     Role: !Sub ${IAM.Outputs.LambdaDonationReceiverRoleArn}
     Events:

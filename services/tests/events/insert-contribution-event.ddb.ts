@@ -71,6 +71,9 @@ export const insertContributionEvent = {
           "cardNumberLastFourDigits": {
             "S": "1232"
           },
+          "emailAddress": {
+            "S": "evan@schweitzerlabs.com"
+          },
           "direction": {
             "S": "in"
           }

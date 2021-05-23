@@ -4,7 +4,6 @@ import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import {
   ITransaction,
   Transaction,
-  Transactions,
 } from "./queries/search-transactions.decoder";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "./utils/application-error";
@@ -15,8 +14,9 @@ import {
   ICommittee,
 } from "./queries/get-committee-by-id.query";
 import { pipe } from "fp-ts/function";
-import { taskEither } from "fp-ts";
+import { task, taskEither } from "fp-ts";
 import { PathReporter } from "io-ts/PathReporter";
+import { TaskEither } from "fp-ts/TaskEither";
 
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
@@ -25,6 +25,7 @@ AWS.config.update({ region: "us-east-1" });
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 const dynamoDB = new DynamoDB();
 const runenv: any = process.env.RUNENV;
+const sqsUrl: any = process.env.SQSQUEUE;
 const committeesTableName: any = `committees-${runenv}`;
 
 export default async (event: DynamoDBStreamEvent, context): Promise<any> => {
@@ -42,15 +43,10 @@ export default async (event: DynamoDBStreamEvent, context): Promise<any> => {
 
     switch (stream.eventName) {
       case "INSERT":
-        const res = await handleInsert(committeesTableName)(dynamoDB)(
+        return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
           eitherTxn.right
         );
-        console.log(res);
-        console.log("transaction insert event emitted");
-        break;
-      // return await sendQueue(eitherTxn.right);
       case "MODIFY":
-        console.log("transaction modify event emitted");
         return;
       default:
         return;
@@ -71,22 +67,43 @@ interface EffectMetadata {
   status: Status;
   ddbEventName: string;
   message: string;
-  action: Effect;
+  effect: Effect;
 }
 
+const successfulSend: EffectMetadata = {
+  status: Status.SUCCESS,
+  ddbEventName: "INSERT",
+  message: "message send succeeded",
+  effect: Effect.SQS_RECEIPT_MESSAGE_SENT,
+};
+
+const failedSend: EffectMetadata = {
+  status: Status.FAILURE,
+  ddbEventName: "INSERT",
+  message: "message send failed",
+  effect: Effect.SQS_RECEIPT_MESSAGE_SENT,
+};
+
 const handleInsert =
+  (sqsUrl: string) =>
   (committeeTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  async (txn: ITransaction) => {
+  async (txn: ITransaction): Promise<EffectMetadata> => {
     if (txn.source === Source.DONATE_FORM) {
-      const res = await pipe(
+      return await pipe(
         getCommitteeById(committeeTableName)(dynamoDB)(txn.committeeId),
-        taskEither.map(formatMessage(txn))
+        taskEither.map(formatMessage(sqsUrl)(txn)),
+        taskEither.chain(sendMessage),
+        taskEither.fold(
+          () => task.of(failedSend),
+          () => task.of(successfulSend)
+        )
       )();
     }
   };
 
 const formatMessage =
+  (sqsUrl: string) =>
   (txn: ITransaction) =>
   (committee: ICommittee): SendMessageRequest => {
     const { tzDatabaseName, emailAddresses } = committee;
@@ -104,8 +121,14 @@ const formatMessage =
       MessageBody: JSON.stringify(txn),
       MessageDeduplicationId: txn.id,
       MessageGroupId: txn.committeeId,
-      QueueUrl: process.env.SQSQUEUE,
+      QueueUrl: sqsUrl,
     };
   };
-
-const sendMessage = async (message: SendMessageRequest) => {};
+const sendMessage = (
+  message: SendMessageRequest
+): TaskEither<ApplicationError, any> => {
+  return taskEither.tryCatch(
+    () => sqs.sendMessage(message).promise(),
+    (e) => new ApplicationError("SQS send failed", e)
+  );
+};

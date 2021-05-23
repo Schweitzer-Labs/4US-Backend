@@ -48,4 +48,7 @@ export class Committee {
 
   @Field((type) => String)
   plan?: string;
+
+  @Field((type) => String)
+  emailAddresses?: string;
 }
