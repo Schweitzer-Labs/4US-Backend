@@ -3,8 +3,8 @@ SHELL			:= bash
 
 SRCS			:= $(shell find 0* -name '*.yml' -o -name '*.txt')
 
-IMPORTED_RESOURCES	:= $(BUILD_DIR)/ImportedResources-$(STACK).yml
-IMPORTS			:= $(BUILD_DIR)/imports-template-$(STACK).yml
+IMPORTED_RESOURCES      := $(CFN_BUILD_DIR)/ImportedResources-$(STACK).yml
+IMPORTS                 := $(CFN_BUILD_DIR)/imports-template-$(STACK).yml
 
 CREPES_PARAMS		:= --region $(REGION)
 CREPES_PARAMS		+= --domain $(DOMAIN) --tld $(TLD) --product $(PRODUCT)
