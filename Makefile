@@ -107,8 +107,9 @@ mkbuilddir:
 build: clean mkbuilddir buildstacks buildsam
 
 buildsam: buildstacks compile $(JS_APPS)
-	sam build \
+	time sam build \
 		--cached \
+		--parallel \
 		--base-dir . \
 		--build-dir $(SAM_BUILD_DIR) \
 		--cache-dir $(SAM_BUILD_DIR)/cache \
