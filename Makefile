@@ -54,8 +54,9 @@ export EMAILER_DIR	:= lambdas
 
 export STACK		:= $(RUNENV)-$(PRODUCT)-backend
 
-export SAM_DIR		:= $(PWD)/.aws-sam
-export BUILD_DIR	:= $(PWD)/build
+export BUILD_DIR	:= $(PWD)/.build
+export SAM_BUILD_DIR	:= $(BUILD_DIR)/sam
+export CFN_BUILD_DIR	:= $(BUILD_DIR)/cloudformation
 
 export DATE		:= $(shell date)
 export NONCE		:= $(shell uuidgen | cut -d\- -f1)
@@ -66,23 +67,24 @@ export CFN_BUCKET	:= $(PRODUCT)-cfn-templates-$(REGION)
 export STACK_PARAMS	:= Nonce=$(NONCE)
 STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV) Product=$(PRODUCT)
 STACK_PARAMS		+= Domain=$(DOMAIN) TLD=$(TLD)
+
 ifneq ($(SUBDOMAIN),)
 	STACK_PARAMS	+= SubDomain=$(SUBDOMAIN)
 endif
 
-export PACKAGE		:= $(SAM_DIR)/CloudFormation-template.yml
+export PACKAGE		:= $(CFN_BUILD_DIR)/CloudFormation-template.yml
 
 CFN_DIR			:= cfn/templates
 
 # stacks and templates
 BACKEND_STACK		:= backend
-BACKEND_TEMPLATE	:= $(BUILD_DIR)/$(BACKEND_STACK).yml
+BACKEND_TEMPLATE	:= $(CFN_BUILD_DIR)/$(BACKEND_STACK).yml
 CONTRIBUTOR_RECEIPT	:= contributor-receipt
-CONTRIBUTOR_TEMPLATE	:= $(BUILD_DIR)/$(CONTRIBUTOR_RECEIPT).yml
+CONTRIBUTOR_TEMPLATE	:= $(CFN_BUILD_DIR)/$(CONTRIBUTOR_RECEIPT).yml
 COMMITTEE_RECEIPT	:= committee-receipt
-COMMITTEE_TEMPLATE	:= $(BUILD_DIR)/$(COMMITTEE_RECEIPT).yml
+COMMITTEE_TEMPLATE	:= $(CFN_BUILD_DIR)/$(COMMITTEE_RECEIPT).yml
 
-IMPORTS			:= $(BUILD_DIR)/Imports-$(STACK).yml
+IMPORTS			:= $(CFN_BUILD_DIR)/Imports-$(STACK).yml
 
 CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
 ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
@@ -100,8 +102,7 @@ all: build
 	$(MAKE) -C $(CFN_DIR)/$(BACKEND_STACK)
 
 mkbuilddir:
-	echo $(BUILD_DIR)
-	mkdir -p $(BUILD_DIR)
+	@mkdir -p $(SAM_BUILD_DIR) $(CFN_BUILD_DIR)
 
 build: clean mkbuilddir buildstacks buildsam
 
@@ -109,6 +110,8 @@ buildsam: buildstacks compile $(JS_APPS)
 	sam build \
 		--cached \
 		--base-dir . \
+		--build-dir $(SAM_BUILD_DIR) \
+		--cache-dir $(SAM_BUILD_DIR)/cache \
 		--template-file $(BACKEND_TEMPLATE)
 
 buildstacks: mkbuilddir $(CFN_TEMPLATES)
@@ -121,7 +124,7 @@ compile:
 dep:
 	@pip3 install jinja2 cfn_flip boto3
 
-$(BUILD_DIR)/%.yml: $(CFN_DIR)/%
+$(CFN_BUILD_DIR)/%.yml: $(CFN_DIR)/%
 	$(MAKE) template=$@ -C $^ check
 
 
@@ -130,18 +133,19 @@ check: buildstacks
 
 
 clean:
-	rm -f $(BUILD_DIR)/*.yml
+	@rm -f $(SAM_BUILD_DIR)/*.yml
+	@rm -f $(CFN_BUILD_DIR)/*.yml
 
 realclean: clean
-	@rm -rf $(SAM_DIR)
+	@rm -rf $(BUILD_DIR)
 
 local: build
-	@sam local start-api
+	@sam local start-api --template-file $(SAM_BUILD_DIR)/template.yaml
 
 package: build
 	aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
-		--template-file $(SAM_DIR)/build/template.yaml \
+		--template-file $(SAM_BUILD_DIR)/template.yaml \
 		--region $(REGION) \
 		--s3-bucket $(CFN_BUCKET) \
 		--s3-prefix $(STACK) \
