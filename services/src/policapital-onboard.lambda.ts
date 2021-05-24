@@ -1,14 +1,14 @@
 import headers from "./utils/headers";
 
 import Joi from "joi";
-import {createStripeConnectUser} from "./utils/createStripeConnectUser"
-
+import { createStripeConnectUser } from "./utils/createStripeConnectUser";
 
 const onboardingSchema = Joi.object({
   code: Joi.string().required(),
 }).required();
 
 export default async (event, context) => {
+  console.log(event);
   const res = onboardingSchema.validate(event.queryStringParameters);
   if (res.error) {
     return {
@@ -16,27 +16,24 @@ export default async (event, context) => {
       body: JSON.stringify({
         message: res.error.message,
       }),
-      headers
+      headers,
     };
   }
 
-  console.log("payload passed validation")
+  console.log("payload passed validation");
 
-  const {
-    code
-  } = res.value;
-
+  const { code } = res.value;
 
   try {
     const id = await createStripeConnectUser(code);
-    console.log("Stripe connect account request successful")
-    console.log(id)
+    console.log("Stripe connect account request successful");
+    console.log(id);
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: "success",
       }),
-      headers
+      headers,
     };
   } catch (e) {
     return {
@@ -44,7 +41,7 @@ export default async (event, context) => {
       body: JSON.stringify({
         message: "Code is not valid",
       }),
-      headers
+      headers,
     };
   }
-}
+};

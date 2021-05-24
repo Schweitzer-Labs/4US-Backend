@@ -1,10 +1,11 @@
 import { data } from "./contributions.data";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
-import { v4 as uuidv4 } from "uuid";
 import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { Source } from "../../src/utils/enums/source.enum";
+import { Direction } from "../../src/utils/enums/direction.enum";
+import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 
 const run = async (dynamoDB: DynamoDB, sequence: number) => {
   const list = data.slice(25 * sequence - 25, 25 * sequence);
@@ -15,8 +16,8 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
     const contribution: ITransaction = {
       committeeId,
       id: genTxnId(),
-      direction: "in",
-      amount: txn.amount,
+      direction: Direction.IN,
+      amount: txn.amount * 100,
       paymentMethod: txn.paymentMethod,
       bankVerified: false,
       ruleVerified: true,
@@ -35,7 +36,7 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
       entityType: txn.contributorType,
       companyName: txn.companyName,
       attestsToBeingAnAdultCitizen: true,
-      transactionType: "contribution",
+      transactionType: TransactionType.CONTRIBUTION,
       source: Source.FINICITY,
     };
     const marshalledContrib = DynamoDB.Converter.marshall(contribution);

@@ -1,6 +1,7 @@
-import Joi from 'joi'
-import {parseUA} from "./utils/parse-ua";
+import Joi from "joi";
+import { parseUA } from "./utils/parse-ua";
 import headers from "./utils/headers";
+import { APIGatewayProxyResult } from "aws-lambda";
 
 const analyticsSchema = Joi.object({
   userAgent: Joi.string().required(),
@@ -9,39 +10,38 @@ const analyticsSchema = Joi.object({
   src: Joi.string().required(),
 }).required();
 
-export default async (event, context) => {
-  const res = analyticsSchema.validate(JSON.parse(event.body), {allowUnknown: true});
+export default async (event, context): Promise<APIGatewayProxyResult> => {
+  console.log(event);
+  const res = analyticsSchema.validate(JSON.parse(event.body), {
+    allowUnknown: true,
+  });
   if (res.error) {
     return {
       statusCode: 400,
       body: JSON.stringify({
         message: res.error.message,
       }),
-      headers
+      headers,
     };
   }
 
-  const {
-    userAgent,
-    referrer,
-    src
-  } = res.value
+  const { userAgent, referrer, src } = res.value;
 
   const logItem = {
     headers: event.headers,
     userAgent: parseUA(userAgent),
     referrer,
     src,
-    event: res.value.event
-  }
+    event: res.value.event,
+  };
 
-  console.log(logItem)
+  console.log(logItem);
 
   return {
     statusCode: 200,
     body: JSON.stringify({
       message: "success",
     }),
-    headers
+    headers,
   };
-}
+};

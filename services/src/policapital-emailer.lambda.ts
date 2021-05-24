@@ -34,6 +34,7 @@ const posRecordTemplate: any = process.env.POS_RECORD;
  * Main Function
  */
 export default async (event: SQSEvent, context): Promise<any[]> => {
+  console.log(event);
   console.log(JSON.stringify(event));
   let res = [];
 
@@ -87,6 +88,7 @@ const txnToTemplateData = (txn: ITransaction) => ({
   refCode: txn.refCode || "N/A",
   email: txn.emailAddress,
   addressLine2: txn.addressLine2 || "",
+  phoneNumber: txn.phoneNumber || "",
 });
 
 const sendEmail = async (txn: ITransaction, parameters, committee: string) => {
