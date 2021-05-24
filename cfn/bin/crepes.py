@@ -66,7 +66,7 @@ def assemble(stack):
     sections.sort()
 
     if args.imports:
-        sections.remove('08_Outputs')
+        if '08_Outputs' in sections: sections.remove('08_Outputs')
 
     for section in sections:
         sec = section.split('_')[1]
