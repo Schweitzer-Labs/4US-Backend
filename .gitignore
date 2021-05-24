@@ -129,7 +129,8 @@ $RECYCLE.BIN/
 
 .idea/
 
-.aws-sam
+# SAM and CloudFormation
+.build/
 
 # IDE
 */.idea

@@ -8,7 +8,7 @@ PolicapitalContributeFunction:
       - !Ref ServicesLayer
     Handler: app.policapitalContributeHandler
     Runtime: nodejs12.x
-    Role: !Sub ${IAM.Outputs.LambdaDynamoDBWriterRoleArn}
+    Role: !GetAtt LambdaDynamoDBWriterRole.Arn
     Events:
       PolicapitalContribute:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api

@@ -3,8 +3,15 @@ SHELL			:= bash
 
 SRCS			:= $(shell find 0* -name '*.yml' -o -name '*.txt')
 
-IMPORTED_RESOURCES	:= $(BUILD_DIR)/ImportedResources-$(STACK).yml
-IMPORTS			:= $(BUILD_DIR)/imports-template-$(STACK).yml
+IMPORTED_RESOURCES      := $(CFN_BUILD_DIR)/ImportedResources-$(STACK).yml
+IMPORTS                 := $(CFN_BUILD_DIR)/imports-template-$(STACK).yml
+
+CREPES_PARAMS		:= --region $(REGION)
+CREPES_PARAMS		+= --domain $(DOMAIN) --tld $(TLD) --product $(PRODUCT)
+
+ifneq ($(SUBDOMAIN),)
+	CREPES_PARAMS	+= --subdomain $(SUBDOMAIN)
+endif
 
 .PHONY: build buildimports check import
 
@@ -20,10 +27,7 @@ check: $(template)
 $(template): $(SRCS)
 	@echo $@
 	@$(CREPES) . \
-		--region $(REGION) \
-		--subdomain $(SUBDOMAIN) \
-                --domain $(DOMAIN) \
-                --tld $(TLD) \
+		$(CREPES_PARAMS) \
 		--runenv $(RUNENV) \
 		--output $@
 
@@ -31,7 +35,7 @@ $(template): $(SRCS)
 $(IMPORTED_RESOURCES): ImportedResources/$(REGION).yml $(SRCS)
 	@echo "Importing resources from $(REGION) into $(STACK) via $@"
 	@$(CREPES) . \
-		--region $(REGION) \
+		$(CREPES_PARAMS) \
 		--import $@ \
 		--output $(IMPORTS)
 

@@ -1,13 +1,7 @@
-LambdaBasicManagedPolicy:
+LambdaBasicPolicy:
   Type: AWS::IAM::ManagedPolicy
   Description: Policy for all Lambdas in {{ DOMAIN }}.{{ TLD }}
   Properties:
-    Roles:
-      - !Ref LambdaBasicRole
-      - !Ref LambdaDynamoDBWriterRole
-      - !Ref LambdaSESRole
-      - !Ref LambdaDonationReceiverRole
-      - !Ref LambdaGraphQLRole
     PolicyDocument:
       Version: '2012-10-17'
       Statement:

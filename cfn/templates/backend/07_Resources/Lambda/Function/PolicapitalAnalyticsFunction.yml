@@ -8,7 +8,7 @@ PolicapitalAnalyticsFunction:
       - !Ref ServicesLayer
     Handler: app.policapitalAnalyticsHandler
     Runtime: nodejs12.x
-    Role: !Sub ${IAM.Outputs.LambdaBasicRoleArn}
+    Role: !GetAtt LambdaBasicRole.Arn
     Events:
       PolicapitalAnalytics:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api

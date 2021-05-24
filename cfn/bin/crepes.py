@@ -15,10 +15,13 @@ parser.add_argument('directory', metavar='dir', type=str, help='src directory')
 parser.add_argument('--region', dest='region', type=str, default='us-west-1', help='AWS Region')
 parser.add_argument('--output', dest='outfile', type=str, help='output CloudFormation YAML file')
 parser.add_argument('--import', dest='imports', type=str, help='import a subset of existing resources into the stack')
-parser.add_argument('--runenv', dest='runenv', type=str, help='lambda run environment (prod/qa/dev)')
+parser.add_argument('--runenv', dest='runenv', type=str, help='lambda run environment (prod/qa/demo)')
 parser.add_argument('--domain', dest='domain', type=str, help="domain name (e.g. 'example' from 'www.example.com')")
 parser.add_argument('--subdomain', dest='subdomain', type=str, help="subdomain (e.g. 'www' from 'www.example.com')")
 parser.add_argument('--tld', dest='tld', type=str, help="tld (e.g. 'com' from 'www.example.com')")
+parser.add_argument('--product', dest='product', type=str, help="the product (p2 or 4us) for which we are building this template")
+parser.add_argument('--hostid', dest='hostid', type=str, help="route53 hostid")
+
 
 #
 # Set Global Variables
@@ -28,8 +31,6 @@ args = parser.parse_args()
 src = os.path.dirname(args.directory)
 stack = os.path.basename(args.directory)
 
-regsplit = args.region.split('-')
-regcode = regsplit[0] + regsplit[1][0] + regsplit[2] # us-east-2 ==> use2
 runenv = args.runenv or 'dev'
 subdomain = args.subdomain or ''
 domain = args.domain or ''
@@ -53,7 +54,7 @@ def process_jinja_template(filename):
         contents = f.read()
 
     template = Template(contents)
-    return template.render(AZs=AZs, REGION=args.region, REGCODE=regcode, RUNENV=runenv, SUBDOMAIN=subdomain, DOMAIN=domain, TLD=tld)
+    return template.render(AZs=AZs, REGION=args.region, RUNENV=runenv, SUBDOMAIN=subdomain, DOMAIN=domain, TLD=tld, PRODUCT=args.product, HOSTID=args.hostid)
 
 # Assemble all the components of a stack into a single cloudformation::stack object
 def assemble(stack):
@@ -64,6 +65,8 @@ def assemble(stack):
     sections = [l for l in os.listdir(stack) if l.startswith('0')]
     sections.sort()
 
+    if args.imports:
+        if '08_Outputs' in sections: sections.remove('08_Outputs')
 
     for section in sections:
         sec = section.split('_')[1]
@@ -117,7 +120,7 @@ def main():
     global imports
 
     if args.imports: # process the ImportedResources file
-        imports = load_yaml(process_jinja_template(os.path.join('ImportedResources', args.region) + '.yml'))
+        imports = load_yaml(process_jinja_template('ImportedResources.yml'))
 
     # Assemble the stack into a dict and convert that to yaml
     stack = assemble(args.directory)

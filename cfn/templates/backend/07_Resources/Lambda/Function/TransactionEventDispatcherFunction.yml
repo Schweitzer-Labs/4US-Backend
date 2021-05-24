@@ -8,7 +8,7 @@ TransactionEventDispatcherFunction:
       - !Ref ServicesLayer
     Handler: app.transactionEventDispatcherHandler
     Runtime: nodejs12.x
-    Role: !Sub ${IAM.Outputs.LambdaDonationReceiverRoleArn}
+    Role: !GetAtt LambdaDonationReceiverRole.Arn
     Events:
       TransactionRecorded:
         Type: DynamoDB

@@ -1,8 +1,6 @@
-DynamoDBWriterManagedPolicy:
+DynamoDBWriterPolicy:
   Type: AWS::IAM::ManagedPolicy
   Properties:
-    Roles:
-      - !Ref LambdaDynamoDBWriterRole
     PolicyDocument:
       Version: '2012-10-17'
       Statement:

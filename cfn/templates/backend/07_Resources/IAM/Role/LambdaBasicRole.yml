@@ -1,6 +1,8 @@
-LambdaGraphQLRole:
+LambdaBasicRole:
   Type: AWS::IAM::Role
   Properties:
+    ManagedPolicyArns:
+      - !Ref LambdaBasicPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:

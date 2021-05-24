@@ -1,6 +1,5 @@
 LambdaRunEnvironment:
   Type: String
-  Default: qa
   AllowedValues:
     - prod
     - qa
