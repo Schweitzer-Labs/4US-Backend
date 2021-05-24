@@ -32,6 +32,7 @@ const run = async (dynamoDB: DynamoDB) => {
     refCode: "home-page",
     entityType: EntityType.IND,
     transactionType: TransactionType.CONTRIBUTION,
+    stripePaymentIntentId: "fjdsk234jsidjf",
   };
   return await putTransaction("transactions-dev")(dynamoDB)(txn);
 };

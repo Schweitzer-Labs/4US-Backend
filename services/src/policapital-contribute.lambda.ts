@@ -15,6 +15,7 @@ let stripeApiKey: string;
 let dynamoDB: DynamoDB;
 
 export default async (event: any) => {
+  console.log(event);
   if (!stripeApiKey || !stripe || !dynamoDB) {
     // Set up dependencies
     stripeApiKey = await getStripeApiKey(runenv);
