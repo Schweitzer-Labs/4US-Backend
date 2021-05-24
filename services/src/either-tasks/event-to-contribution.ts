@@ -44,7 +44,12 @@ export const objectToContribution = (
     );
   } else {
     console.log("Validation succeeded");
-    return right(res.value);
+    // @Todo Change email to emailAddress in API.
+    const txn = {
+      ...res.value,
+      emailAddress: res.value.email,
+    };
+    return right(txn);
   }
 };
 

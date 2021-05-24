@@ -6,6 +6,7 @@ describe("Transaction Event Dispatch", function () {
   it("Publishes a web contribution to a queue", async () => {
     const payload: any = insertContributionEvent;
     const res = await transactionEventDispatcher(payload, {});
-    expect(true).to.equal(false);
+    expect(res.status).to.equal("success");
+    expect(res.effect).to.equal("sqs_receipt_message_sent");
   });
 });

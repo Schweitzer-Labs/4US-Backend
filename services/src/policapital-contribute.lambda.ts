@@ -25,7 +25,6 @@ export default async (event: any) => {
     AWS.config.apiVersions = {
       dynamodb: "2012-08-10",
     };
-    AWS.config.update({ region: "us-east-1" });
     dynamoDB = new DynamoDB();
   }
 

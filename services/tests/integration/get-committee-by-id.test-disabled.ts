@@ -14,7 +14,6 @@ describe("Get Committee by ID Query", function () {
     AWS.config.apiVersions = {
       dynamodb: "2012-08-10",
     };
-    AWS.config.update({ region: "us-east-1" });
     dynamoDB = new DynamoDB();
   });
   it("Retrieves a committee by valid ID", async () => {

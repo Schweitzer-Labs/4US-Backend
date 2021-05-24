@@ -4,6 +4,7 @@ import { DynamoDB } from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { Source } from "../../src/utils/enums/source.enum";
 
 const run = async (dynamoDB: DynamoDB, sequence: number) => {
   const list = data.slice(25 * sequence - 25, 25 * sequence);
@@ -35,6 +36,7 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
       companyName: txn.companyName,
       attestsToBeingAnAdultCitizen: true,
       transactionType: "contribution",
+      source: Source.FINICITY,
     };
     const marshalledContrib = DynamoDB.Converter.marshall(contribution);
 
@@ -59,7 +61,6 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
-AWS.config.update({ region: "us-east-1" });
 const dynamoDB = new DynamoDB();
 
 run(dynamoDB, 1).then(console.log).catch(console.log);

@@ -21,21 +21,22 @@ import { TaskEither } from "fp-ts/TaskEither";
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
-AWS.config.update({ region: "us-east-1" });
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 const dynamoDB = new DynamoDB();
 const runenv: any = process.env.RUNENV;
 const sqsUrl: any = process.env.SQSQUEUE;
 const committeesTableName: any = `committees-${runenv}`;
 
-export default async (event: DynamoDBStreamEvent, context): Promise<any> => {
+export default async (
+  event: DynamoDBStreamEvent,
+  context
+): Promise<EffectMetadata> => {
   for (const stream of event.Records) {
     const record = stream.dynamodb;
     const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
     const eitherTxn = Transaction.decode(unmarshalledTxn);
-    PathReporter.report;
     if (isLeft(eitherTxn)) {
-      return new ApplicationError(
+      throw new ApplicationError(
         "Invalid transaction data",
         PathReporter.report(eitherTxn)
       );
@@ -43,10 +44,12 @@ export default async (event: DynamoDBStreamEvent, context): Promise<any> => {
 
     switch (stream.eventName) {
       case "INSERT":
+        console.log("INSERT event emitted");
         return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
           eitherTxn.right
         );
       case "MODIFY":
+        console.log("MODIFY event emitted");
         return;
       default:
         return;
@@ -106,16 +109,20 @@ const formatMessage =
   (sqsUrl: string) =>
   (txn: ITransaction) =>
   (committee: ICommittee): SendMessageRequest => {
-    const { tzDatabaseName, emailAddresses } = committee;
+    const { tzDatabaseName, emailAddresses, committeeName } = committee;
     return {
       MessageAttributes: {
         committeeEmailAddress: {
           DataType: "String",
           StringValue: emailAddresses,
         },
-        tzcommittee: {
+        committeeTzDatabaseName: {
           DataType: "String",
           StringValue: tzDatabaseName,
+        },
+        committeeName: {
+          DataType: "String",
+          StringValue: committeeName,
         },
       },
       MessageBody: JSON.stringify(txn),

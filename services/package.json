@@ -33,6 +33,7 @@
     "test-get-committee": "ts-mocha tests/integration/get-committee-by-id.test.ts --timeout 10000",
     "test-lambdas": "ts-mocha tests/lambdas/*.test.ts --timeout 10000",
     "test-dispatcher": "ts-mocha tests/lambdas/transaction-event-dispatcher.test.ts --timeout 10000",
+    "test-emailer": "ts-mocha tests/lambdas/policapital-emailer.test.ts --timeout 10000",
     "compile": "npm install && tsc"
   },
   "devDependencies": {

@@ -10,7 +10,6 @@ describe("Committee Store", function () {
     AWS.config.apiVersions = {
       dynamodb: "2012-08-10",
     };
-    AWS.config.update({ region: "us-east-1" });
     dynamoDB = new DynamoDB();
   });
   it("Queries committee table", async () => {
