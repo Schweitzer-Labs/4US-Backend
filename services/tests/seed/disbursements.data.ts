@@ -1,10 +1,11 @@
 import { ITransaction } from "../../src/queries/search-transactions.decoder";
-import { v4 as uuidv4 } from "uuid";
 import { now } from "../../src/utils/time.utils";
+import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { Source } from "../../src/utils/enums/source.enum";
 
 export const disbursementsData: ITransaction[] = [
   {
-    id: uuidv4(),
+    id: genTxnId(),
     committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
     direction: "out",
     amount: 1000,
@@ -13,9 +14,10 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
-    id: uuidv4(),
+    id: genTxnId(),
     committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
     direction: "out",
     amount: 12000,
@@ -24,9 +26,10 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
-    id: uuidv4(),
+    id: genTxnId(),
     committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
     direction: "out",
     amount: 123000,
@@ -35,9 +38,10 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
-    id: uuidv4(),
+    id: genTxnId(),
     committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
     direction: "out",
     amount: 49000,
@@ -46,9 +50,10 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
-    id: uuidv4(),
+    id: genTxnId(),
     committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
     direction: "out",
     amount: 194000,
@@ -57,9 +62,10 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
   {
-    id: uuidv4(),
+    id: genTxnId(),
     committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
     direction: "out",
     amount: 1500,
@@ -68,5 +74,6 @@ export const disbursementsData: ITransaction[] = [
     ruleVerified: false,
     initiatedTimestamp: now(),
     transactionType: "disbursement",
+    source: Source.FINICITY,
   },
 ];

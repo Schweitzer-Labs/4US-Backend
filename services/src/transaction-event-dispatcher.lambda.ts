@@ -1,64 +1,141 @@
 import * as AWS from "aws-sdk";
 import { DynamoDBStreamEvent } from "aws-lambda";
-AWS.config.update({ region: process.env.REGION });
-const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
-/*
- * Helper Functions
- */
-const getCommitteeDetails = async (committee) => {
-  const emails = {
-    "angel-cruz": ["seemant@schweitzerlabs.com", "evan@schweitzerlabs.com"],
-    "john-safford": ["awsadmin@schweitzerlabs.com"],
-  };
-  return { emails: emails[committee], timezone: "America/New_York" };
-}; // getCommitteeDetails()
+import { SendMessageRequest } from "aws-sdk/clients/sqs";
+import {
+  ITransaction,
+  Transaction,
+} from "./queries/search-transactions.decoder";
+import { isLeft } from "fp-ts/Either";
+import { ApplicationError } from "./utils/application-error";
+import { Source } from "./utils/enums/source.enum";
+import { DynamoDB } from "aws-sdk";
+import {
+  getCommitteeById,
+  ICommittee,
+} from "./queries/get-committee-by-id.query";
+import { pipe } from "fp-ts/function";
+import { task, taskEither } from "fp-ts";
+import { PathReporter } from "io-ts/PathReporter";
+import { TaskEither } from "fp-ts/TaskEither";
 
-const sendQueue = async (message) => {
-  const { emails, timezone } = await getCommitteeDetails(message.committee),
-    params = {
+AWS.config.apiVersions = {
+  dynamodb: "2012-08-10",
+};
+const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
+const dynamoDB = new DynamoDB();
+const runenv: any = process.env.RUNENV;
+const sqsUrl: any = process.env.SQSQUEUE;
+const committeesTableName: any = `committees-${runenv}`;
+
+export default async (
+  event: DynamoDBStreamEvent,
+  context
+): Promise<EffectMetadata> => {
+  for (const stream of event.Records) {
+    const record = stream.dynamodb;
+    const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
+    const eitherTxn = Transaction.decode(unmarshalledTxn);
+    if (isLeft(eitherTxn)) {
+      throw new ApplicationError(
+        "Invalid transaction data",
+        PathReporter.report(eitherTxn)
+      );
+    }
+
+    switch (stream.eventName) {
+      case "INSERT":
+        console.log("INSERT event emitted");
+        return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
+          eitherTxn.right
+        );
+      case "MODIFY":
+        console.log("MODIFY event emitted");
+        return;
+      default:
+        return;
+    }
+  }
+};
+
+enum Effect {
+  SQS_RECEIPT_MESSAGE_SENT = "sqs_receipt_message_sent",
+}
+
+enum Status {
+  SUCCESS = "success",
+  FAILURE = "failure",
+}
+
+interface EffectMetadata {
+  status: Status;
+  ddbEventName: string;
+  message: string;
+  effect: Effect;
+}
+
+const successfulSend: EffectMetadata = {
+  status: Status.SUCCESS,
+  ddbEventName: "INSERT",
+  message: "message send succeeded",
+  effect: Effect.SQS_RECEIPT_MESSAGE_SENT,
+};
+
+const failedSend: EffectMetadata = {
+  status: Status.FAILURE,
+  ddbEventName: "INSERT",
+  message: "message send failed",
+  effect: Effect.SQS_RECEIPT_MESSAGE_SENT,
+};
+
+const handleInsert =
+  (sqsUrl: string) =>
+  (committeeTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  async (txn: ITransaction): Promise<EffectMetadata> => {
+    if (txn.source === Source.DONATE_FORM) {
+      return await pipe(
+        getCommitteeById(committeeTableName)(dynamoDB)(txn.committeeId),
+        taskEither.map(formatMessage(sqsUrl)(txn)),
+        taskEither.chain(sendMessage),
+        taskEither.fold(
+          () => task.of(failedSend),
+          () => task.of(successfulSend)
+        )
+      )();
+    }
+  };
+
+const formatMessage =
+  (sqsUrl: string) =>
+  (txn: ITransaction) =>
+  (committee: ICommittee): SendMessageRequest => {
+    const { tzDatabaseName, emailAddresses, committeeName } = committee;
+    return {
       MessageAttributes: {
-        committee: {
+        committeeEmailAddress: {
           DataType: "String",
-          StringValue: emails.join(","),
+          StringValue: emailAddresses,
         },
-        tzcommittee: {
+        committeeTzDatabaseName: {
           DataType: "String",
-          StringValue: timezone,
+          StringValue: tzDatabaseName,
+        },
+        committeeName: {
+          DataType: "String",
+          StringValue: committeeName,
         },
       },
-      MessageBody: JSON.stringify(message),
-      MessageDeduplicationId: message.id,
-      MessageGroupId: message.committee,
-      QueueUrl: process.env.SQSQUEUE,
+      MessageBody: JSON.stringify(txn),
+      MessageDeduplicationId: txn.id,
+      MessageGroupId: txn.committeeId,
+      QueueUrl: sqsUrl,
     };
-  const resp = await sqs.sendMessage(params).promise();
-  console.log("sent SQS", resp);
-}; // sendQueue()
-
-/*
- * Main Function
- */
-export default async (event: DynamoDBStreamEvent, context) => {
-  for (const stream of event.Records) {
-    console.log(stream);
-    const record = stream.dynamodb,
-      data = AWS.DynamoDB.Converter.unmarshall(record.NewImage),
-      timestamp = new Date(record.ApproximateCreationDateTime * 1000);
-    const payload = {
-      ...data,
-      id: stream.eventID,
-      timezone: "America/New_York",
-      amount: (data.amount / 100).toFixed(2),
-      timestamp,
-      state: data.state.toUpperCase(),
-      receipt: data.stripePaymentIntentId.slice(-8),
-      occupation: data.occupation || "",
-      employer: data.employer || "",
-      refCode: data.refCode || "N/A",
-    };
-
-    console.log("Sending contribution ddb record to stream", payload);
-
-    await sendQueue(payload);
-  }
+  };
+const sendMessage = (
+  message: SendMessageRequest
+): TaskEither<ApplicationError, any> => {
+  return taskEither.tryCatch(
+    () => sqs.sendMessage(message).promise(),
+    (e) => new ApplicationError("SQS send failed", e)
+  );
 };

@@ -1,11 +1,8 @@
 import { expect } from "chai";
 import { DynamoDB } from "aws-sdk";
 import * as AWS from "aws-sdk";
-import { pipe } from "fp-ts/function";
-import { task, taskEither } from "fp-ts";
 import { getAllCommittees } from "../../src/repositories/committee/committee.repository";
 import { isLeft } from "fp-ts/Either";
-import { ApplicationError } from "../../src/utils/application-error";
 
 let dynamoDB: DynamoDB;
 describe("Committee Store", function () {
@@ -13,7 +10,6 @@ describe("Committee Store", function () {
     AWS.config.apiVersions = {
       dynamodb: "2012-08-10",
     };
-    AWS.config.update({ region: "us-east-1" });
     dynamoDB = new DynamoDB();
   });
   it("Queries committee table", async () => {

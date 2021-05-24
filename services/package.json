@@ -25,13 +25,15 @@
     "ua-parser-js": "^0.7.28"
   },
   "scripts": {
-    "test": "ts-mocha tests/**/*.ts --timeout 10000",
+    "test": "ts-mocha tests/**/*.test.ts --timeout 10000",
     "test-graphql": "ts-mocha tests/lambdas/committee-graphql.test.ts --timeout 10000",
     "integ-test": "mocha tests/integration",
     "seed-contrib": "ts-node tests/seed/seed-contributions.job.ts",
     "test-contrib": "ts-mocha tests/lambdas/policapital-contribute.test.ts --timeout 10000",
     "test-get-committee": "ts-mocha tests/integration/get-committee-by-id.test.ts --timeout 10000",
     "test-lambdas": "ts-mocha tests/lambdas/*.test.ts --timeout 10000",
+    "test-dispatcher": "ts-mocha tests/lambdas/transaction-event-dispatcher.test.ts --timeout 10000",
+    "test-emailer": "ts-mocha tests/lambdas/policapital-emailer.test.ts --timeout 10000",
     "compile": "npm install && tsc"
   },
   "devDependencies": {

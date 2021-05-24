@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { eventToContribution } from "../../src/either-tasks/event-to-contribution";
 
-import invalidContributeEvent from "../events/invalid-contribute";
-import validContributeEvent from "../events/valid-contribute";
+import { invalidPolicapitalContributeProxy } from "../events/invalid-policapital-contribute.proxy";
+import { validPolicapitalContributeProxy } from "../events/valid-policapital-contribute-proxy";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import { StatusCodes } from "http-status-codes";
@@ -10,7 +10,7 @@ import { StatusCodes } from "http-status-codes";
 describe("Tests event to contribution monad", function () {
   it("Stops a contribution call with an invalid payload", async () => {
     const res: any = await pipe(
-      eventToContribution(invalidContributeEvent),
+      eventToContribution(invalidPolicapitalContributeProxy),
       taskEither.fold(
         (err) => task.of(err.statusCode),
         (succ) => task.of(StatusCodes.OK)
@@ -20,7 +20,7 @@ describe("Tests event to contribution monad", function () {
   });
   it("Allows a contribution call with an valid payload", async () => {
     const res = await pipe(
-      eventToContribution(validContributeEvent),
+      eventToContribution(validPolicapitalContributeProxy),
       taskEither.fold(
         (err) => task.of(err.message),
         (succ) => task.of(succ.cardCVC)

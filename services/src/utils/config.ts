@@ -1,7 +1,7 @@
 import * as AWS from "aws-sdk";
-AWS.config.update({
-  region: "us-east-1",
-});
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const ps = new AWS.SSM();
 

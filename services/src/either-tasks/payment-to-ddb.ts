@@ -6,6 +6,7 @@ import { Payment } from "./contribution-to-payment";
 import { DynamoDB } from "aws-sdk";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { now } from "../utils/time.utils";
+import { Source } from "../utils/enums/source.enum";
 
 const savePayment =
   (transactionsTableName: string) =>
@@ -15,6 +16,7 @@ const savePayment =
       ...payment,
       id: uuidv4(),
       committeeId: payment.committee,
+      source: Source.DONATE_FORM,
       direction: "in",
       bankVerified: false,
       ruleVerified: false,

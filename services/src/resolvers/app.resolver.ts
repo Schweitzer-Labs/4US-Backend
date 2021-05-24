@@ -27,7 +27,6 @@ export class AppResolver {
     AWS.config.apiVersions = {
       dynamodb: "2012-08-10",
     };
-    AWS.config.update({ region: "us-east-1" });
     this.dynamoDB = new DynamoDB();
   }
 
@@ -84,7 +83,6 @@ export class AppResolver {
       needsReviewCount: 0,
       donorMap: {},
     };
-    console.log(transactions[1]);
 
     const aggs: any = transactions.reduce((acc: any, txn) => {
       // Total Raised

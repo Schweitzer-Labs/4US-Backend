@@ -10,11 +10,7 @@ import {
   toFilterExpression,
   validateDDBResponse,
 } from "../repositories/ddb.utils";
-import {
-  ddbResponseToTransactions,
-  DDBTransactionsRes,
-  ITransaction,
-} from "./search-transactions.decoder";
+import { ITransaction, Transactions } from "./search-transactions.decoder";
 import { TransactionsArg } from "../args/transactions.arg";
 
 const getTransactionsRes =
@@ -55,7 +51,7 @@ const getTransactionsRes =
         },
       })
       .promise();
-    return res;
+    return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
   };
 
 export const searchTransactions =
@@ -74,6 +70,5 @@ export const searchTransactions =
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       ),
-      taskEither.chain(validateDDBResponse(DDBTransactionsRes)),
-      taskEither.chain(ddbResponseToTransactions)
+      taskEither.chain(validateDDBResponse(Transactions))
     );
