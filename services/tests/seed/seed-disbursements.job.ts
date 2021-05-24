@@ -3,7 +3,7 @@ import { DynamoDB } from "aws-sdk";
 import { disbursementsData } from "./disbursements.data";
 
 const run = async (dynamoDB: DynamoDB) => {
-  const tableName = "transactions-dev";
+  const tableName = "transactions-qa";
   const items = disbursementsData.map((txn) => {
     const marshalledContrib = DynamoDB.Converter.marshall(txn);
     return {

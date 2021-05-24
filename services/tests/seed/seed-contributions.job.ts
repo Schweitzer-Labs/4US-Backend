@@ -9,7 +9,7 @@ import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 
 const run = async (dynamoDB: DynamoDB, sequence: number) => {
   const list = data.slice(25 * sequence - 25, 25 * sequence);
-  const tableName = "transactions-dev";
+  const tableName = "transactions-qa";
   const committeeId = "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4";
   const now = new Date().getTime().toString();
   const items = list.map((txn) => {

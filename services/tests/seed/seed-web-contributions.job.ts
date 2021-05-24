@@ -34,7 +34,7 @@ const run = async (dynamoDB: DynamoDB) => {
     transactionType: TransactionType.CONTRIBUTION,
     stripePaymentIntentId: "fjdsk234jsidjf",
   };
-  return await putTransaction("transactions-dev")(dynamoDB)(txn);
+  return await putTransaction("transactions-qa")(dynamoDB)(txn);
 };
 
 AWS.config.apiVersions = {

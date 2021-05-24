@@ -148,3 +148,4 @@ template.yml
 */dist
 
 **/dist
+.aws-sam

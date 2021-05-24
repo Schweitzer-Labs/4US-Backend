@@ -23,4 +23,4 @@ AWS.config.apiVersions = {
 };
 const dynamoDB = new DynamoDB();
 
-run("committees-dev")(dynamoDB)(committeesData);
+run("committees-qa")(dynamoDB)(committeesData);
