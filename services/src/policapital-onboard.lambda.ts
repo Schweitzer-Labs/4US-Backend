@@ -8,7 +8,7 @@ const onboardingSchema = Joi.object({
 }).required();
 
 export default async (event, context) => {
-  console.log(event);
+  console.log(JSON.stringify(event));
   const res = onboardingSchema.validate(event.queryStringParameters);
   if (res.error) {
     return {

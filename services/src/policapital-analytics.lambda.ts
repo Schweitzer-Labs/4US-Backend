@@ -11,7 +11,7 @@ const analyticsSchema = Joi.object({
 }).required();
 
 export default async (event, context): Promise<APIGatewayProxyResult> => {
-  console.log(event);
+  console.log(JSON.stringify(event));
   const res = analyticsSchema.validate(JSON.parse(event.body), {
     allowUnknown: true,
   });

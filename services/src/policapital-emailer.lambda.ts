@@ -34,7 +34,6 @@ const posRecordTemplate: any = process.env.POS_RECORD;
  * Main Function
  */
 export default async (event: SQSEvent, context): Promise<any[]> => {
-  console.log(event);
   console.log(JSON.stringify(event));
   let res = [];
 

@@ -15,7 +15,7 @@ CommitteeGraphQLFunction:
         Properties:
           Path: /graphql
           Method: ANY
-          RestApiId: !Ref DonationGateway
+          RestApiId: !Ref CommitteeGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

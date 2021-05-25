@@ -1,0 +1,18 @@
+CommitteeGateway:
+  Type: AWS::Serverless::Api
+  Properties:
+    StageName: !Ref LambdaRunEnvironment
+    Cors:
+      AllowMethods: "'POST, GET'"
+      AllowOrigin: "'*'"
+      AllowHeaders: "'Content-Type'"
+    MethodSettings:
+      - LoggingLevel: INFO
+        ResourcePath: '/*'
+        HttpMethod: '*'
+    Auth:
+      DefaultAuthorizer: PlatformUserCognitoAuthorizer
+      Authorizers:
+        PlatformUserCognitoAuthorizer:
+          UserPoolArn: !GetAtt PlatformUserCognitoUserPool.Arn
+

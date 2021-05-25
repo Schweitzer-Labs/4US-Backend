@@ -25,7 +25,7 @@ const createHandler = async () => {
 };
 
 export default (event, context, callback) => {
-  console.log(event);
+  console.log(JSON.stringify(event));
   createHandler().then((handler: any) => {
     return handler(event, context, callback);
   });

@@ -31,7 +31,7 @@ export default async (
   event: DynamoDBStreamEvent,
   context
 ): Promise<EffectMetadata> => {
-  console.log(event);
+  console.log(JSON.stringify(event));
   for (const stream of event.Records) {
     const record = stream.dynamodb;
     const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
