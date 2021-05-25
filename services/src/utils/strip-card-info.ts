@@ -1,4 +1,4 @@
-import { Contribution } from "../either-tasks/contribution-to-payment";
+import { IContribution } from "../either-tasks/event-to-contribution";
 
 export const stripCardInfo = ({
   cardCVC,
@@ -6,7 +6,7 @@ export const stripCardInfo = ({
   cardExpirationYear,
   cardNumber,
   ...rest
-}: Contribution): StrippedContribution => ({
+}: IContribution): StrippedContribution => ({
   ...rest,
   cardNumberLastFourDigits: cardNumber.substr(cardNumber.length - 4),
 });

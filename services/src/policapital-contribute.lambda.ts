@@ -10,6 +10,7 @@ dotenv.config();
 
 const runenv: any = process.env.RUNENV;
 const transactionsTableName: any = `transactions-${runenv}`;
+const committeeTableName: any = `committees-${runenv}`;
 let stripe: Stripe;
 let stripeApiKey: string;
 let dynamoDB: DynamoDB;
@@ -29,5 +30,7 @@ export default async (event: any) => {
     dynamoDB = new DynamoDB();
   }
 
-  return main(transactionsTableName)(stripe)(dynamoDB)(event)();
+  return main(committeeTableName)(transactionsTableName)(stripe)(dynamoDB)(
+    event
+  )();
 };

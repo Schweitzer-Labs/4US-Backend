@@ -3,39 +3,18 @@ import { StatusCodes } from "http-status-codes";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { stripCardInfo, StrippedContribution } from "../utils/strip-card-info";
 import { ApplicationError } from "../utils/application-error";
-
-export interface Contribution {
-  paymentMethod: string;
-  cardNumberLastFourDigits?: string;
-  stripeAccount: string;
-  amount: number;
-  cardNumber: string;
-  cardExpirationMonth: number;
-  cardExpirationYear: number;
-  cardCVC: string;
-  firstName?: string;
-  lastName?: string;
-  email: string;
-  occupation?: string;
-  employer?: string;
-  addressLine1?: string;
-  addressLine2?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  phoneNumber?: string;
-  refCode?: string;
-  committee?: string;
-  contributorType?: string;
-}
+import { IContribution } from "./event-to-contribution";
+import { ICommitteeContribution } from "./contribution-to-committee-contribution";
 
 export interface Payment extends StrippedContribution {
   stripePaymentIntentId: string;
 }
 
-export const processPaymentFromContribution =
+export const processPaymentFromCommitteeContribution =
   (stripe: Stripe) =>
-  async (contribution: Contribution): Promise<Payment> => {
+  async (committeeContribution: ICommitteeContribution): Promise<Payment> => {
+    console.log(committeeContribution);
+    const { contribution, committee } = committeeContribution;
     const {
       stripeAccount,
       amount,
@@ -64,7 +43,7 @@ export const processPaymentFromContribution =
         payment_method: paymentMethodId,
         confirm: true,
         transfer_data: {
-          destination: stripeAccount,
+          destination: committee.stripeAccount,
         },
       });
 
@@ -88,11 +67,14 @@ export const processPaymentFromContribution =
     }
   };
 
-export const contributionToPayment =
+export const committeeContributionToPayment =
   (stripe: Stripe) =>
-  (contribution: Contribution): TaskEither<ApplicationError, Payment> =>
+  (
+    committeeContribution: ICommitteeContribution
+  ): TaskEither<ApplicationError, Payment> =>
     tryCatch<ApplicationError, any>(
-      () => processPaymentFromContribution(stripe)(contribution),
+      () =>
+        processPaymentFromCommitteeContribution(stripe)(committeeContribution),
       (error) =>
         new ApplicationError("Payment failed", {}, StatusCodes.UNAUTHORIZED)
     );

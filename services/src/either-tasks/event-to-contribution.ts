@@ -4,8 +4,32 @@ import { StatusCodes } from "http-status-codes";
 import { TaskEither, left, right } from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import { Contribution } from "./contribution-to-payment";
 import { ApplicationError } from "../utils/application-error";
+
+export interface IContribution {
+  paymentMethod: string;
+  cardNumberLastFourDigits?: string;
+  stripeAccount: string;
+  amount: number;
+  cardNumber: string;
+  cardExpirationMonth: number;
+  cardExpirationYear: number;
+  cardCVC: string;
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  occupation?: string;
+  employer?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  phoneNumber?: string;
+  refCode?: string;
+  committee?: string;
+  contributorType?: string;
+}
 
 const contribSchema = Joi.object({
   cardNumber: Joi.string().required(),
@@ -13,8 +37,15 @@ const contribSchema = Joi.object({
   cardExpirationYear: Joi.number().required(),
   cardCVC: Joi.string().required(),
   amount: Joi.number().required(),
-  stripeUserId: Joi.string().required(),
+  email: Joi.string().required(),
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  addressLine1: Joi.string().required(),
+  city: Joi.string().required(),
+  state: Joi.string().required(),
+  postalCode: Joi.string().required(),
   committee: Joi.string().required(),
+  attestsToBeingAdultCitizen: Joi.bool().required(),
 });
 
 export const eventToObject = (
@@ -35,7 +66,7 @@ export const eventToObject = (
 
 export const objectToContribution = (
   body: object
-): TaskEither<ApplicationError, Contribution> => {
+): TaskEither<ApplicationError, IContribution> => {
   const res = contribSchema.validate(body, { allowUnknown: true });
   if (res.error) {
     console.log("Validation failed", res.error);
@@ -55,7 +86,7 @@ export const objectToContribution = (
 
 export const eventToContribution = (
   event: any
-): TaskEither<ApplicationError, Contribution> =>
+): TaskEither<ApplicationError, IContribution> =>
   pipe(
     taskEither.of<ApplicationError, APIGatewayProxyEvent>(event),
     taskEither.chain(eventToObject),
