@@ -1,4 +1,13 @@
-import { Arg, Args, FieldResolver, Query, Resolver, Root } from "type-graphql";
+import {
+  Arg,
+  Args,
+  Ctx,
+  FieldResolver,
+  Query,
+  Resolver,
+  Root,
+  UnauthorizedError,
+} from "type-graphql";
 
 import { Committee } from "../types/committee.type";
 import { Donor } from "../types/donor.type";
@@ -9,11 +18,10 @@ import { DynamoDB } from "aws-sdk";
 import * as AWS from "aws-sdk";
 import * as dotenv from "dotenv";
 import { searchTransactions } from "../queries/search-transactions.query";
-import { pipe } from "fp-ts/function";
-import { task, taskEither } from "fp-ts";
 import { TransactionsArg } from "../args/transactions.arg";
 import { getCommitteeById } from "../queries/get-committee-by-id.query";
 import { isLeft } from "fp-ts/Either";
+import CurrentUser from "../decorators/current-user.decorator";
 
 dotenv.config();
 
@@ -31,21 +39,42 @@ export class AppResolver {
   }
 
   @Query((returns) => Committee)
-  async committee(@Arg("committeeId") id: string) {
-    const res = await getCommitteeById(`committees-${runenv}`)(this.dynamoDB)(
-      id
-    )();
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      return res.right;
+  async committee(
+    @Arg("committeeId") id: string,
+    @CurrentUser() currentUser: string
+  ) {
+    const eitherCommittees = await getCommitteeById(`committees-${runenv}`)(
+      this.dynamoDB
+    )(id)();
+    if (isLeft(eitherCommittees)) {
+      throw eitherCommittees.left;
     }
+    const committee = eitherCommittees.right;
+    console.log("is member?", committee.members.includes(currentUser));
+    if (!committee.members.includes(currentUser)) {
+      throw new UnauthorizedError();
+    }
+
+    return committee;
   }
 
   @Query((returns) => [Transaction])
   async transactions(
-    @Args() transactionArgs: TransactionsArg
+    @Args() transactionArgs: TransactionsArg,
+    @CurrentUser() currentUser: string
   ): Promise<Transaction[]> {
+    const eitherCommittees = await getCommitteeById(`committees-${runenv}`)(
+      this.dynamoDB
+    )(transactionArgs.committeeId)();
+    if (isLeft(eitherCommittees)) {
+      throw eitherCommittees.left;
+    }
+    const committee = eitherCommittees.right;
+    console.log("is member?", committee.members.includes(currentUser));
+    if (!committee.members.includes(currentUser)) {
+      throw new UnauthorizedError();
+    }
+
     const res = await searchTransactions(runenv)(this.dynamoDB)(
       transactionArgs
     )();
@@ -56,15 +85,25 @@ export class AppResolver {
     }
   }
 
-  @Query((returns) => [Donor])
-  async donors(@Arg("committeeId") committeeId: string): Promise<Donor[]> {
-    return [];
-  }
-
   @Query((returns) => Aggregations)
-  async aggregations(@Arg("committeeId") id: string): Promise<Aggregations> {
+  async aggregations(
+    @Arg("committeeId") committeeId: string,
+    @CurrentUser() currentUser: string
+  ): Promise<Aggregations> {
+    const eitherCommittees = await getCommitteeById(`committees-${runenv}`)(
+      this.dynamoDB
+    )(committeeId)();
+    if (isLeft(eitherCommittees)) {
+      throw eitherCommittees.left;
+    }
+    const committee = eitherCommittees.right;
+    console.log("is member?", committee.members.includes(currentUser));
+    if (!committee.members.includes(currentUser)) {
+      throw new UnauthorizedError();
+    }
+
     const args = new TransactionsArg();
-    args.committeeId = id;
+    args.committeeId = committeeId;
     const res = await searchTransactions(runenv)(this.dynamoDB)(args)();
     if (isLeft(res)) {
       throw res.left;
