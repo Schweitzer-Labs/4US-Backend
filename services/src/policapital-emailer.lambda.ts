@@ -88,6 +88,7 @@ const txnToTemplateData = (txn: ITransaction) => ({
   email: txn.emailAddress,
   addressLine2: txn.addressLine2 || "",
   phoneNumber: txn.phoneNumber || "",
+  occupation: txn.occupation || "",
 });
 
 const sendEmail = async (txn: ITransaction, parameters, committee: string) => {

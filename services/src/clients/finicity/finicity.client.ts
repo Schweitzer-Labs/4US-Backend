@@ -11,6 +11,7 @@ import { pipe } from "fp-ts/function";
 import { Errors, failures } from "io-ts";
 
 const getToken = async (config: FinicityConfig) => {
+  console.log(config);
   const finicityAuthUrl =
     "https://api.finicity.com/aggregation/v2/partners/authentication";
 
@@ -28,37 +29,40 @@ const getToken = async (config: FinicityConfig) => {
     body: JSON.stringify(body),
   });
   const { token } = await tokenRes.json();
+  console.log(token);
   return token;
 };
 
-const getTransactionsRes = (config: FinicityConfig) => async (
-  customerId: string,
-  accountId: string,
-  epochFrom: number,
-  epochTo: number
-): Promise<any> => {
-  const qs = `?fromDate=${epochFrom}&toDate=${epochTo}`;
-  const apiUrl = `https://api.finicity.com/aggregation/v3/customers/${customerId}/accounts/${accountId}/transactions${qs}`;
-  const token = await getToken(config);
+const getTransactionsRes =
+  (config: FinicityConfig) =>
+  async (
+    customerId: string,
+    accountId: string,
+    epochFrom: number,
+    epochTo: number
+  ): Promise<any> => {
+    const qs = `?fromDate=${epochFrom}&toDate=${epochTo}`;
+    const apiUrl = `https://api.finicity.com/aggregation/v3/customers/${customerId}/accounts/${accountId}/transactions${qs}`;
+    const token = await getToken(config);
 
-  const res = await fetch(apiUrl, {
-    method: "GET",
-    headers: {
-      "Finicity-App-Key": config.appKey,
-      "Finicity-App-Token": token,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
+    const res = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Finicity-App-Key": config.appKey,
+        "Finicity-App-Token": token,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (res.ok) {
-    return data;
-  } else {
-    throw new Error(data.message);
-  }
-};
+    if (res.ok) {
+      return data;
+    } else {
+      throw new Error(data.message);
+    }
+  };
 
 const validateTransactionsRes = (
   res: any
@@ -75,18 +79,20 @@ const validateTransactionsRes = (
   );
 };
 
-export const getTransactions = (config: FinicityConfig) => (
-  customerId: string,
-  accountId: string,
-  epochFrom: number,
-  epochTo: number
-): TaskEither<ApplicationError, FinicityTransaction[]> =>
-  pipe(
-    tryCatch<ApplicationError, any>(
-      () =>
-        getTransactionsRes(config)(customerId, accountId, epochFrom, epochTo),
-      (e: any) =>
-        new ApplicationError("Get Finicity Transactions request failed", e)
-    ),
-    taskEither.chain(validateTransactionsRes)
-  );
+export const getTransactions =
+  (config: FinicityConfig) =>
+  (
+    customerId: string,
+    accountId: string,
+    epochFrom: number,
+    epochTo: number
+  ): TaskEither<ApplicationError, FinicityTransaction[]> =>
+    pipe(
+      tryCatch<ApplicationError, any>(
+        () =>
+          getTransactionsRes(config)(customerId, accountId, epochFrom, epochTo),
+        (e: any) =>
+          new ApplicationError("Get Finicity Transactions request failed", e)
+      ),
+      taskEither.chain(validateTransactionsRes)
+    );

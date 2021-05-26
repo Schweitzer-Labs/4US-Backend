@@ -6,8 +6,8 @@ import { task, taskEither } from "fp-ts";
 
 dotenv.config();
 
-let customerId = "1017099505";
-let accountId = "1045029583";
+let customerId = "5006720186";
+let accountId = "5014139079";
 let epochFrom = 1588365858;
 let epochTo = 1598970681;
 
