@@ -111,6 +111,7 @@ describe("Committee GraphQL Lambda", function () {
         genGraphQLProxy(aggregationsQuery, "evan-piro"),
         {}
       );
+      console.log(res);
 
       const body = JSON.parse(res.body);
       expect(body.data.aggregations.balance).to.be.a("number");
