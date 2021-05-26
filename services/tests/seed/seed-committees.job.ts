@@ -2,19 +2,14 @@ import { DynamoDB } from "aws-sdk";
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import * as AWS from "aws-sdk";
 import { committeesData } from "./committees.data";
+import { putCommittee } from "../../src/utils/model/put-committee.utils";
 
 const run =
   (committeeTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (committees: ICommittee[]) => {
     for (const committee of committees) {
-      const marshalledCommittee = DynamoDB.Converter.marshall(committee);
-      const res = await dynamoDB
-        .putItem({
-          TableName: committeeTableName,
-          Item: marshalledCommittee,
-        })
-        .promise();
+      await putCommittee(committeeTableName)(dynamoDB)(committee);
     }
   };
 

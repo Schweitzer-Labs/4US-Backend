@@ -13,6 +13,7 @@ const CommitteeRequired = t.type({
   candidateFirstName: t.string,
   candidateLastName: t.string,
   stripeAccount: t.string,
+  members: t.array(t.string),
 });
 
 const CommitteeOptional = t.partial({

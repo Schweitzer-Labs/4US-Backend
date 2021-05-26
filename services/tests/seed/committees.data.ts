@@ -12,6 +12,7 @@ export const committeesData: ICommittee[] = [
     emailAddresses: "evan@schweitzerlabs.com,seemant@schweitzerlabs.com",
     tzDatabaseName: "America/New_York",
     plan: "policapital",
+    members: ["36fcc915-a3d2-4bba-997d-281c46419974"],
   },
   {
     // required
@@ -23,5 +24,6 @@ export const committeesData: ICommittee[] = [
     emailAddresses: "evan@schweitzerlabs.com,seemant@schweitzerlabs.com",
     tzDatabaseName: "America/New_York",
     plan: "policapital",
+    members: ["9ee487a4-f767-4298-9cb8-ce73652f96fd"],
   },
 ];
