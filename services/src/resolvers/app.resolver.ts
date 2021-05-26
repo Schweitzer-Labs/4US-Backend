@@ -22,6 +22,7 @@ import { TransactionsArg } from "../args/transactions.arg";
 import { getCommitteeById } from "../queries/get-committee-by-id.query";
 import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
+import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 
 dotenv.config();
 
@@ -40,22 +41,12 @@ export class AppResolver {
 
   @Query((returns) => Committee)
   async committee(
-    @Arg("committeeId") id: string,
+    @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ) {
-    const eitherCommittees = await getCommitteeById(`committees-${runenv}`)(
-      this.dynamoDB
-    )(id)();
-    if (isLeft(eitherCommittees)) {
-      throw eitherCommittees.left;
-    }
-    const committee = eitherCommittees.right;
-    console.log("is member?", committee.members.includes(currentUser));
-    if (!committee.members.includes(currentUser)) {
-      throw new UnauthorizedError();
-    }
-
-    return committee;
+    return await loadCommitteeOrThrow(`committees-${runenv}`)(this.dynamoDB)(
+      committeeId
+    )(currentUser);
   }
 
   @Query((returns) => [Transaction])
@@ -63,17 +54,9 @@ export class AppResolver {
     @Args() transactionArgs: TransactionsArg,
     @CurrentUser() currentUser: string
   ): Promise<Transaction[]> {
-    const eitherCommittees = await getCommitteeById(`committees-${runenv}`)(
+    const committee = await loadCommitteeOrThrow(`committees-${runenv}`)(
       this.dynamoDB
-    )(transactionArgs.committeeId)();
-    if (isLeft(eitherCommittees)) {
-      throw eitherCommittees.left;
-    }
-    const committee = eitherCommittees.right;
-    console.log("is member?", committee.members.includes(currentUser));
-    if (!committee.members.includes(currentUser)) {
-      throw new UnauthorizedError();
-    }
+    )(transactionArgs.committeeId)(currentUser);
 
     const res = await searchTransactions(runenv)(this.dynamoDB)(
       transactionArgs
@@ -90,17 +73,9 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ): Promise<Aggregations> {
-    const eitherCommittees = await getCommitteeById(`committees-${runenv}`)(
+    const committee = await loadCommitteeOrThrow(`committees-${runenv}`)(
       this.dynamoDB
-    )(committeeId)();
-    if (isLeft(eitherCommittees)) {
-      throw eitherCommittees.left;
-    }
-    const committee = eitherCommittees.right;
-    console.log("is member?", committee.members.includes(currentUser));
-    if (!committee.members.includes(currentUser)) {
-      throw new UnauthorizedError();
-    }
+    )(committeeId)(currentUser);
 
     const args = new TransactionsArg();
     args.committeeId = committeeId;
