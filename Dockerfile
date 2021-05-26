@@ -23,4 +23,4 @@ RUN unzip awscliv2.zip
 RUN ./aws/install
 RUN aws --version
 RUN dockerd &
-CMD cd build-sam && export LC_ALL=C.UTF-8 && export LANG=C.UTF-8 && make dep && make deploy
+CMD cd build-sam && export LC_ALL=C.UTF-8 && export LANG=C.UTF-8 && make dep && make build

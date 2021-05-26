@@ -10,7 +10,6 @@ enum ConfigKeys {
 }
 
 const getConfig = async (env: string, name: string): Promise<string> => {
-  console.log(env, name);
   switch (name) {
     case ConfigKeys.stripeApiKey:
       const fullKey = `/${env}${name}`;

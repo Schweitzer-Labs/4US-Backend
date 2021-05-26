@@ -18,4 +18,5 @@ AWS.config.apiVersions = {
 };
 const dynamoDB = new DynamoDB();
 
-run("committees-qa")(dynamoDB)(committeesData);
+export const seedCommittees = async () =>
+  run("committees-qa")(dynamoDB)(committeesData);

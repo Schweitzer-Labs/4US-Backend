@@ -30,7 +30,7 @@ export const insertContributionEvent = {
             "S": "ind"
           },
           "committeeId": {
-            "S": "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4"
+            "S": "pat-miller"
           },
           "postalCode": {
             "S": "11377"

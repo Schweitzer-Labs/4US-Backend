@@ -1,7 +1,8 @@
 import { expect } from "chai";
 import contribute from "../../src/policapital-contribute.lambda";
-import {invalidPolicapitalContributeProxy} from "../events/invalid-policapital-contribute.proxy";
-import {validPolicapitalContributeProxy} from "../events/valid-policapital-contribute-proxy";
+import { invalidPolicapitalContributeProxy } from "../events/invalid-policapital-contribute.proxy";
+import { validPolicapitalContributeProxy } from "../events/valid-policapital-contribute-proxy";
+import { seedCommittees } from "../seed/seed-committees.job";
 
 describe("Policapital Contribute Lambda", function () {
   it("Stops a contribution call with an invalid payload", async () => {

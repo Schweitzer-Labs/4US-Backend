@@ -18,7 +18,6 @@ export const loadCommitteeOrThrow =
       throw eitherCommittees.left;
     }
     const committee = eitherCommittees.right;
-    console.log("is member?", committee.members.includes(currentUser));
     if (!committee.members.includes(currentUser)) {
       throw new UnauthorizedError();
     }

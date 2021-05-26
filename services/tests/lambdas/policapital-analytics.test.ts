@@ -2,6 +2,7 @@ import { expect } from "chai";
 import analytics from "../../src/policapital-analytics.lambda";
 import { validPolitcapitalAnalyticsProxy } from "../events/valid-policapital-analytics.proxy";
 import { invalidPolicapitalAnalyticsProxy } from "../events/invalid-policapital-analytics.proxy";
+import { seedCommittees } from "../seed/seed-committees.job";
 
 describe("Policapital Analytics Lambda", function () {
   it("Accepts a valid analytics object", async () => {

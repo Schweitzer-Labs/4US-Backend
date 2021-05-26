@@ -7,6 +7,9 @@ import { DynamoDB } from "aws-sdk";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { now } from "../utils/time.utils";
 import { Source } from "../utils/enums/source.enum";
+import { genTxnId } from "../utils/gen-txn-id.utils";
+import { Direction } from "../utils/enums/direction.enum";
+import { TransactionType } from "../utils/enums/transaction-type.enum";
 
 const savePayment =
   (transactionsTableName: string) =>
@@ -14,14 +17,14 @@ const savePayment =
   async (payment: Payment): Promise<any> => {
     const transaction: ITransaction = {
       ...payment,
-      id: uuidv4(),
+      id: genTxnId(),
       committeeId: payment.committee,
       source: Source.DONATE_FORM,
-      direction: "in",
+      direction: Direction.IN,
       bankVerified: false,
       ruleVerified: false,
       initiatedTimestamp: now(),
-      transactionType: "contribution",
+      transactionType: TransactionType.CONTRIBUTION,
     };
 
     console.log(

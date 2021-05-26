@@ -27,7 +27,6 @@ export default async (event, context) => {
   try {
     const id = await createStripeConnectUser(code);
     console.log("Stripe connect account request successful");
-    console.log(id);
     return {
       statusCode: 200,
       body: JSON.stringify({

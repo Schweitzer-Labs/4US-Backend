@@ -11,7 +11,6 @@ import { pipe } from "fp-ts/function";
 import { Errors, failures } from "io-ts";
 
 const getToken = async (config: FinicityConfig) => {
-  console.log(config);
   const finicityAuthUrl =
     "https://api.finicity.com/aggregation/v2/partners/authentication";
 
@@ -29,7 +28,6 @@ const getToken = async (config: FinicityConfig) => {
     body: JSON.stringify(body),
   });
   const { token } = await tokenRes.json();
-  console.log(token);
   return token;
 };
 

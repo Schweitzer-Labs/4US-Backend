@@ -1,14 +1,16 @@
 import { expect } from "chai";
+
 import graphql from "../../src/committee-graphql.lambda";
-import { forbiddenGraphqlMemberProxy } from "../events/forbidden-graphql-member.proxy";
 import { genGraphQLProxy } from "../utils/gen-allowed-proxy.util";
 
 const expectedForbiddenText =
   "Access denied! You need to be authorized to perform this action!";
 
+const committeeId = "pat-miller";
+
 const getAllTransactionsQuery = `
   query {
-    transactions(committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4") {
+    transactions(committeeId: "${committeeId}") {
       lastName
       firstName
       amount
@@ -17,17 +19,9 @@ const getAllTransactionsQuery = `
   }
 `;
 
-const getContributionsQuery = `
-  query {
-    transactions(committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4") {
-      lastName
-    }
-  }
-`;
-
 const getCommitteeQuery = `
   query {
-    committee(committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4") {
+    committee(committeeId: "${committeeId}") {
       id
       candidateFirstName
     }
@@ -36,7 +30,7 @@ const getCommitteeQuery = `
 
 const aggregationsQuery = `
   query {
-    aggregations(committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4") {
+    aggregations(committeeId: "${committeeId}") {
       balance,
       totalRaised,
       totalSpent,
@@ -62,10 +56,7 @@ describe("Committee GraphQL Lambda", function () {
     it("Prevents a non-member user from querying a committee", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          getCommitteeQuery,
-          "9ee487a4-f767-4298-9cb8-ce73652f96fd"
-        ),
+        genGraphQLProxy(getCommitteeQuery, "james-martin"),
         {}
       );
       const body = JSON.parse(res.body);
@@ -74,10 +65,7 @@ describe("Committee GraphQL Lambda", function () {
     it("Prevents a non-member user from querying a transaction", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          getAllTransactionsQuery,
-          "9ee487a4-f767-4298-9cb8-ce73652f96fd"
-        ),
+        genGraphQLProxy(getAllTransactionsQuery, "james-martin"),
         {}
       );
       const body = JSON.parse(res.body);
@@ -86,10 +74,7 @@ describe("Committee GraphQL Lambda", function () {
     it("Prevents a non-member user from querying an aggregation", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          aggregationsQuery,
-          "9ee487a4-f767-4298-9cb8-ce73652f96fd"
-        ),
+        genGraphQLProxy(aggregationsQuery, "james-martin"),
         {}
       );
       const body = JSON.parse(res.body);
@@ -100,10 +85,7 @@ describe("Committee GraphQL Lambda", function () {
     it("Get by Committee ID", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          getAllTransactionsQuery,
-          "36fcc915-a3d2-4bba-997d-281c46419974"
-        ),
+        genGraphQLProxy(getAllTransactionsQuery, "evan-piro"),
         {}
       );
       const body = JSON.parse(res.body);
@@ -114,27 +96,19 @@ describe("Committee GraphQL Lambda", function () {
     it("Get by Committee ID", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          getCommitteeQuery,
-          "36fcc915-a3d2-4bba-997d-281c46419974"
-        ),
+        genGraphQLProxy(getCommitteeQuery, "evan-piro"),
         {}
       );
       const body = JSON.parse(res.body);
       console.log(body);
-      expect(body.data.committee.id).to.equal(
-        "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4"
-      );
+      expect(body.data.committee.id).to.equal("pat-miller");
     });
   });
   describe("Aggregations", function () {
     it("Get by Committee ID", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          aggregationsQuery,
-          "36fcc915-a3d2-4bba-997d-281c46419974"
-        ),
+        genGraphQLProxy(aggregationsQuery, "evan-piro"),
         {}
       );
 

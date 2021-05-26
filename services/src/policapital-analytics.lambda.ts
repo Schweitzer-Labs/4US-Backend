@@ -35,8 +35,6 @@ export default async (event, context): Promise<APIGatewayProxyResult> => {
     event: res.value.event,
   };
 
-  console.log(logItem);
-
   return {
     statusCode: 200,
     body: JSON.stringify({

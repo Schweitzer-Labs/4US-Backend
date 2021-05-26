@@ -3,7 +3,7 @@ CommitteeGateway:
   Properties:
     StageName: !Ref LambdaRunEnvironment
     Cors:
-      AllowMethods: "'POST, GET'"
+      AllowMethods: "'POST, GET, OPTIONS'"
       AllowOrigin: "'*'"
       AllowHeaders: "'Content-Type'"
     MethodSettings:

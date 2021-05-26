@@ -44,7 +44,6 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ) {
-    console.log(currentUser);
     return await loadCommitteeOrThrow(`committees-${runenv}`)(this.dynamoDB)(
       committeeId
     )(currentUser);

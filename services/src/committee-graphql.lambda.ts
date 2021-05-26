@@ -23,6 +23,7 @@ const server = new ApolloServer({
 
 export default server.createHandler({
   cors: {
-    origin: "*",
+    origin: "http://localhost:3000",
+    credentials: true,
   },
 });
