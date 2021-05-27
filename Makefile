@@ -57,8 +57,8 @@ export STACK		:= $(RUNENV)-$(PRODUCT)-backend
 export BUILD_DIR	:= $(PWD)/.build
 export SAM_DIR		:= $(BUILD_DIR)/sam
 export CFN_BUILD_DIR	:= $(BUILD_DIR)/cloudformation
-SAM_BUILD_DIR		:= $(SAM_DIR)/build
-SAM_CACHE_DIR		:= $(SAM_DIR)/cache
+export SAM_BUILD_DIR	:= $(SAM_DIR)/build
+export SAM_CACHE_DIR	:= $(SAM_DIR)/cache
 
 export SAM_CLI_TELEMETRY	:=0
 
