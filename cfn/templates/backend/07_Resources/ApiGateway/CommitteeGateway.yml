@@ -1,18 +1,95 @@
 CommitteeGateway:
   Type: AWS::Serverless::Api
   Properties:
-    StageName: !Ref LambdaRunEnvironment
+    Name: !Sub ${AWS::StackName}-committee
+    StageName: !Sub ${LambdaRunEnvironment}
+    Domain:
+      CertificateArn: !Ref CertificateManagerCertificate
+      DomainName: !Sub capi{% if RUNENV != 'prod' %}-${LambdaRunEnvironment}{% endif %}.${Domain}.${TLD}
+      EndpointConfiguration: REGIONAL
+      Route53:
+        EvaluateTargetHealth: true
+        HostedZoneId: !Ref HostedZone
     Cors:
-      AllowMethods: "'POST, GET, OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowMethods: "'POST', 'GET', 'OPTIONS', 'PUT'"
       AllowOrigin: "'*'"
-      AllowHeaders: "'Content-Type'"
+      MaxAge: "'600'"
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
         HttpMethod: '*'
     Auth:
+      #AddDefaultAuthorizerToCorsPreflight: true
       DefaultAuthorizer: PlatformUserCognitoAuthorizer
       Authorizers:
         PlatformUserCognitoAuthorizer:
           UserPoolArn: !GetAtt PlatformUserCognitoUserPool.Arn
-
+    OpenApiVersion: 3.0.1
+    DefinitionBody:
+      openapi: 3.0.1
+      info:
+        title: api
+        version: 1.0
+      paths:
+        /graphql:
+          options:
+            summary: cors support
+            description: enable cors by returning correct headers
+            responses:
+              '200':
+                description: default response for cors method
+                headers:
+                  Access-Control-Allow-Origin:
+                    schema:
+                      type: string
+                  Access-Control-Allow-Methods:
+                    schema:
+                      type: string
+                  Access-Control-Allow-Headers:
+                    schema:
+                      type: string
+                content: {}
+            x-amazon-apigateway-integration:
+              type: mock
+              requestTemplates:
+                application/json: |
+                  {
+                    "statusCode" : 200
+                  }
+              responses:
+                default:
+                  statusCode: 200
+                  responseParameters:
+                    method.response.header.Access-Control-Allow-Headers:
+                      '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                    method.response.header.Access-Control-Allow-Methods:
+                      '''*'''
+                    method.response.header.Access-Control-Allow-Origin:
+                      '''*'''
+                  responseTemplates:
+                    application/json: |
+                      {}
+      x-amazon-apigateway-cors:
+        allowOrigins:
+          - "*"
+        allowMethods:
+          - DELETE
+          - GET
+          - OPTIONS
+          - POST
+          - PUT
+        allowHeaders:
+          - x-amzm-header
+          - x-apigateway-header
+          - x-api-key
+          - authorization
+          - x-amz-date
+          - content-type
+      components:
+        schemas:
+          body:
+            type: object
+            properties:
+              key:
+                type: string
