@@ -72,3 +72,26 @@ import: $(IMPORTED_RESOURCES)
 		--endpoint-url $(ENDPOINT) \
 		--stack-name=$(STACKNAME) \
 		--region=$(REGION)
+
+package: build
+	@aws cloudformation package \
+		--endpoint-url $(ENDPOINT) \
+		--template-file $(SAM_BUILD_DIR)/template.yaml \
+		--region $(REGION) \
+		--s3-bucket $(CFN_BUCKET) \
+		--s3-prefix $(STACK) \
+		--output-template-file $(PACKAGE)
+
+deploy: package
+	@aws cloudformation deploy \
+		--endpoint-url $(ENDPOINT) \
+		--region $(REGION) \
+		--template-file $(PACKAGE) \
+		--stack-name $(STACK) \
+		--s3-bucket $(CFN_BUCKET) \
+		--s3-prefix $(STACK) \
+		--capabilities \
+		       CAPABILITY_NAMED_IAM \
+		       CAPABILITY_AUTO_EXPAND \
+		--parameter-overrides \
+			$(STACK_PARAMS)

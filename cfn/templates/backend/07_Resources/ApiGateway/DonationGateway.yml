@@ -1,7 +1,8 @@
 DonationGateway:
   Type: AWS::Serverless::Api
   Properties:
-    StageName: !Ref LambdaRunEnvironment
+    Name: !Sub ${AWS::StackName}-donation
+    StageName: !Sub ${LambdaRunEnvironment}
     Cors:
       AllowMethods: "'POST, GET'"
       AllowOrigin: "'*'"

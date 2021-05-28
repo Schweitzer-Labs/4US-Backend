@@ -55,8 +55,12 @@ export EMAILER_DIR	:= lambdas
 export STACK		:= $(RUNENV)-$(PRODUCT)-backend
 
 export BUILD_DIR	:= $(PWD)/.build
-export SAM_BUILD_DIR	:= $(BUILD_DIR)/sam
+export SAM_DIR		:= $(BUILD_DIR)/sam
 export CFN_BUILD_DIR	:= $(BUILD_DIR)/cloudformation
+export SAM_BUILD_DIR	:= $(SAM_DIR)/build
+export SAM_CACHE_DIR	:= $(SAM_DIR)/cache
+
+export SAM_CLI_TELEMETRY	:=0
 
 export DATE		:= $(shell date)
 export NONCE		:= $(shell uuidgen | cut -d\- -f1)
@@ -74,7 +78,7 @@ endif
 
 export PACKAGE		:= $(CFN_BUILD_DIR)/CloudFormation-template.yml
 
-CFN_DIR			:= cfn/templates
+CFN_SRC_DIR			:= cfn/templates
 
 # stacks and templates
 BACKEND_STACK		:= backend
@@ -99,7 +103,7 @@ CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLAT
 
 # Make targets
 all: build
-	$(MAKE) -C $(CFN_DIR)/$(BACKEND_STACK)
+	$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK)
 
 mkbuilddir:
 	@mkdir -p $(SAM_BUILD_DIR) $(CFN_BUILD_DIR)
@@ -107,12 +111,12 @@ mkbuilddir:
 build: clean mkbuilddir buildstacks buildsam
 
 buildsam: buildstacks compile $(JS_APPS)
-	time sam build \
+	sam build \
 		--cached \
 		--parallel \
-		--base-dir . \
+		--base-dir $(PWD) \
 		--build-dir $(SAM_BUILD_DIR) \
-		--cache-dir $(SAM_BUILD_DIR)/cache \
+		--cache-dir $(SAM_CACHE_DIR) \
 		--template-file $(BACKEND_TEMPLATE)
 
 buildstacks: mkbuilddir $(CFN_TEMPLATES)
@@ -125,47 +129,28 @@ compile:
 dep:
 	@pip3 install jinja2 cfn_flip boto3
 
-$(CFN_BUILD_DIR)/%.yml: $(CFN_DIR)/%
+$(CFN_BUILD_DIR)/%.yml: $(CFN_SRC_DIR)/%
 	$(MAKE) template=$@ -C $^ check
 
 
 check: buildstacks
-	$(MAKE) -c $(CFN_DIR)/$(BACKEND_STACK) check
+	$(MAKE) -c $(CFN_SRC_DIR)/$(BACKEND_STACK) check
 
 
 clean:
-	@rm -f $(SAM_BUILD_DIR)/*.yml
 	@rm -f $(CFN_BUILD_DIR)/*.yml
 
 realclean: clean
 	@rm -rf $(BUILD_DIR)
 
 local: build
-	@sam local start-api --template-file $(SAM_BUILD_DIR)/template.yaml
+	@sam local start-api --warm-containers EAGER --template-file $(SAM_BUILD_DIR)/template.yaml
+
+import:
+	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) import
 
 package: build
-	aws cloudformation package \
-		--endpoint-url $(ENDPOINT) \
-		--template-file $(SAM_BUILD_DIR)/template.yaml \
-		--region $(REGION) \
-		--s3-bucket $(CFN_BUCKET) \
-		--s3-prefix $(STACK) \
-		--output-template-file $(PACKAGE)
+	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) package
 
 deploy: package
-	aws cloudformation deploy \
-		--endpoint-url $(ENDPOINT) \
-		--region $(REGION) \
-		--template-file $(PACKAGE) \
-		--stack-name $(STACK) \
-		--s3-bucket $(CFN_BUCKET) \
-		--s3-prefix $(STACK) \
-		--capabilities \
-		       CAPABILITY_NAMED_IAM \
-		       CAPABILITY_AUTO_EXPAND \
-		--parameter-overrides \
-			$(STACK_PARAMS)
-
-	
-import: build
-	@$(MAKE) -C $(CFN_DIR) import
+	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) deploy
