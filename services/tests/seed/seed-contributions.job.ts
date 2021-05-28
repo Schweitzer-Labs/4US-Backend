@@ -11,7 +11,7 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
   const list = data.slice(25 * sequence - 25, 25 * sequence);
   const tableName = "transactions-qa";
   const committeeId = "pat-miller";
-  const now = new Date().getTime().toString();
+  const now = new Date().getTime();
   const items = list.map((txn) => {
     const contribution: ITransaction = {
       committeeId,
