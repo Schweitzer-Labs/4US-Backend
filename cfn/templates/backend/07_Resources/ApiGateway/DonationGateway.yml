@@ -9,7 +9,7 @@ DonationGateway:
       AllowHeaders: "'Content-Type'"
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
-      DomainName: !Sub api{% if RUNENV != 'prod' %}-${LambdaRunEnvironment}{% endif %}.${Domain}.${TLD}
+      DomainName: !Sub donor-api-${LambdaRunEnvironment}.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
       Route53:
         EvaluateTargetHealth: true
@@ -29,13 +29,13 @@ DonationGateway:
           firstName:
             type: string
           lastName:
-            type: integer
+            type: string
           addressLine1:
             type: string
           addressLine2:
             type: string
           city:
-            type: integer
+            type: string
           state:
             type: string
           postalCode:
