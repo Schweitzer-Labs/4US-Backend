@@ -6,10 +6,11 @@ export const putTransaction =
   (dynamoDB: DynamoDB) =>
   async (txn: ITransaction) => {
     const marshalledTxn = DynamoDB.Converter.marshall(txn);
-    return await dynamoDB
+    await dynamoDB
       .putItem({
         TableName: txnTableName,
         Item: marshalledTxn,
       })
       .promise();
+    return txn;
   };

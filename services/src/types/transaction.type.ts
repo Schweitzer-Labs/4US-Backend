@@ -30,13 +30,13 @@ export class Transaction implements ITransaction {
   @Field()
   ruleVerified: boolean;
   @Field()
-  initiatedTimestamp: string;
+  initiatedTimestamp: number;
   @Field()
   source: string;
   @Field({ nullable: true })
-  bankVerifiedTimestamp?: string;
+  bankVerifiedTimestamp?: number;
   @Field({ nullable: true })
-  ruleVerifiedTimestamp?: string;
+  ruleVerifiedTimestamp?: number;
   @Field({ nullable: true })
   purposeCode?: string;
   @Field({ nullable: true })

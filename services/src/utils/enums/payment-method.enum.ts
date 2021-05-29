@@ -5,4 +5,5 @@ export enum PaymentMethod {
   Debit = "debit",
   Credit = "credit",
   Transfer = "transfer",
+  InKind = "in-kind",
 }

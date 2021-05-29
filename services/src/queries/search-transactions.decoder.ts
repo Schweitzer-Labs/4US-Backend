@@ -8,13 +8,16 @@ const TransactionRequired = t.type({
   paymentMethod: t.string,
   bankVerified: t.boolean,
   ruleVerified: t.boolean,
-  initiatedTimestamp: t.string,
+  initiatedTimestamp: t.number,
   source: t.string,
 });
 
 const TransactionOptional = t.partial({
-  bankVerifiedTimestamp: t.string,
-  ruleVerifiedTimestamp: t.string,
+  donorId: t.string,
+  paymentDate: t.number,
+  checkNumber: t.string,
+  bankVerifiedTimestamp: t.number,
+  ruleVerifiedTimestamp: t.number,
   purposeCode: t.string,
   refCode: t.string,
   // Donor Props
@@ -36,6 +39,7 @@ const TransactionOptional = t.partial({
   attestsToBeingAnAdultCitizen: t.boolean,
   stripePaymentIntentId: t.string,
   cardNumberLastFourDigits: t.string,
+  entityName: t.string,
 });
 
 export const Transaction = t.intersection([

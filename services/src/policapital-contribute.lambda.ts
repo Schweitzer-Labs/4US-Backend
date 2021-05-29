@@ -9,8 +9,8 @@ import { DynamoDB } from "aws-sdk";
 dotenv.config();
 
 const runenv: any = process.env.RUNENV;
-const transactionsTableName: any = `transactions-${runenv}`;
-const committeeTableName: any = `committees-${runenv}`;
+const transactionsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
+const committeeTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 let stripe: Stripe;
 let stripeApiKey: string;
 let dynamoDB: DynamoDB;

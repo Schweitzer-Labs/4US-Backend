@@ -78,12 +78,9 @@ const txnToTemplateData = (txn: ITransaction) => ({
   amount: (txn.amount / 100).toFixed(2),
   state: txn.state.toUpperCase(),
   receipt: txn.id,
-  timestamp: new Date(parseInt(txn.initiatedTimestamp)).toLocaleString(
-    "en-US",
-    {
-      timeZone: "America/New_York",
-    }
-  ),
+  timestamp: new Date(txn.initiatedTimestamp).toLocaleString("en-US", {
+    timeZone: "America/New_York",
+  }),
   refCode: txn.refCode || "N/A",
   email: txn.emailAddress,
   addressLine2: txn.addressLine2 || "",

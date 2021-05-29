@@ -20,3 +20,5 @@ TransactionEventDispatcherFunction:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
         SQSQUEUE: !Ref EmailQueue
+        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
+        COMMITTEES_DDB_TABLE_NAME: !Ref Committees

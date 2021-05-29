@@ -1,7 +1,6 @@
 Donors:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: !Sub donors-${LambdaRunEnvironment}
     SSESpecification:
       SSEEnabled: true
     ProvisionedThroughput:
@@ -13,5 +12,8 @@ Donors:
     KeySchema:
       - KeyType: HASH
         AttributeName: id
+      - KeyType: RANGE
+        AttributeName: flacspeeMatch
     StreamSpecification:
       StreamViewType: NEW_IMAGE
+

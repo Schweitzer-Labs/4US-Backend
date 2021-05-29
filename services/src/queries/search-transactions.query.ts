@@ -14,7 +14,7 @@ import { ITransaction, Transactions } from "./search-transactions.decoder";
 import { TransactionsArg } from "../args/transactions.arg";
 
 const getTransactionsRes =
-  (env = "dev") =>
+  (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   ({
     committeeId,
@@ -23,7 +23,6 @@ const getTransactionsRes =
     ruleVerified,
   }: TransactionsArg) =>
   async (): Promise<any> => {
-    const transactionsTable = `transactions-${env}`;
     const filterExpressionString = [
       ...toFilterExpression("transactionType", transactionType),
       ...toFilterExpression("bankVerified", bankVerified),
@@ -37,7 +36,7 @@ const getTransactionsRes =
 
     const res = await dynamoDB
       .query({
-        TableName: transactionsTable,
+        TableName: txnsTableName,
         KeyConditionExpression: "committeeId = :committeeId",
         ...FilterExpression,
         ExpressionAttributeValues: {
@@ -55,14 +54,14 @@ const getTransactionsRes =
   };
 
 export const searchTransactions =
-  (env: string) =>
+  (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (
     transactionsArg: TransactionsArg
   ): TaskEither<ApplicationError, ITransaction[]> =>
     pipe(
       tryCatch<ApplicationError, any>(
-        () => getTransactionsRes(env)(dynamoDB)(transactionsArg)(),
+        () => getTransactionsRes(txnsTableName)(dynamoDB)(transactionsArg)(),
         (e) =>
           new ApplicationError(
             "Get transaction request failed",
