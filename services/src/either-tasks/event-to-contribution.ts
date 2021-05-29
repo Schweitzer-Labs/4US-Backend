@@ -7,14 +7,14 @@ import { taskEither } from "fp-ts";
 import { ApplicationError } from "../utils/application-error";
 
 export interface IContribution {
-  paymentMethod: string;
-  cardNumberLastFourDigits?: string;
   stripeAccount: string;
   amount: number;
   cardNumber: string;
   cardExpirationMonth: number;
   cardExpirationYear: number;
   cardCVC: string;
+  paymentMethod: string;
+  cardNumberLastFourDigits?: string;
   firstName?: string;
   lastName?: string;
   email: string;
@@ -28,7 +28,7 @@ export interface IContribution {
   phoneNumber?: string;
   refCode?: string;
   committee?: string;
-  contributorType?: string;
+  entityType?: string;
 }
 
 const contribSchema = Joi.object({
@@ -45,6 +45,7 @@ const contribSchema = Joi.object({
   state: Joi.string().required(),
   postalCode: Joi.string().required(),
   committee: Joi.string().required(),
+  entityType: Joi.string().required(),
   attestsToBeingAdultCitizen: Joi.bool().required(),
 });
 

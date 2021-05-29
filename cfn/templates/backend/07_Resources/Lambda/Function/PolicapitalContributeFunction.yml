@@ -19,4 +19,6 @@ PolicapitalContributeFunction:
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
-        CONTRIBUTIONS_DDB_TABLE_NAME: !Ref Contributions
+        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
+        COMMITTEES_DDB_TABLE_NAME: !Ref Committees
+

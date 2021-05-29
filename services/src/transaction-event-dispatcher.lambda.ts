@@ -23,9 +23,8 @@ AWS.config.apiVersions = {
 };
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 const dynamoDB = new DynamoDB();
-const runenv: any = process.env.RUNENV;
 const sqsUrl: any = process.env.SQSQUEUE;
-const committeesTableName: any = `committees-${runenv}`;
+const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 
 export default async (
   event: DynamoDBStreamEvent,

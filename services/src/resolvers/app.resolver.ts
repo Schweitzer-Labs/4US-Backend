@@ -1,16 +1,6 @@
-import {
-  Arg,
-  Args,
-  Ctx,
-  FieldResolver,
-  Query,
-  Resolver,
-  Root,
-  UnauthorizedError,
-} from "type-graphql";
+import { Arg, Args, Mutation, Query, Resolver } from "type-graphql";
 
 import { Committee } from "../types/committee.type";
-import { Donor } from "../types/donor.type";
 import { Transaction } from "../types/transaction.type";
 import { Aggregations } from "../types/aggregations.type";
 import { Service } from "typedi";
@@ -19,32 +9,40 @@ import * as AWS from "aws-sdk";
 import * as dotenv from "dotenv";
 import { searchTransactions } from "../queries/search-transactions.query";
 import { TransactionsArg } from "../args/transactions.arg";
-import { getCommitteeById } from "../queries/get-committee-by-id.query";
 import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
+import { CreateContributionInput } from "../input-types/create-contribution.input-type";
+import { putTransaction } from "../utils/model/put-transaction.utils";
+import { TransactionType } from "../utils/enums/transaction-type.enum";
+import { ITransaction } from "../queries/search-transactions.decoder";
+import { genTxnId } from "../utils/gen-txn-id.utils";
+import { Direction } from "../utils/enums/direction.enum";
+import { now } from "../utils/time.utils";
+import { Source } from "../utils/enums/source.enum";
+import { stripCardInfo } from "../utils/strip-card-info";
 
 dotenv.config();
 
-const runenv: any = process.env.RUNENV;
+const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
+const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
+const donorsTableName: any = process.env.DONORS_DDB_TABLE_NAME;
+
+AWS.config.apiVersions = {
+  dynamodb: "2012-08-10",
+};
+
+const dynamoDB = new DynamoDB();
 
 @Service()
 @Resolver()
 export class AppResolver {
-  private readonly dynamoDB: DynamoDB;
-  constructor() {
-    AWS.config.apiVersions = {
-      dynamodb: "2012-08-10",
-    };
-    this.dynamoDB = new DynamoDB();
-  }
-
   @Query((returns) => Committee)
   async committee(
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ) {
-    return await loadCommitteeOrThrow(`committees-${runenv}`)(this.dynamoDB)(
+    return await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
       committeeId
     )(currentUser);
   }
@@ -54,11 +52,13 @@ export class AppResolver {
     @Args() transactionArgs: TransactionsArg,
     @CurrentUser() currentUser: string
   ): Promise<Transaction[]> {
-    const committee = await loadCommitteeOrThrow(`committees-${runenv}`)(
-      this.dynamoDB
-    )(transactionArgs.committeeId)(currentUser);
+    console.log("the table name");
+    console.log(txnsTableName);
+    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      transactionArgs.committeeId
+    )(currentUser);
 
-    const res = await searchTransactions(runenv)(this.dynamoDB)(
+    const res = await searchTransactions(txnsTableName)(dynamoDB)(
       transactionArgs
     )();
     if (isLeft(res)) {
@@ -73,13 +73,13 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ): Promise<Aggregations> {
-    const committee = await loadCommitteeOrThrow(`committees-${runenv}`)(
-      this.dynamoDB
-    )(committeeId)(currentUser);
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
+      currentUser
+    );
 
     const args = new TransactionsArg();
     args.committeeId = committeeId;
-    const res = await searchTransactions(runenv)(this.dynamoDB)(args)();
+    const res = await searchTransactions(txnsTableName)(dynamoDB)(args)();
     if (isLeft(res)) {
       throw res.left;
     }
@@ -100,7 +100,7 @@ export class AppResolver {
 
     const aggs: any = transactions.reduce((acc: any, txn) => {
       // Total Raised
-      if (txn.transactionType === "contribution") {
+      if (txn.transactionType === TransactionType.CONTRIBUTION) {
         if (txn.bankVerified) {
           acc.totalRaised = acc.totalRaised + txn.amount;
           acc.balance = acc.balance + txn.amount;
@@ -112,7 +112,7 @@ export class AppResolver {
         acc.donorMap[donorHash] = true;
       }
       /// Total Spent
-      if (txn.transactionType === "disbursement") {
+      if (txn.transactionType === TransactionType.DISBURSEMENT) {
         if (txn.bankVerified) {
           acc.totalSpent = acc.totalSpent + txn.amount;
         } else {
@@ -131,4 +131,33 @@ export class AppResolver {
     aggs.totalDonors = Object.keys(aggs.donorMap).length;
     return aggs;
   }
+
+  @Mutation((returns) => Transaction)
+  async createContribution(
+    @Arg("createContributionData")
+    createContributionData: CreateContributionInput,
+    @CurrentUser() currentUser: string
+  ): Promise<Transaction> {
+    const { committeeId } = createContributionData;
+    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      committeeId
+    )(currentUser);
+
+    const txn: ITransaction = {
+      // required field
+      id: genTxnId(),
+      direction: Direction.IN,
+      bankVerified: false,
+      ruleVerified: false,
+      initiatedTimestamp: now(),
+      source: Source.DASHBOARD,
+      ...createContributionData,
+    };
+
+    return await putTransaction(txnsTableName)(dynamoDB)(txn);
+  }
+
+  async createDisbursement() {}
+
+  async verifyDisbursement() {}
 }

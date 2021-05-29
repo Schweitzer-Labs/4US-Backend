@@ -13,7 +13,6 @@ export interface Payment extends StrippedContribution {
 export const processPaymentFromCommitteeContribution =
   (stripe: Stripe) =>
   async (committeeContribution: ICommitteeContribution): Promise<Payment> => {
-    console.log(committeeContribution);
     const { contribution, committee } = committeeContribution;
     const {
       stripeAccount,

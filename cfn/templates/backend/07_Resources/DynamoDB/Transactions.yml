@@ -1,7 +1,6 @@
 Transactions:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: !Sub transactions-${LambdaRunEnvironment}
     SSESpecification:
       SSEEnabled: true
     ProvisionedThroughput:

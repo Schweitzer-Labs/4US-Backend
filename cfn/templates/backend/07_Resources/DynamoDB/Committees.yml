@@ -1,7 +1,6 @@
 Committees:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: !Sub committees-${LambdaRunEnvironment}
     SSESpecification:
       SSEEnabled: true
     ProvisionedThroughput:

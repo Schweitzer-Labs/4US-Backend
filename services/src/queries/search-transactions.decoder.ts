@@ -13,6 +13,9 @@ const TransactionRequired = t.type({
 });
 
 const TransactionOptional = t.partial({
+  donorId: t.string,
+  paymentDate: t.number,
+  checkNumber: t.string,
   bankVerifiedTimestamp: t.number,
   ruleVerifiedTimestamp: t.number,
   purposeCode: t.string,
