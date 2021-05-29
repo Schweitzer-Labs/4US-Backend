@@ -43,13 +43,13 @@ export const Donor = t.intersection([DonorRequired, DonorOptional]);
 export type IDonor = t.TypeOf<typeof Donor>;
 
 export const flacspeeMatchToDDBRes =
-  (committeeTableName: string) =>
+  (donorTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (flacspeeInput: IFlacspeeInput): Promise<any> => {
     const flacspeeMatch = genFlacspee(flacspeeInput);
     const res = await dynamoDB
       .getItem({
-        TableName: committeeTableName,
+        TableName: donorTableName,
         Key: {
           flacspeeMatch: {
             S: flacspeeMatch,
@@ -61,16 +61,15 @@ export const flacspeeMatchToDDBRes =
   };
 
 export const getDonorByFlacspee =
-  (committeesTableName: string) =>
+  (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (flacspeeInput: IFlacspeeInput): TaskEither<ApplicationError, IDonor> => {
     return pipe(
       tryCatch<ApplicationError, any>(
-        () =>
-          flacspeeMatchToDDBRes(committeesTableName)(dynamoDB)(flacspeeInput),
+        () => flacspeeMatchToDDBRes(donorsTableName)(dynamoDB)(flacspeeInput),
         (e) =>
           new ApplicationError(
-            "Get committee request failed",
+            "Get donor request failed",
             e,
             StatusCodes.INTERNAL_SERVER_ERROR
           )
