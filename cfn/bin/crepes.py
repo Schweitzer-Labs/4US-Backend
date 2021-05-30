@@ -41,6 +41,8 @@ ec2 = boto3.setup_default_session(region_name=args.region)
 ec2 = boto3.client('ec2')
 zones = ec2.describe_availability_zones()['AvailabilityZones']
 AZs = [z['ZoneName'] for z in zones]
+AZcodes = [z.split('-')[2] for z in AZs]
+
 
 imports = {}
 
@@ -54,7 +56,7 @@ def process_jinja_template(filename):
         contents = f.read()
 
     template = Template(contents)
-    return template.render(AZs=AZs, REGION=args.region, RUNENV=runenv, SUBDOMAIN=subdomain, DOMAIN=domain, TLD=tld, PRODUCT=args.product, HOSTID=args.hostid)
+    return template.render(AZs=AZs, AZcodes=AZcodes, REGION=args.region, RUNENV=runenv, SUBDOMAIN=subdomain, DOMAIN=domain, TLD=tld, PRODUCT=args.product, HOSTID=args.hostid)
 
 # Assemble all the components of a stack into a single cloudformation::stack object
 def assemble(stack):
@@ -64,9 +66,6 @@ def assemble(stack):
     # Section names start with '0'
     sections = [l for l in os.listdir(stack) if l.startswith('0')]
     sections.sort()
-
-    if args.imports:
-        if '08_Outputs' in sections: sections.remove('08_Outputs')
 
     for section in sections:
         sec = section.split('_')[1]
@@ -96,8 +95,6 @@ def assemble(stack):
                     # place the text into the stackobj
                     stackobj[sec] = contents
 
-    if args.imports: stackobj['Outputs'] = None
-
     return {k: v for k, v in stackobj.items() if v} # discard null/empty keys
 
 
@@ -107,7 +104,10 @@ def importify(resource, obj):
     temp = {}
     for prop in imports[resource]['Property']:
         print('Importing %s for %s' % (prop, resource))
-        temp[prop] = obj['Properties'][prop]
+        try:
+            temp[prop] = obj['Properties'][prop]
+        except KeyError: # e.g. SNSTopic requires TopicARN for import, but it is not a property in the template
+            pass
 
     # Replace the Properties key with only the filtered items
     obj['Properties'] = temp
@@ -125,7 +125,9 @@ def main():
     # Assemble the stack into a dict and convert that to yaml
     stack = assemble(args.directory)
 
+
     if args.imports: # trim the stack based on the ImportedResources
+        stack.pop('Outputs', None)
         imports_list = [importify(res, stack['Resources'][res]) for res in stack['Resources']]
 
         print(dump_json(imports_list))
