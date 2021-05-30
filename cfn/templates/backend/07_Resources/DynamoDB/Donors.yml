@@ -9,6 +9,8 @@ Donors:
     AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
+      - AttributeName: flacspeeMatch
+        AttributeType: S
     KeySchema:
       - KeyType: HASH
         AttributeName: id
