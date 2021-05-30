@@ -5,7 +5,7 @@ CommitteeGateway:
     StageName: !Sub ${LambdaRunEnvironment}
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
-      DomainName: !Sub committeeapi-${LambdaRunEnvironment}.${Domain}.${TLD}
+      DomainName: !Sub committee-api-${LambdaRunEnvironment}.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
       Route53:
         EvaluateTargetHealth: true
