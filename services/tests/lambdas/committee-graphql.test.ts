@@ -137,7 +137,6 @@ describe("Committee GraphQL Lambda", function () {
         {}
       );
       const body: any = JSON.parse(res.body);
-      console.log(body.data.transactions);
       expect(body.data.transactions[0].donorId).to.equal(donorId);
     });
   });

@@ -24,7 +24,7 @@ const iidConfig = {
 };
 
 describe("Donor Verifier", function () {
-  it("Creates a verified donor record with new donor input", async () => {
+  it("Creates a verified individual donor record with new donor input", async () => {
     const donorInput = genDonorInput(EntityType.IND);
     const res: any = await pipe(
       verifyDonor(donorsTableName)(dynamoDB)(iidConfig)(donorInput),
@@ -36,8 +36,27 @@ describe("Donor Verifier", function () {
     expect(res.instantIdComprehensiveVerificationScore).to.be.a("number");
   });
 
-  it("Matches an existing donor with recognized donor input", async () => {
+  it("Matches an existing individual donor with recognized donor input", async () => {
     const donorInput = genDonorInput(EntityType.IND);
+    const res1: any = await pipe(
+      verifyDonor(donorsTableName)(dynamoDB)(iidConfig)(donorInput),
+      taskEither.getOrElseW(() => {
+        throw new Error();
+      })
+    )();
+
+    const res2: any = await pipe(
+      verifyDonor(donorsTableName)(dynamoDB)(iidConfig)(donorInput),
+      taskEither.getOrElseW(() => {
+        throw new Error();
+      })
+    )();
+
+    expect(res1.id === res2.id).to.equal(true);
+  });
+
+  it("Matches an existing non-individual donor with recognized donor input", async () => {
+    const donorInput = genDonorInput(EntityType.LLC);
     const res1: any = await pipe(
       verifyDonor(donorsTableName)(dynamoDB)(iidConfig)(donorInput),
       taskEither.getOrElseW(() => {
