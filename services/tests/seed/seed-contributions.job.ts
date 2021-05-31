@@ -6,10 +6,14 @@ import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { Source } from "../../src/utils/enums/source.enum";
 import { Direction } from "../../src/utils/enums/direction.enum";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const txnsTableName = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 
 const run = async (dynamoDB: DynamoDB, sequence: number) => {
   const list = data.slice(25 * sequence - 25, 25 * sequence);
-  const tableName = "transactions-qa";
   const committeeId = "pat-miller";
   const now = new Date().getTime();
   const items = list.map((txn) => {
@@ -48,15 +52,13 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
     };
   });
 
-  const res = await dynamoDB
+  return await dynamoDB
     .batchWriteItem({
       RequestItems: {
-        [tableName]: items,
+        [txnsTableName]: items,
       },
     })
     .promise();
-
-  return res;
 };
 
 AWS.config.apiVersions = {

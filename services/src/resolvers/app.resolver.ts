@@ -20,7 +20,6 @@ import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Direction } from "../utils/enums/direction.enum";
 import { now } from "../utils/time.utils";
 import { Source } from "../utils/enums/source.enum";
-import { stripCardInfo } from "../utils/strip-card-info";
 
 dotenv.config();
 
@@ -52,9 +51,7 @@ export class AppResolver {
     @Args() transactionArgs: TransactionsArg,
     @CurrentUser() currentUser: string
   ): Promise<Transaction[]> {
-    console.log("the table name");
-    console.log(txnsTableName);
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
       transactionArgs.committeeId
     )(currentUser);
 
@@ -115,6 +112,7 @@ export class AppResolver {
       if (txn.transactionType === TransactionType.DISBURSEMENT) {
         if (txn.bankVerified) {
           acc.totalSpent = acc.totalSpent + txn.amount;
+          acc.balance = acc.balance - txn.amount;
         } else {
           acc.totalDisbursementsInProcessing =
             acc.totalDisbursementsInProcessing + txn.amount;

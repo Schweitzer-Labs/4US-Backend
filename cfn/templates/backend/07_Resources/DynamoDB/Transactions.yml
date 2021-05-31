@@ -4,8 +4,8 @@ Transactions:
     SSESpecification:
       SSEEnabled: true
     ProvisionedThroughput:
-      WriteCapacityUnits: 1
-      ReadCapacityUnits: 1
+      WriteCapacityUnits: 3
+      ReadCapacityUnits: 3
     AttributeDefinitions:
       - AttributeName: committeeId
         AttributeType: S

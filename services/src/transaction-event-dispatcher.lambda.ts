@@ -17,6 +17,9 @@ import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import { PathReporter } from "io-ts/PathReporter";
 import { TaskEither } from "fp-ts/TaskEither";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
@@ -25,6 +28,8 @@ const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 const dynamoDB = new DynamoDB();
 const sqsUrl: any = process.env.SQSQUEUE;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
+
+console.log("comtab", committeesTableName);
 
 export default async (
   event: DynamoDBStreamEvent,
@@ -45,6 +50,7 @@ export default async (
     switch (stream.eventName) {
       case "INSERT":
         console.log("INSERT event emitted");
+        console.log("comtab", committeesTableName);
         return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
           eitherTxn.right
         );
@@ -89,12 +95,12 @@ const failedSend: EffectMetadata = {
 
 const handleInsert =
   (sqsUrl: string) =>
-  (committeeTableName: string) =>
+  (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (txn: ITransaction): Promise<EffectMetadata> => {
     if (txn.source === Source.DONATE_FORM) {
       return await pipe(
-        getCommitteeById(committeeTableName)(dynamoDB)(txn.committeeId),
+        getCommitteeById(committeesTableName)(dynamoDB)(txn.committeeId),
         taskEither.map(formatMessage(sqsUrl)(txn)),
         taskEither.chain(sendMessage),
         taskEither.fold(

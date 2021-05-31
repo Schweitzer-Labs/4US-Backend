@@ -14,7 +14,7 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @Field()
   paymentMethod: string;
 
-  @Field()
+  @Field({ nullable: true })
   emailAddress: string;
 
   @Field()

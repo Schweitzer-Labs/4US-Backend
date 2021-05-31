@@ -7,13 +7,15 @@ Donors:
       WriteCapacityUnits: 1
       ReadCapacityUnits: 1
     AttributeDefinitions:
+      - AttributeName: flacspeeMatch
+        AttributeType: S
       - AttributeName: id
         AttributeType: S
     KeySchema:
       - KeyType: HASH
-        AttributeName: id
-      - KeyType: RANGE
         AttributeName: flacspeeMatch
+      - KeyType: RANGE
+        AttributeName: id
     StreamSpecification:
       StreamViewType: NEW_IMAGE
 

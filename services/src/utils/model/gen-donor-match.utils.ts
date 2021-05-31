@@ -21,5 +21,7 @@ export const genFlacspee = ({
   entityType,
   emailAddress,
 }: IFlacspeeInput) => {
-  return `flacspee:[${firstName.toLowerCase()}][${lastName.toLowerCase()}][${addressLine1.toLowerCase()}][${city.toLowerCase()}][${state.toLowerCase()}][${postalCode.toLowerCase()}][${entityType.toLowerCase()}][${emailAddress.toLowerCase()}]`;
+  return `flacspee:[${firstName.toLowerCase()}][${lastName.toLowerCase()}][${addressLine1.toLowerCase()}][${city.toLowerCase()}][${state.toLowerCase()}][${postalCode.toLowerCase()}][${entityType.toLowerCase()}][${(
+    emailAddress || ""
+  ).toLowerCase()}]`;
 };

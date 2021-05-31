@@ -12,6 +12,7 @@ import {
 } from "../repositories/ddb.utils";
 import { ITransaction, Transactions } from "./search-transactions.decoder";
 import { TransactionsArg } from "../args/transactions.arg";
+import { Order } from "../utils/enums/order.enum";
 
 const getTransactionsRes =
   (txnsTableName: string) =>
@@ -21,8 +22,9 @@ const getTransactionsRes =
     transactionType,
     bankVerified,
     ruleVerified,
+    order = Order.DESC,
   }: TransactionsArg) =>
-  async (): Promise<any> => {
+  async (): Promise<object[]> => {
     const filterExpressionString = [
       ...toFilterExpression("transactionType", transactionType),
       ...toFilterExpression("bankVerified", bankVerified),
@@ -39,6 +41,7 @@ const getTransactionsRes =
         TableName: txnsTableName,
         KeyConditionExpression: "committeeId = :committeeId",
         ...FilterExpression,
+        ScanIndexForward: order === Order.ASC,
         ExpressionAttributeValues: {
           ":committeeId": { S: committeeId },
           ...toExpressionAttributeValueString(
