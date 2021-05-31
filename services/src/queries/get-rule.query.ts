@@ -1,8 +1,6 @@
 import { DynamoDB } from "aws-sdk";
 import { ICommittee } from "./get-committee-by-id.query";
-import { IDonor } from "./search-donors.query";
 import { committeeAndDonorToRuleCode } from "../utils/model/gen-rule-code.utils";
-import * as t from "io-ts";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { pipe } from "fp-ts/function";
@@ -10,13 +8,14 @@ import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../repositories/ddb.utils";
 import { IRule, Rules } from "./get-rule.decoder";
+import { IDonor } from "./search-donors.decoder";
 
 export const queryDDB =
   (rulesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committee: ICommittee) =>
   async (donor: IDonor): Promise<unknown> => {
-    return await dynamoDB
+    const res = await dynamoDB
       .query({
         TableName: rulesTableName,
         KeyConditionExpression: "code = :code",
@@ -25,6 +24,8 @@ export const queryDDB =
         },
       })
       .promise();
+
+    return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
   };
 
 const RulesToRule = (rules: IRule[]): TaskEither<ApplicationError, IRule> => {

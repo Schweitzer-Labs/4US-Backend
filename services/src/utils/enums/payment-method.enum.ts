@@ -7,3 +7,13 @@ export enum PaymentMethod {
   Transfer = "transfer",
   InKind = "in-kind",
 }
+
+export const paymentMethods: PaymentMethod[] = [
+  PaymentMethod.ACH,
+  PaymentMethod.Wire,
+  PaymentMethod.Check,
+  PaymentMethod.Debit,
+  PaymentMethod.Credit,
+  PaymentMethod.Transfer,
+  PaymentMethod.InKind,
+];

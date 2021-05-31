@@ -1,6 +1,4 @@
 import { Field, InputType } from "type-graphql";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
-import { EntityType } from "../utils/enums/entity-type.enum";
 import { ITransaction } from "../queries/search-transactions.decoder";
 
 @InputType()

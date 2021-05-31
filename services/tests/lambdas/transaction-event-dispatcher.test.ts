@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import transactionEventDispatcher from "../../src/transaction-event-dispatcher.lambda";
 import { insertContributionEvent } from "../events/insert-contribution-event.ddb";
-import { seedCommittees } from "../seed/seed-committees.job";
 
 describe("Transaction Event Dispatch", function () {
   it("Publishes a web contribution to a queue", async () => {

@@ -12,11 +12,8 @@ import { genTxnId } from "../utils/gen-txn-id.utils";
 import { now } from "../utils/time.utils";
 import { genFlacspee } from "../utils/model/gen-donor-match.utils";
 import { taskEither } from "fp-ts";
-import {
-  donorInputToDonors,
-  IDonor,
-  IDonorInput,
-} from "../queries/search-donors.query";
+import { donorInputToDonors } from "../queries/search-donors.query";
+import { IDonor, IDonorInput } from "../queries/search-donors.decoder";
 
 const instantIdResultToNewDonor =
   (donorsTableName: string) =>

@@ -24,4 +24,7 @@ export class TransactionsArg {
 
   @Field((type) => Boolean, { nullable: true })
   bankVerified?: boolean;
+
+  @Field((type) => String, { nullable: true })
+  donorId?: string;
 }

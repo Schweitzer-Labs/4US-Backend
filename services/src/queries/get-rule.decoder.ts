@@ -16,6 +16,7 @@ const RuleOptional = t.partial({
   entityType: t.string,
   aggregateDuration: t.string,
   fields: t.array(t.string),
+  limit: t.number,
 });
 
 export const Rule = t.intersection([RuleRequired, RuleOptional]);

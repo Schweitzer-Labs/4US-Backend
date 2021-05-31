@@ -1,6 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../../queries/search-transactions.decoder";
-import { IDonor } from "../../queries/search-donors.query";
+import { IDonor } from "../../queries/search-donors.decoder";
 
 export const putDonor =
   (donorsTableName: string) =>

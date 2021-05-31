@@ -1,4 +1,3 @@
-import { IDonorInput } from "../../queries/search-donors.query";
 import { Env } from "../../utils/enums/env.enum";
 import { ApplicationError } from "../../utils/application-error";
 import { left, TaskEither, tryCatch } from "fp-ts/TaskEither";
@@ -10,6 +9,7 @@ import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { PathReporter } from "io-ts/PathReporter";
 import { now } from "../../utils/time.utils";
+import { IDonorInput } from "../../queries/search-donors.decoder";
 
 const instantIdEndpoint =
   "'https://wsonline.seisint.com/WsIdentity/InstantID?&ver_=2.80&_product_code=false&json_test_'";

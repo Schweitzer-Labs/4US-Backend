@@ -23,12 +23,14 @@ const getTransactionsRes =
     bankVerified,
     ruleVerified,
     order = Order.DESC,
+    donorId,
   }: TransactionsArg) =>
   async (): Promise<object[]> => {
     const filterExpressionString = [
       ...toFilterExpression("transactionType", transactionType),
       ...toFilterExpression("bankVerified", bankVerified),
       ...toFilterExpression("ruleVerified", ruleVerified),
+      ...toFilterExpression("donorId", donorId),
     ].join(" AND ");
 
     const FilterExpression =
@@ -48,6 +50,7 @@ const getTransactionsRes =
             "transactionType",
             transactionType
           ),
+          ...toExpressionAttributeValueString("donorId", donorId),
           ...toExpressionAttributeValueBool("bankVerified", bankVerified),
           ...toExpressionAttributeValueBool("ruleVerified", ruleVerified),
         },

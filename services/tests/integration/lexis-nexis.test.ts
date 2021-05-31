@@ -1,11 +1,10 @@
 import { expect } from "chai";
-import { donorInputToInstanceIdResult } from "../../src/clients/lexis-nexis/lexis-nexis.client";
 import { Env } from "../../src/utils/enums/env.enum";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
-import { IDonorInput } from "../../src/queries/search-donors.query";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import { isLeft } from "fp-ts/Either";
+import { donorInputToInstantIdResult } from "../../src/clients/lexis-nexis/lexis-nexis.client";
+import { IDonorInput } from "../../src/queries/search-donors.decoder";
 
 const donorInput: IDonorInput = {
   firstName: "Test",
@@ -31,7 +30,7 @@ const donorInput: IDonorInput = {
 describe("Lexis Nexis Instant ID", function () {
   it("Receives and decodes a valid response", async () => {
     const res: any = await pipe(
-      donorInputToInstanceIdResult({
+      donorInputToInstantIdResult({
         env: Env.Dev,
         username: "fake_name",
         password: "fake_password",
@@ -40,8 +39,6 @@ describe("Lexis Nexis Instant ID", function () {
         throw new Error();
       })
     )();
-    console.log(res);
-
-    expect(res.comprehensiveVerificationScore).to.equal(20);
+    expect(res.instantIdComprehensiveVerificationScore).to.equal(20);
   });
 });

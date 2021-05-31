@@ -4,53 +4,67 @@ import * as dotenv from "dotenv";
 import { IRule } from "../../src/queries/get-rule.decoder";
 import { rulesData } from "./rules.data";
 import { ruleToRuleCode } from "../../src/utils/model/gen-rule-code.utils";
+import { sleep } from "../../src/utils/sleep.utils";
 
 dotenv.config();
 
 const rulesTableName = process.env.RULES_DDB_TABLE_NAME;
 
+let index = 1;
 const run =
-  (rulesTableName: string) =>
-  (dynamoDB: DynamoDB) =>
-  (sequence: number) =>
-  async (data: any[]) => {
-    const list = data.slice(25 * sequence - 25, 25 * sequence);
-    const items = list.map((r) => {
-      const rule: IRule = {
-        code: "",
-        state: r.state,
-        scope: r.scope,
-        party: r.party,
-        race: r.race,
-        district: r.district,
-        county: r.county,
-        officeType: r.office_type,
-        ruleVersion: r.rule_version,
-        entityType: r.contributor_type,
-        aggregateDuration: r.aggregate_duration,
-        fields: r.fields.split(","),
-      };
-      const code = ruleToRuleCode(rule);
-      console.log(code);
-      const marshalledRule = DynamoDB.Converter.marshall({
-        ...rule,
-        code,
+  (rulesTableName: string) => (dynamoDB: DynamoDB) => async (data: any[]) => {
+    const length = data.length;
+    const remaining = length % 25;
+    const sequences = Math.ceil((length - remaining) / 25);
+
+    for (let i = 1; i <= sequences + 1; i++) {
+      const list = data.slice(25 * i - 25, 25 * i);
+      const items = list.map((r) => {
+        const rule: IRule = {
+          code: "",
+          state: r.state,
+          scope: r.scope,
+          party: r.party,
+          race: r.race,
+          district: r.district + "",
+          county: r.county,
+          officeType: r.office_type,
+          ruleVersion: r.rule_version,
+          entityType: r.contributor_type,
+          limit: r.limit === "NULL" ? null : r.limit,
+          aggregateDuration: r.aggregate_duration,
+          fields: r.fields.split(","),
+        };
+        const code = ruleToRuleCode(rule);
+        const marshalledRule = DynamoDB.Converter.marshall({
+          ...rule,
+          code,
+        });
+
+        console.log(index);
+
+        index++;
+
+        return {
+          PutRequest: {
+            Item: marshalledRule,
+          },
+        };
       });
 
-      return {
-        PutRequest: {
-          Item: marshalledRule,
-        },
-      };
-    });
+      await dynamoDB
+        .batchWriteItem({
+          RequestItems: {
+            [rulesTableName]: items,
+          },
+        })
+        .promise()
+        .then((data) => console.log(`Batch ${i} written`))
+        .catch(console.log)
+        .finally(console.log);
 
-    return await dynamoDB
-      .batchWriteItem({
-        RequestItems: {
-          [rulesTableName]: items,
-        },
-      })
-      .promise();
+      await sleep(100);
+    }
   };
 
 AWS.config.apiVersions = {
@@ -58,15 +72,9 @@ AWS.config.apiVersions = {
 };
 const dynamoDB = new DynamoDB();
 
-run(rulesTableName)(dynamoDB)(1)(rulesData)
-  .then(console.log)
-  .catch(console.log);
-run(rulesTableName)(dynamoDB)(2)(rulesData)
-  .then(console.log)
-  .catch(console.log);
-run(rulesTableName)(dynamoDB)(3)(rulesData)
-  .then(console.log)
-  .catch(console.log);
-run(rulesTableName)(dynamoDB)(4)(rulesData)
-  .then(console.log)
-  .catch(console.log);
+run(rulesTableName)(dynamoDB)(rulesData);
+// run(rulesTableName)(dynamoDB)(1)(rulesData);
+// run(rulesTableName)(dynamoDB)(2)(rulesData);
+// run(rulesTableName)(dynamoDB)(3)(rulesData);
+// run(rulesTableName)(dynamoDB)(4)(rulesData);
+// run(rulesTableName)(dynamoDB)(5)(rulesData);
