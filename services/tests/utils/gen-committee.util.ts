@@ -28,22 +28,26 @@ export const genCommittee = ({
   tzDatabaseName,
   emailAddresses,
   plan,
-}: IGenCommitteeConfig): ICommittee => ({
-  id: genTxnId(),
-  committeeName: `Vote for ${faker.name.lastName()}`,
-  candidateFirstName: faker.name.firstName(),
-  candidateLastName: faker.name.lastName(),
-  stripeAccount: "acct_1IjTcsRC8iiQex3V",
-  members: ["evan-piro", "5e41bd77-eae7-4b2d-8d20-a05bef22c4e2"],
-  state,
-  scope,
-  officeType,
-  party,
-  race,
-  district,
-  county,
-  ruleVersion,
-  tzDatabaseName,
-  emailAddresses: emailAddresses || "evan@schweitzerlabs.com",
-  plan,
-});
+}: IGenCommitteeConfig): ICommittee => {
+  const candidateFirstName = faker.name.firstName();
+  const candidateLastName = faker.name.lastName();
+  return {
+    id: genTxnId(),
+    committeeName: `Vote for ${candidateFirstName}`,
+    candidateFirstName,
+    candidateLastName,
+    stripeAccount: "acct_1IjTcsRC8iiQex3V",
+    members: ["evan-piro", "5e41bd77-eae7-4b2d-8d20-a05bef22c4e2"],
+    state,
+    scope,
+    officeType,
+    party,
+    race,
+    district,
+    county,
+    ruleVersion,
+    tzDatabaseName,
+    emailAddresses: emailAddresses || "evan@schweitzerlabs.com",
+    plan,
+  };
+};

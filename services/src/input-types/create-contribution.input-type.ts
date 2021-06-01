@@ -1,7 +1,7 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
 
-export enum EntityType {
+enum EntityType {
   CAN = "can",
   FAM = "fam",
   IND = "ind",
@@ -55,7 +55,7 @@ export class CreateContributionInput implements Partial<ITransaction> {
   postalCode: string;
 
   @Field()
-  entityType: string;
+  entityType: EntityType;
 
   @Field({ nullable: true })
   paymentDate?: number;

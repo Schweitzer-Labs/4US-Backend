@@ -1,5 +1,4 @@
 import { ArgsType, Field, Int } from "type-graphql";
-import { Max, Min } from "class-validator";
 import { Order } from "../utils/enums/order.enum";
 import { registerEnumType } from "type-graphql";
 import { EntityType } from "../utils/enums/entity-type.enum";

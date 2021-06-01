@@ -49,7 +49,7 @@ export const paymentToDDB =
       () => savePayment(transactionsTableName)(dynamoDB)(payment),
       (error) =>
         new ApplicationError(
-          "DDB Write failed",
+          "Payment successful, DDB write failed",
           error,
           StatusCodes.UNAUTHORIZED
         )

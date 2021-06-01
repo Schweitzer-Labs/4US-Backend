@@ -6,7 +6,7 @@ import { verifyDonor } from "./donor-verification.pipe";
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { taskEither as te } from "fp-ts";
 import { createContributionInputToDonorInput } from "../utils/model/createContributionInputToDonorInput.utils";
-import { runComplianceCheck } from "./compliance-check.pipe";
+import { IComplianceResult, runComplianceCheck } from "./compliance-check.pipe";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 
@@ -19,13 +19,13 @@ export const runRulesEngine =
   (committee: ICommittee) =>
   (
     contribInput: CreateContributionInput
-  ): TaskEither<ApplicationError, string> =>
+  ): TaskEither<ApplicationError, IComplianceResult> =>
     pipe(
       te.of(createContributionInputToDonorInput(contribInput)),
       te.chain(verifyDonor(donorsTableName)(dynamoDB)(instantIdConfig)),
       te.chain(
         runComplianceCheck(txnsTableName)(rulesTableName)(dynamoDB)(
-          contribInput.amount
+          contribInput
         )(committee)
       )
     );

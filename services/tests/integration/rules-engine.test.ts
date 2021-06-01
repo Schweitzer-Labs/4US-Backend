@@ -31,20 +31,22 @@ AWS.config.apiVersions = {
 const dynamoDB = new DynamoDB();
 
 const limit = 750000;
+const committee = genCommittee({
+  district: "53",
+  officeType: "senate",
+  party: "democrat",
+  race: "primary",
+  ruleVersion: "nyboe-2020",
+  scope: "state",
+  state: "ny",
+});
 
 describe("Rules engine", function () {
-  it("Disallows a contribution in excess of a committee's limit", async () => {
-    const committee = genCommittee({
-      district: "53",
-      officeType: "senate",
-      party: "democrat",
-      race: "primary",
-      ruleVersion: "nyboe-2020",
-      scope: "state",
-      state: "ny",
-    });
+  before(async () => {
     await putCommittee(comsTable)(dynamoDB)(committee);
+  });
 
+  it("Disallows a contribution in excess of a committee's limit", async () => {
     const contrib = genCreateContributionInput(
       committee.id,
       750001,
@@ -65,15 +67,6 @@ describe("Rules engine", function () {
   });
 
   it("Allows a contribution within committee's limit", async () => {
-    const committee = genCommittee({
-      district: "53",
-      officeType: "senate",
-      party: "democrat",
-      race: "primary",
-      ruleVersion: "nyboe-2020",
-      scope: "state",
-      state: "ny",
-    });
     await putCommittee(comsTable)(dynamoDB)(committee);
 
     const contrib = genCreateContributionInput(
@@ -88,10 +81,13 @@ describe("Rules engine", function () {
       )(committee)(contrib),
       taskEither.fold(
         (e) => task.of(e.data.remaining),
-        (s) => task.of("worked")
+        (res) => {
+          console.log(res);
+          return task.of(res.balance);
+        }
       )
     )();
 
-    expect(res).to.equal("worked");
+    expect(res).to.equal(0);
   });
 });

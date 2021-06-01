@@ -10,6 +10,7 @@ import { searchTransactions } from "../queries/search-transactions.query";
 import { IRule } from "../queries/get-rule.decoder";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { StatusCodes } from "http-status-codes";
+import { CreateContributionInput } from "../input-types/create-contribution.input-type";
 
 const committeeDonorAndRuleToBalance =
   (txnsTableName: string) =>
@@ -33,10 +34,16 @@ const committeeDonorAndRuleToBalance =
     );
   };
 
+interface IRuleResult {
+  balance: number;
+  remaining: number;
+  rule: IRule;
+}
+
 const runRule =
   (attemptedAmount: number) =>
   (rule: IRule) =>
-  (balance: number): TaskEither<ApplicationError, string> => {
+  (balance: number): TaskEither<ApplicationError, IRuleResult> => {
     const remaining = rule.limit - balance;
     const exceedsLimit = balance + attemptedAmount > rule.limit;
     if (exceedsLimit) {
@@ -48,7 +55,7 @@ const runRule =
         )
       );
     } else {
-      return te.right("Passed");
+      return te.right({ balance, remaining, rule });
     }
   };
 
@@ -58,7 +65,7 @@ const committeeDonorAndRuleToDetermination =
   (attemptedAmount: number) =>
   (committee: ICommittee) =>
   (donor: IDonor) =>
-  (rule: IRule): TaskEither<ApplicationError, string> =>
+  (rule: IRule): TaskEither<ApplicationError, IRuleResult> =>
     pipe(
       committeeDonorAndRuleToBalance(txnsTableName)(dynamoDB)(committee)(donor)(
         rule
@@ -66,19 +73,36 @@ const committeeDonorAndRuleToDetermination =
       te.chain(runRule(attemptedAmount)(rule))
     );
 
+export interface IComplianceResult {
+  donor: IDonor;
+  committee: ICommittee;
+  createContributionInput: CreateContributionInput;
+  rule: IRule;
+  balance: number;
+  remaining: number;
+}
+
 export const runComplianceCheck =
   (txnsTableName: string) =>
   (rulesTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (attemptedAmount: number) =>
+  (createContributionInput: CreateContributionInput) =>
   (committee: ICommittee) =>
-  (donor: IDonor): TaskEither<ApplicationError, string> => {
+  (donor: IDonor): TaskEither<ApplicationError, IComplianceResult> => {
     return pipe(
       committeeAndDonorToRule(rulesTableName)(dynamoDB)(committee)(donor),
       te.chain(
         committeeDonorAndRuleToDetermination(txnsTableName)(dynamoDB)(
-          attemptedAmount
+          createContributionInput.amount
         )(committee)(donor)
-      )
+      ),
+      te.map(({ rule, balance, remaining }) => ({
+        donor,
+        committee,
+        rule,
+        balance,
+        remaining,
+        createContributionInput,
+      }))
     );
   };
