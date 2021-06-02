@@ -18,3 +18,24 @@ export enum PurposeCode {
   BKFEE = "BKFEE",
   LWNSN = "LWNSN",
 }
+
+export const purposeCodes = [
+  PurposeCode.LITER,
+  PurposeCode.OFFICE,
+  PurposeCode.OTHER,
+  PurposeCode.PETIT,
+  PurposeCode.INT,
+  PurposeCode.POLLS,
+  PurposeCode.POSTA,
+  PurposeCode.PRINT,
+  PurposeCode.PROFL,
+  PurposeCode.RADIO,
+  PurposeCode.REIMB,
+  PurposeCode.RDET,
+  PurposeCode.RENTO,
+  PurposeCode.TVADS,
+  PurposeCode.VOTER,
+  PurposeCode.WAGES,
+  PurposeCode.BKFEE,
+  PurposeCode.LWNSN,
+];

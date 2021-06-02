@@ -25,6 +25,8 @@ describe("Get transaction by id", function () {
   it("Retrieve a transaction by an valid id", async () => {
     const txn = genTransaction({
       committeeId,
+      ruleVerified: true,
+      bankVerified: true,
     });
 
     await putTransaction(txnTableName)(dynamoDB)(txn);

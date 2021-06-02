@@ -41,6 +41,7 @@
     "test-engine": "ts-mocha tests/integration/rules-engine.test.ts --timeout 10000",
     "test-ln-decoders": "ts-mocha tests/unit/lexis-nexis-decoders.test.ts --timeout 10000",
     "test-get-txn": "ts-mocha tests/integration/get-txn-by-id.test.ts --timeout 10000",
+    "test-disbver": "ts-mocha tests/integration/verify-disbursment-from-user.test.ts --timeout 10000",
     "compile": "npm install && tsc"
   },
   "devDependencies": {

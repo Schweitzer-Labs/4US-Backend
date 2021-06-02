@@ -18,6 +18,8 @@ export const genContributionRecord = (
       committeeId,
       direction: Direction.IN,
       paymentMethod: PaymentMethod.Credit,
+      ruleVerified: true,
+      bankVerified: false,
     }),
     transactionType: TransactionType.CONTRIBUTION,
     committeeId,

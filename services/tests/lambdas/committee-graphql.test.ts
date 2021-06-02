@@ -4,11 +4,12 @@ import graphql from "../../src/committee-graphql.lambda";
 import { genGraphQLProxy } from "../utils/gen-allowed-proxy.util";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { genContributionRecord } from "../utils/gen-contribution.util";
-import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { sleep } from "../../src/utils/sleep.utils";
+import { genCommittee } from "../utils/gen-committee.util";
+import { putCommittee } from "../../src/utils/model/put-committee.utils";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ AWS.config.apiVersions = {
 const dynamoDB = new DynamoDB();
 
 const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
+const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 
 const validUsername = "evan-piro";
 
@@ -26,7 +28,17 @@ const invalidUsername = "james-martin";
 const expectedForbiddenText =
   "Access denied! You need to be authorized to perform this action!";
 
-const committeeId = "pat-miller";
+const committee = genCommittee({
+  district: "53",
+  officeType: "senate",
+  party: "democrat",
+  race: "primary",
+  ruleVersion: "nyboe-2020",
+  scope: "state",
+  state: "ny",
+});
+
+const committeeId = committee.id;
 
 const getAllTransactionsQuery = `
   query {
@@ -76,7 +88,7 @@ const aggregationsQuery = `
 `;
 
 const createContributionVariables = {
-  committeeId: "pat-miller",
+  committeeId,
 };
 
 const createContributionQuery = `
@@ -113,6 +125,10 @@ const lambdaPromise = (lambda, event, context) => {
 };
 
 describe("Committee GraphQL Lambda", function () {
+  before(async () => {
+    await putCommittee(committeesTableName)(dynamoDB)(committee);
+    await sleep(1000);
+  });
   describe("Permissions", function () {
     it("Prevents a non-member user from querying a committee", async () => {
       const res: any = await lambdaPromise(
@@ -153,6 +169,7 @@ describe("Committee GraphQL Lambda", function () {
         {}
       );
       const body = JSON.parse(res.body);
+      console.log(res.body);
       expect(body.data.transactions.length > 0).to.equal(true);
     });
     it("Get by Committee ID and Donor ID", async () => {
@@ -180,7 +197,7 @@ describe("Committee GraphQL Lambda", function () {
         {}
       );
       const body = JSON.parse(res.body);
-      expect(body.data.committee.id).to.equal("pat-miller");
+      expect(body.data.committee.id).to.equal(committee.id);
     });
   });
   describe("Aggregations", function () {

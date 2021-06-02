@@ -7,10 +7,11 @@ export const putCommittee =
   (dynamoDB: DynamoDB) =>
   async (committee: ICommittee) => {
     const marshalledCommittee = DynamoDB.Converter.marshall(committee);
-    return await dynamoDB
+    await dynamoDB
       .putItem({
         TableName: committeeTableName,
         Item: marshalledCommittee,
       })
       .promise();
+    return committee;
   };

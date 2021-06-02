@@ -4,49 +4,52 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 
 registerEnumType(PurposeCode, {
-  name: "Purpose Code",
+  name: "PurposeCode",
   description: "Purpose code for an expenditure",
 });
 
 registerEnumType(PaymentMethod, {
-  name: "Payment Method",
+  name: "PaymentMethod",
   description: "Payment method used in an expenditure",
 });
 
 @InputType()
 export class VerifyDisbursementInput implements Partial<ITransaction> {
-  @Field()
+  @Field({ nullable: true })
   entityName?: string;
 
-  @Field()
-  isSubcontracted: boolean;
+  @Field({ nullable: true })
+  isSubcontracted?: boolean;
 
-  @Field()
-  isPartialPayment: boolean;
+  @Field({ nullable: true })
+  isPartialPayment?: boolean;
 
-  @Field()
-  isExistingLiability: boolean;
+  @Field({ nullable: true })
+  isExistingLiability?: boolean;
 
   @Field((type) => PaymentMethod)
   paymentMethod?: PaymentMethod;
 
   @Field((type) => PurposeCode)
-  purposeCode: PurposeCode;
+  purposeCode?: PurposeCode;
 
-  @Field()
-  addressLine1: string;
+  @Field({ nullable: true })
+  addressLine1?: string;
 
   @Field({ nullable: true })
   addressLine2?: string;
 
-  @Field()
-  city: string;
+  @Field({ nullable: true })
+  city?: string;
 
-  @Field()
-  state: string;
+  @Field({ nullable: true })
+  state?: string;
 
-  @Field()
-  postalCode: string;
+  @Field({ nullable: true })
+  postalCode?: string;
+
+  @Field({ nullable: true })
+  paymentDate?: number;
 
   // Required for PaymentMethod.Check
   @Field({ nullable: true })
