@@ -1,7 +1,10 @@
 CommitteeReceiptTemplate:
+{% if REGION in ['us-east-1', 'us-west-2'] %}
   Type: AWS::CloudFormation::Stack
+  Condition: Production
   Properties:
     TemplateURL: committee-receipt.yml
     TimeoutInMinutes: 60
     Parameters:
       LambdaRunEnvironment: !Ref LambdaRunEnvironment
+{% endif %}
