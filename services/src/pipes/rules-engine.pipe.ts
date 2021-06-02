@@ -5,10 +5,10 @@ import { CreateContributionInput } from "../input-types/create-contribution.inpu
 import { verifyDonor } from "./donor-verification.pipe";
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { taskEither as te } from "fp-ts";
-import { createContributionInputToDonorInput } from "../utils/model/createContributionInputToDonorInput.utils";
 import { IComplianceResult, runComplianceCheck } from "./compliance-check.pipe";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
+import { createContributionInputToDonorInput } from "../utils/model/create-contribution-input-to-donor-input.utils";
 
 export const runRulesEngine =
   (billableEventsTableName: string) =>

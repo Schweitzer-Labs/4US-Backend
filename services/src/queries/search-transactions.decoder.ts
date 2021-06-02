@@ -42,6 +42,9 @@ const TransactionOptional = t.partial({
   entityName: t.string,
   ruleCode: t.string,
   createdByUser: t.string,
+  isSubcontracted: t.boolean,
+  isPartialPayment: t.boolean,
+  isExistingLiability: t.boolean,
 });
 
 export const Transaction = t.intersection([
