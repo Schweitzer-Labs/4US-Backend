@@ -1,7 +1,6 @@
 ContributorReceiptTemplate:
 {% if REGION in ['us-east-1', 'us-west-2'] %}
   Type: AWS::CloudFormation::Stack
-  Condition: Production
   Properties:
     TemplateURL: contributor-receipt.yml
     TimeoutInMinutes: 60
