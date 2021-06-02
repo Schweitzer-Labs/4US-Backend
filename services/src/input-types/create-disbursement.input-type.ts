@@ -4,12 +4,12 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 
 registerEnumType(PurposeCode, {
-  name: "Purpose Code",
+  name: "PurposeCode",
   description: "Purpose code for an expenditure",
 });
 
 registerEnumType(PaymentMethod, {
-  name: "Payment Method",
+  name: "PaymentMethod",
   description: "Payment method used in an expenditure",
 });
 

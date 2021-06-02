@@ -6,6 +6,7 @@ export enum PaymentMethod {
   Credit = "credit",
   Transfer = "transfer",
   InKind = "in-kind",
+  Cash = "cash",
 }
 
 export const paymentMethods: PaymentMethod[] = [
@@ -16,4 +17,5 @@ export const paymentMethods: PaymentMethod[] = [
   PaymentMethod.Credit,
   PaymentMethod.Transfer,
   PaymentMethod.InKind,
+  PaymentMethod.Cash,
 ];
