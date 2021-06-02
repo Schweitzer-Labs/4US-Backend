@@ -18,5 +18,7 @@ PolicapitalEmailerFunction:
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
+{% if REGION in ['us-east-1', 'us-west-2'] %}
         POS_RECEIPT: !Sub ${ContributorReceiptTemplate.Outputs.SES}
         POS_RECORD: !Sub ${CommitteeReceiptTemplate.Outputs.SES}
+{% endif %}
