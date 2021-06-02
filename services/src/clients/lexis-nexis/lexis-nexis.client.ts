@@ -1,33 +1,24 @@
-import { Env } from "../../utils/enums/env.enum";
 import { ApplicationError } from "../../utils/application-error";
-import { left, TaskEither, tryCatch } from "fp-ts/TaskEither";
-import * as t from "io-ts";
+import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 
-import { mockRes } from "./lexis-nexis.mock";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { PathReporter } from "io-ts/PathReporter";
 import { now } from "../../utils/time.utils";
 import { IDonorInput } from "../../queries/search-donors.decoder";
+import { InstantIdResponse } from "./lexis-nexis.decoder";
+import { ICommittee } from "../../queries/get-committee-by-id.query";
+import {
+  BillableEventName,
+  putBillableEvent,
+} from "../../utils/model/put-billable-event.utils";
+import { DynamoDB } from "aws-sdk";
+import { genTxnId } from "../../utils/gen-txn-id.utils";
+import axios from "axios";
 
 const instantIdEndpoint =
-  "'https://wsonline.seisint.com/WsIdentity/InstantID?&ver_=2.80&_product_code=false&json_test_'";
-
-const InstantIdResponse = t.type({
-  InstantIDResponseEx: t.type({
-    response: t.type({
-      Result: t.type({
-        UniqueId: t.string,
-        ComprehensiveVerification: t.type({
-          ComprehensiveVerificationIndex: t.number,
-        }),
-      }),
-    }),
-  }),
-});
-
-type IInstantIdResponse = t.TypeOf<typeof InstantIdResponse>;
+  "https://wsonline.seisint.com/WsIdentity/InstantID?&ver_=2.80&_product_code=false&json_test_";
 
 const formatInstantIdRequest = (d: IDonorInput) => {
   const streetAddress2 = d.addressLine2 ? { StreetAddress2: "2FL" } : {};
@@ -75,31 +66,35 @@ const formatInstantIdRequest = (d: IDonorInput) => {
   };
 };
 
-const post = async (url: string, payload: any, options: object) => {
-  return mockRes;
-};
-
 export interface IInstantIdConfig {
   username: string;
   password: string;
-  env: Env;
 }
 
 const runInstantId =
+  (billableEventTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (committee: ICommittee) =>
   (config: IInstantIdConfig) =>
   async (donorInput: IDonorInput): Promise<any> => {
     const payload = formatInstantIdRequest(donorInput);
+    const { data } = await axios.post(instantIdEndpoint, payload, {
+      auth: {
+        username: config.username,
+        password: config.password,
+      },
+    });
 
-    if ([Env.Dev, Env.QA].includes(config.env)) {
-      return await post(instantIdEndpoint, payload, {
-        auth: {
-          username: config.username,
-          password: config.password,
-        },
-      });
-    } else {
-      throw new ApplicationError("Failure due to missing config", {});
-    }
+    await putBillableEvent(billableEventTableName)(dynamoDB)({
+      id: genTxnId(),
+      committeeId: committee.id,
+      eventName: BillableEventName.LexisNexisInstantIdLookUp,
+      cost: 75,
+      request: payload,
+      response: data,
+    });
+    // @ToDo re-enable once IPs are whitelisted
+    return {};
   };
 
 export interface IInstantIdResult {
@@ -136,11 +131,17 @@ const resToInstantIdResult = (
 };
 
 export const donorInputToInstantIdResult =
+  (billableEventsTable: string) =>
+  (dynamoDB: DynamoDB) =>
   (config: IInstantIdConfig) =>
+  (committee: ICommittee) =>
   (donorInput: IDonorInput): TaskEither<ApplicationError, IInstantIdResult> =>
     pipe(
       tryCatch(
-        () => runInstantId(config)(donorInput),
+        () =>
+          runInstantId(billableEventsTable)(dynamoDB)(committee)(config)(
+            donorInput
+          ),
         (e) => new ApplicationError("ID verification look up failed", e)
       ),
       taskEither.chain(resToInstantIdResult)

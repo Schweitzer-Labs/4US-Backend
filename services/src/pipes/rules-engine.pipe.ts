@@ -11,6 +11,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 
 export const runRulesEngine =
+  (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
   (rulesTableName: string) =>
@@ -22,7 +23,11 @@ export const runRulesEngine =
   ): TaskEither<ApplicationError, IComplianceResult> =>
     pipe(
       te.of(createContributionInputToDonorInput(contribInput)),
-      te.chain(verifyDonor(donorsTableName)(dynamoDB)(instantIdConfig)),
+      te.chain(
+        verifyDonor(billableEventsTableName)(donorsTableName)(dynamoDB)(
+          instantIdConfig
+        )(committee)
+      ),
       te.chain(
         runComplianceCheck(txnsTableName)(rulesTableName)(dynamoDB)(
           contribInput

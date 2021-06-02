@@ -13,7 +13,6 @@ const queryDDB =
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (donorInput: IDonorInput): Promise<unknown> => {
-    console.log(donorsTableName);
     const res = await dynamoDB
       .query({
         TableName: donorsTableName,
@@ -24,7 +23,6 @@ const queryDDB =
         },
       })
       .promise();
-    console.log(res);
     return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
   };
 

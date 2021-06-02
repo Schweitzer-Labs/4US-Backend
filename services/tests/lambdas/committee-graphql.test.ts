@@ -75,6 +75,35 @@ const aggregationsQuery = `
   }
 `;
 
+const createContributionVariables = {
+  committeeId: "pat-miller",
+};
+
+const createContributionQuery = `
+mutation($committeeId: String!) {
+  createContribution(createContributionData: {
+    committeeId: $committeeId
+    amount: 12000
+    paymentMethod: Credit
+    cardCVC: "321"
+    cardNumber: "4242424242424242"
+    cardExpirationMonth: 12
+    cardExpirationYear: 2023
+    emailAddress: "dev.evanpiro@gmail.com"
+    firstName: "Carvin"
+    lastName: "Brierson"
+    addressLine1: "43 Lane"
+    addressLine2: "2FL"
+    city: "Downingtown"
+    state: "PA"
+    postalCode: "13224"
+    entityType: IND
+  }) {
+    amount
+  }
+}
+`;
+
 const lambdaPromise = (lambda, event, context) => {
   return new Promise((resolve, reject) => {
     lambda(event, context, (error, res) => {
@@ -115,6 +144,9 @@ describe("Committee GraphQL Lambda", function () {
   });
   describe("Transactions", function () {
     it("Get by Committee ID", async () => {
+      const txn = genContributionRecord(committeeId);
+      await putTransaction(txnsTableName)(dynamoDB)(txn);
+      await sleep(1000);
       const res: any = await lambdaPromise(
         graphql,
         genGraphQLProxy(getAllTransactionsQuery, validUsername),
@@ -124,20 +156,20 @@ describe("Committee GraphQL Lambda", function () {
       expect(body.data.transactions.length > 0).to.equal(true);
     });
     it("Get by Committee ID and Donor ID", async () => {
-      const donorId = genTxnId();
-      const txn = genContributionRecord(committeeId, donorId);
-
+      const txn = genContributionRecord(committeeId);
       await putTransaction(txnsTableName)(dynamoDB)(txn);
-
       await sleep(1000);
 
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(getTransactionsByDonorIdQuery(donorId), validUsername),
+        genGraphQLProxy(
+          getTransactionsByDonorIdQuery(txn.donorId),
+          validUsername
+        ),
         {}
       );
       const body: any = JSON.parse(res.body);
-      expect(body.data.transactions[0].donorId).to.equal(donorId);
+      expect(body.data.transactions[0].donorId).to.equal(txn.donorId);
     });
   });
   describe("Committee", function () {
@@ -161,6 +193,24 @@ describe("Committee GraphQL Lambda", function () {
 
       const body = JSON.parse(res.body);
       expect(body.data.aggregations.balance).to.be.a("number");
+    });
+  });
+
+  describe("Create Contributions", function () {
+    it("Supports the creation of a contribution", async () => {
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          createContributionQuery,
+          validUsername,
+          createContributionVariables
+        ),
+        {}
+      );
+
+      const body = JSON.parse(res.body);
+      console.log(body);
+      expect(body.data.createContribution.amount).to.equal(12000);
     });
   });
 });

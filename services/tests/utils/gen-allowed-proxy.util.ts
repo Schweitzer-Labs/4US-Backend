@@ -1,6 +1,10 @@
-export const genGraphQLProxy = (query: string, userName: string) => {
+export const genGraphQLProxy = (
+  query: string,
+  userName: string,
+  variables = {}
+) => {
   const body = {
-    variables: {},
+    variables,
     operationName: null,
     query,
   };

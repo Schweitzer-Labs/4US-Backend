@@ -17,6 +17,7 @@ import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { putTransaction } from "../utils/model/put-transaction.utils";
 
 export const processContribution =
+  (currentUser: string) =>
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (stripe: Stripe) =>
@@ -26,6 +27,20 @@ export const processContribution =
     donor,
     rule,
   }: IComplianceResult): TaskEither<ApplicationError, ITransaction> => {
+    const baseTxn = {
+      id: genTxnId(),
+      createdByUser: currentUser,
+      donorId: donor.id,
+      ruleCode: rule.code,
+      initiatedTimestamp: now(),
+      direction: Direction.IN,
+      transactionType: TransactionType.CONTRIBUTION,
+      bankVerified: false,
+      ruleVerified: true,
+      source: Source.DASHBOARD,
+      ...c,
+    };
+
     switch (c.paymentMethod) {
       case PaymentMethod.Credit:
       case PaymentMethod.Debit:
@@ -33,30 +48,17 @@ export const processContribution =
           committeeContributionToPayment(stripe)({
             committee,
             contribution: {
-              donorId: donor.id,
-              ruleCode: rule.code,
+              ...baseTxn,
               // @ToDo Make source dynamic to support email on public donations
               source: Source.DASHBOARD,
-              ...c,
             },
           }),
           taskEither.chain(paymentToDDB(txnsTableName)(dynamoDB))
         );
       default:
-        const txn: ITransaction = {
-          // required field
-          id: genTxnId(),
-          direction: Direction.IN,
-          transactionType: TransactionType.CONTRIBUTION,
-          bankVerified: false,
-          ruleVerified: true,
-          initiatedTimestamp: now(),
-          source: Source.DASHBOARD,
-          ...c,
-        };
         return pipe(
           taskEither.tryCatch(
-            () => putTransaction(txnsTableName)(dynamoDB)(txn),
+            () => putTransaction(txnsTableName)(dynamoDB)(baseTxn),
             (e) =>
               new ApplicationError(
                 "Failed to write rules compliant transaction to DDB.",

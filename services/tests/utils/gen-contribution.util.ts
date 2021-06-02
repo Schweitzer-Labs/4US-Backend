@@ -6,10 +6,11 @@ import { EntityType } from "../../src/utils/enums/entity-type.enum";
 import * as faker from "faker";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { CreateContributionInput } from "../../src/input-types/create-contribution.input-type";
+import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 
 export const genContributionRecord = (
   committeeId: string,
-  donorId: string,
+  donorId?: string,
   entityType?: EntityType
 ): ITransaction => {
   return {
@@ -20,8 +21,8 @@ export const genContributionRecord = (
     }),
     transactionType: TransactionType.CONTRIBUTION,
     committeeId,
-    donorId,
-    entityType,
+    donorId: donorId || genTxnId(),
+    entityType: entityType || EntityType.IND,
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     addressLine1: faker.address.streetAddress(),
