@@ -29,14 +29,17 @@ const txnHasAnsweredComplianceQuestions = (
     return te.right(txn);
   }
   return te.left(
-    new ApplicationError("Disbursement must have a purpose code", {})
+    new ApplicationError(
+      "Disbursement must have compliance questions answered",
+      {}
+    )
   );
 };
 
 const txnHasAPurposeCode = (
   txn: ITransaction
 ): TaskEither<ApplicationError, ITransaction> => {
-  if (txn.paymentMethod === PaymentMethod.Check && txn.checkNumber) {
+  if (txn.purposeCode) {
     return te.right(txn);
   }
   return te.left(
@@ -58,26 +61,21 @@ const txnHasAPaymentDate = (
 const txnHasCheckNumberIfCheck = (
   txn: ITransaction
 ): TaskEither<ApplicationError, ITransaction> => {
-  if (txn.paymentMethod === PaymentMethod.Check && txn.checkNumber) {
+  if (txn.paymentMethod === PaymentMethod.Check && !txn.checkNumber) {
+    return te.left(
+      new ApplicationError(
+        "Check number must be provided for transactions made with checks",
+        {}
+      )
+    );
   }
-  return te.left(
-    new ApplicationError(
-      "Check number must be provided for transactions made with checks",
-      {}
-    )
-  );
+  return te.right(txn);
 };
 
 const txnHasAnAddress = (
   txn: ITransaction
 ): TaskEither<ApplicationError, ITransaction> => {
-  if (
-    txn.addressLine1 &&
-    txn.addressLine2 &&
-    txn.city &&
-    txn.state &&
-    txn.postalCode
-  ) {
+  if (txn.addressLine1 && txn.city && txn.state && txn.postalCode) {
     return te.right(txn);
   }
   return te.left(new ApplicationError("Transaction must contain address", {}));

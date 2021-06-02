@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
+import { Plan } from "../../src/utils/enums/plan.enum";
 
 export const committeesData: ICommittee[] = [
   {
@@ -11,7 +12,7 @@ export const committeesData: ICommittee[] = [
     stripeAccount: "acct_1IjTcsRC8iiQex3V",
     emailAddresses: "evan@schweitzerlabs.com,seemant@schweitzerlabs.com",
     tzDatabaseName: "America/New_York",
-    plan: "policapital",
+    plan: Plan.FOURUS,
     members: ["evan-piro", "5e41bd77-eae7-4b2d-8d20-a05bef22c4e2"],
     state: "ny",
     scope: "state",
@@ -30,8 +31,36 @@ export const committeesData: ICommittee[] = [
     candidateLastName: "Cruz",
     stripeAccount: "acct_1IjTcsRC8iiQex3V",
     emailAddresses: "evan@schweitzerlabs.com,seemant@schweitzerlabs.com",
+    plan: Plan.POLICAPITAL,
+    members: ["james-martin", "5e41bd77-eae7-4b2d-8d20-a05bef22c4e2"],
     tzDatabaseName: "America/New_York",
-    plan: "policapital",
-    members: ["james-martin"],
+    state: "ny",
+    scope: "state",
+    party: "democrat",
+    race: "general",
+    district: "35",
+    county: "",
+    officeType: "assembly",
+    ruleVersion: "nyboe-2020",
+  },
+  {
+    // required
+    id: "john-safford",
+    committeeName: "John Safford for Supervisor",
+    candidateFirstName: "John",
+    candidateLastName: "Safford",
+    stripeAccount: "acct_1IjTcsRC8iiQex3V",
+    emailAddresses: "evan@schweitzerlabs.com,seemant@schweitzerlabs.com",
+    plan: Plan.POLICAPITAL,
+    members: ["james-martin", "5e41bd77-eae7-4b2d-8d20-a05bef22c4e2"],
+    tzDatabaseName: "America/New_York",
+    state: "ny",
+    scope: "state",
+    party: "democrat",
+    race: "general",
+    district: "35",
+    county: "",
+    officeType: "assembly",
+    ruleVersion: "nyboe-2020",
   },
 ];

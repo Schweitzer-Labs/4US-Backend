@@ -79,21 +79,21 @@ const runInstantId =
   async (donorInput: IDonorInput): Promise<any> => {
     const payload = formatInstantIdRequest(donorInput);
     // @ToDo re-enable once IPs are whitelisted
-    // const { data } = await axios.post(instantIdEndpoint, payload, {
-    //   auth: {
-    //     username: config.username,
-    //     password: config.password,
-    //   },
-    // });
-    //
-    // await putBillableEvent(billableEventTableName)(dynamoDB)({
-    //   id: genTxnId(),
-    //   committeeId: committee.id,
-    //   eventName: BillableEventName.LexisNexisInstantIdLookUp,
-    //   cost: 75,
-    //   request: payload,
-    //   response: data,
-    // });
+    const { data } = await axios.post(instantIdEndpoint, payload, {
+      auth: {
+        username: config.username,
+        password: config.password,
+      },
+    });
+
+    await putBillableEvent(billableEventTableName)(dynamoDB)({
+      id: genTxnId(),
+      committeeId: committee.id,
+      eventName: BillableEventName.LexisNexisInstantIdLookUp,
+      cost: 75,
+      request: payload,
+      response: data,
+    });
     return {};
   };
 

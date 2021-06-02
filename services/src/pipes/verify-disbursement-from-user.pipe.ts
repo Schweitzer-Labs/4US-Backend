@@ -1,5 +1,4 @@
 import { DynamoDB } from "aws-sdk";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { pipe } from "fp-ts/function";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 import { taskEither as te } from "fp-ts";
@@ -9,7 +8,7 @@ import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
 
-export const validateVerifyDisbursementInput =
+export const verifyDisbursementFromUserAndPut =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committeeId: string) =>

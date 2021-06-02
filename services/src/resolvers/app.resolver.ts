@@ -26,16 +26,9 @@ import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
 import { createDisbursementInputToTransaction } from "../utils/model/create-disbursement-input-to-transaction.utils";
-import {
-  putTransaction,
-  putTransactionAndDecode,
-} from "../utils/model/put-transaction.utils";
+import { putTransaction } from "../utils/model/put-transaction.utils";
 import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
-import { getTxnById } from "../utils/model/get-txn-by-id.utils";
-import { ApplicationError } from "../utils/application-error";
-import { isNonVerifiedDisbursement } from "../utils/model/is-non-verified-disbursement.utils";
-import { validateDisbursement } from "../utils/model/validate-disbursement.utils";
-import { validateVerifyDisbursementInput } from "../pipes/validate-verify-disbursement-input.pipe";
+import { verifyDisbursementFromUserAndPut } from "../pipes/verify-disbursement-from-user.pipe";
 
 dotenv.config();
 
@@ -257,8 +250,8 @@ export class AppResolver {
     await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
       currentUser
     );
-    //
-    const res = await validateVerifyDisbursementInput(txnsTableName)(dynamoDB)(
+
+    const res = await verifyDisbursementFromUserAndPut(txnsTableName)(dynamoDB)(
       committeeId
     )(txnId)(d)();
 
