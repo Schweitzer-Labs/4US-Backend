@@ -40,6 +40,8 @@ const TransactionOptional = t.partial({
   stripePaymentIntentId: t.string,
   cardNumberLastFourDigits: t.string,
   entityName: t.string,
+  ruleCode: t.string,
+  createdByUser: t.string,
 });
 
 export const Transaction = t.intersection([

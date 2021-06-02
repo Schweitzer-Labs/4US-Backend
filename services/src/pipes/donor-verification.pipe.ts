@@ -14,6 +14,7 @@ import { genFlacspee } from "../utils/model/gen-donor-match.utils";
 import { taskEither } from "fp-ts";
 import { donorInputToDonors } from "../queries/search-donors.query";
 import { IDonor, IDonorInput } from "../queries/search-donors.decoder";
+import { ICommittee } from "../queries/get-committee-by-id.query";
 
 const instantIdResultToNewDonor =
   (donorsTableName: string) =>
@@ -35,16 +36,20 @@ const instantIdResultToNewDonor =
     );
 
 const verifyAndCreateDonorIfEmpty =
+  (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (config: IInstantIdConfig) =>
+  (committee: ICommittee) =>
   (donorInput: IDonorInput) =>
   (matchedDonors: IDonor[]): TaskEither<ApplicationError, IDonor> => {
     if (matchedDonors.length > 0) {
       return taskEither.of(matchedDonors[0]);
     } else {
       return pipe(
-        donorInputToInstantIdResult(config)(donorInput),
+        donorInputToInstantIdResult(billableEventsTableName)(dynamoDB)(config)(
+          committee
+        )(donorInput),
         taskEither.chain(
           instantIdResultToNewDonor(donorsTableName)(dynamoDB)(donorInput)
         )
@@ -53,15 +58,17 @@ const verifyAndCreateDonorIfEmpty =
   };
 
 export const verifyDonor =
+  (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (config: IInstantIdConfig) =>
+  (committee: ICommittee) =>
   (donorInput: IDonorInput): TaskEither<ApplicationError, IDonor> =>
     pipe(
       donorInputToDonors(donorsTableName)(dynamoDB)(donorInput),
       taskEither.chain(
-        verifyAndCreateDonorIfEmpty(donorsTableName)(dynamoDB)(config)(
-          donorInput
-        )
+        verifyAndCreateDonorIfEmpty(billableEventsTableName)(donorsTableName)(
+          dynamoDB
+        )(config)(committee)(donorInput)
       )
     );

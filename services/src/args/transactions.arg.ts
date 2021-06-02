@@ -9,7 +9,7 @@ registerEnumType(Order, {
 });
 
 registerEnumType(EntityType, {
-  name: "Entity Type", // this one is mandatory
+  name: "EntityType", // this one is mandatory
   description: "Type of entity involved in the transaction", // this one is optional
 });
 
@@ -33,6 +33,6 @@ export class TransactionsArg {
   @Field((type) => String, { nullable: true })
   donorId?: string;
 
-  @Field((type) => String, { nullable: true })
+  @Field((type) => EntityType, { nullable: true })
   entityType?: EntityType;
 }

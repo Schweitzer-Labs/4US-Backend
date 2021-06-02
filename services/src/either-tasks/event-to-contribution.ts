@@ -27,11 +27,12 @@ export interface IContribution {
   postalCode?: string;
   phoneNumber?: string;
   refCode?: string;
-  committee?: string;
+  committeeId: string;
   entityType?: string;
   donorId?: string;
   ruleCode?: string;
   source?: Source;
+  createdByUser?: string;
 }
 
 const contribSchema = Joi.object({
@@ -82,6 +83,7 @@ export const objectToContribution = (
     // @Todo Change email to emailAddress in API.
     const txn = {
       ...res.value,
+      committeeId: res.value.committee,
       emailAddress: res.value.email,
     };
     return right(txn);

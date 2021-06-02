@@ -10,6 +10,7 @@ import { Source } from "../utils/enums/source.enum";
 import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Direction } from "../utils/enums/direction.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
+import { putTransaction } from "../utils/model/put-transaction.utils";
 
 const savePayment =
   (transactionsTableName: string) =>
@@ -18,7 +19,6 @@ const savePayment =
     const transaction: ITransaction = {
       ...payment,
       id: genTxnId(),
-      committeeId: payment.committee,
       source: Source.DONATE_FORM,
       direction: Direction.IN,
       bankVerified: false,
@@ -31,14 +31,7 @@ const savePayment =
       `Writing contribution to ${transactionsTableName}`,
       transaction
     );
-
-    const payload = DynamoDB.Converter.marshall(transaction);
-    return await dynamoDB
-      .putItem({
-        TableName: transactionsTableName,
-        Item: payload,
-      })
-      .promise();
+    return await putTransaction(transactionsTableName)(dynamoDB)(transaction);
   };
 
 export const paymentToDDB =

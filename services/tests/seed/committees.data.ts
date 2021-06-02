@@ -13,6 +13,14 @@ export const committeesData: ICommittee[] = [
     tzDatabaseName: "America/New_York",
     plan: "policapital",
     members: ["evan-piro", "5e41bd77-eae7-4b2d-8d20-a05bef22c4e2"],
+    state: "ny",
+    scope: "state",
+    party: "democrat",
+    race: "general",
+    district: "35",
+    county: "",
+    officeType: "assembly",
+    ruleVersion: "nyboe-2020",
   },
   {
     // required

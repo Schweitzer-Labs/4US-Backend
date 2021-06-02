@@ -77,7 +77,7 @@ export const searchTransactions =
         () => getTransactionsRes(txnsTableName)(dynamoDB)(transactionsArg)(),
         (e) =>
           new ApplicationError(
-            "Get transaction request failed",
+            "Get transactions request failed",
             e,
             StatusCodes.INTERNAL_SERVER_ERROR
           )
