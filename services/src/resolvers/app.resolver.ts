@@ -18,13 +18,18 @@ import { pipe } from "fp-ts/function";
 import { runRulesEngine } from "../pipes/rules-engine.pipe";
 import { taskEither } from "fp-ts";
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
-import { Env } from "../utils/enums/env.enum";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
 import { Stripe } from "stripe";
 import { processContribution } from "../pipes/process-contribution.pipe";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
+import { createDisbursementInputToTransaction } from "../utils/model/create-disbursement-input-to-transaction.utils";
+import { putTransaction } from "../utils/model/put-transaction.utils";
+import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
+import { getTxnById } from "../utils/model/get-txn-by-id.utils";
+import { ApplicationError } from "../utils/application-error";
 
 dotenv.config();
 
@@ -178,6 +183,7 @@ export class AppResolver {
       cardNumber,
       cardExpirationMonth,
       cardExpirationYear,
+      checkNumber,
     } = createContributionInput;
 
     if (![EntityType.IND, EntityType.FAM].includes(entityType) && !entityName) {
@@ -197,6 +203,13 @@ export class AppResolver {
         );
     }
 
+    if (paymentMethod === PaymentMethod.Check) {
+      if (!checkNumber)
+        throw new ValidationError(
+          "Check number must be provided for contributions by check"
+        );
+    }
+
     const res = await pipe(
       runRulesEngine(billableEventsTableName)(donorsTableName)(txnsTableName)(
         rulesTableName
@@ -209,12 +222,49 @@ export class AppResolver {
     if (isLeft(res)) {
       throw res.left;
     } else {
-      console.log("right res", res.right);
       return res.right;
     }
   }
 
-  async createDisbursement() {}
+  @Mutation((returns) => Transaction)
+  async createDisbursement(
+    @Arg("createDisbursementData")
+    d: CreateDisbursementInput,
+    @CurrentUser() currentUser: string
+  ) {
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(d.committeeId)(
+      currentUser
+    );
 
-  async verifyDisbursement() {}
+    const txn = createDisbursementInputToTransaction(currentUser)(d);
+
+    return await putTransaction(txnsTableName)(dynamoDB)(txn);
+  }
+
+  @Mutation((returns) => Transaction)
+  async verifyDisbursement(
+    @Arg("committeeId") committeeId: string,
+    @Arg("transactionId") txnId: string,
+    @Arg("verifyDisbursementData") d: VerifyDisbursementInput,
+    @CurrentUser() currentUser: string
+  ) {
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
+      currentUser
+    );
+    //
+    // const res = pipe(
+    //   getTxnById(txnsTableName)(dynamoDB)(committeeId)(txnId),
+    //   taskEither.chain(isNonVerifiedDisbursement),
+    //   taskEither.chain(mergeVerifyDisbursementInputWithTxn),
+    //   taskEither.chain(validateDisbursement),
+    //   taskEither.chain(markAsRuleVerified),
+    //   taskEither.chain(putTransaction(txnsTableName)(dynamoDB))
+    // );
+    //
+    // if (isLeft(res)) {
+    //   throw res.left;
+    // } else {
+    //   return res.right;
+    // }
+  }
 }
