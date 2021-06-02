@@ -29,19 +29,15 @@ else ifeq ($(RUNENV), prod)
 		export DOMAIN   := policapital
 		export TLD      := net
 	endif
-else ifeq ($(RUNENV), backup)
+else ifeq ($(RUNENV), demo)
         export REGION   := us-west-1
-	ifeq ($(PRODUCT), p2)
-		export DOMAIN   := 4us
-		export TLD      := net
-	else
-		export DOMAIN   := policapital
-		export TLD      := net
-	endif
-else # demo
+	export DOMAIN   := 4usdemo
+	export TLD      := com
+	export PRODUCT	:= 4us
+else # backup
         export REGION   := us-east-2
-        export DOMAIN   := 4usdemo
-        export TLD      := com
+        export DOMAIN   := purplepay
+        export TLD      := us
 endif
 
 export CONTRIB_DIR	:= lambdas
@@ -78,7 +74,7 @@ endif
 
 export PACKAGE		:= $(CFN_BUILD_DIR)/CloudFormation-template.yml
 
-CFN_SRC_DIR			:= cfn/templates
+CFN_SRC_DIR		:= cfn/templates
 
 # stacks and templates
 BACKEND_STACK		:= backend
@@ -97,7 +93,12 @@ RECORDER_APP		:= $(RECORDER_DIR)/app.js
 EMAILER_APP		:= $(EMAILER_DIR)/app.js
 
 JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
-CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
+
+ifeq ($(RUNENV), prod)
+	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
+else
+	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
+endif
 
 .PHONY: dep build buildstacks check local import package deploy clean realclean
 
