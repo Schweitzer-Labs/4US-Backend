@@ -22,7 +22,7 @@ buildimports: $(IMPORTED_RESOURCES)
 
 check: $(template)
 	@echo "Validating template"
-	@aws cloudformation validate-template --template-body file://$^
+	#@aws cloudformation validate-template --template-body file://$^
 
 $(template): $(SRCS)
 	@echo $@
