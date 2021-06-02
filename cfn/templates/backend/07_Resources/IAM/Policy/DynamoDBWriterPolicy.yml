@@ -4,8 +4,15 @@ DynamoDBWriterPolicy:
     PolicyDocument:
       Version: '2012-10-17'
       Statement:
-        - Sid: DynamoDBWriter
+        - Sid: WriteTransaction
           Effect: Allow
           Resource:
             - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
-          Action: dynamodb:putItem
+          Action:
+            - dynamodb:putItem
+        - Sid: FetchCommittee
+          Effect: Allow
+          Resource:
+            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Committees}
+          Action:
+            - dynamodb:getItem
