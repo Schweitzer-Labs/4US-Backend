@@ -94,10 +94,12 @@ EMAILER_APP		:= $(EMAILER_DIR)/app.js
 
 JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
 
-ifeq ($(RUNENV), prod)
-	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
-else
+ifeq ($(REGION), us-west-1)
 	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
+else ifeq ($(REGION), us-east-2)
+	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
+else
+	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
 endif
 
 .PHONY: dep build buildstacks check local import package deploy clean realclean
