@@ -3,14 +3,11 @@ DonationGateway:
   Properties:
     Name: !Sub ${AWS::StackName}-donation
     StageName: !Sub ${LambdaRunEnvironment}
-    Cors:
-      AllowMethods: "'POST, GET'"
-      AllowOrigin: "'*'"
-      AllowHeaders: "'Content-Type'"
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub donor-api-${LambdaRunEnvironment}.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
+      DistributionDomainName: !Sub donate-${LambdaRunEnvironment}.${Domain}.${TLD}
       Route53:
         EvaluateTargetHealth: true
         HostedZoneId: !Ref HostedZone
