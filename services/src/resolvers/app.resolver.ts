@@ -16,7 +16,7 @@ import { CreateContributionInput } from "../input-types/create-contribution.inpu
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { pipe } from "fp-ts/function";
 import { runRulesEngine } from "../pipes/rules-engine.pipe";
-import { taskEither } from "fp-ts";
+import { taskEither as te } from "fp-ts";
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
 import { Stripe } from "stripe";
@@ -26,10 +26,16 @@ import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
 import { createDisbursementInputToTransaction } from "../utils/model/create-disbursement-input-to-transaction.utils";
-import { putTransaction } from "../utils/model/put-transaction.utils";
+import {
+  putTransaction,
+  putTransactionAndDecode,
+} from "../utils/model/put-transaction.utils";
 import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 import { ApplicationError } from "../utils/application-error";
+import { isNonVerifiedDisbursement } from "../utils/model/is-non-verified-disbursement.utils";
+import { validateDisbursement } from "../utils/model/validate-disbursement.utils";
+import { validateVerifyDisbursementInput } from "../pipes/validate-verify-disbursement-input.pipe";
 
 dotenv.config();
 
@@ -214,7 +220,7 @@ export class AppResolver {
       runRulesEngine(billableEventsTableName)(donorsTableName)(txnsTableName)(
         rulesTableName
       )(dynamoDB)(instantIdConfig)(committee)(createContributionInput),
-      taskEither.chain(
+      te.chain(
         processContribution(currentUser)(txnsTableName)(dynamoDB)(this.stripe)
       )
     )();
@@ -252,19 +258,14 @@ export class AppResolver {
       currentUser
     );
     //
-    // const res = pipe(
-    //   getTxnById(txnsTableName)(dynamoDB)(committeeId)(txnId),
-    //   taskEither.chain(isNonVerifiedDisbursement),
-    //   taskEither.chain(mergeVerifyDisbursementInputWithTxn),
-    //   taskEither.chain(validateDisbursement),
-    //   taskEither.chain(markAsRuleVerified),
-    //   taskEither.chain(putTransaction(txnsTableName)(dynamoDB))
-    // );
-    //
-    // if (isLeft(res)) {
-    //   throw res.left;
-    // } else {
-    //   return res.right;
-    // }
+    const res = await validateVerifyDisbursementInput(txnsTableName)(dynamoDB)(
+      committeeId
+    )(txnId)(d)();
+
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      return res.right;
+    }
   }
 }
