@@ -1,4 +1,5 @@
 import { IContribution } from "../either-tasks/event-to-contribution";
+import { Source } from "./enums/source.enum";
 
 export const stripCardInfo = ({
   cardCVC,
@@ -14,7 +15,7 @@ export const stripCardInfo = ({
 export interface StrippedContribution {
   firstName?: string;
   lastName?: string;
-  email: string;
+  email?: string;
   occupation?: string;
   employer?: string;
   addressLine1?: string;
@@ -30,4 +31,7 @@ export interface StrippedContribution {
   cardNumberLastFourDigits: string;
   attestsToBeingAdultCitizen?: boolean;
   paymentMethod: string;
+  donorId?: string;
+  ruleCode?: string;
+  source?: Source;
 }

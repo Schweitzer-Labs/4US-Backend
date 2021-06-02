@@ -6,7 +6,7 @@ import { Source } from "../../src/utils/enums/source.enum";
 export const disbursementsData: ITransaction[] = [
   {
     id: genTxnId(),
-    committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
+    committeeId: "pat-miller",
     direction: "out",
     amount: 1000,
     paymentMethod: "ach",
@@ -18,7 +18,7 @@ export const disbursementsData: ITransaction[] = [
   },
   {
     id: genTxnId(),
-    committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
+    committeeId: "pat-miller",
     direction: "out",
     amount: 12000,
     paymentMethod: "ach",
@@ -30,7 +30,7 @@ export const disbursementsData: ITransaction[] = [
   },
   {
     id: genTxnId(),
-    committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
+    committeeId: "pat-miller",
     direction: "out",
     amount: 123000,
     paymentMethod: "ach",
@@ -42,7 +42,7 @@ export const disbursementsData: ITransaction[] = [
   },
   {
     id: genTxnId(),
-    committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
+    committeeId: "pat-miller",
     direction: "out",
     amount: 49000,
     paymentMethod: "ach",
@@ -54,7 +54,7 @@ export const disbursementsData: ITransaction[] = [
   },
   {
     id: genTxnId(),
-    committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
+    committeeId: "pat-miller",
     direction: "out",
     amount: 194000,
     paymentMethod: "ach",
@@ -66,7 +66,7 @@ export const disbursementsData: ITransaction[] = [
   },
   {
     id: genTxnId(),
-    committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
+    committeeId: "pat-miller",
     direction: "out",
     amount: 1500,
     paymentMethod: "ach",

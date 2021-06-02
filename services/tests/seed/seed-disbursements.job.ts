@@ -1,9 +1,13 @@
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { disbursementsData } from "./disbursements.data";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const tableName = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 
 const run = async (dynamoDB: DynamoDB) => {
-  const tableName = "transactions-qa";
   const items = disbursementsData.map((txn) => {
     const marshalledContrib = DynamoDB.Converter.marshall(txn);
     return {

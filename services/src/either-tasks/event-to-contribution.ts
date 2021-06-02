@@ -5,19 +5,19 @@ import { TaskEither, left, right } from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { ApplicationError } from "../utils/application-error";
+import { Source } from "../utils/enums/source.enum";
 
 export interface IContribution {
-  stripeAccount: string;
   amount: number;
-  cardNumber: string;
-  cardExpirationMonth: number;
-  cardExpirationYear: number;
-  cardCVC: string;
+  cardNumber?: string;
+  cardExpirationMonth?: number;
+  cardExpirationYear?: number;
+  cardCVC?: string;
   paymentMethod: string;
   cardNumberLastFourDigits?: string;
   firstName?: string;
   lastName?: string;
-  email: string;
+  email?: string;
   occupation?: string;
   employer?: string;
   addressLine1?: string;
@@ -29,6 +29,9 @@ export interface IContribution {
   refCode?: string;
   committee?: string;
   entityType?: string;
+  donorId?: string;
+  ruleCode?: string;
+  source?: Source;
 }
 
 const contribSchema = Joi.object({

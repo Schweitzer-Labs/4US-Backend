@@ -3,7 +3,6 @@ import { StatusCodes } from "http-status-codes";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { stripCardInfo, StrippedContribution } from "../utils/strip-card-info";
 import { ApplicationError } from "../utils/application-error";
-import { IContribution } from "./event-to-contribution";
 import { ICommitteeContribution } from "./contribution-to-committee-contribution";
 
 export interface Payment extends StrippedContribution {
@@ -15,7 +14,6 @@ export const processPaymentFromCommitteeContribution =
   async (committeeContribution: ICommitteeContribution): Promise<Payment> => {
     const { contribution, committee } = committeeContribution;
     const {
-      stripeAccount,
       amount,
       cardNumber,
       cardExpirationMonth,

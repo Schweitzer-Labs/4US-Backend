@@ -1,7 +1,26 @@
-import { Field, InputType } from "type-graphql";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
-import { EntityType } from "../utils/enums/entity-type.enum";
+import { Field, InputType, registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
+
+enum EntityType {
+  CAN = "can",
+  FAM = "fam",
+  IND = "ind",
+  SOLEP = "solep",
+  PART = "part",
+  CORP = "corp",
+  COMM = "comm",
+  UNION = "union",
+  ASSOC = "assoc",
+  LLC = "llc",
+  PAC = "pac",
+  PLC = "plc",
+  OTH = "oth",
+}
+
+registerEnumType(EntityType, {
+  name: "Entity Type", // this one is mandatory
+  description: "Type of entity involved in the transaction", // this one is optional
+});
 
 @InputType()
 export class CreateContributionInput implements Partial<ITransaction> {
@@ -14,8 +33,8 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @Field()
   paymentMethod: string;
 
-  @Field()
-  emailAddress: string;
+  @Field({ nullable: true })
+  emailAddress?: string;
 
   @Field()
   firstName: string;
@@ -36,7 +55,7 @@ export class CreateContributionInput implements Partial<ITransaction> {
   postalCode: string;
 
   @Field()
-  entityType: string;
+  entityType: EntityType;
 
   @Field({ nullable: true })
   paymentDate?: number;

@@ -1,17 +1,16 @@
-Contributions:
+Rules:
   Type: AWS::DynamoDB::Table
   Properties:
     SSESpecification:
       SSEEnabled: true
     ProvisionedThroughput:
-      WriteCapacityUnits: 5
-      ReadCapacityUnits: 5
+      WriteCapacityUnits: 1
+      ReadCapacityUnits: 1
     AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: code
         AttributeType: S
     KeySchema:
       - KeyType: HASH
-        AttributeName: id
+        AttributeName: code
     StreamSpecification:
       StreamViewType: NEW_IMAGE
-

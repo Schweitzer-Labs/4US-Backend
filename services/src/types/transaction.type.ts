@@ -78,4 +78,6 @@ export class Transaction implements ITransaction {
   stripePaymentIntentId?: string;
   @Field({ nullable: true })
   cardNumberLastFourDigits?: string;
+  @Field({ nullable: true })
+  donorId?: string;
 }

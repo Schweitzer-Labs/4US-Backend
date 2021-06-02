@@ -7,6 +7,5 @@ DynamoDBWriterPolicy:
         - Sid: DynamoDBWriter
           Effect: Allow
           Resource:
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Contributions}
             - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
           Action: dynamodb:putItem

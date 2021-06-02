@@ -5,6 +5,8 @@ import {
 } from "../../queries/get-committee-by-id.query";
 import { isLeft } from "fp-ts/Either";
 import { UnauthorizedError } from "type-graphql";
+import { ApplicationError } from "../application-error";
+import { StatusCodes } from "http-status-codes";
 
 export const loadCommitteeOrThrow =
   (committeeTableName: string) =>
@@ -15,7 +17,11 @@ export const loadCommitteeOrThrow =
       dynamoDB
     )(committeeId)();
     if (isLeft(eitherCommittees)) {
-      throw eitherCommittees.left;
+      throw new ApplicationError(
+        "Committee look up failed",
+        {},
+        StatusCodes.NOT_FOUND
+      );
     }
     const committee = eitherCommittees.right;
     if (!committee.members.includes(currentUser)) {

@@ -66,7 +66,7 @@ export const insertContributionEvent = {
             "S": "home-page"
           },
           "initiatedTimestamp": {
-            "S": "1621795836019"
+            "N": 1621795836019
           },
           "cardNumberLastFourDigits": {
             "S": "1232"

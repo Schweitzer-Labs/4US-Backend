@@ -20,13 +20,30 @@ import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Direction } from "../utils/enums/direction.enum";
 import { now } from "../utils/time.utils";
 import { Source } from "../utils/enums/source.enum";
-import { stripCardInfo } from "../utils/strip-card-info";
+import { pipe } from "fp-ts/function";
+import { runRulesEngine } from "../pipes/rules-engine.pipe";
+import { task, taskEither } from "fp-ts";
+import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { Env } from "../utils/enums/env.enum";
+import { getStripeApiKey } from "../utils/config";
+import { Stripe } from "stripe";
+import { processContribution } from "../pipes/process-contribution.pipe";
+import { ApplicationError } from "../utils/application-error";
 
 dotenv.config();
 
 const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const donorsTableName: any = process.env.DONORS_DDB_TABLE_NAME;
+const rulesTableName: any = process.env.RULES_DDB_TABLE_NAME;
+const runenv: any = process.env.RUNENV;
+
+// @ToDO load config from env when prod creds are provided by Lexis Nexis.
+const instantIdConfig: IInstantIdConfig = {
+  env: Env.Dev,
+  username: "fake_name",
+  password: "fake_password",
+};
 
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
@@ -37,6 +54,8 @@ const dynamoDB = new DynamoDB();
 @Service()
 @Resolver()
 export class AppResolver {
+  private stripeApiKey: string;
+  private stripe: Stripe;
   @Query((returns) => Committee)
   async committee(
     @Arg("committeeId") committeeId: string,
@@ -52,9 +71,7 @@ export class AppResolver {
     @Args() transactionArgs: TransactionsArg,
     @CurrentUser() currentUser: string
   ): Promise<Transaction[]> {
-    console.log("the table name");
-    console.log(txnsTableName);
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
       transactionArgs.committeeId
     )(currentUser);
 
@@ -115,6 +132,7 @@ export class AppResolver {
       if (txn.transactionType === TransactionType.DISBURSEMENT) {
         if (txn.bankVerified) {
           acc.totalSpent = acc.totalSpent + txn.amount;
+          acc.balance = acc.balance - txn.amount;
         } else {
           acc.totalDisbursementsInProcessing =
             acc.totalDisbursementsInProcessing + txn.amount;
@@ -135,26 +153,35 @@ export class AppResolver {
   @Mutation((returns) => Transaction)
   async createContribution(
     @Arg("createContributionData")
-    createContributionData: CreateContributionInput,
+    createContributionInput: CreateContributionInput,
     @CurrentUser() currentUser: string
   ): Promise<Transaction> {
-    const { committeeId } = createContributionData;
+    if (!this.stripeApiKey || !this.stripe) {
+      this.stripeApiKey = await getStripeApiKey(runenv);
+      this.stripe = new Stripe(this.stripeApiKey, {
+        apiVersion: "2020-08-27",
+      });
+    }
+
+    const { committeeId } = createContributionInput;
     const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
       committeeId
     )(currentUser);
 
-    const txn: ITransaction = {
-      // required field
-      id: genTxnId(),
-      direction: Direction.IN,
-      bankVerified: false,
-      ruleVerified: false,
-      initiatedTimestamp: now(),
-      source: Source.DASHBOARD,
-      ...createContributionData,
-    };
+    const res = await pipe(
+      runRulesEngine(donorsTableName)(txnsTableName)(rulesTableName)(dynamoDB)(
+        instantIdConfig
+      )(committee)(createContributionInput),
+      taskEither.chain(
+        processContribution(txnsTableName)(dynamoDB)(this.stripe)
+      )
+    )();
 
-    return await putTransaction(txnsTableName)(dynamoDB)(txn);
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      return res.right;
+    }
   }
 
   async createDisbursement() {}

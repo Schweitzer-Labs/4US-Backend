@@ -12,6 +12,7 @@ import {
 } from "../repositories/ddb.utils";
 import { ITransaction, Transactions } from "./search-transactions.decoder";
 import { TransactionsArg } from "../args/transactions.arg";
+import { Order } from "../utils/enums/order.enum";
 
 const getTransactionsRes =
   (txnsTableName: string) =>
@@ -21,12 +22,20 @@ const getTransactionsRes =
     transactionType,
     bankVerified,
     ruleVerified,
+    order = Order.DESC,
+    donorId,
+    entityType,
   }: TransactionsArg) =>
-  async (): Promise<any> => {
+  async (): Promise<object[]> => {
+    const byDonorIndex = donorId
+      ? { IndexName: "TransactionsByCommitteeDonorIndex" }
+      : {};
+
     const filterExpressionString = [
       ...toFilterExpression("transactionType", transactionType),
       ...toFilterExpression("bankVerified", bankVerified),
       ...toFilterExpression("ruleVerified", ruleVerified),
+      ...toFilterExpression("entityType", entityType),
     ].join(" AND ");
 
     const FilterExpression =
@@ -34,22 +43,26 @@ const getTransactionsRes =
         ? {}
         : { FilterExpression: filterExpressionString };
 
-    const res = await dynamoDB
-      .query({
-        TableName: txnsTableName,
-        KeyConditionExpression: "committeeId = :committeeId",
-        ...FilterExpression,
-        ExpressionAttributeValues: {
-          ":committeeId": { S: committeeId },
-          ...toExpressionAttributeValueString(
-            "transactionType",
-            transactionType
-          ),
-          ...toExpressionAttributeValueBool("bankVerified", bankVerified),
-          ...toExpressionAttributeValueBool("ruleVerified", ruleVerified),
-        },
-      })
-      .promise();
+    const keyConditionExpress = donorId
+      ? "committeeId = :committeeId AND donorId = :donorId"
+      : "committeeId = :committeeId";
+    const query = {
+      TableName: txnsTableName,
+      ...byDonorIndex,
+      KeyConditionExpression: keyConditionExpress,
+      ...FilterExpression,
+      ScanIndexForward: order === Order.ASC,
+      ExpressionAttributeValues: {
+        ":committeeId": { S: committeeId },
+        ...toExpressionAttributeValueString("transactionType", transactionType),
+        ...toExpressionAttributeValueString("donorId", donorId),
+        ...toExpressionAttributeValueBool("bankVerified", bankVerified),
+        ...toExpressionAttributeValueBool("ruleVerified", ruleVerified),
+        ...toExpressionAttributeValueString("entityType", entityType),
+      },
+    };
+
+    const res = await dynamoDB.query(query).promise();
     return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
   };
 

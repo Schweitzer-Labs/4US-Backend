@@ -2,6 +2,7 @@ import * as t from "io-ts";
 import { left, right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { isLeft } from "fp-ts/Either";
+import { PathReporter } from "io-ts/PathReporter";
 
 export const ddbString = t.type({
   S: t.string,
@@ -24,7 +25,12 @@ export const validateDDBResponse =
   (res: any): TaskEither<ApplicationError, T> => {
     const eitherRes = type.decode(res);
     if (isLeft(eitherRes)) {
-      return left(new ApplicationError("Invalid ddb response", {}));
+      return left(
+        new ApplicationError(
+          "Invalid ddb response",
+          PathReporter.report(eitherRes)
+        )
+      );
     } else {
       return right(eitherRes.right);
     }
