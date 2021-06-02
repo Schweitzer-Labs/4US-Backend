@@ -21,7 +21,7 @@ export const contributionToCommitteeContribution =
     contribution: IContribution
   ): TaskEither<ApplicationError, ICommitteeContribution> => {
     return pipe(
-      getCommitteeById(committeeTableName)(dynamoDB)(contribution.committee),
+      getCommitteeById(committeeTableName)(dynamoDB)(contribution.committeeId),
       taskEither.chain(committeeToCommitteeContribution(contribution))
     );
   };

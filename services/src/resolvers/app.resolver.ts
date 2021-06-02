@@ -4,8 +4,8 @@ import { Committee } from "../types/committee.type";
 import { Transaction } from "../types/transaction.type";
 import { Aggregations } from "../types/aggregations.type";
 import { Service } from "typedi";
-import { DynamoDB } from "aws-sdk";
 import * as AWS from "aws-sdk";
+import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { searchTransactions } from "../queries/search-transactions.query";
 import { TransactionsArg } from "../args/transactions.arg";
@@ -13,37 +13,27 @@ import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "../input-types/create-contribution.input-type";
-import { putTransaction } from "../utils/model/put-transaction.utils";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { ITransaction } from "../queries/search-transactions.decoder";
-import { genTxnId } from "../utils/gen-txn-id.utils";
-import { Direction } from "../utils/enums/direction.enum";
-import { now } from "../utils/time.utils";
-import { Source } from "../utils/enums/source.enum";
 import { pipe } from "fp-ts/function";
 import { runRulesEngine } from "../pipes/rules-engine.pipe";
-import { task, taskEither } from "fp-ts";
+import { taskEither } from "fp-ts";
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { Env } from "../utils/enums/env.enum";
-import { getStripeApiKey } from "../utils/config";
+import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
 import { Stripe } from "stripe";
 import { processContribution } from "../pipes/process-contribution.pipe";
-import { ApplicationError } from "../utils/application-error";
+import { EntityType } from "../utils/enums/entity-type.enum";
+import { ValidationError } from "apollo-server-lambda";
+import { PaymentMethod } from "../utils/enums/payment-method.enum";
 
 dotenv.config();
 
+const billableEventsTableName: any = process.env.BILLABLE_EVENTS_DDB_TABLE_NAME;
 const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const donorsTableName: any = process.env.DONORS_DDB_TABLE_NAME;
 const rulesTableName: any = process.env.RULES_DDB_TABLE_NAME;
 const runenv: any = process.env.RUNENV;
-
-// @ToDO load config from env when prod creds are provided by Lexis Nexis.
-const instantIdConfig: IInstantIdConfig = {
-  env: Env.Dev,
-  username: "fake_name",
-  password: "fake_password",
-};
 
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
@@ -56,6 +46,8 @@ const dynamoDB = new DynamoDB();
 export class AppResolver {
   private stripeApiKey: string;
   private stripe: Stripe;
+  private lnUsername: string;
+  private lnPassword: string;
   @Query((returns) => Committee)
   async committee(
     @Arg("committeeId") committeeId: string,
@@ -156,30 +148,68 @@ export class AppResolver {
     createContributionInput: CreateContributionInput,
     @CurrentUser() currentUser: string
   ): Promise<Transaction> {
-    if (!this.stripeApiKey || !this.stripe) {
+    if (
+      !this.stripeApiKey ||
+      !this.stripe ||
+      !this.lnUsername ||
+      !this.lnPassword
+    ) {
       this.stripeApiKey = await getStripeApiKey(runenv);
+      this.lnUsername = await getLNUsername(runenv);
+      this.lnPassword = await getLNPassword(runenv);
       this.stripe = new Stripe(this.stripeApiKey, {
         apiVersion: "2020-08-27",
       });
     }
+    const instantIdConfig: IInstantIdConfig = {
+      username: this.lnUsername,
+      password: this.lnPassword,
+    };
 
-    const { committeeId } = createContributionInput;
     const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      committeeId
+      createContributionInput.committeeId
     )(currentUser);
 
+    const {
+      paymentMethod,
+      entityType,
+      entityName,
+      cardCVC,
+      cardNumber,
+      cardExpirationMonth,
+      cardExpirationYear,
+    } = createContributionInput;
+
+    if (![EntityType.IND, EntityType.FAM].includes(entityType) && !entityName) {
+      throw new ValidationError(
+        "Entity name must be provided for non-individual and non-family contributions"
+      );
+    }
+    if ([PaymentMethod.Credit, PaymentMethod.Debit].includes(paymentMethod)) {
+      if (
+        !cardCVC ||
+        !cardNumber ||
+        !cardExpirationMonth ||
+        !cardExpirationYear
+      )
+        throw new ValidationError(
+          "Card info must be provided for contributions in credit and debit"
+        );
+    }
+
     const res = await pipe(
-      runRulesEngine(donorsTableName)(txnsTableName)(rulesTableName)(dynamoDB)(
-        instantIdConfig
-      )(committee)(createContributionInput),
+      runRulesEngine(billableEventsTableName)(donorsTableName)(txnsTableName)(
+        rulesTableName
+      )(dynamoDB)(instantIdConfig)(committee)(createContributionInput),
       taskEither.chain(
-        processContribution(txnsTableName)(dynamoDB)(this.stripe)
+        processContribution(currentUser)(txnsTableName)(dynamoDB)(this.stripe)
       )
     )();
 
     if (isLeft(res)) {
       throw res.left;
     } else {
+      console.log("right res", res.right);
       return res.right;
     }
   }

@@ -14,15 +14,17 @@ import { EntityType } from "../../src/utils/enums/entity-type.enum";
 
 dotenv.config();
 
+const billableEventsTableName = process.env.BILLABLE_EVENTS_DDB_TABLE_NAME;
 const donorsTable = process.env.DONORS_DDB_TABLE_NAME;
 const txnsTable = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const rulesTable = process.env.RULES_DDB_TABLE_NAME;
 const comsTable = process.env.COMMITTEES_DDB_TABLE_NAME;
+const lnUsername = process.env.LN_USERNAME;
+const lnPassword = process.env.LN_PASSWORD;
 
 const instantIdConfig: IInstantIdConfig = {
-  env: Env.Dev,
-  username: "fake_name",
-  password: "fake_password",
+  username: lnUsername,
+  password: lnPassword,
 };
 
 AWS.config.apiVersions = {
@@ -54,9 +56,9 @@ describe("Rules engine", function () {
     );
 
     const res = await pipe(
-      runRulesEngine(donorsTable)(txnsTable)(rulesTable)(dynamoDB)(
-        instantIdConfig
-      )(committee)(contrib),
+      runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
+        rulesTable
+      )(dynamoDB)(instantIdConfig)(committee)(contrib),
       taskEither.fold(
         (e) => task.of(e.data.remaining),
         (s) => task.of("worked")
@@ -76,13 +78,12 @@ describe("Rules engine", function () {
     );
 
     const res = await pipe(
-      runRulesEngine(donorsTable)(txnsTable)(rulesTable)(dynamoDB)(
-        instantIdConfig
-      )(committee)(contrib),
+      runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
+        rulesTable
+      )(dynamoDB)(instantIdConfig)(committee)(contrib),
       taskEither.fold(
         (e) => task.of(e.data.remaining),
         (res) => {
-          console.log(res);
           return task.of(res.balance);
         }
       )

@@ -26,7 +26,7 @@ export interface StrippedContribution {
   phoneNumber?: string;
   amount: number;
   refCode?: string;
-  committee?: string;
+  committeeId: string;
   entityType?: string;
   cardNumberLastFourDigits: string;
   attestsToBeingAdultCitizen?: boolean;
