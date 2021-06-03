@@ -1,7 +1,14 @@
-DonationGatewayId:
+DonorGatewayId:
   Type: AWS::SSM::Parameter
   Properties:
-    Name: !Sub /${LambdaRunEnvironment}/${Product}/apigateway
+    Name: !Sub /${LambdaRunEnvironment}/${Product}/api/donor
     Type: String
-    Description: SSM Parameter to store the ID for Policapital API Gateway
-    Value: !Ref DonationGateway
+    Description: SSM Parameter to store the ID for the Donor API Gateway
+    Value: !Ref DonorGateway
+CommitteeGatewayId:
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/${Product}/api/committee
+    Type: String
+    Description: SSM Parameter to store the ID for the Committee API Gaeway
+    Value: !Ref CommitteeGateway
