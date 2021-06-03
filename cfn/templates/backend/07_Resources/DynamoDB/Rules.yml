@@ -1,8 +1,11 @@
 Rules:
   Type: AWS::DynamoDB::Table
+  DeletionPolicy: Retain
   Properties:
     SSESpecification:
       SSEEnabled: true
+    PointInTimeRecoverySpecification:
+      PointInTimeRecoveryEnabled: true
     ProvisionedThroughput:
       WriteCapacityUnits: 1
       ReadCapacityUnits: 1
