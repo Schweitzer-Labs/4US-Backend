@@ -15,7 +15,7 @@ PolicapitalOnboardFunction:
         Properties:
           Path: /api/onboard
           Method: get
-          RestApiId: !Ref DonationGateway
+          RestApiId: !Ref DonorGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

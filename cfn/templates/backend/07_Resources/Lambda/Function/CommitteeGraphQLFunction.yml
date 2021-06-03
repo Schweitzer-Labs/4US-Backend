@@ -13,7 +13,7 @@ CommitteeGraphQLFunction:
       GraphQLAny:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
-          Path: /api/graphql
+          Path: /api/committee/graphql
           Method: ANY
           RestApiId: !Ref CommitteeGateway
     Environment:

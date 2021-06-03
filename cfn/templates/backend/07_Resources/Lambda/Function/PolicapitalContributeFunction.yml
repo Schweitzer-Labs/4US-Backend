@@ -13,9 +13,9 @@ PolicapitalContributeFunction:
       PolicapitalContribute:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
-          Path: /api/contribute
+          Path: /api/donor/contribute
           Method: post
-          RestApiId: !Ref DonationGateway
+          RestApiId: !Ref DonorGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
