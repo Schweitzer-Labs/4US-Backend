@@ -1,24 +1,24 @@
-DonationGateway4xxErrorTopic:
+Gateway5xxErrorTopic:
   Type: AWS::SNS::Topic
   Properties:
-    DisplayName: !Sub Gateway4xxError-${Domain}-${LambdaRunEnvironment}
-    TopicName: !Sub Gateway-Errors-4xx-${Domain}-${LambdaRunEnvironment}
+    DisplayName: !Sub Gateway5xxError-${Domain}-${LambdaRunEnvironment}
+    TopicName: !Sub Gateway-Errors-5xx-${Domain}-${LambdaRunEnvironment}
     KmsMasterKeyId: !Ref SNSKey
     Subscription:
       - Endpoint: !Ref AdminEmail
         Protocol: email
 
-DonationGateway4xxErrorAlarm:
+Gateway5xxErrorAlarm:
   Type: AWS::CloudWatch::Alarm
   Properties:
-    AlarmName: DonationGateway4xxErrors
-    AlarmDescription: !Sub Alarms when the ${Domain} Donation gateway returns a 4xx error.
+    AlarmName: Gateway5xxErrors
+    AlarmDescription: !Sub Alarms when the ${Domain} gateways return 5xx errors
     Dimensions:
       - Name: ApiName
         Value: !Sub ${Domain}-backend-${LambdaRunEnvironment}
     AlarmActions:
-      - !Ref DonationGateway4xxErrorTopic
-    MetricName: 4XXError
+      - !Ref Gateway5xxErrorTopic
+    MetricName: 5XXError
     Namespace: AWS/ApiGateway
     ComparisonOperator: GreaterThanOrEqualToThreshold
     EvaluationPeriods: 1
