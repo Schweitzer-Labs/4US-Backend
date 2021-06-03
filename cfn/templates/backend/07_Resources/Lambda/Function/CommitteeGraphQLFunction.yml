@@ -23,3 +23,4 @@ CommitteeGraphQLFunction:
         COMMITTEES_DDB_TABLE_NAME: !Ref Committees
         DONORS_DDB_TABLE_NAME: !Ref Donors
         RULES_DDB_TABLE_NAME: !Ref Rules
+        BILLABLE_EVENTS_DDB_TABLE_NAME: !Ref BillableEvents
