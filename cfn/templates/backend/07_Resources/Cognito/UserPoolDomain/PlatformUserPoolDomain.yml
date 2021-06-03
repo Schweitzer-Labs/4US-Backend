@@ -1,0 +1,6 @@
+PlatformUserPoolDomain:
+  Type: AWS::Cognito::UserPoolDomain
+  Properties:
+    Domain: platform-user
+    UserPoolId: !Ref PlatformUserPool
+

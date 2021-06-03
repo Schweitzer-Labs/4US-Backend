@@ -1,0 +1,10 @@
+UserPoolUserSeemant:
+  Type: AWS::Cognito::UserPoolUser
+  Properties:
+    Username: seemant@schweitzerlabs.com
+    UserPoolId: !Ref PlatformUserPool
+    UserAttributes:
+      - Name: email_verified
+        Value: 'true'
+      - Name: email
+        Value: seemant@schweitzerlabs.com

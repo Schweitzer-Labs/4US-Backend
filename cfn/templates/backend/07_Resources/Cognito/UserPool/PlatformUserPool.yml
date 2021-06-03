@@ -1,4 +1,4 @@
-PlatformUserCognitoUserPool:
+PlatformUserPool:
   Type: AWS::Cognito::UserPool
   Properties:
     Policies:

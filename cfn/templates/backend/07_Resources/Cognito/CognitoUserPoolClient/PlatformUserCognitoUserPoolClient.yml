@@ -1,5 +1,0 @@
-PlatformUserCognitoUserPoolClient:
-  Type: AWS::Cognito::UserPoolClient
-  Properties:
-    UserPoolId: !Ref PlatformUserCognitoUserPool
-    GenerateSecret: false
