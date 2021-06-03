@@ -3,6 +3,8 @@ Transactions:
   Properties:
     SSESpecification:
       SSEEnabled: true
+    PointInTimeRecoverySpecification:
+      PointInTimeRecoveryEnabled: true
     ProvisionedThroughput:
       WriteCapacityUnits: 3
       ReadCapacityUnits: 3

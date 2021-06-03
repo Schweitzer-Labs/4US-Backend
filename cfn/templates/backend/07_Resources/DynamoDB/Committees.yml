@@ -3,6 +3,8 @@ Committees:
   Properties:
     SSESpecification:
       SSEEnabled: true
+    PointInTimeRecoverySpecification:
+      PointInTimeRecoveryEnabled: true
     ProvisionedThroughput:
       WriteCapacityUnits: 5
       ReadCapacityUnits: 5

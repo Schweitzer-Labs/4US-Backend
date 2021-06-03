@@ -3,6 +3,8 @@ Donors:
   Properties:
     SSESpecification:
       SSEEnabled: true
+    PointInTimeRecoverySpecification:
+      PointInTimeRecoveryEnabled: true
     ProvisionedThroughput:
       WriteCapacityUnits: 1
       ReadCapacityUnits: 1
