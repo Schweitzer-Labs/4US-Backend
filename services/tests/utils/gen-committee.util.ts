@@ -1,6 +1,7 @@
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import * as faker from "faker";
+import { Plan } from "../../src/utils/enums/plan.enum";
 
 interface IGenCommitteeConfig {
   state?: string;
@@ -46,8 +47,8 @@ export const genCommittee = ({
     district,
     county,
     ruleVersion,
-    tzDatabaseName,
+    tzDatabaseName: tzDatabaseName || "America/New_York",
     emailAddresses: emailAddresses || "evan@schweitzerlabs.com",
-    plan,
+    plan: plan || Plan.FOURUS,
   };
 };

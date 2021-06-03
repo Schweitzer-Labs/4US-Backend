@@ -9,8 +9,6 @@ dotenv.config();
 
 const committeesTableName = process.env.COMMITTEES_DDB_TABLE_NAME;
 
-console.log(committeesTableName)
-
 const run =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>

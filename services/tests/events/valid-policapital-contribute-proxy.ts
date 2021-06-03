@@ -1,5 +1,5 @@
-export const validPolicapitalContributeProxy = {
-  body: '{"email":"evan@schweitzerlabs.com","phoneNumber":"5555555555","firstName":"May","lastName":"Monthman","employer":"General Mills","occupation":"President","addressLine1":"123 Cleveland Park","addressLine2":"","city":"Ridgewood","state":"ny","postalCode":"11385","amount":19335,"cardNumber":"4242424242424242","cardExpirationMonth":12,"cardExpirationYear":2023,"cardCVC":"123","paymentMethod":"credit","entityType":"ind","companyName":"","refCode":"","attestsToBeingAdultCitizen":true,"committee":"angel-cruz"}',
+export const validPolicapitalContributeProxy = (committeeId: string) => ({
+  body: `{"email":"evan@schweitzerlabs.com","phoneNumber":"5555555555","firstName":"May","lastName":"Monthman","employer":"General Mills","occupation":"President","addressLine1":"123 Cleveland Park","addressLine2":"","city":"Ridgewood","state":"ny","postalCode":"11385","amount":19335,"cardNumber":"4242424242424242","cardExpirationMonth":12,"cardExpirationYear":2023,"cardCVC":"123","paymentMethod":"credit","entityType":"ind","companyName":"","refCode":"","attestsToBeingAdultCitizen":true,"committeeId":"${committeeId}", "committee":"${committeeId}"}`,
   resource: "/{proxy+}",
   path: "/path/to/resource",
   httpMethod: "POST",
@@ -85,4 +85,4 @@ export const validPolicapitalContributeProxy = {
     apiId: "1234567890",
     protocol: "HTTP/1.1",
   },
-};
+});

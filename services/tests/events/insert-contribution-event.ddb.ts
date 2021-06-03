@@ -1,4 +1,4 @@
-export const insertContributionEvent = {
+export const insertContributionEvent = (committeeId: string) => ({
   "Records": [
     {
       "eventID": "9e5cb72b65445a16093ca586467e3794",
@@ -10,7 +10,7 @@ export const insertContributionEvent = {
         "ApproximateCreationDateTime": 1621795836,
         "Keys": {
           "committeeId": {
-            "S": "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4"
+            "S": committeeId
           },
           "id": {
             "S": "1621795836019-zjnlfa"
@@ -30,7 +30,7 @@ export const insertContributionEvent = {
             "S": "ind"
           },
           "committeeId": {
-            "S": "pat-miller"
+            "S": committeeId
           },
           "postalCode": {
             "S": "11377"
@@ -76,6 +76,9 @@ export const insertContributionEvent = {
           },
           "direction": {
             "S": "in"
+          },
+          "tzDatabaseName": {
+            "S": "America/New_York"
           }
         },
         "SequenceNumber": "23283700000000006358742399",
@@ -85,5 +88,5 @@ export const insertContributionEvent = {
       "eventSourceARN": "arn:aws:dynamodb:us-east-1:396408709989:table/transactions-dev/stream/2021-05-23T17:53:12.489"
     }
   ]
-}
+})
 

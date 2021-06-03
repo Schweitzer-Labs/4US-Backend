@@ -14,6 +14,8 @@ const CommitteeRequired = t.type({
   candidateLastName: t.string,
   stripeAccount: t.string,
   members: t.array(t.string),
+  tzDatabaseName: t.string,
+  plan: t.string,
 });
 
 const CommitteeOptional = t.partial({
@@ -30,8 +32,6 @@ const CommitteeOptional = t.partial({
   finicityCustomerId: t.string,
   chainId: t.string,
   emailAddresses: t.string,
-  tzDatabaseName: t.string,
-  plan: t.string,
 });
 
 export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);

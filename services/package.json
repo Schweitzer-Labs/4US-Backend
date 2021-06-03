@@ -10,6 +10,7 @@
     "apollo-server": "^2.24.0",
     "apollo-server-lambda": "^2.24.0",
     "axios": "^0.21.1",
+    "blockapps-rest": "^7.6.6",
     "class-validator": "^0.13.1",
     "dotenv": "^8.2.0",
     "fp-ts": "^2.10.5",
