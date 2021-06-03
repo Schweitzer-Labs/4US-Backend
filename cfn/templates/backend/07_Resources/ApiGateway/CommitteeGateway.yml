@@ -18,4 +18,4 @@ CommitteeGateway:
       DefaultAuthorizer: PlatformUserCognitoAuthorizer
       Authorizers:
         PlatformUserCognitoAuthorizer:
-          UserPoolArn: !GetAtt PlatformUserCognitoUserPool.Arn
+          UserPoolArn: !GetAtt PlatformUserPool.Arn

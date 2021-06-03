@@ -1,4 +1,4 @@
-DonationGateway:
+DonorGateway:
   Type: AWS::Serverless::Api
   Properties:
     Name: !Sub ${AWS::StackName}-donation
