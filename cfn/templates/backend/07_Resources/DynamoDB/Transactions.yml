@@ -1,5 +1,6 @@
 Transactions:
   Type: AWS::DynamoDB::Table
+  DeletionPolicy: Retain
   Properties:
     SSESpecification:
       SSEEnabled: true
