@@ -2,7 +2,7 @@ ContributorReceiptEmail:
   Type: AWS::SES::Template
   Properties:
     Template:
-      TemplateName: !Sub ContributorReceipt-${LambdaRunEnvironment}
+      TemplateName: !Sub ContributorReceipt-${Product}-${LambdaRunEnvironment}
       SubjectPart: Thank you for your contribution
       TextPart: {% raw %}|
         This is a receipt for your ${{amount}} contribution made at {{timestamp}}
