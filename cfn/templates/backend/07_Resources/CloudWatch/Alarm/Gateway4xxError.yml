@@ -11,7 +11,7 @@ Gateway4xxErrorTopic:
 Gateway4xxErrorAlarm:
   Type: AWS::CloudWatch::Alarm
   Properties:
-    AlarmName: Gateway4xxErrors
+    AlarmName: !Sub Gateway4xxErrors-${Product}-${LambdaRunEnvironment}
     AlarmDescription: !Sub Alarms when the ${Domain} API gateways return 4xx errors
     Dimensions:
       - Name: ApiName
