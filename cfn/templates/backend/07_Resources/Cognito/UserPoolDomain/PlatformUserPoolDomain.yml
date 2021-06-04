@@ -1,6 +1,6 @@
 PlatformUserPoolDomain:
   Type: AWS::Cognito::UserPoolDomain
   Properties:
-    Domain: platform-user
+    Domain: !Sub platform-user-${Product}-${LambdaRunEnvironment}
     UserPoolId: !Ref PlatformUserPool
 
