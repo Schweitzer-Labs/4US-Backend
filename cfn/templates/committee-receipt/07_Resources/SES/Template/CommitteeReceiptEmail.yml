@@ -2,7 +2,7 @@ CommitteeReceiptEmail:
   Type: AWS::SES::Template
   Properties:
     Template:
-      TemplateName: !Sub CommitteeReceipt-${LambdaRunEnvironment}
+      TemplateName: !Sub CommitteeReceipt-${Product}-${LambdaRunEnvironment}
       SubjectPart: New Contribution Received
       TextPart: {% raw %}|
         You've received a new contribution!

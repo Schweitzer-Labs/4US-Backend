@@ -11,7 +11,7 @@ Gateway5xxErrorTopic:
 Gateway5xxErrorAlarm:
   Type: AWS::CloudWatch::Alarm
   Properties:
-    AlarmName: Gateway5xxErrors
+    AlarmName: !Sub Gateway5xxErrors-${Product}-${LambdaRunEnvironment}
     AlarmDescription: !Sub Alarms when the ${Domain} gateways return 5xx errors
     Dimensions:
       - Name: ApiName

@@ -6,4 +6,5 @@ CommitteeReceiptTemplate:
     TimeoutInMinutes: 60
     Parameters:
       LambdaRunEnvironment: !Ref LambdaRunEnvironment
+      Product: !Ref Product
 {% endif %}
