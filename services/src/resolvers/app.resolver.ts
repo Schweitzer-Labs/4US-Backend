@@ -57,9 +57,14 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ) {
-    return await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+    console.log("from committee resolver");
+    const res = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
       committeeId
     )(currentUser);
+
+    console.log("committee response", res);
+
+    return res;
   }
 
   @Query((returns) => [Transaction])
@@ -86,6 +91,16 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ): Promise<Aggregations> {
+    console.log("aggregation", committeeId, currentUser);
+    console.log([
+      billableEventsTableName,
+      txnsTableName,
+      committeesTableName,
+      donorsTableName,
+      rulesTableName,
+      runenv,
+    ]);
+
     await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
       currentUser
     );

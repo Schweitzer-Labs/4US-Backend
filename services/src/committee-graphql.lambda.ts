@@ -13,6 +13,7 @@ const server = new ApolloServer({
   schema,
   introspection: true,
   context: ({ event }, context) => {
+    console.log("graphql event", JSON.stringify(event));
     const currentUser =
       event?.requestContext?.authorizer?.claims["cognito:username"];
     return {
@@ -21,9 +22,4 @@ const server = new ApolloServer({
   },
 });
 
-export default server.createHandler({
-  cors: {
-    origin: "http://localhost:3000",
-    credentials: true,
-  },
-});
+export default server.createHandler();

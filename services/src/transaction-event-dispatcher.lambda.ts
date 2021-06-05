@@ -29,8 +29,6 @@ const dynamoDB = new DynamoDB();
 const sqsUrl: any = process.env.SQSQUEUE;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 
-console.log("comtab", committeesTableName);
-
 export default async (
   event: DynamoDBStreamEvent,
   context
@@ -50,7 +48,6 @@ export default async (
     switch (stream.eventName) {
       case "INSERT":
         console.log("INSERT event emitted");
-        console.log("comtab", committeesTableName);
         return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
           eitherTxn.right
         );

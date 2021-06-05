@@ -4,12 +4,12 @@ import graphql from "../../src/committee-graphql.lambda";
 import { genGraphQLProxy } from "../utils/gen-allowed-proxy.util";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { genContributionRecord } from "../utils/gen-contribution.util";
-import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { sleep } from "../../src/utils/sleep.utils";
 import { genCommittee } from "../utils/gen-committee.util";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import * as dotenv from "dotenv";
 
 dotenv.config();
 
@@ -18,8 +18,8 @@ AWS.config.apiVersions = {
 };
 const dynamoDB = new DynamoDB();
 
-const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
+const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 
 const validUsername = "evan-piro";
 
@@ -202,11 +202,9 @@ describe("Committee GraphQL Lambda", function () {
   });
   describe("Aggregations", function () {
     it("Get by Committee ID", async () => {
-      const res: any = await lambdaPromise(
-        graphql,
-        genGraphQLProxy(aggregationsQuery, validUsername),
-        {}
-      );
+      const query = genGraphQLProxy(aggregationsQuery, validUsername);
+      console.log(query);
+      const res: any = await lambdaPromise(graphql, query, {});
 
       const body = JSON.parse(res.body);
       expect(body.data.aggregations.balance).to.be.a("number");

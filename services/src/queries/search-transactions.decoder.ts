@@ -45,6 +45,7 @@ const TransactionOptional = t.partial({
   isSubcontracted: t.boolean,
   isPartialPayment: t.boolean,
   isExistingLiability: t.boolean,
+  blockchainMetadata: t.unknown,
 });
 
 export const Transaction = t.intersection([

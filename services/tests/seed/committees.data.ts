@@ -13,7 +13,7 @@ export const committeesData: ICommittee[] = [
     emailAddresses: "evan@schweitzerlabs.com,seemant@schweitzerlabs.com",
     tzDatabaseName: "America/New_York",
     plan: Plan.FOURUS,
-    members: ["evan-piro", "5e41bd77-eae7-4b2d-8d20-a05bef22c4e2"],
+    members: ["evan-piro", "e1b4b8db-a24d-4b5c-af17-0b5ee6ef6b67"],
     state: "ny",
     scope: "state",
     party: "democrat",
