@@ -1,4 +1,5 @@
 import * as t from "io-ts";
+import { FinicityTransaction } from "../clients/finicity/finicity.decoders";
 
 const TransactionRequired = t.type({
   id: t.string,
@@ -46,6 +47,8 @@ const TransactionOptional = t.partial({
   isPartialPayment: t.boolean,
   isExistingLiability: t.boolean,
   blockchainMetadata: t.unknown,
+  finicityTransactionId: t.number,
+  finicityTransactionData: FinicityTransaction,
 });
 
 export const Transaction = t.intersection([

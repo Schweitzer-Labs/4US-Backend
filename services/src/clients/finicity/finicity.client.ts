@@ -2,8 +2,8 @@ import fetch from "node-fetch";
 import { ApplicationError } from "../../utils/application-error";
 import {
   FinicityConfig,
-  FinicityTransaction,
   GetFinicityTransactionsResponse,
+  IFinicityTransaction,
 } from "./finicity.decoders";
 import { TaskEither, left, right, tryCatch } from "fp-ts/TaskEither";
 import { task, taskEither } from "fp-ts";
@@ -64,7 +64,7 @@ const getTransactionsRes =
 
 const validateTransactionsRes = (
   res: any
-): TaskEither<ApplicationError, FinicityTransaction[]> => {
+): TaskEither<ApplicationError, IFinicityTransaction[]> => {
   return pipe(
     task.of(GetFinicityTransactionsResponse.decode(res)),
     taskEither.fold(
@@ -77,14 +77,24 @@ const validateTransactionsRes = (
   );
 };
 
+export interface IGetFinicityTransactionsArg {
+  customerId: string;
+  accountId: string;
+  epochFrom: number;
+  epochTo: number;
+}
+
 export const getTransactions =
   (config: FinicityConfig) =>
-  (
-    customerId: string,
-    accountId: string,
-    epochFrom: number,
-    epochTo: number
-  ): TaskEither<ApplicationError, FinicityTransaction[]> =>
+  ({
+    customerId,
+    accountId,
+    epochFrom,
+    epochTo,
+  }: IGetFinicityTransactionsArg): TaskEither<
+    ApplicationError,
+    IFinicityTransaction[]
+  > =>
     pipe(
       tryCatch<ApplicationError, any>(
         () =>

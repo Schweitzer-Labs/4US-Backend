@@ -9,6 +9,7 @@ import { getTxnById } from "../../src/utils/model/get-txn-by-id.utils";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
+import { genContributionRecord } from "../utils/gen-contribution.util";
 
 dotenv.config();
 const txnTableName = process.env.TRANSACTIONS_DDB_TABLE_NAME;
@@ -23,11 +24,7 @@ const dynamoDB = new DynamoDB();
 
 describe("Get transaction by id", function () {
   it("Retrieve a transaction by an valid id", async () => {
-    const txn = genTransaction({
-      committeeId,
-      ruleVerified: true,
-      bankVerified: true,
-    });
+    const txn = genContributionRecord(committeeId);
 
     await putTransaction(txnTableName)(dynamoDB)(txn);
 

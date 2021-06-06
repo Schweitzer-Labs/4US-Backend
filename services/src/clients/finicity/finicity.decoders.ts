@@ -27,9 +27,11 @@ const FinicityTransactionRequired = t.type({
 
 const FinicityTransactionOptional = t.partial({
   lastUpdatedDate: t.number,
+  type: t.string,
+  checkNum: t.string,
 });
 
-const FinicityTransaction = t.intersection([
+export const FinicityTransaction = t.intersection([
   FinicityTransactionRequired,
   FinicityTransactionOptional,
 ]);
@@ -52,4 +54,4 @@ export const GetFinicityTransactionsResponse = t.intersection([
   GetFinicityTransactionsResponseOptional,
 ]);
 
-export type FinicityTransaction = t.TypeOf<typeof FinicityTransaction>;
+export type IFinicityTransaction = t.TypeOf<typeof FinicityTransaction>;

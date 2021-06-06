@@ -8,14 +8,6 @@ export const ddbString = t.type({
   S: t.string,
 });
 
-export const ddbBool = t.type({
-  BOOL: t.boolean,
-});
-
-export const ddbNumber = t.type({
-  N: t.string,
-});
-
 export const ddbStringList = t.type({
   SS: t.array(t.string),
 });
@@ -35,18 +27,6 @@ export const validateDDBResponse =
       return right(eitherRes.right);
     }
   };
-
-export const extractDDBNumber = (obj: { N: string }): number => {
-  return parseInt(obj?.N);
-};
-
-export const extractDDBString = (obj: { S: string }): string => {
-  return obj?.S;
-};
-
-export const extractDDBBool = (obj: { BOOL: boolean }): boolean => {
-  return obj?.BOOL;
-};
 
 export const toFilterExpression = (name: string, value?: any): string[] =>
   typeof value === "undefined" ? [] : [`${name} = :${name}`];

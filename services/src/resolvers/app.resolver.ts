@@ -118,7 +118,7 @@ export class AppResolver {
       balance: 0,
       totalRaised: 0,
       totalSpent: 0,
-      totalDonors: 112,
+      totalDonors: 0,
       totalTransactions: transactions.length,
       totalContributionsInProcessing: 0,
       totalDisbursementsInProcessing: 0,
@@ -197,6 +197,7 @@ export class AppResolver {
       cardNumber,
       cardExpirationMonth,
       cardExpirationYear,
+      paymentDate,
       checkNumber,
     } = createContributionInput;
 
@@ -221,6 +222,13 @@ export class AppResolver {
       if (!checkNumber)
         throw new ValidationError(
           "Check number must be provided for contributions by check"
+        );
+    }
+
+    if ([PaymentMethod.Check, PaymentMethod.ACH].includes(paymentMethod)) {
+      if (!paymentDate)
+        throw new ValidationError(
+          "Payment date must be provided for contributions by check or ACH"
         );
     }
 

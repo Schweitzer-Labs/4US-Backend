@@ -30,11 +30,14 @@ const CommitteeOptional = t.partial({
   bankName: t.string,
   ruleVersion: t.string,
   finicityCustomerId: t.string,
+  finicityAccountId: t.string,
   chainId: t.string,
   emailAddresses: t.string,
 });
 
 export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);
+
+export const Committees = t.array(Committee);
 
 export type ICommittee = t.TypeOf<typeof Committee>;
 

@@ -3,13 +3,14 @@ import * as Finicity from "../../src/clients/finicity/finicity.client";
 import * as dotenv from "dotenv";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
+import { now, milliToEpoch } from "../../src/utils/time.utils";
 
 dotenv.config();
 
-let customerId = "5006720186";
-let accountId = "5014139079";
-let epochFrom = 1588365858;
-let epochTo = 1598970681;
+let customerId = "5003896371";
+let accountId = "5015365202";
+let epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6; // 6 months ago
+let epochTo = milliToEpoch(now());
 
 let config: any;
 
@@ -24,17 +25,18 @@ describe("Test Finicity client", function () {
 
   it("Pulls transactions by customer id and account id", async () => {
     const transactions = await pipe(
-      Finicity.getTransactions(config)(
+      Finicity.getTransactions(config)({
         customerId,
         accountId,
         epochFrom,
-        epochTo
-      ),
+        epochTo,
+      }),
       taskEither.fold(
         () => task.of([]),
         (res) => task.of(res)
       )
     )();
+    console.log(transactions);
     expect(transactions[0].amount).to.be.an("number");
   });
 
