@@ -22,7 +22,7 @@ const getTransactionsRes =
     transactionType,
     bankVerified,
     ruleVerified,
-    order = Order.DESC,
+    order = Order.Desc,
     donorId,
     entityType,
   }: TransactionsArg) =>
@@ -51,7 +51,7 @@ const getTransactionsRes =
       ...byDonorIndex,
       KeyConditionExpression: keyConditionExpress,
       ...FilterExpression,
-      ScanIndexForward: order === Order.ASC,
+      ScanIndexForward: order === Order.Asc,
       ExpressionAttributeValues: {
         ":committeeId": { S: committeeId },
         ...toExpressionAttributeValueString("transactionType", transactionType),

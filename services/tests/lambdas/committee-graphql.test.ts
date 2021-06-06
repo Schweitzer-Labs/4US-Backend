@@ -109,7 +109,7 @@ mutation($committeeId: String!) {
     city: "Downingtown"
     state: "PA"
     postalCode: "13224"
-    entityType: IND
+    entityType: Ind
   }) {
     amount
   }
@@ -224,7 +224,7 @@ describe("Committee GraphQL Lambda", function () {
       );
 
       const body = JSON.parse(res.body);
-      console.log(body);
+      console.log(res.body);
       expect(body.data.createContribution.amount).to.equal(12000);
     });
   });

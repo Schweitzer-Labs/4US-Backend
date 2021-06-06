@@ -49,6 +49,6 @@ export const genCommittee = ({
     ruleVersion,
     tzDatabaseName: tzDatabaseName || "America/New_York",
     emailAddresses: emailAddresses || "evan@schweitzerlabs.com",
-    plan: plan || Plan.FOURUS,
+    plan: plan || Plan.FourUs,
   };
 };

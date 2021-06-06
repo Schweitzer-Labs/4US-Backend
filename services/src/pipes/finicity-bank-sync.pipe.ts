@@ -122,7 +122,7 @@ const finicityTxnToTransactionType = (
   fTxn: IFinicityTransaction
 ): TransactionType =>
   fTxn.categorization.normalizedPayeeName === "deposit" &&
-  TransactionType.DEPOSIT;
+  TransactionType.Deposit;
 
 const dollarToCents = (num: number): number => num * 100;
 
@@ -134,7 +134,7 @@ const finicityTxnToPlatformTxn =
       id: genTxnId(),
       amount: flow(dollarToCents, Math.abs)(fTxn.amount),
       paymentMethod: finicityTxnToPaymentMethod(fTxn),
-      direction: fTxn.amount > 0 ? Direction.IN : Direction.OUT,
+      direction: fTxn.amount > 0 ? Direction.In : Direction.Out,
       paymentDate: epochToMilli(fTxn.postedDate),
       initiatedTimestamp: epochToMilli(fTxn.postedDate),
       source: Source.FINICITY,

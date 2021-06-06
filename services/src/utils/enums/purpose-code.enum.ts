@@ -10,7 +10,7 @@ export enum PurposeCode {
   PROFL = "PROFL",
   RADIO = "RADIO",
   REIMB = "REIMB",
-  RDET = "R-DET",
+  RDET = "RDET",
   RENTO = "RENTO",
   TVADS = "TVADS",
   VOTER = "VOTER",

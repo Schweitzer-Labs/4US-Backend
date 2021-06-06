@@ -1,5 +1,5 @@
 export enum TransactionType {
-  CONTRIBUTION = "contribution",
-  DISBURSEMENT = "disbursement",
-  DEPOSIT = "deposit",
+  Contribution = "Contribution",
+  Disbursement = "Disbursement",
+  Deposit = "Deposit",
 }

@@ -25,13 +25,13 @@ export const genFlacspee = ({
 }: IFlacspeeInput) => {
   // Put entity name in last name field and leave first name blank when donor is a non-individual
   const fl =
-    entityType === EntityType.IND
+    entityType === EntityType.Ind
       ? `[${firstName.toLowerCase()}][${lastName.toLowerCase()}]`
       : `[][${entityName.toLowerCase()}]`;
   const acspe = `[${addressLine1.toLowerCase()}][${city.toLowerCase()}][${state.toLowerCase()}][${postalCode.toLowerCase()}][${entityType.toLowerCase()}]`;
   // Exclude email when donor is a non-individual
   const e =
-    entityType === EntityType.IND
+    entityType === EntityType.Ind
       ? `[${(emailAddress || "").toLowerCase()}]`
       : `[]`;
   return `flacspee:${fl}${acspe}${e}`;

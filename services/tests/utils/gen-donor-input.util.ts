@@ -10,7 +10,7 @@ export const genDonorInput = (entityType: EntityType): IDonorInput => ({
   state: faker.address.stateAbbr().toLowerCase(),
   postalCode: faker.address.zipCode(),
   entityType,
-  ...(![EntityType.IND, EntityType.FAM].includes(entityType)
+  ...(![EntityType.Ind, EntityType.Fam].includes(entityType)
     ? { entityName: faker.company.companyName() }
     : {}),
 });

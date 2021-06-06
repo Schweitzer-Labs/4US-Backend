@@ -13,8 +13,8 @@ export const genDisbursement = (
   config: GenDisbursementConfig
 ): ITransaction => ({
   ...genTransaction({
-    direction: Direction.OUT,
+    direction: Direction.Out,
     ...config,
   }),
-  transactionType: TransactionType.DISBURSEMENT,
+  transactionType: TransactionType.Disbursement,
 });

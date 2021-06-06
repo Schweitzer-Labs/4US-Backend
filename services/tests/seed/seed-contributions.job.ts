@@ -20,7 +20,7 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
     const contribution: ITransaction = {
       committeeId,
       id: genTxnId(),
-      direction: Direction.IN,
+      direction: Direction.In,
       amount: txn.amount * 100,
       paymentMethod: txn.paymentMethod,
       bankVerified: false,
@@ -40,7 +40,7 @@ const run = async (dynamoDB: DynamoDB, sequence: number) => {
       entityType: txn.contributorType,
       companyName: txn.companyName,
       attestsToBeingAnAdultCitizen: true,
-      transactionType: TransactionType.CONTRIBUTION,
+      transactionType: TransactionType.Contribution,
       source: Source.FINICITY,
     };
     const marshalledContrib = DynamoDB.Converter.marshall(contribution);

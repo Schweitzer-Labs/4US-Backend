@@ -20,11 +20,11 @@ const savePayment =
       ...payment,
       id: genTxnId(),
       source: Source.DONATE_FORM,
-      direction: Direction.IN,
+      direction: Direction.In,
       bankVerified: false,
       ruleVerified: false,
       initiatedTimestamp: now(),
-      transactionType: TransactionType.CONTRIBUTION,
+      transactionType: TransactionType.Contribution,
     };
 
     console.log(

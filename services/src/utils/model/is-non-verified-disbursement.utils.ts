@@ -8,7 +8,7 @@ export const isNonVerifiedDisbursement = (
   t: ITransaction
 ): TaskEither<ApplicationError, ITransaction> => {
   if (
-    t.transactionType === TransactionType.DISBURSEMENT &&
+    t.transactionType === TransactionType.Disbursement &&
     t.bankVerified &&
     !t.ruleVerified
   ) {

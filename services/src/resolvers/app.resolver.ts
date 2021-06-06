@@ -128,7 +128,7 @@ export class AppResolver {
 
     const aggs: any = transactions.reduce((acc: any, txn) => {
       // Total Raised
-      if (txn.transactionType === TransactionType.CONTRIBUTION) {
+      if (txn.transactionType === TransactionType.Contribution) {
         if (txn.bankVerified) {
           acc.totalRaised = acc.totalRaised + txn.amount;
           acc.balance = acc.balance + txn.amount;
@@ -140,7 +140,7 @@ export class AppResolver {
         acc.donorMap[donorHash] = true;
       }
       /// Total Spent
-      if (txn.transactionType === TransactionType.DISBURSEMENT) {
+      if (txn.transactionType === TransactionType.Disbursement) {
         if (txn.bankVerified) {
           acc.totalSpent = acc.totalSpent + txn.amount;
           acc.balance = acc.balance - txn.amount;
@@ -201,7 +201,7 @@ export class AppResolver {
       checkNumber,
     } = createContributionInput;
 
-    if (![EntityType.IND, EntityType.FAM].includes(entityType) && !entityName) {
+    if (![EntityType.Ind, EntityType.Fam].includes(entityType) && !entityName) {
       throw new ValidationError(
         "Entity name must be provided for non-individual and non-family contributions"
       );
@@ -225,7 +225,7 @@ export class AppResolver {
         );
     }
 
-    if ([PaymentMethod.Check, PaymentMethod.ACH].includes(paymentMethod)) {
+    if ([PaymentMethod.Check, PaymentMethod.Ach].includes(paymentMethod)) {
       if (!paymentDate)
         throw new ValidationError(
           "Payment date must be provided for contributions by check or ACH"

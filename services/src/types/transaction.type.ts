@@ -2,15 +2,30 @@ import { Field, ID, ObjectType } from "type-graphql";
 
 import { registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
-
-enum Direction {
-  IN = "in",
-  OUT = "out",
-}
+import { Direction } from "../utils/enums/direction.enum";
+import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { PurposeCode } from "../utils/enums/purpose-code.enum";
+import { EntityType } from "../utils/enums/entity-type.enum";
+import { TransactionType } from "../utils/enums/transaction-type.enum";
 
 registerEnumType(Direction, {
-  name: "Direction", // this one is mandatory
-  description: "Direction of payment", // this one is optional
+  name: "Direction",
+});
+
+registerEnumType(PaymentMethod, {
+  name: "PaymentMethod",
+});
+
+registerEnumType(PurposeCode, {
+  name: "PurposeCode",
+});
+
+registerEnumType(EntityType, {
+  name: "EntityType",
+});
+
+registerEnumType(TransactionType, {
+  name: "TransactionType",
 });
 
 @ObjectType()
@@ -19,11 +34,11 @@ export class Transaction implements ITransaction {
   id;
   @Field()
   committeeId: string;
-  @Field()
+  @Field((type) => Direction)
   direction: string;
   @Field()
   amount: number;
-  @Field()
+  @Field((type) => PaymentMethod)
   paymentMethod: string;
   @Field()
   bankVerified: boolean;
@@ -37,7 +52,7 @@ export class Transaction implements ITransaction {
   bankVerifiedTimestamp?: number;
   @Field({ nullable: true })
   ruleVerifiedTimestamp?: number;
-  @Field({ nullable: true })
+  @Field((type) => PurposeCode, { nullable: true })
   purposeCode?: string;
   @Field({ nullable: true })
   refCode?: string;
@@ -62,7 +77,7 @@ export class Transaction implements ITransaction {
   employer?: string;
   @Field({ nullable: true })
   occupation?: string;
-  @Field({ nullable: true })
+  @Field((type) => EntityType, { nullable: true })
   entityType?: string;
   @Field({ nullable: true })
   companyName?: string;
@@ -72,7 +87,7 @@ export class Transaction implements ITransaction {
   emailAddress?: string;
   @Field({ nullable: true })
   attestsToBeingAnAdultCitizen?: boolean;
-  @Field({ nullable: true })
+  @Field((type) => TransactionType, { nullable: true })
   transactionType?: string;
   @Field({ nullable: true })
   stripePaymentIntentId?: string;

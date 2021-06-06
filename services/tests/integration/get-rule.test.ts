@@ -42,7 +42,7 @@ const dynamoDB = new DynamoDB();
 
 describe("Get Rule Query", function () {
   it("Returns a rule for a given committee and donor", async () => {
-    const donor = genDonor(EntityType.IND);
+    const donor = genDonor(EntityType.Ind);
     const res: any = await pipe(
       committeeAndDonorToRule(rulesTableName)(dynamoDB)(committee)(donor),
       getOrElseW(() => {

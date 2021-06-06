@@ -19,7 +19,7 @@ const committeeDonorAndRuleToBalance =
   (donor: IDonor) =>
   (rule: IRule): TaskEither<ApplicationError, number> => {
     const query =
-      donor.entityType === EntityType.FAM
+      donor.entityType === EntityType.Fam
         ? { entityType: donor.entityType }
         : { donorId: donor.id };
     return pipe(

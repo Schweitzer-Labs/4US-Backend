@@ -1,6 +1,6 @@
 export enum Direction {
-  IN = "in",
-  OUT = "out",
+  In = "In",
+  Out = "Out",
 }
 
-export const directions: Direction[] = [Direction.IN, Direction.OUT];
+export const directions: Direction[] = [Direction.In, Direction.Out];

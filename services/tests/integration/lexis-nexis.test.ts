@@ -16,7 +16,7 @@ import { DynamoDB } from "aws-sdk";
 dotenv.config();
 const committee = genCommittee({});
 
-const donorInput: IDonorInput = genDonorInput(EntityType.IND);
+const donorInput: IDonorInput = genDonorInput(EntityType.Ind);
 
 const lsUsername = process.env.LN_USERNAME;
 const lsPassword = process.env.LN_PASSWORD;

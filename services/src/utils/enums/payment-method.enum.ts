@@ -1,17 +1,17 @@
 export enum PaymentMethod {
-  ACH = "ach",
-  Wire = "wire",
-  Check = "check",
-  Debit = "debit",
-  Credit = "credit",
-  Transfer = "transfer",
-  InKind = "in-kind",
-  Cash = "cash",
-  Other = "other",
+  Ach = "Ach",
+  Wire = "Wire",
+  Check = "Check",
+  Debit = "Debit",
+  Credit = "Credit",
+  Transfer = "Transfer",
+  InKind = "InKind",
+  Cash = "Cash",
+  Other = "Other",
 }
 
 export const paymentMethods: PaymentMethod[] = [
-  PaymentMethod.ACH,
+  PaymentMethod.Ach,
   PaymentMethod.Wire,
   PaymentMethod.Check,
   PaymentMethod.Debit,

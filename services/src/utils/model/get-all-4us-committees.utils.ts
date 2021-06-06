@@ -29,7 +29,7 @@ const queryDB =
         TableName: committeesTableName,
         FilterExpression: "plan = :plan",
         ExpressionAttributeValues: {
-          ":plan": { S: Plan.FOURUS },
+          ":plan": { S: Plan.FourUs },
         },
       })
       .promise();

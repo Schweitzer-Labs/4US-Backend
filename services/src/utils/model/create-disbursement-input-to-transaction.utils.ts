@@ -9,7 +9,7 @@ export const createDisbursementInputToTransaction =
   (createdByUser: string) =>
   (d: CreateDisbursementInput): ITransaction => ({
     id: genTxnId(),
-    direction: Direction.OUT,
+    direction: Direction.Out,
     bankVerified: false,
     ruleVerified: true,
     createdByUser,

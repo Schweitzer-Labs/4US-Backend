@@ -52,7 +52,7 @@ describe("Rules engine", function () {
     const contrib = genCreateContributionInput(
       committee.id,
       750001,
-      EntityType.IND
+      EntityType.Ind
     );
 
     const res = await pipe(
@@ -60,7 +60,10 @@ describe("Rules engine", function () {
         rulesTable
       )(dynamoDB)(instantIdConfig)(committee)(contrib),
       taskEither.fold(
-        (e) => task.of(e.data.remaining),
+        (e) => {
+          console.log(e);
+          return task.of(e.data.remaining);
+        },
         (s) => task.of("worked")
       )
     )();
@@ -74,7 +77,7 @@ describe("Rules engine", function () {
     const contrib = genCreateContributionInput(
       committee.id,
       750000,
-      EntityType.IND
+      EntityType.Ind
     );
 
     const res = await pipe(

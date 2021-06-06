@@ -42,6 +42,6 @@ export const genTransaction = ({
   initiatedTimestamp: initiatedTimestamp || now(),
   bankVerified,
   ruleVerified,
-  paymentMethod: paymentMethod || PaymentMethod.ACH,
+  paymentMethod: paymentMethod || PaymentMethod.Ach,
   source: source || Source.DASHBOARD,
 });

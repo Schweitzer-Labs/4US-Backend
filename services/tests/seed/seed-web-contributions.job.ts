@@ -15,7 +15,7 @@ const run = async (dynamoDB: DynamoDB) => {
     id: genTxnId(),
     source: Source.DONATE_FORM,
     committeeId: "907b427a-f8a9-450b-9d3c-33d8ec4a4cc4",
-    direction: Direction.IN,
+    direction: Direction.In,
     paymentMethod: PaymentMethod.Credit,
     bankVerified: false,
     ruleVerified: false,
@@ -30,8 +30,8 @@ const run = async (dynamoDB: DynamoDB) => {
     amount: 2000,
     cardNumberLastFourDigits: "1232",
     refCode: "home-page",
-    entityType: EntityType.IND,
-    transactionType: TransactionType.CONTRIBUTION,
+    entityType: EntityType.Ind,
+    transactionType: TransactionType.Contribution,
     stripePaymentIntentId: "fjdsk234jsidjf",
   };
   return await putTransaction("transactions-qa")(dynamoDB)(txn);

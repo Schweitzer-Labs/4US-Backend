@@ -97,7 +97,7 @@ const sendEmail = async (txn: ITransaction, parameters, committee: string) => {
     ...parameters,
     Source: from_address,
     TemplateData: JSON.stringify(templateData),
-    ConfigurationSetName: "SNSDebugging",
+    ConfigurationSetName: "SESDebugging",
   };
   return await ses.sendTemplatedEmail(params).promise();
 };

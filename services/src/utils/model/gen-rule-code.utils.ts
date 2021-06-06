@@ -15,7 +15,7 @@ export const committeeAndDonorToRuleCode =
       c.officeType,
       c.ruleVersion,
       d.entityType,
-    ].reduce((acc, val) => acc + `[${val || ""}]`, "");
+    ].reduce((acc, val) => acc + `[${(val || "").toLowerCase()}]`, "");
 
 export const ruleToRuleCode = (r: IRule): string =>
   [
@@ -28,4 +28,4 @@ export const ruleToRuleCode = (r: IRule): string =>
     r.officeType,
     r.ruleVersion,
     r.entityType,
-  ].reduce((acc, val) => acc + `[${val || ""}]`, "");
+  ].reduce((acc, val) => acc + `[${(val || "").toLowerCase()}]`, "");

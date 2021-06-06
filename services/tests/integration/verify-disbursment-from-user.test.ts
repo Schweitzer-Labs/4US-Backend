@@ -13,6 +13,7 @@ import { VerifyDisbursementInput } from "../../src/input-types/verify-disburseme
 import { isLeft } from "fp-ts/Either";
 import { PurposeCode } from "../../src/utils/enums/purpose-code.enum";
 import { now } from "../../src/utils/time.utils";
+import { ApplicationError } from "../../src/utils/application-error";
 
 dotenv.config();
 
@@ -55,8 +56,10 @@ describe("Verify Disbursement Validator", function () {
       committee.id
     )(disbr.id)(input)();
 
+    console.log(res);
+
     if (isLeft(res)) {
-      throw Error();
+      throw new ApplicationError("Test failed", res);
     }
 
     expect(res.right.ruleVerified).to.equal(true);

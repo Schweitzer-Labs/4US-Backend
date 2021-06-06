@@ -2,7 +2,14 @@ import { Field, InputType, registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
-import { MinLength, Min, IsEmail, IsNumber } from "class-validator";
+import {
+  MinLength,
+  Min,
+  IsEmail,
+  IsNumber,
+  Max,
+  MaxLength,
+} from "class-validator";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -69,15 +76,20 @@ export class CreateContributionInput implements Partial<ITransaction> {
 
   // Required for PaymentMethod.Credit
   @Field({ nullable: true })
-  @Min(50)
+  @Min(1)
+  @Max(12)
   cardExpirationMonth?: number;
 
   // Required for PaymentMethod.Credit
   @Field({ nullable: true })
+  @Min(2020)
+  @Max(2060)
   cardExpirationYear?: number;
 
   // Required for PaymentMethod.Credit
   @Field({ nullable: true })
+  @MinLength(1)
+  @MaxLength(5)
   cardCVC?: string;
 
   // Required for PaymentMethod.ACH and Check

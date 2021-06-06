@@ -16,22 +16,22 @@ export const genContributionRecord = (
   return {
     ...genTransaction({
       committeeId,
-      direction: Direction.IN,
+      direction: Direction.In,
       paymentMethod: PaymentMethod.Credit,
       ruleVerified: true,
       bankVerified: false,
     }),
-    transactionType: TransactionType.CONTRIBUTION,
+    transactionType: TransactionType.Contribution,
     committeeId,
     donorId: donorId || genTxnId(),
-    entityType: entityType || EntityType.IND,
+    entityType: entityType || EntityType.Ind,
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     addressLine1: faker.address.streetAddress(),
     city: faker.address.city(),
     state: faker.address.state(),
     postalCode: faker.address.zipCode(),
-    ...(![EntityType.IND, EntityType.FAM].includes(entityType)
+    ...(![EntityType.Ind, EntityType.Fam].includes(entityType)
       ? { entityName: faker.company.companyName() }
       : {}),
   };
@@ -53,7 +53,7 @@ export const genCreateContributionInput = (
     city: faker.address.city(),
     state: faker.address.state(),
     postalCode: faker.address.zipCode(),
-    ...(![EntityType.IND, EntityType.FAM].includes(entityType)
+    ...(![EntityType.Ind, EntityType.Fam].includes(entityType)
       ? { entityName: faker.company.companyName() }
       : {}),
   };
