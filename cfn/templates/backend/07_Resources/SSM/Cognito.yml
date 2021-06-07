@@ -1,0 +1,9 @@
+PlatformUserPoolParameter:
+{% if PRODUCT == '4us' %}
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/cognito/userpool/platform
+    Type: String
+    Description: PlatformUserPool parameter
+    Value: !GetAtt PlatformUserPool.Arn
+{% endif %}

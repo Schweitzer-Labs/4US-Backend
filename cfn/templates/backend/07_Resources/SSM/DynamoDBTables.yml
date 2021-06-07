@@ -1,0 +1,54 @@
+BillableEventsTable:
+{% if PRODUCT == '4us' %}
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/billable-events
+    Type: String
+    Description: Billable Events table for use by both products in this region
+    Value: !Ref BillableEvents
+{% endif %}
+CommitteesTable:
+{% if PRODUCT == '4us' %}
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/committees
+    Type: String
+    Description: Committees table for use by both products in this region
+    Value: !Ref Committees
+{% endif %}
+DonorsTable:
+{% if PRODUCT == '4us' %}
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/donors
+    Type: String
+    Description: Donors table for use by both products in this region
+    Value: !Ref Donors
+{% endif %}
+RulesTable:
+{% if PRODUCT == '4us' %}
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/rules
+    Type: String
+    Description: Compliance Rules table for use by both products in this region
+    Value: !Ref Rules
+{% endif %}
+TransactionsTable:
+{% if PRODUCT == '4us' %}
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/transactions
+    Type: String
+    Description: Transactions table for use by both products in this region
+    Value: !Ref Transactions
+{% endif %}
+TransactionsStream:
+{% if PRODUCT == '4us' %}
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: !Sub /${LambdaRunEnvironment}/dynamodb/stream/transactions
+    Type: String
+    Description: Transactions table stream for use by both products in this region
+    Value: !GetAtt Transactions.StreamArn
+{% endif %}
