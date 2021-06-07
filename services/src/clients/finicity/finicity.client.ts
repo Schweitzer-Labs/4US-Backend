@@ -58,7 +58,7 @@ const getTransactionsRes =
     if (res.ok) {
       return data;
     } else {
-      throw new Error(data.message);
+      throw new ApplicationError("finicity txn look up failed", data);
     }
   };
 

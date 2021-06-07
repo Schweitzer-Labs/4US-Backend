@@ -51,7 +51,7 @@ export const processPaymentFromCommitteeContribution =
       const payment: Payment = {
         ...stripCardInfo(contribution),
         stripePaymentIntentId,
-        ruleVerified: committee.plan === Plan.FourUs,
+        ruleVerified: committee.platformPlan === Plan.FourUs,
       };
 
       console.log("Payment succeeded", payment);

@@ -12,7 +12,7 @@ import {
 } from "../clients/finicity/finicity.decoders";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { getTransactions } from "../clients/finicity/finicity.client";
-import { epochToMilli, now } from "../utils/time.utils";
+import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
 import { searchTransactions } from "../queries/search-transactions.query";
 import { getAll4USCommittees } from "../utils/model/get-all-4us-committees.utils";
 import { Direction } from "../utils/enums/direction.enum";
@@ -64,9 +64,10 @@ const matchToPlatformTxn =
   (fTxn: ITransaction): ITransaction[] => {
     return pTxns.filter((pTxn) => {
       const hasSameAmount = pTxn.amount === fTxn.amount;
-      const hasOccurredWithinTheSameDay = Math.abs(
-        pTxn.paymentDate - fTxn.paymentDate
-      );
+      const hasOccurredWithinTheSameDay =
+        Math.abs(pTxn.paymentDate - fTxn.paymentDate) < 60 * 60 * 24;
+      const verdict = hasSameAmount && hasOccurredWithinTheSameDay;
+      return verdict;
     });
   };
 
@@ -124,15 +125,13 @@ const finicityTxnToTransactionType = (
   fTxn.categorization.normalizedPayeeName === "deposit" &&
   TransactionType.Deposit;
 
-const dollarToCents = (num: number): number => num * 100;
-
 const finicityTxnToPlatformTxn =
   (committee: ICommittee) =>
   (fTxn: IFinicityTransaction): ITransaction => {
     return {
       committeeId: committee.id,
       id: genTxnId(),
-      amount: flow(dollarToCents, Math.abs)(fTxn.amount),
+      amount: Math.round(Math.abs(fTxn.amount)) * 100,
       paymentMethod: finicityTxnToPaymentMethod(fTxn),
       direction: fTxn.amount > 0 ? Direction.In : Direction.Out,
       paymentDate: epochToMilli(fTxn.postedDate),
@@ -156,8 +155,8 @@ const getAllFinicityTxns =
     committee: ICommittee
   ): TaskEither<ApplicationError, IFinicityTransaction[]> => {
     const { finicityAccountId, finicityCustomerId } = committee;
-    const epochFrom = now() - 60 * 60 * 24 * 30 * 6;
-    const epochTo = now();
+    const epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6;
+    const epochTo = milliToEpoch(now());
     return getTransactions(config)({
       customerId: finicityCustomerId,
       accountId: finicityAccountId,

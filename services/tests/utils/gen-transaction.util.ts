@@ -5,6 +5,7 @@ import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { now } from "../../src/utils/time.utils";
 import { Source, sources } from "../../src/utils/enums/source.enum";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
+import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 
 interface IGenTransactionConfig {
   id?: string;
@@ -16,6 +17,8 @@ interface IGenTransactionConfig {
   amount?: number;
   initiatedTimestamp?: number;
   source?: Source;
+  transactionType?: TransactionType;
+  paymentDate: number;
 }
 
 export const genTransaction = ({
@@ -28,6 +31,8 @@ export const genTransaction = ({
   amount,
   initiatedTimestamp,
   source,
+  transactionType,
+  paymentDate,
 }: IGenTransactionConfig): ITransaction => ({
   // Required fields
   id: id || genTxnId(),
@@ -44,4 +49,6 @@ export const genTransaction = ({
   ruleVerified,
   paymentMethod: paymentMethod || PaymentMethod.Ach,
   source: source || Source.DASHBOARD,
+  transactionType,
+  paymentDate,
 });

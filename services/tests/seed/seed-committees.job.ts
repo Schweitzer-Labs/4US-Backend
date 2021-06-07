@@ -7,7 +7,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const committeesTableName = process.env.COMMITTEES_DDB_TABLE_NAME;
+const committeesTableName = "qa-4us-backend-Committees-1QNBGOQ2OEBZI";
 
 const run =
   (committeesTableName: string) =>
