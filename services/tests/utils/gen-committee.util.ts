@@ -14,7 +14,9 @@ interface IGenCommitteeConfig {
   ruleVersion?: string;
   tzDatabaseName?: string;
   emailAddresses?: string;
-  plan?: string;
+  platformPlan?: string;
+  finicityCustomerId?: string;
+  finicityAccountId?: string;
 }
 
 export const genCommittee = ({
@@ -28,7 +30,9 @@ export const genCommittee = ({
   ruleVersion,
   tzDatabaseName,
   emailAddresses,
-  plan,
+  platformPlan,
+  finicityCustomerId,
+  finicityAccountId,
 }: IGenCommitteeConfig): ICommittee => {
   const candidateFirstName = faker.name.firstName();
   const candidateLastName = faker.name.lastName();
@@ -49,6 +53,8 @@ export const genCommittee = ({
     ruleVersion,
     tzDatabaseName: tzDatabaseName || "America/New_York",
     emailAddresses: emailAddresses || "evan@schweitzerlabs.com",
-    plan: plan || Plan.FourUs,
+    platformPlan: platformPlan || Plan.FourUs,
+    finicityCustomerId,
+    finicityAccountId,
   };
 };

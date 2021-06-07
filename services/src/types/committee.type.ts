@@ -47,7 +47,7 @@ export class Committee {
   tzDatabaseName?: string;
 
   @Field((type) => String)
-  plan?: string;
+  platformPlan?: string;
 
   @Field((type) => String)
   emailAddresses?: string;

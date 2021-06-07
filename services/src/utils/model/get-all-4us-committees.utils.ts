@@ -25,11 +25,11 @@ const queryDB =
   (committeesTableName: string) =>
   async (dynamoDB: DynamoDB): Promise<any[]> => {
     const res = await dynamoDB
-      .query({
+      .scan({
         TableName: committeesTableName,
-        FilterExpression: "plan = :plan",
+        FilterExpression: "platformPlan = :platformPlan",
         ExpressionAttributeValues: {
-          ":plan": { S: Plan.FourUs },
+          ":platformPlan": { S: Plan.FourUs },
         },
       })
       .promise();

@@ -22,7 +22,7 @@ export const loadCommitteeOrThrow =
       console.log("error gets thrown, committees is left");
       throw new ApplicationError(
         "Committee look up failed",
-        {},
+        eitherCommittees.left,
         StatusCodes.NOT_FOUND
       );
     }

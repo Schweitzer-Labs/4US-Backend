@@ -15,7 +15,7 @@ const CommitteeRequired = t.type({
   stripeAccount: t.string,
   members: t.array(t.string),
   tzDatabaseName: t.string,
-  plan: t.string,
+  platformPlan: t.string,
 });
 
 const CommitteeOptional = t.partial({
@@ -46,6 +46,7 @@ export const committeeIdToDDBRes =
   (dynamoDB: DynamoDB) =>
   async (committeeId: string): Promise<any> => {
     console.log("committeeIdToDDB called");
+    console.log(committeeId);
     const res = await dynamoDB
       .getItem({
         TableName: committeeTableName,
