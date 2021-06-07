@@ -1,5 +1,6 @@
 UserPoolUserSeemant:
   Type: AWS::Cognito::UserPoolUser
+  Condition: 4US
   Properties:
     Username: seemant@schweitzerlabs.com
     UserPoolId: !Ref PlatformUserPool
