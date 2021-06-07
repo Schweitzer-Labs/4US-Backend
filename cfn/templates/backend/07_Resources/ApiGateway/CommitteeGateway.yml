@@ -5,7 +5,7 @@ CommitteeGateway:
     StageName: !Sub ${LambdaRunEnvironment}
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
-      DomainName: !Sub committee-api-${LambdaRunEnvironment}.${Domain}.${TLD}
+      DomainName: !Sub committee-api.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
       Route53:
         EvaluateTargetHealth: true
@@ -18,4 +18,8 @@ CommitteeGateway:
       DefaultAuthorizer: PlatformUserCognitoAuthorizer
       Authorizers:
         PlatformUserCognitoAuthorizer:
+        {% if PRODUCT == '4us' %}
           UserPoolArn: !GetAtt PlatformUserPool.Arn
+        {% else %}
+          UserPoolArn: !Ref PlatformUserPoolArn
+        {% endif %}
