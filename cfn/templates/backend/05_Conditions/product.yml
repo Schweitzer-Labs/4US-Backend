@@ -1,0 +1,2 @@
+4US:
+  !Equals [!Ref Product, 4us]
