@@ -1,4 +1,5 @@
 Committees:
+{% if PRODUCT == '4us' %}
   Type: AWS::DynamoDB::Table
   DeletionPolicy: Retain
   Properties:
@@ -17,3 +18,4 @@ Committees:
         AttributeName: id
     StreamSpecification:
       StreamViewType: NEW_IMAGE
+{% endif %}

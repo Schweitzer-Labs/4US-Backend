@@ -1,4 +1,5 @@
 Donors:
+{% if PRODUCT == '4us' %}
   Type: AWS::DynamoDB::Table
   DeletionPolicy: Retain
   Properties:
@@ -21,4 +22,4 @@ Donors:
         AttributeName: id
     StreamSpecification:
       StreamViewType: NEW_IMAGE
-
+{% endif %}

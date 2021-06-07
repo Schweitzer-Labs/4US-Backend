@@ -1,4 +1,5 @@
 Transactions:
+{% if PRODUCT == '4us' %}
   Type: AWS::DynamoDB::Table
   DeletionPolicy: Retain
   Properties:
@@ -35,4 +36,4 @@ Transactions:
          ProvisionedThroughput:
              WriteCapacityUnits: 3
              ReadCapacityUnits: 3
-
+{% endif %}

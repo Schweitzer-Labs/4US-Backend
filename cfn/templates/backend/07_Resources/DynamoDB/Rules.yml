@@ -1,4 +1,5 @@
 Rules:
+{% if PRODUCT == '4us' %}
   Type: AWS::DynamoDB::Table
   DeletionPolicy: Retain
   Properties:
@@ -17,3 +18,4 @@ Rules:
         AttributeName: code
     StreamSpecification:
       StreamViewType: NEW_IMAGE
+{% endif %}
