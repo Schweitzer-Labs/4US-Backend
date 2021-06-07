@@ -21,22 +21,10 @@ export class CreateDisbursementInput implements Partial<ITransaction> {
   @Field()
   amount: number;
 
-  @Field()
-  isSubcontracted: boolean;
-
-  @Field()
-  isPartialPayment: boolean;
-
-  @Field()
-  isExistingLiability: boolean;
-
   @Field((type) => PaymentMethod)
   paymentMethod: PaymentMethod;
 
-  @Field((type) => PurposeCode)
-  purposeCode: PurposeCode;
-
-  @Field({ nullable: true })
+  @Field()
   entityName: string;
 
   @Field()
@@ -50,6 +38,18 @@ export class CreateDisbursementInput implements Partial<ITransaction> {
 
   @Field()
   postalCode: string;
+
+  @Field()
+  isSubcontracted: boolean;
+
+  @Field()
+  isPartialPayment: boolean;
+
+  @Field()
+  isExistingLiability: boolean;
+
+  @Field((type) => PurposeCode)
+  purposeCode: PurposeCode;
 
   @Field()
   paymentDate: number;

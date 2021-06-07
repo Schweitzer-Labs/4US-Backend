@@ -22,7 +22,6 @@ const savePayment =
       source: Source.DONATE_FORM,
       direction: Direction.In,
       bankVerified: false,
-      ruleVerified: false,
       initiatedTimestamp: now(),
       transactionType: TransactionType.Contribution,
     };

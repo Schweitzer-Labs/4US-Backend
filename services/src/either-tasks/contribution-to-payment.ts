@@ -4,9 +4,11 @@ import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { stripCardInfo, StrippedContribution } from "../utils/strip-card-info";
 import { ApplicationError } from "../utils/application-error";
 import { ICommitteeContribution } from "./contribution-to-committee-contribution";
+import { Plan } from "../utils/enums/plan.enum";
 
 export interface Payment extends StrippedContribution {
   stripePaymentIntentId: string;
+  ruleVerified: boolean;
 }
 
 export const processPaymentFromCommitteeContribution =
@@ -46,9 +48,10 @@ export const processPaymentFromCommitteeContribution =
 
       const { id: stripePaymentIntentId } = res;
 
-      const payment = {
+      const payment: Payment = {
         ...stripCardInfo(contribution),
         stripePaymentIntentId,
+        ruleVerified: committee.plan === Plan.FourUs,
       };
 
       console.log("Payment succeeded", payment);

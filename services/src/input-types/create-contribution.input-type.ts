@@ -67,6 +67,7 @@ export class CreateContributionInput implements Partial<ITransaction> {
 
   @Field({ nullable: true })
   @IsNumber()
+  @Min(1)
   paymentDate?: number;
 
   // Required for PaymentMethod.Credit

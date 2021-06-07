@@ -136,8 +136,7 @@ export class AppResolver {
           acc.totalContributionsInProcessing =
             acc.totalContributionsInProcessing + txn.amount;
         }
-        const donorHash = `${txn.firstName}${txn.lastName}${txn.entityType}`;
-        acc.donorMap[donorHash] = true;
+        acc.donorMap[txn.donorId] = true;
       }
       /// Total Spent
       if (txn.transactionType === TransactionType.Disbursement) {

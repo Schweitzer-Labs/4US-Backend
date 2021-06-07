@@ -32,67 +32,101 @@ registerEnumType(TransactionType, {
 export class Transaction implements ITransaction {
   @Field((type) => ID)
   id;
+
   @Field()
   committeeId: string;
+
   @Field((type) => Direction)
   direction: string;
+
   @Field()
   amount: number;
+
   @Field((type) => PaymentMethod)
   paymentMethod: string;
+
   @Field()
   bankVerified: boolean;
+
   @Field()
   ruleVerified: boolean;
+
   @Field()
   initiatedTimestamp: number;
+
   @Field()
   source: string;
+
   @Field({ nullable: true })
   bankVerifiedTimestamp?: number;
+
   @Field({ nullable: true })
   ruleVerifiedTimestamp?: number;
+
   @Field((type) => PurposeCode, { nullable: true })
   purposeCode?: string;
+
   @Field({ nullable: true })
   refCode?: string;
+
   // Donor Props
   @Field({ nullable: true })
   firstName?: string;
+
   @Field({ nullable: true })
   middleName?: string;
+
   @Field({ nullable: true })
   lastName?: string;
+
   @Field({ nullable: true })
   addressLine1?: string;
+
   @Field({ nullable: true })
   addressLine2?: string;
+
   @Field({ nullable: true })
   city?: string;
+
   @Field({ nullable: true })
   state?: string;
+
   @Field({ nullable: true })
   postalCode?: string;
+
   @Field({ nullable: true })
   employer?: string;
+
   @Field({ nullable: true })
   occupation?: string;
+
   @Field((type) => EntityType, { nullable: true })
   entityType?: string;
+
+  @Field({ nullable: true })
+  entityName?: string;
+
   @Field({ nullable: true })
   companyName?: string;
+
   @Field({ nullable: true })
   phoneNumber?: string;
+
   @Field({ nullable: true })
   emailAddress?: string;
+
   @Field({ nullable: true })
   attestsToBeingAnAdultCitizen?: boolean;
+
   @Field((type) => TransactionType, { nullable: true })
   transactionType?: string;
+
   @Field({ nullable: true })
   stripePaymentIntentId?: string;
+
   @Field({ nullable: true })
   cardNumberLastFourDigits?: string;
+
   @Field({ nullable: true })
   donorId?: string;
 }
