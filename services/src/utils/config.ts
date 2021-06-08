@@ -6,6 +6,9 @@ enum ConfigKeys {
   stripeApiKey = "/lambda/stripe/apikey",
   lnUsername = "/lambda/ln/username",
   lnPassword = "/lambda/ln/password",
+  finicityPartnerId = "/lambda/finicity/partnerId",
+  finicityPartnerSecret = "/lambda/finicity/partnerSecret",
+  finicityAppKey = "/lambda/finicity/appKey",
 }
 
 const retrieveConfig = async (env: string, name: string) => {
@@ -21,13 +24,16 @@ const retrieveConfig = async (env: string, name: string) => {
 };
 
 const getConfig = async (env: string, name: string): Promise<string> => {
+  console.log(`/${env}${name}`);
   switch (name) {
     case ConfigKeys.stripeApiKey:
-      return retrieveConfig(env, name);
     case ConfigKeys.lnUsername:
-      return retrieveConfig(env, name);
     case ConfigKeys.lnPassword:
+    case ConfigKeys.finicityPartnerId:
+    case ConfigKeys.finicityPartnerSecret:
+    case ConfigKeys.finicityAppKey:
       return retrieveConfig(env, name);
+
     default:
       console.error("Config not found");
       throw new Error("Config not found");
@@ -42,3 +48,12 @@ export const getLNUsername = async (env: string) =>
 
 export const getLNPassword = async (env: string) =>
   await getConfig(env, ConfigKeys.lnPassword);
+
+export const getFinicityPartnerId = async (env: string) =>
+  await getConfig(env, ConfigKeys.finicityPartnerId);
+
+export const getFinicityPartnerSecret = async (env: string) =>
+  await getConfig(env, ConfigKeys.finicityPartnerSecret);
+
+export const getFinicityAppKey = async (env: string) =>
+  await getConfig(env, ConfigKeys.finicityAppKey);

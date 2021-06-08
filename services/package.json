@@ -44,7 +44,7 @@
     "test-get-txn": "ts-mocha tests/integration/get-txn-by-id.test.ts --timeout 10000",
     "test-disbver": "ts-mocha tests/integration/verify-disbursment-from-user.test.ts --timeout 10000",
     "test-dapp": "ts-mocha tests/integration/dapp.test.ts --timeout 10000",
-    "test-sync": "ts-mocha tests/integration/finicity-bank-sync.test.ts --timeout 10000",
+    "test-sync": "ts-mocha tests/lambdas/bank-sync.test.ts --timeout 10000",
     "compile": "npm install && tsc"
   },
   "devDependencies": {

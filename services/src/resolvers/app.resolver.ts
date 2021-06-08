@@ -29,6 +29,7 @@ import { createDisbursementInputToTransaction } from "../utils/model/create-disb
 import { putTransaction } from "../utils/model/put-transaction.utils";
 import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
 import { verifyDisbursementFromUserAndPut } from "../pipes/verify-disbursement-from-user.pipe";
+import { Direction } from "../utils/enums/direction.enum";
 
 dotenv.config();
 
@@ -139,7 +140,7 @@ export class AppResolver {
         acc.donorMap[txn.donorId] = true;
       }
       /// Total Spent
-      if (txn.transactionType === TransactionType.Disbursement) {
+      if (txn.direction === Direction.Out) {
         if (txn.bankVerified) {
           acc.totalSpent = acc.totalSpent + txn.amount;
           acc.balance = acc.balance - txn.amount;

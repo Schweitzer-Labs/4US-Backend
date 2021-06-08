@@ -39,6 +39,8 @@ const getTransactionsRes =
     epochFrom: number,
     epochTo: number
   ): Promise<any> => {
+    console.log("customer id", customerId);
+    console.log("account id", accountId);
     const qs = `?fromDate=${epochFrom}&toDate=${epochTo}`;
     const apiUrl = `https://api.finicity.com/aggregation/v3/customers/${customerId}/accounts/${accountId}/transactions${qs}`;
     const token = await getToken(config);
@@ -100,7 +102,10 @@ export const getTransactions =
         () =>
           getTransactionsRes(config)(customerId, accountId, epochFrom, epochTo),
         (e: any) =>
-          new ApplicationError("Get Finicity Transactions request failed", e)
+          new ApplicationError(
+            "Get Finicity Transactions request failed",
+            JSON.stringify(e)
+          )
       ),
       taskEither.chain(validateTransactionsRes)
     );
