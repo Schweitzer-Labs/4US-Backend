@@ -48,7 +48,7 @@ export default async () => {
   )(dynamoDB)();
 
   if (isLeft(res)) {
-    throw new ApplicationError("sync failed", res.left);
+    throw new ApplicationError("Bank Sync Failed", res.left);
   }
 
   const m = res.right;
@@ -63,12 +63,14 @@ export default async () => {
 
   const either2 = await either1.map(async (eitherF) => {
     if (isLeft(eitherF)) {
-      throw new ApplicationError("error", eitherF);
+      throw new ApplicationError("Bank Sync Failed", eitherF);
     }
     return eitherF.right.map(async (f) => await f());
   });
 
   const res2 = await Promise.all(either2);
+
+  console.log("Bank Sync Succeeded");
 
   return "success";
 };

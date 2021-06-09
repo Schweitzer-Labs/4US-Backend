@@ -11,7 +11,7 @@ BankSyncFunction:
       EveryMinuteEvent:
         Type: Schedule
         Properties:
-          Schedule: 'rate(5 minute)'
+          Schedule: 'rate(5 minutes)'
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

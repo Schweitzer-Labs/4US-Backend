@@ -119,18 +119,14 @@ const finicityTxnToPaymentMethod = (
 
 const finicityTxnToTransactionType = (
   fTxn: IFinicityTransaction
-): TransactionType => {
-  if (fTxn.categorization.normalizedPayeeName === "deposit") {
-    return TransactionType.Deposit;
-  } else if (fTxn.amount < 0) {
-    return TransactionType.Disbursement;
-  }
-};
+): TransactionType =>
+  fTxn.amount > 0 ? TransactionType.Contribution : TransactionType.Disbursement;
 
 const finicityTxnToPlatformTxn =
   (committee: ICommittee) =>
   (fTxn: IFinicityTransaction): ITransaction => {
     return {
+      entityName: fTxn.categorization.normalizedPayeeName,
       committeeId: committee.id,
       id: genTxnId(),
       amount: Math.round(Math.abs(fTxn.amount)) * 100,
