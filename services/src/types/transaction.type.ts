@@ -7,6 +7,7 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
+import { EmploymentStatus } from "../utils/enums/employment-status";
 
 registerEnumType(Direction, {
   name: "Direction",
@@ -26,6 +27,10 @@ registerEnumType(EntityType, {
 
 registerEnumType(TransactionType, {
   name: "TransactionType",
+});
+
+registerEnumType(EmploymentStatus, {
+  name: "EmploymentStatus",
 });
 
 @ObjectType()
@@ -129,4 +134,7 @@ export class Transaction implements ITransaction {
 
   @Field({ nullable: true })
   donorId?: string;
+
+  @Field((type) => EmploymentStatus, { nullable: true })
+  employmentStatus?: string;
 }

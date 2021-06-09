@@ -10,6 +10,7 @@ import {
   Max,
   MaxLength,
 } from "class-validator";
+import { EmploymentStatus } from "../utils/enums/employment-status";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -19,6 +20,11 @@ registerEnumType(EntityType, {
 registerEnumType(PaymentMethod, {
   name: "PaymentMethod",
   description: "Payment method of a contribution",
+});
+
+registerEnumType(EmploymentStatus, {
+  name: "EmploymentStatus",
+  description: "Employment status of donor",
 });
 
 @InputType()
@@ -132,4 +138,7 @@ export class CreateContributionInput implements Partial<ITransaction> {
 
   @Field({ nullable: true })
   attestsToBeingAnAdultCitizen?: boolean;
+
+  @Field((type) => EmploymentStatus, { nullable: true })
+  employmentStatus?: EmploymentStatus;
 }

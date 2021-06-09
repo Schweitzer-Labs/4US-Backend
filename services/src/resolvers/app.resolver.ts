@@ -30,6 +30,7 @@ import { putTransaction } from "../utils/model/put-transaction.utils";
 import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
 import { verifyDisbursementFromUserAndPut } from "../pipes/verify-disbursement-from-user.pipe";
 import { Direction } from "../utils/enums/direction.enum";
+import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 
 dotenv.config();
 
@@ -236,14 +237,11 @@ export class AppResolver {
         );
     }
 
-    const res = await pipe(
-      runRulesEngine(billableEventsTableName)(donorsTableName)(txnsTableName)(
-        rulesTableName
-      )(dynamoDB)(instantIdConfig)(committee)(createContributionInput),
-      te.chain(
-        processContribution(currentUser)(txnsTableName)(dynamoDB)(this.stripe)
-      )
-    )();
+    const res = await runRulesAndProcess(billableEventsTableName)(
+      donorsTableName
+    )(txnsTableName)(rulesTableName)(dynamoDB)(this.stripe)(instantIdConfig)(
+      currentUser
+    )(committee)(createContributionInput)();
 
     if (isLeft(res)) {
       throw res.left;

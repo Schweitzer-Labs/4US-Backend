@@ -33,6 +33,7 @@ const CommitteeOptional = t.partial({
   finicityAccountId: t.string,
   chainId: t.string,
   emailAddresses: t.string,
+  employmentStatus: t.string,
 });
 
 export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);
