@@ -37,7 +37,6 @@ export const committeesData: ICommittee[] = [
       "61a54d64-a93e-469e-ae4d-95cc2495a2e6",
       "a85b50d2-5d0d-4392-a342-c587205c5797",
       "b9fa7e9b-e404-4ac8-a9d0-524be2949ef2",
-      "f48818c0-e057-481a-a934-e2c0afbdf296",
     ],
     tzDatabaseName: "America/New_York",
     state: "ny",

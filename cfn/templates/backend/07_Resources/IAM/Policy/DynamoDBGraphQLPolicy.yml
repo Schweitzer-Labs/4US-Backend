@@ -17,3 +17,4 @@ DynamoDBGraphQLPolicy:
             - dynamodb:Query
             - dynamodb:GetItem
             - dynamodb:PutItem
+            - dynamodb:Scan
