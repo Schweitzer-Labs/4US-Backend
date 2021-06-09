@@ -32,7 +32,7 @@ $(template): $(SRCS)
 		--output $@
 
 
-$(IMPORTED_RESOURCES): ImportedResources/$(REGION).yml $(SRCS)
+$(IMPORTED_RESOURCES): ImportedResources.yml $(SRCS)
 	@echo "Importing resources from $(REGION) into $(STACK) via $@"
 	@$(CREPES) . \
 		$(CREPES_PARAMS) \
