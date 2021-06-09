@@ -7,6 +7,7 @@ BankSyncFunction:
     Layers:
       - !Ref ServicesLayer
     Handler: app.bankSyncHandler
+    Role: !GetAtt LambdaGraphQLRole.Arn
     Events:
       EveryMinuteEvent:
         Type: Schedule
