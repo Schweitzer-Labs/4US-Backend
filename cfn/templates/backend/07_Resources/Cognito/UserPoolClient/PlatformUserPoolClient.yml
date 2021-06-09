@@ -22,10 +22,13 @@ PlatformUserPoolClient:
     AllowedOAuthFlowsUserPoolClient: true
     AllowedOAuthFlows:
       - code
+      - implicit
     AllowedOAuthScopes:
       - email
+      - phone
       - openid
       - profile
+      - aws.cognito.signin.user.admin
     ExplicitAuthFlows:
       - ALLOW_CUSTOM_AUTH
       - ALLOW_REFRESH_TOKEN_AUTH
