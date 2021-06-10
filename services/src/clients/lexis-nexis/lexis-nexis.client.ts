@@ -94,7 +94,7 @@ const runInstantId =
       request: payload,
       response: data,
     });
-    return {};
+    return data;
   };
 
 export interface IInstantIdResult {
