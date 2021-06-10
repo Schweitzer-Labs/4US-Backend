@@ -4,6 +4,7 @@ CommitteeGraphQLFunction:
     FunctionName: !Sub ${AWS::StackName}-CommitteeGraphQLFunction
     Description: GraphQL API for Committees
     CodeUri: lambdas/
+    MemorySize: 200
     Layers:
       - !Ref ServicesLayer
     Handler: app.committeeGraphQLHandler

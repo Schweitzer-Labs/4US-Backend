@@ -5,7 +5,7 @@ DonorGateway:
     StageName: !Sub ${LambdaRunEnvironment}
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
-      DomainName: !Sub donor.${Domain}.${TLD}
+      DomainName: !Sub donate-api.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
       DistributionDomainName: !Sub donate.${Domain}.${TLD}
       Route53:
