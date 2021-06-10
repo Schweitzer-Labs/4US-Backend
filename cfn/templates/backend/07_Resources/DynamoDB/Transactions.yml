@@ -8,8 +8,8 @@ Transactions:
     PointInTimeRecoverySpecification:
       PointInTimeRecoveryEnabled: true
     ProvisionedThroughput:
-      WriteCapacityUnits: 3
-      ReadCapacityUnits: 3
+      WriteCapacityUnits: 10
+      ReadCapacityUnits: 10
     AttributeDefinitions:
       - AttributeName: committeeId
         AttributeType: S
@@ -34,6 +34,6 @@ Transactions:
          Projection:
              ProjectionType: ALL
          ProvisionedThroughput:
-             WriteCapacityUnits: 3
-             ReadCapacityUnits: 3
+             WriteCapacityUnits: 10
+             ReadCapacityUnits: 10
 {% endif %}
