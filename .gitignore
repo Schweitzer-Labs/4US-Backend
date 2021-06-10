@@ -151,3 +151,4 @@ template.yml
 .aws-sam
 
 services/tests/seed/prod/*
+services/tests/seed/rules.data.ts

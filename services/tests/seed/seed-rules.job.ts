@@ -2,7 +2,7 @@ import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { IRule } from "../../src/queries/get-rule.decoder";
-import { rulesData } from "./rules.data";
+import { rulesData } from "./safford-rules.data";
 import { ruleToRuleCode } from "../../src/utils/model/gen-rule-code.utils";
 import { sleep } from "../../src/utils/sleep.utils";
 

@@ -15,12 +15,14 @@ export const queryDDB =
   (dynamoDB: DynamoDB) =>
   (committee: ICommittee) =>
   async (donor: IDonor): Promise<unknown> => {
+    const ruleCode = committeeAndDonorToRuleCode(committee)(donor);
+    console.log("rule code look up attempted", ruleCode);
     const res = await dynamoDB
       .query({
         TableName: rulesTableName,
         KeyConditionExpression: "code = :code",
         ExpressionAttributeValues: {
-          ":code": { S: committeeAndDonorToRuleCode(committee)(donor) },
+          ":code": { S: ruleCode },
         },
       })
       .promise();
