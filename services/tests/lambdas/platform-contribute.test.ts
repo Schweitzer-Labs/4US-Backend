@@ -58,53 +58,82 @@ const contrib = genPlatformContribution({
 const testEvent = genEvent(contrib);
 
 describe("Platform Contribute", function () {
-  it("Accepts a valid contribution", async () => {
-    const contrib = genPlatformContribution({
+  // it("Accepts a valid contribution", async () => {
+  //   const contrib = genPlatformContribution({
+  //     committeeId: "john-safford",
+  //     amount: 100,
+  //   });
+  //
+  //   const testEvent = genEvent(contrib);
+  //
+  //   const res = await platformContribute(testEvent);
+  //   const body = JSON.parse(res.body);
+  //
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(body.message).to.equal("success");
+  // });
+  //
+  // it("Reject an excess contribution", async () => {
+  //   const contrib = genPlatformContribution({
+  //     committeeId: "john-safford",
+  //     amount: 480100,
+  //   });
+  //
+  //   const testEvent = genEvent(contrib);
+  //
+  //   const res = await platformContribute(testEvent);
+  //   const body = JSON.parse(res.body);
+  //
+  //   expect(res.statusCode).to.equal(401);
+  //   expect(body.message).to.equal("Excess contribution attempted");
+  //   expect(body.remaining).to.be.a("number");
+  // });
+  //
+  // it("Reject bad card info", async () => {
+  //   const contrib = genPlatformContribution({
+  //     committeeId: "john-safford",
+  //     amount: 100,
+  //     cardNumber: "4242424241414141",
+  //   });
+  //
+  //   const testEvent = genEvent(contrib);
+  //
+  //   const res = await platformContribute(testEvent);
+  //   const body = JSON.parse(res.body);
+  //
+  //   expect(res.statusCode).to.equal(422);
+  //   expect(body.message).to.equal(
+  //     "Payment failed. Please ensure your card info is correct."
+  //   );
+  // });
+
+  it("Accepts a family contribution", async () => {
+    const req = {
       committeeId: "john-safford",
-      amount: 100,
-    });
+      amount: 2500,
+      firstName: "Evan",
+      lastName: "Piro",
+      addressLine1: "1687 Gates Ave 1R",
+      city: "Ridgewood",
+      state: "ny",
+      postalCode: "11385",
+      entityType: "Fam",
+      emailAddress: "dev.evanpiro@gmail.com",
+      cardNumber: "4242424242424242",
+      cardExpirationMonth: 12,
+      cardExpirationYear: 2023,
+      cardCVC: "123",
+      employmentStatus: "Unemployed",
+      attestsToBeingAnAdultCitizen: true,
+    };
 
-    const testEvent = genEvent(contrib);
+    const event = genEvent(req);
 
-    const res = await platformContribute(testEvent);
-    const body = JSON.parse(res.body);
+    const res = await platformContribute(event);
+
+    const body = JSON.stringify(res.body);
 
     expect(res.statusCode).to.equal(200);
-    expect(body.message).to.equal("success");
-  });
-
-  it("Reject an excess contribution", async () => {
-    const contrib = genPlatformContribution({
-      committeeId: "john-safford",
-      amount: 480100,
-    });
-
-    const testEvent = genEvent(contrib);
-
-    const res = await platformContribute(testEvent);
-    const body = JSON.parse(res.body);
-
-    expect(res.statusCode).to.equal(401);
-    expect(body.message).to.equal("Excess contribution attempted");
-    expect(body.remaining).to.be.a("number");
-  });
-
-  it("Reject bad card info", async () => {
-    const contrib = genPlatformContribution({
-      committeeId: "john-safford",
-      amount: 100,
-      cardNumber: "4242424241414141",
-    });
-
-    const testEvent = genEvent(contrib);
-
-    const res = await platformContribute(testEvent);
-    const body = JSON.parse(res.body);
-
-    expect(res.statusCode).to.equal(422);
-    expect(body.message).to.equal(
-      "Payment failed. Please ensure your card info is correct."
-    );
   });
 
   // describe("John Safford", function() {
