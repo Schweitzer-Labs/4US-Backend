@@ -59,34 +59,32 @@ describe("Synchs transactions with a platform account", function () {
     await putTransaction(txnsTableName)(dynamoDB)(tx1);
   });
   it("Adds transactions from finicity which does not match an existing transaction", async () => {
-    // const res = await finicityBankSync(config)(txnsTableName)(
-    //   committeesTableName
-    // )(dynamoDB)();
-    //
-    // if (isLeft(res)) {
-    //   throw new ApplicationError("sync failed", res.left);
-    // }
-    //
-    // const m = res.right;
-    //
-    // // prettier-ignore
-    // const unwind = Promise.all(
-    //     m.map((f) => f())
-    //     .map(async (f) => await f)
-    // );
-    //
-    // const either1 = await unwind;
-    //
-    // const either2 = await either1.map(async (eitherF) => {
-    //   if (isLeft(eitherF)) {
-    //     throw new ApplicationError("error", eitherF);
-    //   }
-    //   return eitherF.right.map(async (f) => await f());
-    // });
-    //
-    // const res2 = (await Promise.all(either2)).map(Promise.all);
-    //
-    // console.log(res2);
+    const res = await finicityBankSync(config)(txnsTableName)(
+      committeesTableName
+    )(dynamoDB)();
+
+    if (isLeft(res)) {
+      throw new ApplicationError("sync failed", res.left);
+    }
+
+    const m = res.right;
+
+    // prettier-ignore
+    const unwind = Promise.all(
+        m.map((f) => f())
+        .map(async (f) => await f)
+    );
+
+    const either1 = await unwind;
+
+    const either2 = await either1.map(async (eitherF) => {
+      if (isLeft(eitherF)) {
+        throw new ApplicationError("error", eitherF);
+      }
+      return eitherF.right.map(async (f) => await f());
+    });
+
+    const res2 = (await Promise.all(either2)).map(Promise.all);
 
     expect(true).to.equal(false);
   });

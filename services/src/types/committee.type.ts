@@ -1,54 +1,55 @@
 import { Field, ID, ObjectType } from "type-graphql";
+
 @ObjectType()
 export class Committee {
   @Field((type) => ID)
   id: string;
 
-  @Field((type) => String)
+  @Field()
   committeeName: string;
 
-  @Field((type) => String)
+  @Field()
   candidateFirstName: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   candidateMiddleName?: string;
 
-  @Field((type) => String)
+  @Field()
   candidateLastName: string;
 
-  @Field((type) => String)
-  bankName: string;
+  @Field({ nullable: true })
+  bankName?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   state?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   scope?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   officeType?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   party?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   race?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   district?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   county?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   ruleVersion?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   tzDatabaseName?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   platformPlan?: string;
 
-  @Field((type) => String)
+  @Field({ nullable: true })
   emailAddresses?: string;
 }

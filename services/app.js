@@ -10,3 +10,6 @@ exports.transactionEventDispatcherHandler =
   require("./dist/transaction-event-dispatcher.lambda").default;
 exports.policapitalEmailerHandler =
   require("./dist/policapital-emailer.lambda").default;
+exports.bankSyncHandler = require("./dist/bank-sync.lambda").default;
+exports.platformContribute =
+  require("./dist/platform-contribute.lambda").default;

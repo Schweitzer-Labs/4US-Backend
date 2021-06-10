@@ -1,0 +1,23 @@
+BankSyncFunction:
+  Type: "AWS::Serverless::Function"
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-BankSyncFunction
+    Runtime: nodejs12.x
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.bankSyncHandler
+    Role: !GetAtt LambdaGraphQLRole.Arn
+    Events:
+      EveryMinuteEvent:
+        Type: Schedule
+        Properties:
+          Schedule: 'rate(5 minutes)'
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
+        COMMITTEES_DDB_TABLE_NAME: !Ref Committees
+        DONORS_DDB_TABLE_NAME: !Ref Donors
+        RULES_DDB_TABLE_NAME: !Ref Rules
+        BILLABLE_EVENTS_DDB_TABLE_NAME: !Ref BillableEvents

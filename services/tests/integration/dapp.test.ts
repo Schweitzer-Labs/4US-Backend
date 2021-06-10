@@ -124,16 +124,11 @@ describe("DAPP Tests", async () => {
         launchCommittee(eNodeURL)(config)(committeesTableName)(dynamoDB)(
           committee
         ),
-        taskEither.map((a) => {
-          console.log("with chain", a);
-          return a;
-        }),
-        taskEither.chain((committeeWithChain) => {
-          console.log("from within", committeeWithChain);
-          return commitTransaction(config)(txnsTableName)(dynamoDB)(
+        taskEither.chain((committeeWithChain) =>
+          commitTransaction(config)(txnsTableName)(dynamoDB)(
             committeeWithChain
-          )(txn);
-        })
+          )(txn)
+        )
       )();
 
       if (isLeft(res)) {

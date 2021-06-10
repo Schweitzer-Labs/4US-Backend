@@ -1,15 +1,14 @@
 import { DynamoDB } from "aws-sdk";
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import * as AWS from "aws-sdk";
-import { committeesData } from "./committees.data";
+import { prodCommitteesData } from "./prod/prod-committees.data";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
 
-AWS.config.update({region: 'us-west-1'});
-
 dotenv.config();
 
-const committeesTableName = process.env.COMMITTEES_DDB_TABLE_NAME;
+AWS.config.region = "us-east-1";
+const committeesTableName = "prod-4us-backend-Committees-1HO9F0CX9Y3VL";
 
 const run =
   (committeesTableName: string) =>
@@ -26,6 +25,6 @@ AWS.config.apiVersions = {
 const dynamoDB = new DynamoDB();
 
 export const seedCommittees = async () =>
-  run(committeesTableName)(dynamoDB)(committeesData);
+  run(committeesTableName)(dynamoDB)(prodCommitteesData);
 
 seedCommittees();

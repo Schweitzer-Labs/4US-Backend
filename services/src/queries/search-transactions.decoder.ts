@@ -49,6 +49,7 @@ const TransactionOptional = t.partial({
   blockchainMetadata: t.unknown,
   finicityTransactionId: t.number,
   finicityTransactionData: FinicityTransaction,
+  employmentStatus: t.string,
 });
 
 export const Transaction = t.intersection([

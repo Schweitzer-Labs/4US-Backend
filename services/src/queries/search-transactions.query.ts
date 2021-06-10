@@ -63,7 +63,11 @@ const getTransactionsRes =
     };
 
     const res = await dynamoDB.query(query).promise();
-    return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
+    const marshalledRes = res.Items.map((item) =>
+      DynamoDB.Converter.unmarshall(item)
+    );
+
+    return marshalledRes;
   };
 
 export const searchTransactions =

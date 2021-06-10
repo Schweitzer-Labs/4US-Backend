@@ -1,14 +1,11 @@
 
 SHELL			:= bash
 export CREPES		:= $(PWD)/cfn/bin/crepes.py
+export PRODUCT		:= 4us
 
 # Allowed values are: prod, qa, demo
 ifeq ($(RUNENV),)
 	export RUNENV	:= qa
-endif
-
-ifeq ($(PRODUCT), )
-        export PRODUCT	:= p2
 endif
 
 ifeq ($(RUNENV), qa)

@@ -1,4 +1,14 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, ID, ObjectType, registerEnumType } from "type-graphql";
+import { EntityType } from "../utils/enums/entity-type.enum";
+import { EmploymentStatus } from "../utils/enums/employment-status";
+
+registerEnumType(EntityType, {
+  name: "EntityType",
+});
+
+registerEnumType(EmploymentStatus, {
+  name: "EmploymentStatus",
+});
 
 @ObjectType()
 export class Donor {
@@ -29,6 +39,9 @@ export class Donor {
   @Field((type) => String)
   postalCode: string;
 
-  @Field((type) => String)
-  contributeType: string;
+  @Field((type) => EntityType)
+  entityType: EntityType;
+
+  @Field((type) => EmploymentStatus)
+  employmentStatus: EmploymentStatus;
 }

@@ -150,4 +150,4 @@ template.yml
 **/dist
 .aws-sam
 
-services/tests/seed/prod/
+services/tests/seed/prod/*

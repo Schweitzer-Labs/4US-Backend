@@ -14,13 +14,9 @@ import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "../input-types/create-contribution.input-type";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { pipe } from "fp-ts/function";
-import { runRulesEngine } from "../pipes/rules-engine.pipe";
-import { taskEither as te } from "fp-ts";
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
 import { Stripe } from "stripe";
-import { processContribution } from "../pipes/process-contribution.pipe";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
@@ -29,6 +25,8 @@ import { createDisbursementInputToTransaction } from "../utils/model/create-disb
 import { putTransaction } from "../utils/model/put-transaction.utils";
 import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
 import { verifyDisbursementFromUserAndPut } from "../pipes/verify-disbursement-from-user.pipe";
+import { Direction } from "../utils/enums/direction.enum";
+import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 
 dotenv.config();
 
@@ -91,16 +89,6 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ): Promise<Aggregations> {
-    console.log("aggregation", committeeId, currentUser);
-    console.log([
-      billableEventsTableName,
-      txnsTableName,
-      committeesTableName,
-      donorsTableName,
-      rulesTableName,
-      runenv,
-    ]);
-
     await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
       currentUser
     );
@@ -136,10 +124,16 @@ export class AppResolver {
           acc.totalContributionsInProcessing =
             acc.totalContributionsInProcessing + txn.amount;
         }
-        acc.donorMap[txn.donorId] = true;
+        if (txn.donorId) {
+          acc.donorMap[txn.donorId] = true;
+        }
+      } else if (txn.direction === Direction.In) {
+        if (txn.bankVerified) {
+          acc.balance = acc.balance + txn.amount;
+        }
       }
       /// Total Spent
-      if (txn.transactionType === TransactionType.Disbursement) {
+      if (txn.direction === Direction.Out) {
         if (txn.bankVerified) {
           acc.totalSpent = acc.totalSpent + txn.amount;
           acc.balance = acc.balance - txn.amount;
@@ -231,14 +225,11 @@ export class AppResolver {
         );
     }
 
-    const res = await pipe(
-      runRulesEngine(billableEventsTableName)(donorsTableName)(txnsTableName)(
-        rulesTableName
-      )(dynamoDB)(instantIdConfig)(committee)(createContributionInput),
-      te.chain(
-        processContribution(currentUser)(txnsTableName)(dynamoDB)(this.stripe)
-      )
-    )();
+    const res = await runRulesAndProcess(billableEventsTableName)(
+      donorsTableName
+    )(txnsTableName)(rulesTableName)(dynamoDB)(this.stripe)(instantIdConfig)(
+      currentUser
+    )(committee)(createContributionInput)();
 
     if (isLeft(res)) {
       throw res.left;

@@ -100,7 +100,10 @@ export const getTransactions =
         () =>
           getTransactionsRes(config)(customerId, accountId, epochFrom, epochTo),
         (e: any) =>
-          new ApplicationError("Get Finicity Transactions request failed", e)
+          new ApplicationError(
+            "Get Finicity Transactions request failed",
+            JSON.stringify(e)
+          )
       ),
       taskEither.chain(validateTransactionsRes)
     );

@@ -13,3 +13,5 @@ export enum EntityType {
   Plc = "Plc",
   Oth = "Oth",
 }
+
+export const entityTypes = Object.values(EntityType);

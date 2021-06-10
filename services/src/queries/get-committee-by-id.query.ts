@@ -33,6 +33,7 @@ const CommitteeOptional = t.partial({
   finicityAccountId: t.string,
   chainId: t.string,
   emailAddresses: t.string,
+  employmentStatus: t.string,
 });
 
 export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);
@@ -45,8 +46,6 @@ export const committeeIdToDDBRes =
   (committeeTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (committeeId: string): Promise<any> => {
-    console.log("committeeIdToDDB called");
-    console.log(committeeId);
     const res = await dynamoDB
       .getItem({
         TableName: committeeTableName,
@@ -57,7 +56,6 @@ export const committeeIdToDDBRes =
         },
       })
       .promise();
-    console.log("ddb res", res);
     return DynamoDB.Converter.unmarshall(res.Item);
   };
 
@@ -65,7 +63,6 @@ export const getCommitteeById =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committeeId: string): TaskEither<ApplicationError, ICommittee> => {
-    console.log("get committee by ID request called", committeeId);
     return pipe(
       tryCatch<ApplicationError, any>(
         () => committeeIdToDDBRes(committeesTableName)(dynamoDB)(committeeId),

@@ -1,22 +1,21 @@
-CommitteeGraphQLFunction:
+PlatformContributeFunction:
   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-CommitteeGraphQLFunction
-    Description: GraphQL API for Committees
+    FunctionName: !Sub ${AWS::StackName}-PlatformContributeFunction
+    Description: Donor Facing Contribute Function for 4US Committees
     CodeUri: lambdas/
-    MemorySize: 200
     Layers:
       - !Ref ServicesLayer
-    Handler: app.committeeGraphQLHandler
+    Handler: app.platformContribute
     Runtime: nodejs12.x
     Role: !GetAtt LambdaGraphQLRole.Arn
     Events:
-      GraphQLAny:
+      PlatformContributeEvent:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
-          Path: /api/committee/graphql
-          Method: ANY
-          RestApiId: !Ref CommitteeGateway
+          Path: /api/platform/contribute
+          Method: post
+          RestApiId: !Ref DonorGateway
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

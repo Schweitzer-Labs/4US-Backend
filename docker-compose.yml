@@ -7,5 +7,7 @@ services:
       - AWS_SECRET_ACCESS_KEY
       - AWS_DEFAULT_REGION
       - REGION
+      - RUNENV
+      - PRODUCT
     volumes:
       - ./:/build-sam

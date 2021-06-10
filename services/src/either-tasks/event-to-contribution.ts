@@ -6,6 +6,7 @@ import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { ApplicationError } from "../utils/application-error";
 import { Source } from "../utils/enums/source.enum";
+import { eventToObject } from "../utils/event-to-object.util";
 
 export interface IContribution {
   amount: number;
@@ -52,22 +53,6 @@ const contribSchema = Joi.object({
   entityType: Joi.string().required(),
   attestsToBeingAdultCitizen: Joi.bool().required(),
 });
-
-export const eventToObject = (
-  event: any
-): TaskEither<ApplicationError, object> => {
-  try {
-    return right(JSON.parse(event.body));
-  } catch (e) {
-    return left(
-      new ApplicationError(
-        "Error parsing body",
-        {},
-        StatusCodes.UNPROCESSABLE_ENTITY
-      )
-    );
-  }
-};
 
 export const objectToContribution = (
   body: object

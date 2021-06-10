@@ -1,7 +1,7 @@
-import { flow, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import { DynamoDB } from "aws-sdk";
 import { taskEither } from "fp-ts";
-import { TaskEither } from "fp-ts/TaskEither";
+import { right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import * as FPArray from "fp-ts/lib/Array";
@@ -21,7 +21,6 @@ import { Source } from "../utils/enums/source.enum";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { FinicityTransactionType } from "../utils/enums/finicity-transaction-type.enum";
-import { Committee } from "../types/committee.type";
 import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
 
 export const finicityBankSync =
@@ -32,24 +31,22 @@ export const finicityBankSync =
     pipe(
       getAll4USCommittees(committeesTable)(dynamoDB),
       taskEither.map(
-        flow(
-          FPArray.map((committee) =>
-            pipe(
-              taskEither.of(committee),
-              taskEither.chain(getAllFinicityTxns(config)),
-              taskEither.chain((finicityTxns) =>
-                pipe(
-                  getUnverifiedTxns(txnsTable)(dynamoDB)(committee),
-                  taskEither.chain((platformTxns) =>
-                    pipe(
-                      finicityTxns,
-                      FPArray.map(
-                        matchAndProcess(txnsTable)(dynamoDB)(committee)(
-                          platformTxns
-                        )
-                      ),
-                      taskEither.of
-                    )
+        FPArray.map((committee) =>
+          pipe(
+            taskEither.of(committee),
+            taskEither.chain(getAllFinicityTxns(config)),
+            taskEither.chain((finicityTxns) =>
+              pipe(
+                getUnverifiedTxns(txnsTable)(dynamoDB)(committee),
+                taskEither.chain((platformTxns) =>
+                  pipe(
+                    finicityTxns,
+                    FPArray.map(
+                      matchAndProcess(txnsTable)(dynamoDB)(committee)(
+                        platformTxns
+                      )
+                    ),
+                    taskEither.of
                   )
                 )
               )
@@ -63,11 +60,9 @@ const matchToPlatformTxn =
   (pTxns: ITransaction[]) =>
   (fTxn: ITransaction): ITransaction[] => {
     return pTxns.filter((pTxn) => {
-      const hasSameAmount = pTxn.amount === fTxn.amount;
-      const hasOccurredWithinTheSameDay =
-        Math.abs(pTxn.paymentDate - fTxn.paymentDate) < 60 * 60 * 24;
-      const verdict = hasSameAmount && hasOccurredWithinTheSameDay;
-      return verdict;
+      const isFinicityTxn =
+        pTxn.finicityTransactionId === fTxn.finicityTransactionId;
+      return isFinicityTxn;
     });
   };
 
@@ -95,7 +90,10 @@ const matchAndProcess =
         return putTransactionAndDecode(txnsTableName)(dynamoDB)(fTxn);
       default:
         return taskEither.left(
-          new ApplicationError("Unhandled duplicates found", {})
+          new ApplicationError(
+            "Unhandled duplicates found",
+            JSON.stringify(pTxnRes)
+          )
         );
     }
   };
@@ -122,16 +120,16 @@ const finicityTxnToPaymentMethod = (
 const finicityTxnToTransactionType = (
   fTxn: IFinicityTransaction
 ): TransactionType =>
-  fTxn.categorization.normalizedPayeeName === "deposit" &&
-  TransactionType.Deposit;
+  fTxn.amount > 0 ? TransactionType.Contribution : TransactionType.Disbursement;
 
 const finicityTxnToPlatformTxn =
   (committee: ICommittee) =>
   (fTxn: IFinicityTransaction): ITransaction => {
     return {
+      entityName: fTxn.categorization.normalizedPayeeName,
       committeeId: committee.id,
       id: genTxnId(),
-      amount: Math.round(Math.abs(fTxn.amount)) * 100,
+      amount: Math.abs(fTxn.amount) * 100,
       paymentMethod: finicityTxnToPaymentMethod(fTxn),
       direction: fTxn.amount > 0 ? Direction.In : Direction.Out,
       paymentDate: epochToMilli(fTxn.postedDate),
@@ -145,9 +143,6 @@ const finicityTxnToPlatformTxn =
       finicityTransactionData: fTxn,
     };
   };
-// const match = (pTxn: ITransaction) => (fTxns: IFinicityTransaction[]): boolean => {
-//   return fTxns.filter()
-// }
 
 const getAllFinicityTxns =
   (config: FinicityConfig) =>
@@ -155,6 +150,11 @@ const getAllFinicityTxns =
     committee: ICommittee
   ): TaskEither<ApplicationError, IFinicityTransaction[]> => {
     const { finicityAccountId, finicityCustomerId } = committee;
+
+    if (!finicityAccountId || !finicityCustomerId) {
+      return right([]);
+    }
+
     const epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6;
     const epochTo = milliToEpoch(now());
     return getTransactions(config)({
@@ -171,5 +171,4 @@ const getUnverifiedTxns =
   (committee: ICommittee): TaskEither<ApplicationError, ITransaction[]> =>
     searchTransactions(txnsTableName)(dynamoDB)({
       committeeId: committee.id,
-      bankVerified: false,
     });

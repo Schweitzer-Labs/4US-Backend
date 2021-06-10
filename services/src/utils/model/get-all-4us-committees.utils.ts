@@ -33,6 +33,8 @@ const queryDB =
         },
       })
       .promise();
-
-    return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
+    const committees = res.Items.map((item) =>
+      DynamoDB.Converter.unmarshall(item)
+    );
+    return committees;
   };
