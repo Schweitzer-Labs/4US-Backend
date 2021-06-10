@@ -5,6 +5,8 @@ import { committeesData } from "./committees.data";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
 
+AWS.config.update({region: 'us-west-1'});
+
 dotenv.config();
 
 const committeesTableName = process.env.COMMITTEES_DDB_TABLE_NAME;
