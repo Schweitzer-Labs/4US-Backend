@@ -18,7 +18,7 @@ export class Committee {
   candidateLastName: string;
 
   @Field((type) => String)
-  bankName: string;
+  bankName?: string;
 
   @Field((type) => String)
   state?: string;
