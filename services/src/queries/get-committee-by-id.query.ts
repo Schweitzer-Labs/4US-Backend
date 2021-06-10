@@ -58,7 +58,6 @@ export const committeeIdToDDBRes =
         },
       })
       .promise();
-    console.log("ddb res", res);
     return DynamoDB.Converter.unmarshall(res.Item);
   };
 

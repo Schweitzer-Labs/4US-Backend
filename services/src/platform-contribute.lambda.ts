@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "./utils/config";
 import { Stripe } from "stripe";
 import { IInstantIdConfig } from "./clients/lexis-nexis/lexis-nexis.client";
@@ -5,6 +6,9 @@ import * as dotenv from "dotenv";
 import { platformContribute } from "./pipes/platform-contribute.pipe";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
+import { pipe } from "fp-ts/function";
+import { task, taskEither } from "fp-ts";
+import { successResponse } from "./utils/success-response";
 
 dotenv.config();
 
@@ -27,7 +31,7 @@ let lnUsername: string;
 let lnPassword: string;
 
 export default async (event: any) => {
-  if (stripeApiKey || stripe || lnUsername || lnPassword) {
+  if (!stripeApiKey || !stripe || !lnUsername || !lnPassword) {
     stripeApiKey = await getStripeApiKey(runenv);
     lnUsername = await getLNUsername(runenv);
     lnPassword = await getLNPassword(runenv);
@@ -40,7 +44,15 @@ export default async (event: any) => {
     password: lnPassword,
   };
 
-  return await platformContribute(billableEventsTableName)(donorsTableName)(
-    committeesTableName
-  )(txnsTableName)(rulesTableName)(dynamoDB)(stripe)(instantIdConfig)(event)();
+  console.log("this is stripe", stripe);
+
+  return await pipe(
+    platformContribute(billableEventsTableName)(donorsTableName)(
+      committeesTableName
+    )(txnsTableName)(rulesTableName)(dynamoDB)(stripe)(instantIdConfig)(event),
+    taskEither.fold(
+      (error) => task.of(error.toResponse()),
+      (result) => task.of(successResponse)
+    )
+  )();
 };

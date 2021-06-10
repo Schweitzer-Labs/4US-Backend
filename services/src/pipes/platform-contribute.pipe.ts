@@ -18,6 +18,8 @@ import { taskEither as te } from "fp-ts";
 import { getCommitteeById } from "../queries/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
+import { eventToObject } from "../utils/event-to-object.util";
+import { PaymentMethod } from "../utils/enums/payment-method.enum";
 
 const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
 const stringReq = (min = 1, max = 200) =>
@@ -32,7 +34,9 @@ const schema = Joi.object({
   city: stringReq(),
   state: stringReq(2, 2),
   postalCode: stringReq(5, 10),
-  entityType: Joi.string().valid(entityTypes),
+  entityType: Joi.string()
+    .valid(...entityTypes)
+    .required(),
   emailAddress: Joi.string().email(),
   cardNumber: stringReq(),
   cardExpirationMonth: Joi.number().min(1).max(12).required(),
@@ -40,7 +44,7 @@ const schema = Joi.object({
   cardCVC: stringReq(2, 4),
   entityName: stringOpt(),
   employer: stringOpt(),
-  employmentStatus: Joi.string().valid(employmentStatuses),
+  employmentStatus: Joi.string().valid(...employmentStatuses),
   occupation: stringOpt(),
   middleName: stringOpt(),
   refCode: stringOpt(),
@@ -100,14 +104,18 @@ const validateInd = (
 const eventToCreateContribInput = (
   event: any
 ): TaskEither<ApplicationError, CreateContributionInput> => {
-  const res = schema.validate(event.body, { allowUnknown: true });
+  const res = schema.validate(event);
   if (res.error) {
     return left(
       new ApplicationError(res.error.message, {}, StatusCodes.BAD_REQUEST)
     );
   } else {
     //@Todo Make this a typesafe operation
-    const contrib = plainToClass(CreateContributionInput, res.value);
+    const contrib = plainToClass(CreateContributionInput, {
+      ...res.value,
+      paymentMethod: PaymentMethod.Credit,
+    });
+    console.log(contrib);
     return right(contrib);
   }
 };
@@ -123,7 +131,8 @@ export const platformContribute =
   (instantIdConfig: IInstantIdConfig) =>
   (event: any): TaskEither<ApplicationError, ITransaction> => {
     return pipe(
-      eventToCreateContribInput(event),
+      eventToObject(event),
+      te.chain(eventToCreateContribInput),
       te.chain(validateInd),
       te.chain(validateNonInd),
       te.chain((contrib) =>

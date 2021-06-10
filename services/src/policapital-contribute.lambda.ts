@@ -1,4 +1,3 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
 import { Stripe } from "stripe";
 import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
@@ -16,7 +15,6 @@ let stripeApiKey: string;
 let dynamoDB: DynamoDB;
 
 export default async (event: any) => {
-  console.log(JSON.stringify(event));
   if (!stripeApiKey || !stripe || !dynamoDB) {
     // Set up dependencies
     stripeApiKey = await getStripeApiKey(runenv);
@@ -30,7 +28,7 @@ export default async (event: any) => {
     dynamoDB = new DynamoDB();
   }
 
-  return main(committeeTableName)(transactionsTableName)(stripe)(dynamoDB)(
-    event
-  )();
+  return await main(committeeTableName)(transactionsTableName)(stripe)(
+    dynamoDB
+  )(event)();
 };
