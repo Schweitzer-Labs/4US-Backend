@@ -22,6 +22,7 @@ interface GenPlatformContribConfig {
   addressLine2?: string;
   phoneNumber?: string;
   attestsToBeingAnAdultCitizen?: boolean;
+  cardNumber?: string;
 }
 
 const genPlatformContribution = (config: GenPlatformContribConfig) => ({
@@ -34,7 +35,7 @@ const genPlatformContribution = (config: GenPlatformContribConfig) => ({
   employmentStatus: EmploymentStatus.SelfEmployed,
   employer: "hello",
   entityType: "Ind",
-  cardNumber: "4242424242424242",
+  cardNumber: config.cardNumber || "4242424242424242",
   cardExpirationMonth: 12,
   cardExpirationYear: 2023,
   cardCVC: "123",
@@ -51,16 +52,58 @@ const genEvent = (payload: object) => {
 
 const contrib = genPlatformContribution({
   committeeId: "john-safford",
-  amount: 20000,
+  amount: 2000,
 });
 
 const testEvent = genEvent(contrib);
 
 describe("Platform Contribute", function () {
   it("Accepts a valid contribution", async () => {
-    const res = await platformContribute(testEvent);
-    console.log(res);
+    const contrib = genPlatformContribution({
+      committeeId: "john-safford",
+      amount: 100,
+    });
 
-    expect(res.body).to.equal("success");
+    const testEvent = genEvent(contrib);
+
+    const res = await platformContribute(testEvent);
+    const body = JSON.parse(res.body);
+
+    expect(res.statusCode).to.equal(200);
+    expect(body.message).to.equal("success");
+  });
+
+  it("Reject an excess contribution", async () => {
+    const contrib = genPlatformContribution({
+      committeeId: "john-safford",
+      amount: 480100,
+    });
+
+    const testEvent = genEvent(contrib);
+
+    const res = await platformContribute(testEvent);
+    const body = JSON.parse(res.body);
+
+    expect(res.statusCode).to.equal(401);
+    expect(body.message).to.equal("Excess contribution attempted");
+    expect(body.remaining).to.be.a("number");
+  });
+
+  it("Reject bad card info", async () => {
+    const contrib = genPlatformContribution({
+      committeeId: "john-safford",
+      amount: 100,
+      cardNumber: "4242424241414141",
+    });
+
+    const testEvent = genEvent(contrib);
+
+    const res = await platformContribute(testEvent);
+    const body = JSON.parse(res.body);
+
+    expect(res.statusCode).to.equal(422);
+    expect(body.message).to.equal(
+      "Payment failed. Please ensure your card info is correct."
+    );
   });
 });

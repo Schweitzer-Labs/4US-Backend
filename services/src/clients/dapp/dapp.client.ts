@@ -73,8 +73,6 @@ export const deployCommitteeChain =
       options
     );
 
-    console.log("chain config", chain);
-
     return chain;
   };
 
@@ -103,7 +101,6 @@ const commitTransactionToChain =
   (committee: ICommittee) =>
   (t: ITransaction) =>
   async (user: ICreateUserResponse): Promise<any> => {
-    console.log("chain committee is", committee);
     const contract = {
       name: "CommitteeContract",
       address: "0000000000000000000000000000000000000100",
@@ -129,7 +126,7 @@ const commitTransactionToChain =
       },
     };
     const res = await rest.call(user, callArgs, options);
-    console.log(res);
+
     return res;
   };
 
@@ -181,7 +178,6 @@ export const callMethodOnContract =
     await sleep(1000);
 
     const state = await rest.getState(user, contract, options);
-    console.log("state is here", state);
 
     return res;
   };

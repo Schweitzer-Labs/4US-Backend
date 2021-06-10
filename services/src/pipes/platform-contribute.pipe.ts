@@ -87,7 +87,8 @@ const validateInd = (
       [EmploymentStatus.Employed, EmploymentStatus.SelfEmployed].includes(
         c.employmentStatus
       ) &&
-      !c.employer
+      !c.employer &&
+      !c.occupation
     ) {
       return left(
         new ApplicationError(
@@ -115,7 +116,6 @@ const eventToCreateContribInput = (
       ...res.value,
       paymentMethod: PaymentMethod.Credit,
     });
-    console.log(contrib);
     return right(contrib);
   }
 };

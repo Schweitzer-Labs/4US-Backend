@@ -46,8 +46,6 @@ export const committeeIdToDDBRes =
   (committeeTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (committeeId: string): Promise<any> => {
-    console.log("committeeIdToDDB called");
-    console.log(committeeId);
     const res = await dynamoDB
       .getItem({
         TableName: committeeTableName,
@@ -65,7 +63,6 @@ export const getCommitteeById =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committeeId: string): TaskEither<ApplicationError, ICommittee> => {
-    console.log("get committee by ID request called", committeeId);
     return pipe(
       tryCatch<ApplicationError, any>(
         () => committeeIdToDDBRes(committeesTableName)(dynamoDB)(committeeId),

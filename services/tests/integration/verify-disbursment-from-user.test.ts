@@ -56,8 +56,6 @@ describe("Verify Disbursement Validator", function () {
       committee.id
     )(disbr.id)(input)();
 
-    console.log(res);
-
     if (isLeft(res)) {
       throw new ApplicationError("Test failed", res);
     }

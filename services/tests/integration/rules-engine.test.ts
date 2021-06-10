@@ -61,7 +61,6 @@ describe("Rules engine", function () {
       )(dynamoDB)(instantIdConfig)(committee)(contrib),
       taskEither.fold(
         (e) => {
-          console.log(e);
           return task.of(e.data.remaining);
         },
         (s) => task.of("worked")

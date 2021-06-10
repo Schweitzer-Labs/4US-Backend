@@ -59,7 +59,11 @@ export const processPaymentFromCommitteeContribution =
       return payment;
     } catch (e) {
       console.error("Payment failed", stripCardInfo(contribution));
-      throw new ApplicationError("Payment failed", e, StatusCodes.UNAUTHORIZED);
+      throw new ApplicationError(
+        "Payment failed. Please ensure your card info is correct.",
+        e,
+        StatusCodes.UNPROCESSABLE_ENTITY
+      );
     }
   };
 
@@ -72,5 +76,9 @@ export const committeeContributionToPayment =
       () =>
         processPaymentFromCommitteeContribution(stripe)(committeeContribution),
       (error) =>
-        new ApplicationError("Payment failed", error, StatusCodes.UNAUTHORIZED)
+        new ApplicationError(
+          "Payment failed. Please ensure your card info is correct.",
+          error,
+          StatusCodes.UNPROCESSABLE_ENTITY
+        )
     );

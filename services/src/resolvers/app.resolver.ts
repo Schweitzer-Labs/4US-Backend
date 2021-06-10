@@ -89,16 +89,6 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ): Promise<Aggregations> {
-    console.log("aggregation", committeeId, currentUser);
-    console.log([
-      billableEventsTableName,
-      txnsTableName,
-      committeesTableName,
-      donorsTableName,
-      rulesTableName,
-      runenv,
-    ]);
-
     await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
       currentUser
     );

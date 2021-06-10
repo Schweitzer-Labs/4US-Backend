@@ -86,8 +86,6 @@ describe("Synchs transactions with a platform account", function () {
 
     const res2 = (await Promise.all(either2)).map(Promise.all);
 
-    console.log(res2);
-
     expect(true).to.equal(false);
   });
 

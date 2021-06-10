@@ -13,11 +13,9 @@ export const loadCommitteeOrThrow =
   (dynamoDB: DynamoDB) =>
   (committeeId: string) =>
   async (currentUser: string): Promise<ICommittee> => {
-    console.log("from load committee", committeeId, committeeTableName);
     const eitherCommittees = await getCommitteeById(committeeTableName)(
       dynamoDB
     )(committeeId)();
-    console.log("eitherCommittees set", JSON.stringify(eitherCommittees));
     if (isLeft(eitherCommittees)) {
       console.log("error gets thrown, committees is left");
       throw new ApplicationError(
@@ -31,8 +29,6 @@ export const loadCommitteeOrThrow =
       console.log("api use is not authorized");
       throw new UnauthorizedError();
     }
-
-    console.log("committee has loaded", committee);
 
     return committee;
   };

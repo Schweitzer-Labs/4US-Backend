@@ -113,7 +113,6 @@ const formatMessage =
   (txn: ITransaction) =>
   (committee: ICommittee): SendMessageRequest => {
     const { tzDatabaseName, emailAddresses, committeeName } = committee;
-    console.log(committee);
     return {
       MessageAttributes: {
         committeeEmailAddress: {

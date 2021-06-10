@@ -39,8 +39,6 @@ const getTransactionsRes =
     epochFrom: number,
     epochTo: number
   ): Promise<any> => {
-    console.log("customer id", customerId);
-    console.log("account id", accountId);
     const qs = `?fromDate=${epochFrom}&toDate=${epochTo}`;
     const apiUrl = `https://api.finicity.com/aggregation/v3/customers/${customerId}/accounts/${accountId}/transactions${qs}`;
     const token = await getToken(config);

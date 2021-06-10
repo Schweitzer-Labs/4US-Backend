@@ -66,7 +66,7 @@ const getTransactionsRes =
     const marshalledRes = res.Items.map((item) =>
       DynamoDB.Converter.unmarshall(item)
     );
-    console.log(marshalledRes);
+
     return marshalledRes;
   };
 

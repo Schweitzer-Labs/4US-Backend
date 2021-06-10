@@ -9,6 +9,8 @@ import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import { successResponse } from "./utils/success-response";
+import { errorResponse } from "./utils/error-response.utils";
+import { StatusCodes } from "http-status-codes";
 
 dotenv.config();
 
@@ -44,14 +46,27 @@ export default async (event: any) => {
     password: lnPassword,
   };
 
-  console.log("this is stripe", stripe);
-
   return await pipe(
     platformContribute(billableEventsTableName)(donorsTableName)(
       committeesTableName
     )(txnsTableName)(rulesTableName)(dynamoDB)(stripe)(instantIdConfig)(event),
     taskEither.fold(
-      (error) => task.of(error.toResponse()),
+      (error) => {
+        const message = error.message;
+        const remaining = error?.data?.remaining
+          ? { remaining: error.data.remaining }
+          : {};
+
+        const res = {
+          statusCode: error.statusCode || StatusCodes.UNAUTHORIZED,
+          body: {
+            message,
+            ...remaining,
+          },
+        };
+
+        return task.of(errorResponse(res));
+      },
       (result) => task.of(successResponse)
     )
   )();

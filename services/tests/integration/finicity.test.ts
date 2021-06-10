@@ -36,7 +36,7 @@ describe("Test Finicity client", function () {
         (res) => task.of(res)
       )
     )();
-    console.log(transactions);
+
     expect(transactions[0].amount).to.be.an("number");
   });
 
