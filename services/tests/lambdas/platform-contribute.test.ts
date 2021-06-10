@@ -106,4 +106,10 @@ describe("Platform Contribute", function () {
       "Payment failed. Please ensure your card info is correct."
     );
   });
+
+  // describe("John Safford", function() {
+  //   it("Rejects a contribution exceeding ind limit", async () => {
+  //
+  //   })
+  // })
 });

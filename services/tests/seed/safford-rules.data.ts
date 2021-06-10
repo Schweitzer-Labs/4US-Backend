@@ -12,7 +12,6 @@ export const rulesData = [
     limit: 149475,
     aggregate_duration: "aggregate_limit",
     fields: "donor_full_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -27,7 +26,6 @@ export const rulesData = [
     limit: 298950,
     aggregate_duration: "",
     fields: "donor_full_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -42,7 +40,6 @@ export const rulesData = [
     limit: 298950,
     aggregate_duration: "aggregate_limit",
     fields: "entity_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -57,7 +54,6 @@ export const rulesData = [
     limit: 298950,
     aggregate_duration: "",
     fields: "entity_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -72,7 +68,6 @@ export const rulesData = [
     limit: 500000,
     aggregate_duration: "calendar_year",
     fields: "entity_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -87,7 +82,6 @@ export const rulesData = [
     limit: 500000,
     aggregate_duration: "",
     fields: "entity_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -102,7 +96,6 @@ export const rulesData = [
     limit: 298950,
     aggregate_duration: "aggregate_limit",
     fields: "entity_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -117,7 +110,6 @@ export const rulesData = [
     limit: 298950,
     aggregate_duration: "aggregate_limit",
     fields: "entity_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -147,7 +139,6 @@ export const rulesData = [
     limit: 298950,
     aggregate_duration: "aggregate_limit",
     fields: "entity_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -162,7 +153,6 @@ export const rulesData = [
     limit: 298950,
     aggregate_duration: "aggregate_limit",
     fields: "donor_full_name,donor_address",
-    id: 1,
   },
   {
     state: "ny",
@@ -177,6 +167,5 @@ export const rulesData = [
     limit: 298950,
     aggregate_duration: "aggregate_limit",
     fields: "donor_full_name,donor_address",
-    id: 1,
   },
 ];

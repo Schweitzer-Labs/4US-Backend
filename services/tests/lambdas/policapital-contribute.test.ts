@@ -2,7 +2,6 @@ import { expect } from "chai";
 import contribute from "../../src/policapital-contribute.lambda";
 import { invalidPolicapitalContributeProxy } from "../events/invalid-policapital-contribute.proxy";
 import { validPolicapitalContributeProxy } from "../events/valid-policapital-contribute-proxy";
-import { seedCommittees } from "../seed/seed-committees.job";
 import { genCommittee } from "../utils/gen-committee.util";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
