@@ -134,7 +134,9 @@ export class AppResolver {
           acc.totalContributionsInProcessing =
             acc.totalContributionsInProcessing + txn.amount;
         }
-        acc.donorMap[txn.donorId] = true;
+        if (txn.donorId) {
+          acc.donorMap[txn.donorId] = true;
+        }
       } else if (txn.direction === Direction.In) {
         if (txn.bankVerified) {
           acc.balance = acc.balance + txn.amount;
