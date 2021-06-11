@@ -147,7 +147,7 @@ realclean: clean
 local: build
 	@sam local start-api --warm-containers EAGER --template-file $(SAM_BUILD_DIR)/template.yaml
 
-import:
+import: mkbuilddir
 	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) import
 
 package: build
