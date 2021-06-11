@@ -2,3 +2,25 @@ PurplePayHostedZone:
   Matcher:
     Id: Z0505014WPG6KZLWPQJF
   Property: [Id, Name]
+{% if RUNENV == 'qa' and PRODUCT == '4us' %}
+BillableEvents:
+  Matcher:
+    TableName: qa-4us-backend-BillableEvents-TN5QYKT5637O
+  Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification]
+Committees:
+  Matcher:
+    TableName: qa-4us-backend-Committees-1QNBGOQ2OEBZI
+  Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification]
+Donors:
+  Matcher:
+    TableName: qa-4us-backend-Donors-WJ73ERW34MAV
+  Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification]
+Rules:
+  Matcher:
+    TableName: qa-4us-backend-Rules-1SWN4ADOI7MRK
+  Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification]
+Transactions:
+  Matcher:
+    TableName: qa-4us-backend-Transactions-1JHQO9WAOZDJD
+  Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification]
+{% endif %}
