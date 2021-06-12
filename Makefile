@@ -124,8 +124,7 @@ buildstacks: mkbuilddir $(CFN_TEMPLATES)
 	echo Built all the stacks
 
 compile:
-	cd services && npm run compile
-
+	npm -C services run compile
 
 dep:
 	@pip3 install jinja2 cfn_flip boto3
@@ -133,9 +132,6 @@ dep:
 $(CFN_BUILD_DIR)/%.yml: $(CFN_SRC_DIR)/%
 	$(MAKE) template=$@ -C $^ check
 
-
-check: buildstacks
-	$(MAKE) -c $(CFN_SRC_DIR)/$(BACKEND_STACK) check
 
 
 clean:
@@ -147,11 +143,15 @@ realclean: clean
 local: build
 	@sam local start-api --warm-containers EAGER --template-file $(SAM_BUILD_DIR)/template.yaml
 
+
+check: buildstacks
+	$(MAKE) -c $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
+
 import: mkbuilddir
-	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) import
+	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
 
-package:
-	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) package
+package: build
+	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
 
-deploy:
-	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) deploy
+deploy: package
+	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
