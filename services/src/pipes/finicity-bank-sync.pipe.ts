@@ -30,26 +30,27 @@ export const finicityBankSync =
   (dynamoDB: DynamoDB) =>
     pipe(
       getAll4USCommittees(committeesTable)(dynamoDB),
-      taskEither.map(
-        FPArray.map((committee) =>
-          pipe(
-            taskEither.of(committee),
-            taskEither.chain(getAllFinicityTxns(config)),
-            taskEither.chain((finicityTxns) =>
-              pipe(
-                getUnverifiedTxns(txnsTable)(dynamoDB)(committee),
-                taskEither.chain((platformTxns) =>
-                  pipe(
-                    finicityTxns,
-                    FPArray.map(
-                      matchAndProcess(txnsTable)(dynamoDB)(committee)(
-                        platformTxns
-                      )
-                    ),
-                    taskEither.of
-                  )
-                )
-              )
+      taskEither.map(FPArray.map(syncCommittee(config)(txnsTable)(dynamoDB)))
+    );
+
+export const syncCommittee =
+  (config: FinicityConfig) =>
+  (txnsTable: string) =>
+  (dynamoDB: DynamoDB) =>
+  (committee: ICommittee) =>
+    pipe(
+      taskEither.of(committee),
+      taskEither.chain(getAllFinicityTxns(config)),
+      taskEither.chain((finicityTxns) =>
+        pipe(
+          getUnverifiedTxns(txnsTable)(dynamoDB)(committee),
+          taskEither.chain((platformTxns) =>
+            pipe(
+              finicityTxns,
+              FPArray.map(
+                matchAndProcess(txnsTable)(dynamoDB)(committee)(platformTxns)
+              ),
+              taskEither.of
             )
           )
         )
@@ -125,11 +126,14 @@ const finicityTxnToTransactionType = (
 const finicityTxnToPlatformTxn =
   (committee: ICommittee) =>
   (fTxn: IFinicityTransaction): ITransaction => {
+    const checkNumber = fTxn.checkNum
+      ? { checkNumber: fTxn.checkNum + "" }
+      : {};
     return {
       entityName: fTxn.categorization.normalizedPayeeName,
       committeeId: committee.id,
       id: genTxnId(),
-      amount: Math.abs(fTxn.amount) * 100,
+      amount: Math.round(Math.abs(fTxn.amount) * 100),
       paymentMethod: finicityTxnToPaymentMethod(fTxn),
       direction: fTxn.amount > 0 ? Direction.In : Direction.Out,
       paymentDate: epochToMilli(fTxn.postedDate),
@@ -137,7 +141,7 @@ const finicityTxnToPlatformTxn =
       source: Source.FINICITY,
       bankVerified: true,
       ruleVerified: false,
-      checkNumber: fTxn.checkNum + "",
+      ...checkNumber,
       transactionType: finicityTxnToTransactionType(fTxn),
       finicityTransactionId: fTxn.id,
       finicityTransactionData: fTxn,

@@ -47,6 +47,8 @@
     "test-dapp": "ts-mocha tests/integration/dapp.test.ts --timeout 10000",
     "test-sync": "ts-mocha tests/lambdas/bank-sync.test.ts --timeout 10000",
     "test-4us-contribute": "ts-mocha tests/lambdas/platform-contribute.test.ts --timeout 10000",
+    "test-committee-sync": "ts-mocha tests/integration/committee-sync.test.ts --timeout 10000",
+    "test-server": "ts-node-dev tests/server/graphql.ts --watch",
     "compile": "npm install && tsc"
   },
   "devDependencies": {
@@ -66,6 +68,7 @@
     "prettier": "^2.3.0",
     "sinon": "^11.1.1",
     "ts-node": "^9.1.1",
+    "ts-node-dev": "^1.1.6",
     "typescript": "^4.3.2"
   }
 }
