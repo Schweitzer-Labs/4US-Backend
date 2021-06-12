@@ -81,7 +81,7 @@ import: $(IMPORTED_RESOURCES)
 		--stack-name=$(STACK) \
 		--region=$(REGION)
 
-package: build
+package:
 	@aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
 		--template-file $(SAM_BUILD_DIR)/template.yaml \
@@ -90,7 +90,7 @@ package: build
 		--s3-prefix $(STACK) \
 		--output-template-file $(PACKAGE)
 
-deploy: package
+deploy:
 	@aws cloudformation deploy \
 		--endpoint-url $(ENDPOINT) \
 		--region $(REGION) \
