@@ -45,7 +45,7 @@ const tx1 = genTransaction({
   paymentDate: 1612868400000,
 });
 
-describe("Synchs transactions with a platform account", function () {
+describe("Syncs transactions with a platform account", function () {
   before(async () => {
     // await putCommittee(committeesTableName)(dynamoDB)(committee);
     // await putTransaction(txnsTableName)(dynamoDB)(tx1);

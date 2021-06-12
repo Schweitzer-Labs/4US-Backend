@@ -78,7 +78,6 @@ const runInstantId =
   (config: IInstantIdConfig) =>
   async (donorInput: IDonorInput): Promise<any> => {
     const payload = formatInstantIdRequest(donorInput);
-    // @ToDo re-enable once IPs are whitelisted
     const { data } = await axios.post(instantIdEndpoint, payload, {
       auth: {
         username: config.username,

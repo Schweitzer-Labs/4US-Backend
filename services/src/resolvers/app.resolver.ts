@@ -27,6 +27,8 @@ import { VerifyDisbursementInput } from "../input-types/verify-disbursement.inpu
 import { verifyDisbursementFromUserAndPut } from "../pipes/verify-disbursement-from-user.pipe";
 import { Direction } from "../utils/enums/direction.enum";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
+import * as https from "https";
+import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 
 dotenv.config();
 
@@ -41,7 +43,15 @@ AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
 
-const dynamoDB = new DynamoDB();
+const agent = new https.Agent({
+  keepAlive: true,
+});
+
+const dynamoDB = new DynamoDB({
+  httpOptions: {
+    agent,
+  },
+});
 
 @Service()
 @Resolver()
@@ -100,58 +110,8 @@ export class AppResolver {
       throw res.left;
     }
 
-    const transactions = res.right;
-
-    const init: any = {
-      balance: 0,
-      totalRaised: 0,
-      totalSpent: 0,
-      totalDonors: 0,
-      totalTransactions: transactions.length,
-      totalContributionsInProcessing: 0,
-      totalDisbursementsInProcessing: 0,
-      needsReviewCount: 0,
-      donorMap: {},
-    };
-
-    const aggs: any = transactions.reduce((acc: any, txn) => {
-      // Total Raised
-      if (txn.transactionType === TransactionType.Contribution) {
-        if (txn.bankVerified) {
-          acc.totalRaised = acc.totalRaised + txn.amount;
-          acc.balance = acc.balance + txn.amount;
-        } else {
-          acc.totalContributionsInProcessing =
-            acc.totalContributionsInProcessing + txn.amount;
-        }
-        if (txn.donorId) {
-          acc.donorMap[txn.donorId] = true;
-        }
-      } else if (txn.direction === Direction.In) {
-        if (txn.bankVerified) {
-          acc.balance = acc.balance + txn.amount;
-        }
-      }
-      /// Total Spent
-      if (txn.direction === Direction.Out) {
-        if (txn.bankVerified) {
-          acc.totalSpent = acc.totalSpent + txn.amount;
-          acc.balance = acc.balance - txn.amount;
-        } else {
-          acc.totalDisbursementsInProcessing =
-            acc.totalDisbursementsInProcessing + txn.amount;
-          acc.balance = acc.balance - txn.amount;
-        }
-      }
-      if (!txn.ruleVerified) {
-        acc.needsReviewCount++;
-      }
-
-      return acc;
-    }, init);
-
-    aggs.totalDonors = Object.keys(aggs.donorMap).length;
-    return aggs;
+    const txns = res.right;
+    return txnsToAgg(txns);
   }
 
   @Mutation((returns) => Transaction)
