@@ -150,8 +150,8 @@ local: build
 import: mkbuilddir
 	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) import
 
-package: build
+package:
 	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) package
 
-deploy: package
+deploy:
 	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) deploy
