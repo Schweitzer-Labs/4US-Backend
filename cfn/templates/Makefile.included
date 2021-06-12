@@ -1,0 +1,105 @@
+SHELL			:= bash
+
+SRCS			:= $(shell find 0* -name '*.yml' -o -name '*.txt')
+
+IMPORTED_RESOURCES      := $(CFN_BUILD_DIR)/ImportedResources-$(STACK).yml
+IMPORTS                 := $(CFN_BUILD_DIR)/imports-template-$(STACK).yml
+
+IMPORT_PARAMS		:= ParameterKey=Product,ParameterValue=$(PRODUCT)
+IMPORT_PARAMS		+= ParameterKey=LambdaRunEnvironment,ParameterValue=$(RUNENV)
+IMPORT_PARAMS		+= ParameterKey=Domain,ParameterValue=$(DOMAIN)
+IMPORT_PARAMS		+= ParameterKey=TLD,ParameterValue=$(TLD)
+IMPORT_PARAMS		+= ParameterKey=Nonce,ParameterValue=$(NONCE)
+
+CREPES_PARAMS		:= --region $(REGION) --runenv $(RUNENV)
+CREPES_PARAMS		+= --domain $(DOMAIN) --tld $(TLD) --product $(PRODUCT)
+
+ifneq ($(SUBDOMAIN),)
+	CREPES_PARAMS	+= --subdomain $(SUBDOMAIN)
+endif
+
+.PHONY: build buildimports check import
+
+# Make targets
+build: $(template)
+
+buildimports: $(IMPORTED_RESOURCES)
+
+check: $(template)
+	@echo "Validating template"
+	@aws cloudformation validate-template \
+		--region $(REGION) \
+		--template-body file://$^
+
+$(template): $(SRCS)
+	@echo $@
+	@$(CREPES) . \
+		$(CREPES_PARAMS) \
+		--runenv $(RUNENV) \
+		--output $@
+
+
+$(IMPORTED_RESOURCES): ImportedResources.yml $(SRCS)
+	@echo "Importing resources from $(REGION) into $(STACK) via $@"
+	@$(CREPES) . \
+		$(CREPES_PARAMS) \
+		--import $@ \
+		--output $(IMPORTS)
+
+import: $(IMPORTED_RESOURCES)
+	@echo "Creating import changeset for CloudFormation template"
+	@aws cloudformation create-change-set \
+		--region $(REGION) \
+		--endpoint-url $(ENDPOINT) \
+		--stack-name $(STACK) \
+		--change-set-name ImportChangeSet \
+		--change-set-type IMPORT \
+		--resources-to-import file://$(IMPORTED_RESOURCES) \
+		--template-body file://$(IMPORTS) \
+		--capabilities \
+			CAPABILITY_NAMED_IAM \
+		--parameters $(IMPORT_PARAMS)
+	@aws cloudformation describe-change-set \
+		--endpoint-url $(ENDPOINT) \
+		--stack-name=$(STACK) \
+		--change-set-name ImportChangeSet \
+		--region=$(REGION)
+	@echo "Waiting for the changeset to finish creating"
+	@aws cloudformation wait change-set-create-complete \
+		--endpoint-url $(ENDPOINT) \
+		--stack-name=$(STACK) \
+		--change-set-name ImportChangeSet \
+		--region=$(REGION)
+	@echo "Executing the changeset"
+	@aws cloudformation execute-change-set \
+		--endpoint-url $(ENDPOINT) \
+		--stack-name=$(STACK) \
+		--change-set-name ImportChangeSet \
+		--region=$(REGION)
+	@aws cloudformation wait stack-import-complete \
+		--endpoint-url $(ENDPOINT) \
+		--stack-name=$(STACK) \
+		--region=$(REGION)
+
+package: build
+	@aws cloudformation package \
+		--endpoint-url $(ENDPOINT) \
+		--template-file $(SAM_BUILD_DIR)/template.yaml \
+		--region $(REGION) \
+		--s3-bucket $(CFN_BUCKET) \
+		--s3-prefix $(STACK) \
+		--output-template-file $(PACKAGE)
+
+deploy: package
+	@aws cloudformation deploy \
+		--endpoint-url $(ENDPOINT) \
+		--region $(REGION) \
+		--template-file $(PACKAGE) \
+		--stack-name $(STACK) \
+		--s3-bucket $(CFN_BUCKET) \
+		--s3-prefix $(STACK) \
+		--capabilities \
+		       CAPABILITY_NAMED_IAM \
+		       CAPABILITY_AUTO_EXPAND \
+		--parameter-overrides \
+			$(STACK_PARAMS)

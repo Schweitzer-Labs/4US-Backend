@@ -1,0 +1,11 @@
+LambdaSQSPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  Properties:
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Sid: SendSQSNotifications
+          Effect: Allow
+          Action:
+            - sqs:*
+          Resource: '*'

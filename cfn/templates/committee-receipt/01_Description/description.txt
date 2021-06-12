@@ -1,0 +1,1 @@
+Email template for receipts to committees when a new contribution is made

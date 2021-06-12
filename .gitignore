@@ -129,7 +129,8 @@ $RECYCLE.BIN/
 
 .idea/
 
-.aws-sam
+# SAM and CloudFormation
+.build/
 
 # IDE
 */.idea
@@ -142,3 +143,12 @@ $RECYCLE.BIN/
 template.yml
 
 # End of https://www.gitignore.io/api/osx,node,linux,windows
+
+# TS build
+*/dist
+
+**/dist
+.aws-sam
+
+services/tests/seed/prod/*
+services/tests/seed/rules.data.ts

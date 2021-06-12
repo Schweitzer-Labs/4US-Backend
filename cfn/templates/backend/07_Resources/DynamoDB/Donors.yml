@@ -1,0 +1,25 @@
+Donors:
+{% if PRODUCT == '4us' %}
+  Type: AWS::DynamoDB::Table
+  DeletionPolicy: Retain
+  Properties:
+    SSESpecification:
+      SSEEnabled: true
+    PointInTimeRecoverySpecification:
+      PointInTimeRecoveryEnabled: true
+    ProvisionedThroughput:
+      WriteCapacityUnits: 1
+      ReadCapacityUnits: 1
+    AttributeDefinitions:
+      - AttributeName: flacspeeMatch
+        AttributeType: S
+      - AttributeName: id
+        AttributeType: S
+    KeySchema:
+      - KeyType: HASH
+        AttributeName: flacspeeMatch
+      - KeyType: RANGE
+        AttributeName: id
+    StreamSpecification:
+      StreamViewType: NEW_IMAGE
+{% endif %}

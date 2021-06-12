@@ -1,0 +1,5 @@
+PlatformUserPoolArn:
+{% if PRODUCT != '4us' %}
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /{{ RUNENV }}/cognito/userpool/platform
+{% endif %}

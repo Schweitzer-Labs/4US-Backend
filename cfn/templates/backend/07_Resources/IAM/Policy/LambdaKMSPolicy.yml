@@ -1,0 +1,13 @@
+LambdaKMSPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  Properties:
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Sid: EncryptSNSMessage
+          Effect: Allow
+          Action:
+            - kms:Decrypt
+            - kms:Encrypt
+            - kms:GenerateDataKey
+          Resource: '*'

@@ -1,0 +1,39 @@
+Transactions:
+{% if PRODUCT == '4us' %}
+  Type: AWS::DynamoDB::Table
+  DeletionPolicy: Retain
+  Properties:
+    SSESpecification:
+      SSEEnabled: true
+    PointInTimeRecoverySpecification:
+      PointInTimeRecoveryEnabled: true
+    ProvisionedThroughput:
+      WriteCapacityUnits: 10
+      ReadCapacityUnits: 10
+    AttributeDefinitions:
+      - AttributeName: committeeId
+        AttributeType: S
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: donorId
+        AttributeType: S
+    KeySchema:
+      - KeyType: HASH
+        AttributeName: committeeId
+      - KeyType: RANGE
+        AttributeName: id
+    StreamSpecification:
+      StreamViewType: NEW_AND_OLD_IMAGES
+    GlobalSecondaryIndexes:
+      -  IndexName: TransactionsByCommitteeDonorIndex
+         KeySchema:
+           - KeyType: HASH
+             AttributeName: committeeId
+           - KeyType: RANGE
+             AttributeName: donorId
+         Projection:
+             ProjectionType: ALL
+         ProvisionedThroughput:
+             WriteCapacityUnits: 10
+             ReadCapacityUnits: 10
+{% endif %}

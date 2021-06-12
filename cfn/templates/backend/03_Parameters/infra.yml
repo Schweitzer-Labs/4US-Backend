@@ -1,0 +1,6 @@
+PrivateSubnets:
+  Type: AWS::SSM::Parameter::Value<List<AWS::EC2::Subnet::Id>>
+  Default: /{{ RUNENV }}/{{ PRODUCT }}/ec2/subnets/private/all
+LambdaSecurityGroup:
+  Type: AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>
+  Default: /{{ RUNENV }}/{{ PRODUCT }}/ec2/securitygroup/lambda

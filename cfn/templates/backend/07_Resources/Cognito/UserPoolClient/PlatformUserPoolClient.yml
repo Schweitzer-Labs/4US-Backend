@@ -1,0 +1,40 @@
+PlatformUserPoolClient:
+  Type: AWS::Cognito::UserPoolClient
+  Condition: 4US
+  Properties:
+    UserPoolId: !Ref PlatformUserPool
+    ClientName: !Sub ${LambdaRunEnvironment}-${Product}
+    GenerateSecret: true
+    AccessTokenValidity: 1
+    IdTokenValidity: 1
+    RefreshTokenValidity: 30
+    TokenValidityUnits:
+      AccessToken: days
+      IdToken: days
+    PreventUserExistenceErrors: ENABLED
+    CallbackURLs:
+      - !Sub https://dashboard.${Domain}.${TLD}
+    {% if RUNENV == 'qa' %}
+      - http://localhost:3000
+    {% endif %}
+    LogoutURLs:
+      - !Sub https://dashboard.${Domain}.${TLD}
+    {% if RUNENV == 'qa' %}
+      - http://localhost:3000
+    {% endif %}
+    SupportedIdentityProviders:
+      - COGNITO
+    AllowedOAuthFlowsUserPoolClient: true
+    AllowedOAuthFlows:
+      - code
+      - implicit
+    AllowedOAuthScopes:
+      - email
+      - phone
+      - openid
+      - profile
+      - aws.cognito.signin.user.admin
+    ExplicitAuthFlows:
+      - ALLOW_CUSTOM_AUTH
+      - ALLOW_USER_SRP_AUTH
+      - ALLOW_REFRESH_TOKEN_AUTH

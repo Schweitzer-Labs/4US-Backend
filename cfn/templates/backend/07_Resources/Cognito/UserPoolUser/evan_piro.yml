@@ -1,0 +1,11 @@
+UserPoolUserEvanPiro:
+  Type: AWS::Cognito::UserPoolUser
+  Condition: 4US
+  Properties:
+    Username: evan@schweitzerlabs.com
+    UserPoolId: !Ref PlatformUserPool
+    UserAttributes:
+      - Name: email_verified
+        Value: 'true'
+      - Name: email
+        Value: evan@schweitzerlabs.com

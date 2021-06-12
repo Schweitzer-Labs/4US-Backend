@@ -1,0 +1,27 @@
+CommitteeGraphQLFunction:
+  Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-CommitteeGraphQLFunction
+    Description: GraphQL API for Committees
+    CodeUri: lambdas/
+    MemorySize: 200
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.committeeGraphQLHandler
+    Runtime: nodejs12.x
+    Role: !GetAtt LambdaGraphQLRole.Arn
+    Events:
+      GraphQLAny:
+        Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        Properties:
+          Path: /api/committee/graphql
+          Method: ANY
+          RestApiId: !Ref CommitteeGateway
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
+        COMMITTEES_DDB_TABLE_NAME: !Ref Committees
+        DONORS_DDB_TABLE_NAME: !Ref Donors
+        RULES_DDB_TABLE_NAME: !Ref Rules
+        BILLABLE_EVENTS_DDB_TABLE_NAME: !Ref BillableEvents

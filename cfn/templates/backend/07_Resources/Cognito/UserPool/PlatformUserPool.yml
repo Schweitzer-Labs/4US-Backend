@@ -1,0 +1,13 @@
+PlatformUserPool:
+  Type: AWS::Cognito::UserPool
+  Condition: 4US
+  Properties:
+    Policies:
+      PasswordPolicy:
+        MinimumLength: 8
+    UsernameAttributes:
+      - email
+    Schema:
+      - AttributeDataType: String
+        Name: email
+        Required: false

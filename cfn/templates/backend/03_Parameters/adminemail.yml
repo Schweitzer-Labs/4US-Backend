@@ -1,0 +1,7 @@
+AdminEmail:
+  Type: String
+{% if RUNENV == 'prod' %}
+  Default: awsadmin@schweitzerlabs.com
+{% else %}
+  Default: awsadmin-dev@schweitzerlabs.com
+{% endif %}

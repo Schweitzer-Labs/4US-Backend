@@ -1,3 +1,0 @@
-SNSKey:
-  Type: AWS::SSM::Parameter::Value<String>
-  Default: /4us/key/sns

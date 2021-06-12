@@ -1,0 +1,10 @@
+ContributorReceiptTemplate:
+{% if REGION in ['us-east-1', 'us-west-2'] %}
+  Type: AWS::CloudFormation::Stack
+  Properties:
+    TemplateURL: contributor-receipt.yml
+    TimeoutInMinutes: 60
+    Parameters:
+      LambdaRunEnvironment: !Ref LambdaRunEnvironment
+      Product: !Ref Product
+{% endif %}

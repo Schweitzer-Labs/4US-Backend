@@ -1,0 +1,9 @@
+DonationReceivedTopic:
+  Type: AWS::SNS::Topic
+  Properties:
+    DisplayName: Contribution Received
+    TopicName: !Sub Contribution-Received-${AWS::StackName}
+    KmsMasterKeyId: !Ref SNSKey
+    Subscription:
+      - Endpoint: !Ref AdminEmail
+        Protocol: email
