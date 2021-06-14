@@ -7,6 +7,7 @@ CommitteeGateway:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub committee-api.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
+      DistributionDomainName: !Sub candidate.${Domain}.${TLD}
       Route53:
         EvaluateTargetHealth: true
         HostedZoneId: !Ref HostedZone
