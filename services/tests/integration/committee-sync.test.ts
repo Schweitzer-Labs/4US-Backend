@@ -81,6 +81,7 @@ describe("Synchs transactions with a platform account", function () {
         (txns) => task.of(txns)
       )
     )();
+    console.log(pTxns);
 
     fTxns = await pipe(
       FC.getTransactions(config)({
@@ -109,8 +110,6 @@ describe("Synchs transactions with a platform account", function () {
       console.log(amount);
       return !Number.isInteger(amount);
     });
-    console.log("fin txns:");
-
     expect(nonIntegers.length).to.equal(0);
   });
 
@@ -123,6 +122,6 @@ describe("Synchs transactions with a platform account", function () {
   });
 
   after(async () => {
-    await deleteCommittee(committeesTableName)(dynamoDB)(committee);
+    // await deleteCommittee(committeesTableName)(dynamoDB)(committee);
   });
 });
