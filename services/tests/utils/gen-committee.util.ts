@@ -42,7 +42,7 @@ export const genCommittee = ({
     candidateFirstName,
     candidateLastName,
     stripeAccount: "acct_1IjTcsRC8iiQex3V",
-    members: ["evan-piro", "5e41bd77-eae7-4b2d-8d20-a05bef22c4e2"],
+    members: ["evan-piro", "1643f48e-431c-4461-b2cb-b8fce4c939df"],
     state,
     scope,
     officeType,
@@ -56,5 +56,6 @@ export const genCommittee = ({
     platformPlan: platformPlan || Plan.FourUs,
     finicityCustomerId,
     finicityAccountId,
+    bankName: "chase",
   };
 };

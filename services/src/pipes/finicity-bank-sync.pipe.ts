@@ -126,6 +126,9 @@ const finicityTxnToTransactionType = (
 const finicityTxnToPlatformTxn =
   (committee: ICommittee) =>
   (fTxn: IFinicityTransaction): ITransaction => {
+    const amount = Math.round(Math.abs(fTxn.amount) * 100);
+    console.log(`converted finicity amount ${fTxn.amount} to ${amount}`);
+
     const checkNumber = fTxn.checkNum
       ? { checkNumber: fTxn.checkNum + "" }
       : {};
