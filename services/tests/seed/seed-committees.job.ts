@@ -5,7 +5,7 @@ import { committeesData } from "./committees.data";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
 
-AWS.config.update({region: 'us-west-1'});
+AWS.config.update({ region: "us-west-2" });
 
 dotenv.config();
 
