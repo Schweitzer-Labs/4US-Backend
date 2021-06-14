@@ -31,6 +31,7 @@ let appKey: string;
 let finicityConfig: FinicityConfig;
 
 export default async () => {
+  console.log("bank sync lambda is now running");
   if (!partnerId || !partnerSecret || !appKey) {
     partnerId = await getFinicityPartnerId(runenv);
     partnerSecret = await getFinicityPartnerSecret(runenv);
