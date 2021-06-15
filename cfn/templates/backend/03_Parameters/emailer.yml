@@ -1,0 +1,3 @@
+NotificationEmailAddress:
+  Type: String
+  Default: notification@{{ DOMAIN }}.{{ TLD }}

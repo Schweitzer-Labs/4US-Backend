@@ -136,7 +136,7 @@ const finicityTxnToPlatformTxn =
       entityName: fTxn.categorization.normalizedPayeeName,
       committeeId: committee.id,
       id: genTxnId(),
-      amount: Math.round(Math.abs(fTxn.amount) * 100),
+      amount,
       paymentMethod: finicityTxnToPaymentMethod(fTxn),
       direction: fTxn.amount > 0 ? Direction.In : Direction.Out,
       paymentDate: epochToMilli(fTxn.postedDate),
