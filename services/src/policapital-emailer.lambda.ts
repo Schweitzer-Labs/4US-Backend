@@ -26,7 +26,7 @@ type IMessageAttributes = t.TypeOf<typeof MessageAttributes>;
 
 const ses = new AWS.SES(),
   sns = new AWS.SNS();
-const from_address = "notification@policapital.net";
+const from_address: any = process.env.NOTIFICATION_EMAIL_ADDRESS;
 const posReceiptTemplate: any = process.env.POS_RECEIPT;
 const posRecordTemplate: any = process.env.POS_RECORD;
 
