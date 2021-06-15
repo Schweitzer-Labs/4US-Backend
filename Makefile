@@ -145,7 +145,7 @@ local: build
 
 
 check: buildstacks
-	$(MAKE) -c $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
+	$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
 
 import: mkbuilddir
 	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
