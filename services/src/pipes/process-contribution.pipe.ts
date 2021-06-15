@@ -27,6 +27,7 @@ export const processContribution =
     donor,
     rule,
   }: IComplianceResult): TaskEither<ApplicationError, ITransaction> => {
+    console.log("Contribution processing pipe called.");
     const baseTxn = {
       id: genTxnId(),
       createdByUser: currentUser,

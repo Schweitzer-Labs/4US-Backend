@@ -43,7 +43,9 @@ const verifyAndCreateDonorIfEmpty =
   (committee: ICommittee) =>
   (donorInput: IDonorInput) =>
   (matchedDonors: IDonor[]): TaskEither<ApplicationError, IDonor> => {
+    console.log("Donor verifier running");
     if (matchedDonors.length > 0) {
+      console.log("Donor is matched");
       return taskEither.of(matchedDonors[0]);
     } else {
       return pipe(

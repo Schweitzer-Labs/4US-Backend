@@ -16,6 +16,7 @@ const savePayment =
   (transactionsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (payment: Payment): Promise<any> => {
+    console.log("Payment saving to transactions able");
     const transaction: ITransaction = {
       ...payment,
       id: genTxnId(),

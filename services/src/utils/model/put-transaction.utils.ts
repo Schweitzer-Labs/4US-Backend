@@ -9,6 +9,7 @@ export const putTransaction =
   (txnTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (txn: ITransaction) => {
+    console.log("Transaction writing to ddb");
     const marshalledTxn = DynamoDB.Converter.marshall(txn);
     await dynamoDB
       .putItem({

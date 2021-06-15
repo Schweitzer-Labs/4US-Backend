@@ -136,6 +136,37 @@ describe("Platform Contribute", function () {
     expect(res.statusCode).to.equal(200);
   });
 
+  it("Accepts a union contribution", async () => {
+    const req = {
+      committeeId: "will-schweitzer",
+      amount: 51,
+      firstName: "Evan",
+      lastName: "Piro",
+      addressLine1: "448 Stockholm St",
+      city: "Ridgewood",
+      state: "ny",
+      postalCode: "11385",
+      entityType: "Union",
+      emailAddress: "evanpirollc@gmail.com",
+      cardNumber: "4242424242424242",
+      cardExpirationMonth: 10,
+      cardExpirationYear: 2023,
+      cardCVC: "622",
+      employmentStatus: "Employed",
+      attestsToBeingAnAdultCitizen: true,
+      entityName: "United Workers Union",
+      addressLine2: "2fl",
+    };
+
+    const event = genEvent(req);
+
+    const res = await platformContribute(event);
+
+    const body = JSON.stringify(res.body);
+
+    expect(res.statusCode).to.equal(200);
+  });
+
   // describe("John Safford", function() {
   //   it("Rejects a contribution exceeding ind limit", async () => {
   //

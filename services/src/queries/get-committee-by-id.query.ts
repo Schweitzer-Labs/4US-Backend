@@ -63,6 +63,7 @@ export const getCommitteeById =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committeeId: string): TaskEither<ApplicationError, ICommittee> => {
+    console.log("Get committee query called");
     return pipe(
       tryCatch<ApplicationError, any>(
         () => committeeIdToDDBRes(committeesTableName)(dynamoDB)(committeeId),

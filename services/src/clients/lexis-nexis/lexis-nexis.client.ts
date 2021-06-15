@@ -77,6 +77,7 @@ const runInstantId =
   (committee: ICommittee) =>
   (config: IInstantIdConfig) =>
   async (donorInput: IDonorInput): Promise<any> => {
+    console.log("Instance ID running");
     const payload = formatInstantIdRequest(donorInput);
     const { data } = await axios.post(instantIdEndpoint, payload, {
       auth: {

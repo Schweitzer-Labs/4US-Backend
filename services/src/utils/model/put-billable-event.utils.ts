@@ -21,6 +21,7 @@ export const putBillableEvent =
   (billableEventTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (billableEvent: IBillableEvent): Promise<IBillableEvent> => {
+    console.log("Put billable event running");
     const marshalledBillableEvent = DynamoDB.Converter.marshall(billableEvent);
     await dynamoDB
       .putItem({
