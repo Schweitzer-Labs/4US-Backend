@@ -8,6 +8,8 @@ BankSyncFunction:
       - !Ref ServicesLayer
     Handler: app.bankSyncHandler
     Role: !GetAtt LambdaGraphQLRole.Arn
+    Timeout: 40
+    MemorySize: 300
     Events:
       EveryMinuteEvent:
         Type: Schedule
