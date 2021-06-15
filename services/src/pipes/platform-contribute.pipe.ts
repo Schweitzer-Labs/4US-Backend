@@ -130,6 +130,7 @@ export const platformContribute =
   (stripe: Stripe) =>
   (instantIdConfig: IInstantIdConfig) =>
   (event: any): TaskEither<ApplicationError, ITransaction> => {
+    console.log("Platform contribute pipe initiated");
     return pipe(
       eventToObject(event),
       te.chain(eventToCreateContribInput),
