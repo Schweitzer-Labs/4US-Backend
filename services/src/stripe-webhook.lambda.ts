@@ -7,12 +7,12 @@ export default async (
 
   console.log(payload);
 
-  switch (payload.type) {
+  switch (payload?.type) {
     case "reporting.report_type.updated":
       console.log("reporting.report_type.updated event happened");
       break;
     default:
-      console.log(`Unhandled event type ${payload.type}`);
+      console.log(`Unhandled event type ${payload?.type}`);
   }
 
   return {

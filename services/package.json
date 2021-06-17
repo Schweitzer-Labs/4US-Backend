@@ -49,6 +49,7 @@
     "test-4us-contribute": "ts-mocha tests/lambdas/platform-contribute.test.ts --timeout 10000",
     "test-committee-sync": "ts-mocha tests/integration/committee-sync.test.ts --timeout 10000",
     "test-rec-one": "ts-mocha tests/integration/reconcile-one.test.ts --timeout 10000",
+    "test-stripe-webhook": "ts-mocha tests/lambdas/stripe-webhook.test.ts --timeout 10000",
     "test-server": "ts-node-dev tests/server/graphql.ts --watch",
     "compile": "npm install && tsc"
   },
