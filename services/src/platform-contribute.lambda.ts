@@ -34,18 +34,20 @@ let lnPassword: string;
 
 export default async (event: any) => {
   if (!stripeApiKey || !stripe || !lnUsername || !lnPassword) {
+    console.log("Setting up configuration");
     stripeApiKey = await getStripeApiKey(runenv);
     lnUsername = await getLNUsername(runenv);
     lnPassword = await getLNPassword(runenv);
     stripe = new Stripe(stripeApiKey, {
       apiVersion: "2020-08-27",
     });
+    console.log("Configuration values have been set");
   }
   const instantIdConfig: IInstantIdConfig = {
     username: lnUsername,
     password: lnPassword,
   };
-
+  console.log("Initiating pipe");
   return await pipe(
     platformContribute(billableEventsTableName)(donorsTableName)(
       committeesTableName

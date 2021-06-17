@@ -14,10 +14,10 @@ import { ITransaction, Transactions } from "./search-transactions.decoder";
 import { TransactionsArg } from "../args/transactions.arg";
 import { Order } from "../utils/enums/order.enum";
 
-const getTransactionsRes =
+export const getTransactionsRes =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  ({
+  async ({
     committeeId,
     transactionType,
     bankVerified,
@@ -25,8 +25,7 @@ const getTransactionsRes =
     order = Order.Desc,
     donorId,
     entityType,
-  }: TransactionsArg) =>
-  async (): Promise<object[]> => {
+  }: TransactionsArg): Promise<ITransaction[]> => {
     const byDonorIndex = donorId
       ? { IndexName: "TransactionsByCommitteeDonorIndex" }
       : {};
@@ -63,7 +62,7 @@ const getTransactionsRes =
     };
 
     const res = await dynamoDB.query(query).promise();
-    const marshalledRes = res.Items.map((item) =>
+    const marshalledRes: any = res.Items.map((item) =>
       DynamoDB.Converter.unmarshall(item)
     );
 
@@ -78,7 +77,7 @@ export const searchTransactions =
   ): TaskEither<ApplicationError, ITransaction[]> =>
     pipe(
       tryCatch<ApplicationError, any>(
-        () => getTransactionsRes(txnsTableName)(dynamoDB)(transactionsArg)(),
+        () => getTransactionsRes(txnsTableName)(dynamoDB)(transactionsArg),
         (e) =>
           new ApplicationError(
             "Get transactions request failed",

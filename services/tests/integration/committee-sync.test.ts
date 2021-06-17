@@ -54,7 +54,7 @@ let syncRes;
 let pTxns;
 let fTxns;
 
-describe("Synchs transactions with a platform account", function () {
+describe("Syncs transactions with a platform account", function () {
   before(async () => {
     await putCommittee(committeesTableName)(dynamoDB)(committee);
     await sleep(1000);

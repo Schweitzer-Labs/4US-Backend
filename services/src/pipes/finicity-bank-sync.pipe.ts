@@ -14,7 +14,7 @@ import { ITransaction } from "../queries/search-transactions.decoder";
 import { getTransactions } from "../clients/finicity/finicity.client";
 import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
 import { searchTransactions } from "../queries/search-transactions.query";
-import { getAll4USCommittees } from "../utils/model/get-all-4us-committees.utils";
+import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import { Direction } from "../utils/enums/direction.enum";
 import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Source } from "../utils/enums/source.enum";
@@ -29,7 +29,7 @@ export const finicityBankSync =
   (committeesTable: string) =>
   (dynamoDB: DynamoDB) =>
     pipe(
-      getAll4USCommittees(committeesTable)(dynamoDB),
+      getAll4USCommitteesAndDecode(committeesTable)(dynamoDB),
       taskEither.map(FPArray.map(syncCommittee(config)(txnsTable)(dynamoDB)))
     );
 

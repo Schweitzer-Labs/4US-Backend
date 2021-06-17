@@ -13,3 +13,4 @@ exports.policapitalEmailerHandler =
 exports.bankSyncHandler = require("./dist/bank-sync.lambda").default;
 exports.platformContribute =
   require("./dist/platform-contribute.lambda").default;
+exports.stripeWebhook = require("./dist/stripe-webhook.lambda").default;
