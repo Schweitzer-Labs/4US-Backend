@@ -1,0 +1,9 @@
+KeepLambdaWarm:
+  Type: AWS::Events::Rule
+  Properties:
+    Description: Keep Lambda functions warm to prevent timeouts for users
+    State: ENABLED
+    ScheduleExpression: rate(1 minute)
+    Targets:
+      - Id: !Ref PlatformContributeFunction
+        Arn: !GetAtt PlatformContributeFunction.Arn
