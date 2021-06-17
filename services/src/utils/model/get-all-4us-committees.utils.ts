@@ -10,20 +10,20 @@ import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
 import { pipe } from "fp-ts/function";
 
-export const getAll4USCommittees =
+export const getAll4USCommitteesAndDecode =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB): TaskEither<ApplicationError, ICommittee[]> =>
     pipe(
       taskEither.tryCatch(
-        () => queryDB(committeesTableName)(dynamoDB),
+        () => getAll4USCommittees(committeesTableName)(dynamoDB),
         (e) => new ApplicationError("Committee query failed", e)
       ),
       taskEither.chain(validateDDBResponse(Committees))
     );
 
-const queryDB =
+export const getAll4USCommittees =
   (committeesTableName: string) =>
-  async (dynamoDB: DynamoDB): Promise<any[]> => {
+  async (dynamoDB: DynamoDB): Promise<ICommittee[]> => {
     const res = await dynamoDB
       .scan({
         TableName: committeesTableName,
@@ -33,7 +33,7 @@ const queryDB =
         },
       })
       .promise();
-    const committees = res.Items.map((item) =>
+    const committees: any[] = res.Items.map((item) =>
       DynamoDB.Converter.unmarshall(item)
     );
     return committees;
