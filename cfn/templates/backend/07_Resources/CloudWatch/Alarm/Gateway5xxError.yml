@@ -1,27 +1,19 @@
-Gateway5xxErrorTopic:
-  Type: AWS::SNS::Topic
-  Properties:
-    DisplayName: !Sub Gateway5xxError-${Domain}-${LambdaRunEnvironment}
-    TopicName: !Sub Gateway-Errors-5xx-${Domain}-${LambdaRunEnvironment}
-    KmsMasterKeyId: !Ref SNSKey
-    Subscription:
-      - Endpoint: !Ref AdminEmail
-        Protocol: email
-
 Gateway5xxErrorAlarm:
   Type: AWS::CloudWatch::Alarm
   Properties:
+    ActionsEnabled: true
     AlarmName: !Sub Gateway5xxErrors-${Product}-${LambdaRunEnvironment}
     AlarmDescription: !Sub Alarms when the ${Domain} gateways return 5xx errors
     Dimensions:
       - Name: ApiName
         Value: !Sub ${Domain}-backend-${LambdaRunEnvironment}
-    AlarmActions:
-      - !Ref Gateway5xxErrorTopic
-    MetricName: 5XXError
+    MetricName: 5XXErrors
     Namespace: AWS/ApiGateway
     ComparisonOperator: GreaterThanOrEqualToThreshold
-    EvaluationPeriods: 1
-    Period: 300
-    Statistic: Sum
-    Threshold: 1
+    EvaluationPeriods: 5
+    Period: 60
+    Statistic: Average
+    Threshold: 0.1
+    TreatMissingData: notBreaching
+    AlarmActions:
+      - !Ref GatewayAlarmTopic

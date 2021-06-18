@@ -1,27 +1,19 @@
-Gateway4xxErrorTopic:
-  Type: AWS::SNS::Topic
-  Properties:
-    DisplayName: !Sub Gateway4xxError-${Domain}-${LambdaRunEnvironment}
-    TopicName: !Sub Gateway-Errors-4xx-${Domain}-${LambdaRunEnvironment}
-    KmsMasterKeyId: !Ref SNSKey
-    Subscription:
-      - Endpoint: !Ref AdminEmail
-        Protocol: email
-
 Gateway4xxErrorAlarm:
   Type: AWS::CloudWatch::Alarm
   Properties:
+    ActionsEnabled: true
     AlarmName: !Sub Gateway4xxErrors-${Product}-${LambdaRunEnvironment}
     AlarmDescription: !Sub Alarms when the ${Domain} API gateways return 4xx errors
     Dimensions:
       - Name: ApiName
         Value: !Sub ${Domain}-backend-${LambdaRunEnvironment}
     AlarmActions:
-      - !Ref Gateway4xxErrorTopic
-    MetricName: 4XXError
+      - !Ref GatewayAlarmTopic
+    MetricName: 4XXErrors
     Namespace: AWS/ApiGateway
     ComparisonOperator: GreaterThanOrEqualToThreshold
-    EvaluationPeriods: 1
-    Period: 300
-    Statistic: Sum
-    Threshold: 1
+    EvaluationPeriods: 5
+    Period: 60
+    Statistic: Average
+    Threshold: 0.3
+    TreatMissingData: notBreaching
