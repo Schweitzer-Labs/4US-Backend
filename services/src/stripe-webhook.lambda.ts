@@ -5,7 +5,7 @@ export default async (
 ): Promise<APIGatewayProxyResult> => {
   const payload = JSON.parse(event.body);
 
-  console.log(payload);
+  console.log(event.body);
 
   switch (payload?.type) {
     case "reporting.report_type.updated":
