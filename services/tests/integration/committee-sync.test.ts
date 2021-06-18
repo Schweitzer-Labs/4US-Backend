@@ -46,8 +46,8 @@ const committee = genCommittee({
   scope: "state",
   state: "ny",
   tzDatabaseName: "America/New_York",
-  finicityCustomerId: "5003896371",
-  finicityAccountId: "5015365202",
+  finicityCustomerId: "5007489410",
+  finicityAccountId: "5016000964",
 });
 
 let syncRes;
@@ -122,6 +122,6 @@ describe("Syncs transactions with a platform account", function () {
   });
 
   after(async () => {
-    // await deleteCommittee(committeesTableName)(dynamoDB)(committee);
+    await deleteCommittee(committeesTableName)(dynamoDB)(committee);
   });
 });

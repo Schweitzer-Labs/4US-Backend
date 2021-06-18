@@ -11,6 +11,7 @@ import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Direction } from "../utils/enums/direction.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { putTransaction } from "../utils/model/put-transaction.utils";
+import { ICommittee } from "../queries/get-committee-by-id.query";
 
 const savePayment =
   (transactionsTableName: string) =>
@@ -37,7 +38,7 @@ const savePayment =
 export const paymentToDDB =
   (transactionsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (payment: Payment): TaskEither<ApplicationError, any> =>
+  (payment: Payment): TaskEither<ApplicationError, ITransaction> =>
     tryCatch<ApplicationError, any>(
       () => savePayment(transactionsTableName)(dynamoDB)(payment),
       (error) =>

@@ -7,7 +7,9 @@ import { ICommitteeContribution } from "./contribution-to-committee-contribution
 import { Plan } from "../utils/enums/plan.enum";
 
 export interface Payment extends StrippedContribution {
-  stripePaymentIntentId: string;
+  stripePaymentIntentId?: string;
+  stripeBalanceTransactionId?: string;
+  stripeChargeId?: string;
   ruleVerified: boolean;
 }
 
@@ -47,11 +49,15 @@ export const processPaymentFromCommitteeContribution =
         },
       });
 
-      const { id: stripePaymentIntentId } = res;
+      console.log("contrib res");
+
+      console.log(res);
+
+      console.log(res.charges.data);
 
       const payment: Payment = {
         ...stripCardInfo(contribution),
-        stripePaymentIntentId,
+        ...getStripeMetadata(res),
         ruleVerified: committee.platformPlan === Plan.FourUs,
       };
 
@@ -67,6 +73,29 @@ export const processPaymentFromCommitteeContribution =
       );
     }
   };
+
+interface GetStripeMetadataRes {
+  stripeBalanceTransactionId: string;
+  stripeChargeId: string;
+  stripePaymentIntentId: string;
+}
+
+const getStripeMetadata = (
+  res: Stripe.Response<Stripe.PaymentIntent>
+): GetStripeMetadataRes | {} => {
+  const chargeData = res?.charges?.data;
+  if (chargeData?.length > 0) {
+    return {
+      stripeBalanceTransactionId: chargeData[0].balance_transaction,
+      stripeChargeId: chargeData[0].id,
+      stripePaymentIntentId: res.id,
+    };
+  } else {
+    return {
+      stripePaymentIntentId: res.id,
+    };
+  }
+};
 
 export const committeeContributionToPayment =
   (stripe: Stripe) =>

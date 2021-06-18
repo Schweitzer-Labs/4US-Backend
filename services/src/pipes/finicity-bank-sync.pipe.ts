@@ -164,6 +164,7 @@ const getAllFinicityTxns =
 
     const epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6;
     const epochTo = milliToEpoch(now());
+    console.log(epochTo);
     return getTransactions(config)({
       customerId: finicityCustomerId,
       accountId: finicityAccountId,
