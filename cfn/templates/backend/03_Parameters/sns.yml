@@ -1,0 +1,3 @@
+GatewayAlarmTopic:
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /{{ REGION }}/sns/topic/gateway
