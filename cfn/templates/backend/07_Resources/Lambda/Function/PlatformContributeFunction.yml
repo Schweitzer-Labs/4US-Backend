@@ -9,8 +9,8 @@ PlatformContributeFunction:
     Handler: app.platformContribute
     Runtime: nodejs12.x
     Role: !GetAtt LambdaGraphQLRole.Arn
-    Timeout: 50
-    MemorySize: 200
+    Timeout: 90
+    MemorySize: 400
     Events:
       PlatformContributeEvent:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
