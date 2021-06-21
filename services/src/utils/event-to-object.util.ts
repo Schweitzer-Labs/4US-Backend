@@ -11,7 +11,7 @@ export const eventToObject = (
     return left(
       new ApplicationError(
         "Error parsing body",
-        {},
+        event,
         StatusCodes.UNPROCESSABLE_ENTITY
       )
     );
