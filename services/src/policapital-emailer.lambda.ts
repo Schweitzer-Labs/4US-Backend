@@ -61,6 +61,7 @@ export default async (event: SQSEvent, context): Promise<any[]> => {
     });
   }
 
+  console.log("SES returned:", JSON.stringify(res));
   return res;
 };
 
