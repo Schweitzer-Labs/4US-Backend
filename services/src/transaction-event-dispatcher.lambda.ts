@@ -34,22 +34,15 @@ export default async (
   context
 ): Promise<EffectMetadata> => {
   console.log(JSON.stringify(event));
+  console.log("initiating ddb update loop");
+
   for (const stream of event.Records) {
     const record = stream.dynamodb;
-    const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
-    const eitherTxn = Transaction.decode(unmarshalledTxn);
-    if (isLeft(eitherTxn)) {
-      throw new ApplicationError(
-        "Invalid transaction data",
-        PathReporter.report(eitherTxn)
-      );
-    }
-
     switch (stream.eventName) {
       case "INSERT":
         console.log("INSERT event emitted");
         return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
-          eitherTxn.right
+          parseStreamRecord(record)
         );
       case "MODIFY":
         console.log("MODIFY event emitted");
@@ -58,6 +51,22 @@ export default async (
         return;
     }
   }
+};
+
+const parseStreamRecord = (record: any): ITransaction => {
+  const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
+  console.log(
+    "Transaction record unmarshalled",
+    JSON.stringify(unmarshalledTxn)
+  );
+  const eitherTxn = Transaction.decode(unmarshalledTxn);
+  if (isLeft(eitherTxn)) {
+    throw new ApplicationError(
+      "Invalid transaction data",
+      PathReporter.report(eitherTxn)
+    );
+  }
+  return eitherTxn.right;
 };
 
 enum Effect {
@@ -95,7 +104,10 @@ const handleInsert =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (txn: ITransaction): Promise<EffectMetadata> => {
+    console.log("handleInsert called with transactions:", JSON.stringify(txn));
     if (txn.source === Source.DONATE_FORM) {
+      console.log("donate form transaction recognized");
+      console.log("initiating pipe");
       return await pipe(
         getCommitteeById(committeesTableName)(dynamoDB)(txn.committeeId),
         taskEither.map(formatMessage(sqsUrl)(txn)),
@@ -112,6 +124,12 @@ const formatMessage =
   (sqsUrl: string) =>
   (txn: ITransaction) =>
   (committee: ICommittee): SendMessageRequest => {
+    console.log(
+      "formatMessage called",
+      sqsUrl,
+      JSON.stringify(txn),
+      JSON.stringify(committee)
+    );
     const { tzDatabaseName, emailAddresses, committeeName } = committee;
     return {
       MessageAttributes: {
