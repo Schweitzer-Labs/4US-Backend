@@ -1,8 +1,12 @@
+import { expect } from "chai";
+
 import { getStripeApiKey } from "../../src/utils/config";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
-import { runReport } from "../../src/request-report";
+import { runReport, runReportAndDecode } from "../../src/request-report";
+import { isLeft } from "fp-ts/Either";
+import { ApplicationError } from "../../src/utils/application-error";
 
 const stripeAccount = "acct_1IjTcsRC8iiQex3V";
 AWS.config.apiVersions = {
@@ -19,7 +23,6 @@ let dynamoDB: DynamoDB;
 describe("Reconcile contributions flow", function () {
   before(async () => {
     if (!stripeApiKey || !stripe) {
-      console.log("Setting up configuration");
       stripeApiKey = await getStripeApiKey(runenv);
       stripe = new Stripe(stripeApiKey, {
         apiVersion: "2020-08-27",
@@ -29,8 +32,13 @@ describe("Reconcile contributions flow", function () {
   });
   describe("Create Payout Report Run", function () {
     it("Receive a valid response from a valid request", async () => {
-      const res = await runReport(stripe)(stripeAccount);
+      const res = await runReportAndDecode(stripe)(stripeAccount)();
       console.log(res);
+      if (isLeft(res)) {
+        throw new ApplicationError("Run report decode failed", {});
+      }
+      const status = res.right.status;
+      expect(status).to.equal("pending");
     });
   });
 });

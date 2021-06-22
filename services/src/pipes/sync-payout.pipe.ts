@@ -2,7 +2,10 @@ import { pipe } from "fp-ts/function";
 import { DynamoDB } from "aws-sdk";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ICommittee } from "../queries/get-committee-by-id.query";
+import {
+  decodeCommittees,
+  ICommittee,
+} from "../queries/get-committee-by-id.query";
 import { taskEither } from "fp-ts";
 import { Plan } from "../utils/enums/plan.enum";
 
@@ -20,7 +23,9 @@ export const getCommitteeByStripeAccountAndDecode =
         () =>
           getCommitteesByStripeAccount(committeeTable)(dynamoDB)(stripeAccount),
         (err) => new ApplicationError("Get committee request failed", err)
-      )
+      ),
+      taskEither.chain(decodeCommittees),
+      taskEither.chain(findOne)
     );
 
 export const getCommitteesByStripeAccount =

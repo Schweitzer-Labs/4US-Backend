@@ -4,6 +4,7 @@ import {
   getReportAndDecode,
   reportEventToUrl,
   runReport,
+  runReportAndDecode,
 } from "./request-report";
 import { pipe } from "fp-ts/function";
 import {
@@ -47,26 +48,39 @@ export default async (
   switch (payload?.type) {
     case "reporting.report_run.succeeded":
       console.log("reporting.report_type.succeeded event happened");
-      return await pipe(
-        decodeReportRunEvent(payload),
-        taskEither.map(reportEventToUrl),
-        taskEither.chain(getReportAndDecode(stripeApiKey)),
-        taskEither.chain(parseCSVAndDecode),
-        taskEither.chain(decodePayoutReportRows),
-        fold(
-          (error) => task.of(error.toResponse()),
-          () => task.of(successResponse)
-        )
-      )();
+      await handleReportRunSucceeded(payload);
+      return;
     case "payout.paid":
-      return await pipe(
-        decodePayoutPaidEvent(payload),
-        fold(
-          (error) => task.of(error.toResponse()),
-          () => task.of(successResponse)
-        )
-      )();
+      return await handlePayoutPaid(payload);
     default:
       console.log(`Unhandled event type ${payload?.type}`);
   }
 };
+
+export const handleReportRunSucceeded = async (payload: unknown) =>
+  await pipe(
+    decodeReportRunEvent(payload),
+    taskEither.chain((reportEvent) =>
+      pipe(
+        taskEither.of(reportEventToUrl(reportEvent)),
+        taskEither.chain(getReportAndDecode(stripeApiKey)),
+        taskEither.chain(parseCSVAndDecode),
+        taskEither.chain(decodePayoutReportRows)
+      )
+    ),
+    fold(
+      (error) => task.of(error.toResponse()),
+      () => task.of(successResponse)
+    )
+  )();
+
+export const handlePayoutPaid = async (payload: unknown) =>
+  await pipe(
+    decodePayoutPaidEvent(payload),
+    taskEither.map((res) => res.account),
+    taskEither.chain(runReportAndDecode(stripe)),
+    fold(
+      (error) => task.of(error.toResponse()),
+      () => task.of(successResponse)
+    )
+  )();

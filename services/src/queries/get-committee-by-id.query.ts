@@ -4,8 +4,9 @@ import { pipe } from "fp-ts/function";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { StatusCodes } from "http-status-codes";
-import { taskEither } from "fp-ts";
+import { taskEither as te, taskEither } from "fp-ts";
 import { validateDDBResponse } from "../repositories/ddb.utils";
+import { decodeError } from "../utils/decode-error.util";
 
 const CommitteeRequired = t.type({
   id: t.string,
@@ -41,6 +42,15 @@ export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);
 export const Committees = t.array(Committee);
 
 export type ICommittee = t.TypeOf<typeof Committee>;
+
+export const decodeCommittees = (
+  res: unknown
+): TaskEither<ApplicationError, ICommittee[]> => {
+  return pipe(
+    te.fromEither(Committees.decode(res)),
+    te.mapLeft(decodeError("Committees"))
+  );
+};
 
 export const committeeIdToDDBRes =
   (committeeTableName: string) =>
