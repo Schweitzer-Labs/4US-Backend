@@ -16,9 +16,12 @@ CommitteeReceiptEmail:
 
         {{email}}
         {{phoneNumber}}
-
+        {{#if employer}}
         Occupation          : {{occupation}}
         Employer            : {{employer}}
+        {{else}}
+        {{employmentStatus}}
+        {{/if}}
         Date                : {{timestamp}}
         Stripe Transaction #: {{stripePaymentIntentId}}
         Donor Receipt #     : {{receipt}}
@@ -153,7 +156,7 @@ CommitteeReceiptEmail:
         <td align="left" style="padding:0;Margin:0"><h3 style="Margin:0;line-height:22px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:18px;font-style:normal;font-weight:normal;color:#FFFFFF">{{committee}} has received a ${{amount}} contribution from<br></h3></td>
         </tr>
         <tr>
-        <td style="padding:0;Margin:0"><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{firstName}} {{lastName}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{addressLine1}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{addressLine2}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{city}}, {{state}} {{postalCode}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">&nbsp;</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{email}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{phoneNumber}}</p></td>
+        <td style="padding:0;Margin:0"><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{firstName}} {{lastName}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{addressLine1}}</p>{{#if addressLine2}}<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{addressLine2}}</p>{{/if}}<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{city}}, {{state}} {{postalCode}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">&nbsp;</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{email}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{phoneNumber}}</p></td>
         </tr>
         <tr>
         <td style="padding:20px;Margin:0;font-size:0" align="center">
@@ -164,7 +167,7 @@ CommitteeReceiptEmail:
         </table></td>
         </tr>
         <tr>
-        <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Occupation: {{occupation}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Employer: {{employer}}</p></td>
+        <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{#if employer}}Occupation: {{occupation}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Employer: {{employer}}{{else}}{{employmentStatus}}{{/if}}</p></td>
         </tr>
         <tr>
         <td style="padding:20px;Margin:0;font-size:0" align="center">
@@ -363,18 +366,14 @@ CommitteeReceiptEmail:
                                           <td style="padding:0;Margin:0">
                                             <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{firstName}} {{lastName}}</p>
                                             <dl>
-                                              <dt>
-                                                Occupation
-                                              </dt>
-                                              <dd>
-                                                {{occupation}}
-                                              </dd>
-                                              <dt>
-                                                Employer
-                                              </dt>
-                                              <dd>
-                                                {{employer}}
-                                              </dd>
+                                              <dt>Occupation</dt>
+                                            {{#if employer }}
+                                              <dd>{{occupation}}</dd>
+                                              <dt>Employer</dt>
+                                              <dd>{{employer}}</dd>
+                                            {{else}}
+                                              <dd>{{employmentStatus}}</dd>
+                                            {{/if}}
                                             </dl>
                                           </td>
                                         </tr>
@@ -390,18 +389,10 @@ CommitteeReceiptEmail:
                                         <tr>
                                           <td style="padding:0;Margin:0">
                                             <dl>
-                                              <dt>
-                                                Date
-                                              </dt>
-                                              <dd>
-                                                {{timestamp}}
-                                              </dd>
-                                              <dt>
-                                                Receipt Number
-                                              </dt>
-                                              <dd>
-                                                {{receipt}}
-                                              </dd>
+                                              <dt>Date</dt>
+                                              <dd>{{timestamp}}</dd>
+                                              <dt>Receipt Number</dt>
+                                              <dd>{{receipt}}</dd>
                                             </dl>
                                           </td>
                                         </tr>
@@ -415,7 +406,7 @@ CommitteeReceiptEmail:
                                           </td>
                                         </tr>
                                         <tr>
-                                          <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Contact Info</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{addressLine1}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{addressLine2}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{city}}, {{state}} {{postalCode}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">&nbsp;</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{email}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{phoneNumber}}</p></td>
+                                          <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Contact Info</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{addressLine1}}</p>{{#if addressLine2}}<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{addressLine2}}</p>{{/if}}<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{city}}, {{state}} {{postalCode}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">&nbsp;</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{email}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{phoneNumber}}</p></td>
                                         </tr>
                                         <tr>
                                           <td style="padding:20px;Margin:0;font-size:0" align="center">
