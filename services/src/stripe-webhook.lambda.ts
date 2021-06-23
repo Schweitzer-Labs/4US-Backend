@@ -2,9 +2,8 @@ import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { successResponse } from "./utils/success-response";
 import {
   getReportAndDecode,
-  reportEventToUrl,
-  runReport,
   runReportAndDecode,
+  syncPayout,
 } from "./request-report";
 import { pipe } from "fp-ts/function";
 import {
@@ -12,6 +11,8 @@ import {
   decodePayoutReportRows,
   decodeReportRunEvent,
   parseCSVAndDecode,
+  reportEventToUrl,
+  reportEventToStripeAccount,
 } from "./webhook/webhook.decoders";
 import { fold } from "fp-ts/TaskEither";
 import { task, taskEither } from "fp-ts";
@@ -25,7 +26,7 @@ AWS.config.apiVersions = {
 };
 
 const runenv: any = process.env.RUNENV;
-const transactionsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
+const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const committeeTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 let stripe: Stripe;
 let stripeApiKey: string;
@@ -65,7 +66,12 @@ export const handleReportRunSucceeded = async (payload: unknown) =>
         taskEither.of(reportEventToUrl(reportEvent)),
         taskEither.chain(getReportAndDecode(stripeApiKey)),
         taskEither.chain(parseCSVAndDecode),
-        taskEither.chain(decodePayoutReportRows)
+        taskEither.chain(decodePayoutReportRows),
+        taskEither.chain(
+          syncPayout(txnsTableName)(committeeTableName)(dynamoDB)(
+            reportEventToStripeAccount(reportEvent)
+          )
+        )
       )
     ),
     fold(

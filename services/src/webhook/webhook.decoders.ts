@@ -21,6 +21,12 @@ export const ReportRunEvent = t.type({
   }),
 });
 
+export const reportEventToUrl = (event: IReportRunEvent): string =>
+  event.data.object.result.url;
+
+export const reportEventToStripeAccount = (event: IReportRunEvent): string =>
+  event.data.object.parameter.connected_account;
+
 export type IReportRunEvent = t.TypeOf<typeof ReportRunEvent>;
 
 export const PayoutPaidEvent = t.type({

@@ -17,6 +17,7 @@ interface IGenCommitteeConfig {
   platformPlan?: string;
   finicityCustomerId?: string;
   finicityAccountId?: string;
+  stripeAccount?: string;
 }
 
 export const genCommittee = ({
@@ -33,6 +34,7 @@ export const genCommittee = ({
   platformPlan,
   finicityCustomerId,
   finicityAccountId,
+  stripeAccount,
 }: IGenCommitteeConfig): ICommittee => {
   const candidateFirstName = faker.name.firstName();
   const candidateLastName = faker.name.lastName();
@@ -41,7 +43,7 @@ export const genCommittee = ({
     committeeName: `Vote for ${candidateFirstName}`,
     candidateFirstName,
     candidateLastName,
-    stripeAccount: "acct_1IjTcsRC8iiQex3V",
+    stripeAccount: stripeAccount || "acct_1IjTcsRC8iiQex3V",
     members: ["evan-piro", "1643f48e-431c-4461-b2cb-b8fce4c939df"],
     state,
     scope,

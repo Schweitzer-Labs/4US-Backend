@@ -1,20 +1,14 @@
-import { pipe } from "fp-ts/function";
 import { DynamoDB } from "aws-sdk";
 import { TaskEither } from "fp-ts/TaskEither";
-import { ApplicationError } from "../utils/application-error";
+import { pipe } from "fp-ts/function";
+import { taskEither } from "fp-ts";
+import { ApplicationError } from "../application-error";
 import {
   decodeCommittees,
   ICommittee,
-} from "../queries/get-committee-by-id.query";
-import { taskEither } from "fp-ts";
-import { Plan } from "../utils/enums/plan.enum";
+} from "../../queries/get-committee-by-id.query";
 
-export const getCommitteeByStripeAccountId =
-  (committeeTable: string) =>
-  (dynamoDB: DynamoDB) =>
-  async (accountId: string): Promise<any> => {};
-
-export const getCommitteeByStripeAccountAndDecode =
+export const get_committee_by_stripe_account_and_decode =
   (committeeTable: string) =>
   (dynamoDB: DynamoDB) =>
   (stripeAccount: string): TaskEither<ApplicationError, ICommittee> =>
@@ -44,12 +38,15 @@ export const getCommitteesByStripeAccount =
     return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
   };
 
-export const findOne = <a>(list: a[]): TaskEither<ApplicationError, a> => {
+export const findOne = (
+  list: ICommittee[]
+): TaskEither<ApplicationError, ICommittee> => {
+  console.log(list);
   switch (list.length) {
     case 0:
       return taskEither.left(new ApplicationError("Does not exist", {}));
     case 1:
-      return taskEither.right(list[1]);
+      return taskEither.right(list[0]);
     default:
       return taskEither.left(new ApplicationError("Duplicates found", {}));
   }

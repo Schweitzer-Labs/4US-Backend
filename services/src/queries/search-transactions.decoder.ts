@@ -41,6 +41,7 @@ const TransactionOptional = t.partial({
   stripePaymentIntentId: t.string,
   stripeBalanceTransactionId: t.string,
   stripeChargeId: t.string,
+  stripePayoutId: t.string,
   cardNumberLastFourDigits: t.string,
   entityName: t.string,
   ruleCode: t.string,

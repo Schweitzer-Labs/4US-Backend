@@ -13,12 +13,13 @@ AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
 
+const dynamoDB = new DynamoDB();
+
 const runenv: any = process.env.RUNENV;
 const transactionsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const committeeTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 let stripe: Stripe;
 let stripeApiKey: string;
-let dynamoDB: DynamoDB;
 
 describe("Reconcile contributions flow", function () {
   before(async () => {
@@ -30,7 +31,18 @@ describe("Reconcile contributions flow", function () {
       console.log("Configuration values have been set");
     }
   });
-  describe("Create Payout Report Run", function () {
+  describe("Payout notification processing", function () {
+    it("Sends a request to run a payout report", async () => {
+      const res = await runReportAndDecode(stripe)(stripeAccount)();
+      console.log(res);
+      if (isLeft(res)) {
+        throw new ApplicationError("Run report decode failed", {});
+      }
+      const status = res.right.status;
+      expect(status).to.equal("pending");
+    });
+  });
+  describe("Payout Report Updated processing", function () {
     it("Receive a valid response from a valid request", async () => {
       const res = await runReportAndDecode(stripe)(stripeAccount)();
       console.log(res);

@@ -31,7 +31,7 @@ export const matchContributions =
     );
 
 const getCommitteeContributions =
-  (txnsTableName) => (dynamoDB) => (committee: ICommittee) =>
+  (txnsTableName) => (dynamoDB) => (committee: ICommittee): TaskEither<ApplicationError, ITransaction[]> =>
     searchTransactions(txnsTableName)(dynamoDB)({
       committeeId: committee.id,
       transactionType: TransactionType.Contribution,

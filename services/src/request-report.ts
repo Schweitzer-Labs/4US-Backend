@@ -13,9 +13,10 @@ import {
 } from "./webhook/webhook.decoders";
 import { pipe } from "fp-ts/function";
 import { DynamoDB } from "aws-sdk";
-import { getCommitteeByStripeAccountAndDecode } from "./pipes/sync-payout.pipe";
 import { ICommittee } from "./queries/get-committee-by-id.query";
 import { ITransaction } from "./queries/search-transactions.decoder";
+import { get_committee_by_stripe_account_and_decode } from "./utils/model/get-committee-by-stripe-account.utils";
+import { get_bank_unverified_contributions_not_paid_out } from "./utils/model/get-bank-unverified-contributions.utils";
 
 export const runReport =
   (stripe: Stripe) => async (connectAccountId: string) => {
@@ -48,9 +49,6 @@ export const runReportAndDecode =
       taskEither.chain(decodeRunReportRes)
     );
 
-export const reportEventToUrl = (event: IReportRunEvent): string =>
-  event.data.object.result.url;
-
 export const getReport =
   (stripeApiKey: string) =>
   async (url: string): Promise<string> => {
@@ -71,31 +69,28 @@ export const getReportAndDecode =
       (err) => new ApplicationError("Get report file request failed", err)
     );
 
-export const matchPayoutReportRowsToTxns =
+export const syncPayout =
   (txnsTableName: string) =>
   (committeeTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (stripeAccountId: string) =>
   (reportRows: IPayoutReportRows) =>
     pipe(
-      getCommitteeByStripeAccountAndDecode(committeeTableName)(dynamoDB)(
+      get_committee_by_stripe_account_and_decode(committeeTableName)(dynamoDB)(
         stripeAccountId
       ),
       taskEither.chain(
-        get_bank_unverified_contributions_not_paid_out_by_committee_and_decode(
-          txnsTableName
-        )(dynamoDB)
+        get_bank_unverified_contributions_not_paid_out(txnsTableName)(dynamoDB)
       ),
-      taskEither.chain(match_report_row_with_txn(reportRows)),
-      taskEither.chain(updateTxns)
+      taskEither.chain(matchReportRowsWithTxns(reportRows)),
+      taskEither.chain(insertTxns(txnsTableName)(dynamoDB))
     );
 
-export const get_bank_unverified_contributions_not_paid_out_by_committee_and_decode =
-
-    (txnsTable: string) =>
-    (dynamoDB: DynamoDB) =>
-    (committee: ICommittee): TaskEither<ApplicationError, ITransaction> => {};
-
-export const match_report_row_with_txn =
+export const matchReportRowsWithTxns =
   (reportRows: IPayoutReportRows) =>
-  (txns: ITransaction): TaskEither<ApplicationError, ITransaction[]> => {};
+  (txns: ITransaction[]): TaskEither<ApplicationError, ITransaction[]> => {};
+
+export const insertTxns =
+  (txnsTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (txns: ITransaction[]): TaskEither<ApplicationError, ITransaction[]> => {};

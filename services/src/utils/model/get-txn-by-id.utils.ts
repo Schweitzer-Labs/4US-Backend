@@ -6,14 +6,8 @@ import {
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
-import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
-import {
-  Committee,
-  committeeIdToDDBRes,
-  ICommittee,
-} from "../../queries/get-committee-by-id.query";
 
 export const requestTxnById =
   (txnTableName: string) =>

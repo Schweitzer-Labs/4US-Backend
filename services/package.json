@@ -52,6 +52,7 @@
     "test-reconcile-contrib": "ts-mocha tests/integration/reconcile-contrib.test.ts --timeout 10000",
     "test-rec-one": "ts-mocha tests/integration/reconcile-one.test.ts --timeout 10000",
     "test-stripe-webhook": "ts-mocha tests/lambdas/stripe-webhook.test.ts --timeout 10000",
+    "test-model-utils": "ts-mocha tests/integration/model-utils.test.ts --timeout 10000",
     "test-server": "ts-node-dev tests/server/graphql.ts --watch",
     "compile": "npm install && tsc"
   },
