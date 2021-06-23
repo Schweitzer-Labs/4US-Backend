@@ -262,7 +262,7 @@ ContributorReceiptEmail:
         <td valign="top" align="center" style="padding:0;Margin:0;width:600px">
         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
         <tr>
-        <td align="center" style="padding:0;Margin:0"><h3 style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:20px;font-style:normal;font-weight:normal;color:#FFFFFF">{firstName}}{{lastName}}</h3></td>
+        <td align="center" style="padding:0;Margin:0"><h3 style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:20px;font-style:normal;font-weight:normal;color:#FFFFFF">{{firstName}} {{lastName}}</h3></td>
         </tr>
         </table></td>
         </tr>
@@ -339,7 +339,7 @@ ContributorReceiptEmail:
         <td align="left" style="padding:0;Margin:0;width:270px">
         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
         <tr>
-        <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{lastFourDigits}}</p></td>
+        <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{cardNumberLastFourDigits}}</p></td>
         </tr>
         </table></td>
         </tr>
@@ -365,7 +365,7 @@ ContributorReceiptEmail:
         <td align="left" style="padding:0;Margin:0;width:270px">
         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
         <tr>
-        <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{pinCode}}<br></p></td>
+        <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{postalCode}}<br></p></td>
         </tr>
         </table></td>
         </tr>
