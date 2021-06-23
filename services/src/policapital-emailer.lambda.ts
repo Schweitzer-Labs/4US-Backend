@@ -24,11 +24,11 @@ const MessageAttributes = t.type({
 
 type IMessageAttributes = t.TypeOf<typeof MessageAttributes>;
 
-const ses = new AWS.SES(),
-  sns = new AWS.SNS();
+const ses = new AWS.SES(), sns = new AWS.SNS();
 const from_address: any = process.env.NOTIFICATION_EMAIL_ADDRESS;
 const posReceiptTemplate: any = process.env.POS_RECEIPT;
 const posRecordTemplate: any = process.env.POS_RECORD;
+const sesConfigSet = process.env.SES_CONFIG_SET;
 
 /*
  * Main Function
@@ -98,7 +98,7 @@ const sendEmail = async (txn: ITransaction, parameters, committee: string) => {
     ...parameters,
     Source: from_address,
     TemplateData: JSON.stringify(templateData),
-    ConfigurationSetName: "SESDebugging",
+    ConfigurationSetName: sesConfigSet,
   };
   return await ses.sendTemplatedEmail(params).promise();
 };
