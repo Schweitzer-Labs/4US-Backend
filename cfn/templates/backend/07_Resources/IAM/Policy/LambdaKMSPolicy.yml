@@ -10,4 +10,4 @@ LambdaKMSPolicy:
             - kms:Decrypt
             - kms:Encrypt
             - kms:GenerateDataKey
-          Resource: '*'
+          Resource: !Ref SNSKey
