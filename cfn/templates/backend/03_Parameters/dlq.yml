@@ -1,0 +1,3 @@
+SQSDLQ:
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /{{ RUNENV }}/{{ PRODUCT }}/sqs/fifo/dlq
