@@ -52,15 +52,15 @@ ContributorReceiptEmail:
         text-decoration:none!important;
         }
         a[x-apple-data-detectors] {
-        color:inherit!important;
+        color:#C19446!important;
         text-decoration:none!important;
         font-size:inherit!important;
         font-family:inherit!important;
         font-weight:inherit!important;
         line-height:inherit!important;
         }
-                u + #body a {
-          color: #2CB543!important;
+        u + #body a {
+          color: #C19446!important;
           text-decoration: none !important;
           font-size: inherit !important;
           font-family: inherit !important;
@@ -68,7 +68,7 @@ ContributorReceiptEmail:
           line-height: inherit !important;
         }
         #MessageViewBody a {
-          color: #2CB543!important;
+          color: #C19446!important;
           text-decoration: none !important;
           font-size: inherit !important;
           font-family: inherit !important;
@@ -126,7 +126,7 @@ ContributorReceiptEmail:
         <td align="left" style="padding:0;Margin:0;width:431px">
         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
         <tr>
-        <td align="right" style="padding:0;Margin:0"><h2 style="Margin:0;line-height:29px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:24px;font-style:normal;font-weight:normal;color:#FFFFFF">Your contribution receipt<br></h2></td>
+        <td align="center" style="padding:0;Margin:0"><h2 style="Margin:0;line-height:29px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:24px;font-style:normal;font-weight:normal;color:#FFFFFF">Your contribution receipt<br></h2></td>
         </tr>
         <tr>
         <td align="right" style="padding:0;Margin:0;padding-top:40px;padding-bottom:40px"><h1 style="Margin:0;line-height:34px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:28px;font-style:normal;font-weight:normal;color:#FFFFFF;white-space:nowrap"><strong>${{amount}}</strong></h1></td>
@@ -396,8 +396,8 @@ ContributorReceiptEmail:
         <tr>
         <td align="left" style="padding:0;Margin:0;width:560px">
         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-        <tr>
-        <td esdev-links-color="#666666" align="center" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Copyright ©2021 4us.net. All rights reserved.</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">This email is a courtesy because you made a contribution via <a href="https://4us.net" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#C19446;font-size:14px">4us.net</a></p></td>
+        <tr>,
+        <td esdev-links-color="#666666" align="center" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">This email is a courtesy because you made a contribution via <a href="https://4us.net" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;font-size:14px">4us.net</a></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Copyright ©2021 <a href="https://4us.net">4us.net</a>. All rights reserved.</p></td>
         </tr>
         </table></td>
         </tr>
