@@ -17,6 +17,9 @@ CommitteeGraphQLFunction:
           Path: /api/committee/graphql
           Method: ANY
           RestApiId: !Ref CommitteeGateway
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

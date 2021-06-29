@@ -15,6 +15,9 @@ BankSyncFunction:
         Type: Schedule
         Properties:
           Schedule: 'rate(5 minutes)'
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

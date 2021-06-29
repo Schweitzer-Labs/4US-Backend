@@ -18,6 +18,9 @@ PlatformContributeFunction:
           Path: /api/platform/contribute
           Method: post
           RestApiId: !Ref DonorGateway
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

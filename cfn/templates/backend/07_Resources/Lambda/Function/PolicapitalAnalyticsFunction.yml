@@ -16,6 +16,9 @@ PolicapitalAnalyticsFunction:
           Path: /api/donor/analytics
           Method: post
           RestApiId: !Ref DonorGateway
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

@@ -20,6 +20,9 @@ TransactionEventDispatcherFunction:
       {% else %}
           Stream: !Ref TransactionsStream
       {% endif %}
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment

@@ -16,6 +16,9 @@ PolicapitalContributeFunction:
           Path: /api/donor/contribute
           Method: post
           RestApiId: !Ref DonorGateway
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
