@@ -29,3 +29,13 @@ TransactionEventDispatcherFunction:
         SQSQUEUE: !Ref EmailQueue
         TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
         COMMITTEES_DDB_TABLE_NAME: !Ref Committees
+
+TxnDispatcherInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref TransactionEventDispatcherFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue

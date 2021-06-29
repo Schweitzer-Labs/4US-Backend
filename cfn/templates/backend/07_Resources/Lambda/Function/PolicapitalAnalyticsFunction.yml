@@ -22,3 +22,13 @@ PolicapitalAnalyticsFunction:
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
+
+AnalyticsInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref PolicapitalAnalyticsFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue

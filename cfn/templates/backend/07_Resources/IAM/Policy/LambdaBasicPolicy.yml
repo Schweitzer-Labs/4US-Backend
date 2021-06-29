@@ -26,6 +26,8 @@ LambdaBasicPolicy:
             - logs:PutLogEvents
         - Sid: EnableLambdaDLQ
           Effect: Allow
-          Resource: !Ref LambdaDLQ
+          Resource:
+            - !Ref LambdaDLQ
+            - !Ref LambdaSuccessQueue
           Action:
             - sns:Publish

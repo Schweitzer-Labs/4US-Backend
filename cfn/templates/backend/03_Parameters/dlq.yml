@@ -5,3 +5,8 @@ SQSDLQ:
 LambdaDLQ:
   Type: AWS::SSM::Parameter::Value<String>
   Default: /{{ RUNENV }}/{{ PRODUCT }}/sns/dlq
+
+LambdaSuccessQueue:
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /{{ RUNENV }}/{{ PRODUCT }}/sns/successq
+

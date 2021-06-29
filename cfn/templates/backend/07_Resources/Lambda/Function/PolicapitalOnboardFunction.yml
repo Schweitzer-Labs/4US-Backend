@@ -22,3 +22,13 @@ PolicapitalOnboardFunction:
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
+
+OnboardInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref PolicapitalOnboardFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue

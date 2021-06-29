@@ -26,3 +26,13 @@ BankSyncFunction:
         DONORS_DDB_TABLE_NAME: !Ref Donors
         RULES_DDB_TABLE_NAME: !Ref Rules
         BILLABLE_EVENTS_DDB_TABLE_NAME: !Ref BillableEvents
+
+BankSyncInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref BankSyncFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue
