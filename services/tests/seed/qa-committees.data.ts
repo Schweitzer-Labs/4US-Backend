@@ -1,7 +1,7 @@
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { Plan } from "../../src/utils/enums/plan.enum";
 
-export const committeesData: ICommittee[] = [
+export const qaCommitteesData: ICommittee[] = [
   {
     // required
     id: "angel-cruz",

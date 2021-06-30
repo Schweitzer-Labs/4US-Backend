@@ -51,6 +51,7 @@
     "test-rec-one": "ts-mocha tests/integration/reconcile-one.test.ts --timeout 10000",
     "test-stripe-webhook": "ts-mocha tests/lambdas/stripe-webhook.test.ts --timeout 10000",
     "test-server": "ts-node-dev tests/server/graphql.ts --watch",
+    "deploy-qa-committees": "ts-node tests/seed/seed-qa-committees.job.ts",
     "compile": "npm install && tsc"
   },
   "devDependencies": {
