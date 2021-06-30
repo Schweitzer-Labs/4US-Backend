@@ -7,6 +7,7 @@ import {
   decodeCommittees,
   ICommittee,
 } from "../../queries/get-committee-by-id.query";
+import { StatusCodes } from "http-status-codes";
 
 export const get_committee_by_stripe_account_and_decode =
   (committeeTable: string) =>
@@ -16,7 +17,12 @@ export const get_committee_by_stripe_account_and_decode =
       taskEither.tryCatch(
         () =>
           getCommitteesByStripeAccount(committeeTable)(dynamoDB)(stripeAccount),
-        (err) => new ApplicationError("Get committee request failed", err)
+        (err) =>
+          new ApplicationError(
+            "Get committee request failed",
+            err,
+            StatusCodes.OK
+          )
       ),
       taskEither.chain(decodeCommittees),
       taskEither.chain(findOne)

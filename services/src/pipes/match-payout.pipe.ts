@@ -7,10 +7,6 @@ import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { putTransaction } from "../utils/model/put-transaction.utils";
-import { deleteTxn } from "../utils/model/delete-txn.utils";
-import { Direction } from "../utils/enums/direction.enum";
-import { payoutDescriptions } from "../clients/finicity/finicity.decoders";
 import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import * as FPArray from "fp-ts/Array";
 
@@ -31,29 +27,37 @@ export const matchContributions =
     );
 
 const getCommitteeContributions =
-  (txnsTableName) => (dynamoDB) => (committee: ICommittee): TaskEither<ApplicationError, ITransaction[]> =>
+  (txnsTableName) =>
+  (dynamoDB) =>
+  (committee: ICommittee): TaskEither<ApplicationError, ITransaction[]> =>
     searchTransactions(txnsTableName)(dynamoDB)({
       committeeId: committee.id,
       transactionType: TransactionType.Contribution,
       bankVerified: false,
     });
 
-
 interface PayoutRecord {
-  stripePayoutId: string,
-  stripeBalanceTransactionId: string,
-  stripeEffectiveAt: number,
+  stripePayoutId: string;
+  stripeBalanceTransactionId: string;
+  stripeEffectiveAt: number;
 }
+
+const groupTxnsByPayout = (txns: ITransaction[]) => {
+  const txnsWithPayouts = txns.filter((txn) => !!txn.stripePayoutId);
+  const payoutGroups = txnsWithPayouts.reduce((acc, txn) => {
+    const currentAmount = acc[txn.stripePayoutId] || 0;
+    acc[txn.stripePayoutId] = currentAmount + txn.amount;
+    return acc;
+  }, {});
+};
 
 const processTxns =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-    (payoutRecords: PayoutRecord[]) => async (txns: ITransaction[]): Promise<ITransaction[]> =>
+  (payoutRecords: PayoutRecord[]) =>
+  async (txns: ITransaction[]): Promise<ITransaction[]> =>
     txns.reduce((acc, txn) => {
-      const match = []
+      const match = [];
 
-      return [
-        ..acc,
-
-      ]
-    }, [])
+      return [...acc];
+    }, []);

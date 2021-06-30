@@ -15,7 +15,9 @@ const run =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (committees: ICommittee[]) => {
+    console.log("running run");
     for (const committee of committees) {
+      console.log("seeding committee " + committee.id);
       await putCommittee(committeesTableName)(dynamoDB)(committee);
     }
   };

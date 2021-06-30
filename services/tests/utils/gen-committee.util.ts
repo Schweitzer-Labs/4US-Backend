@@ -18,6 +18,8 @@ interface IGenCommitteeConfig {
   finicityCustomerId?: string;
   finicityAccountId?: string;
   stripeAccount?: string;
+  candidateFirstName?: string;
+  candidateLastName?: string;
 }
 
 export const genCommittee = ({
@@ -35,16 +37,21 @@ export const genCommittee = ({
   finicityCustomerId,
   finicityAccountId,
   stripeAccount,
+  candidateFirstName,
+  candidateLastName,
 }: IGenCommitteeConfig): ICommittee => {
-  const candidateFirstName = faker.name.firstName();
-  const candidateLastName = faker.name.lastName();
+  const randomLastName = faker.name.lastName();
   return {
     id: genTxnId(),
-    committeeName: `Vote for ${candidateFirstName}`,
-    candidateFirstName,
-    candidateLastName,
+    committeeName: `Vote for ${candidateFirstName || randomLastName}`,
+    candidateFirstName: candidateFirstName || faker.name.firstName(),
+    candidateLastName: candidateLastName || randomLastName,
     stripeAccount: stripeAccount || "acct_1IjTcsRC8iiQex3V",
-    members: ["evan-piro", "1643f48e-431c-4461-b2cb-b8fce4c939df"],
+    members: [
+      "evan-piro",
+      "1643f48e-431c-4461-b2cb-b8fce4c939df",
+      "6604131d-1982-4140-9d69-59206766151c",
+    ],
     state,
     scope,
     officeType,

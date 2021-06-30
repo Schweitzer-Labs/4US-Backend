@@ -9,6 +9,7 @@ enum ConfigKeys {
   finicityPartnerId = "/lambda/finicity/partnerId",
   finicityPartnerSecret = "/lambda/finicity/partnerSecret",
   finicityAppKey = "/lambda/finicity/appKey",
+  stripeWebhookEndpointSecret = "/lambda/stripe/webhookEndpointSecret",
 }
 
 const retrieveConfig = async (env: string, name: string) => {
@@ -32,6 +33,7 @@ const getConfig = async (env: string, name: string): Promise<string> => {
     case ConfigKeys.finicityPartnerId:
     case ConfigKeys.finicityPartnerSecret:
     case ConfigKeys.finicityAppKey:
+    case ConfigKeys.stripeWebhookEndpointSecret:
       return retrieveConfig(env, name);
 
     default:
@@ -42,6 +44,9 @@ const getConfig = async (env: string, name: string): Promise<string> => {
 
 export const getStripeApiKey = async (env: string) =>
   await getConfig(env, ConfigKeys.stripeApiKey);
+
+export const getStripeWebhookEndpointSecret = async (env: string) =>
+  await getConfig(env, ConfigKeys.stripeWebhookEndpointSecret);
 
 export const getLNUsername = async (env: string) =>
   await getConfig(env, ConfigKeys.lnUsername);

@@ -5,7 +5,6 @@ import { DynamoDB } from "aws-sdk";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
 import { get_committee_by_stripe_account_and_decode } from "../../src/utils/model/get-committee-by-stripe-account.utils";
-import * as dotenv from "dotenv";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
 import { genCommittee } from "../utils/gen-committee.util";
@@ -19,6 +18,7 @@ import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { getTxnById } from "../../src/utils/model/get-txn-by-id.utils";
 import { deleteTxn } from "../../src/utils/model/delete-txn.utils";
+import * as dotenv from "dotenv";
 
 dotenv.config();
 

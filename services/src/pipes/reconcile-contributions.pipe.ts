@@ -80,7 +80,7 @@ const processTxns =
 const isUnverifiedContribution = (txn: ITransaction) =>
   txn.transactionType === TransactionType.Contribution && !txn.bankVerified;
 
-const isPayout = (txn: ITransaction) =>
+export const isPayout = (txn: ITransaction) =>
   txn.direction === Direction.In &&
   payoutDescriptions.includes(txn?.finicityTransactionData?.description);
 
