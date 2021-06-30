@@ -1,5 +1,6 @@
 LambdaSNSWriterPolicy:
   Type: AWS::IAM::ManagedPolicy
+  DeletionPolicy: Retain
   Properties:
     PolicyDocument:
       Version: 2012-10-17
