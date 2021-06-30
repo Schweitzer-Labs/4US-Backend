@@ -1,5 +1,6 @@
 PolicapitalEmailerFunction:
   Type: AWS::Serverless::Function
+  DeletionPolicy: Retain
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalEmailerFunction
     Description: Receive DynamoDB events and send email with the transaction details

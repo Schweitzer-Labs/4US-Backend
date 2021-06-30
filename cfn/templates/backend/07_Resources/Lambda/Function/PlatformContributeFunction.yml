@@ -1,5 +1,6 @@
 PlatformContributeFunction:
-  Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  Type: AWS::Serverless::Function
+  DeletionPolicy: Retain
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PlatformContributeFunction
     Description: Donor Facing Contribute Function for 4US Committees

@@ -1,5 +1,6 @@
 BankSyncFunction:
   Type: "AWS::Serverless::Function"
+  DeletionPolicy: Retain
   Properties:
     FunctionName: !Sub ${AWS::StackName}-BankSyncFunction
     Runtime: nodejs12.x
