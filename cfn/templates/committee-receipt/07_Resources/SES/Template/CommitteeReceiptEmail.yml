@@ -16,9 +16,12 @@ CommitteeReceiptEmail:
 
         {{email}}
         {{phoneNumber}}
-
+        {{#if employer}}
         Occupation          : {{occupation}}
         Employer            : {{employer}}
+        {{else}}
+        {{employmentStatus}}
+        {{/if}}
         Date                : {{timestamp}}
         Stripe Transaction #: {{stripePaymentIntentId}}
         Donor Receipt #     : {{receipt}}
@@ -59,12 +62,28 @@ CommitteeReceiptEmail:
         text-decoration:none!important;
         }
         a[x-apple-data-detectors] {
-        color:inherit!important;
+        color: #C29546!important;
         text-decoration:none!important;
         font-size:inherit!important;
         font-family:inherit!important;
         font-weight:inherit!important;
         line-height:inherit!important;
+        }
+        u + #body a {
+          color: #C29546!important;
+          text-decoration: none !important;
+          font-size: inherit !important;
+          font-family: inherit !important;
+          font-weight: inherit !important;
+          line-height: inherit !important;
+        }
+        #MessageViewBody a {
+          color: #C29546!important;
+          text-decoration: none !important;
+          font-size: inherit !important;
+          font-family: inherit !important;
+          font-weight: inherit !important;
+          line-height: inherit !important;
         }
         .es-desk-hidden {
         display:none;
@@ -82,7 +101,7 @@ CommitteeReceiptEmail:
         @media only screen and (max-width:600px) {p, ul li, ol li, a { line-height:150%!important } h1 { font-size:30px!important; text-align:center; line-height:120%!important } h2 { font-size:26px!important; text-align:center; line-height:120%!important } h3 { font-size:20px!important; text-align:center; line-height:120%!important } .es-header-body h1 a, .es-content-body h1 a, .es-footer-body h1 a { font-size:30px!important } .es-header-body h2 a, .es-content-body h2 a, .es-footer-body h2 a { font-size:26px!important } .es-header-body h3 a, .es-content-body h3 a, .es-footer-body h3 a { font-size:20px!important } .es-menu td a { font-size:16px!important } .es-header-body p, .es-header-body ul li, .es-header-body ol li, .es-header-body a { font-size:16px!important } .es-content-body p, .es-content-body ul li, .es-content-body ol li, .es-content-body a { font-size:16px!important } .es-footer-body p, .es-footer-body ul li, .es-footer-body ol li, .es-footer-body a { font-size:16px!important } .es-infoblock p, .es-infoblock ul li, .es-infoblock ol li, .es-infoblock a { font-size:12px!important } *[class="gmail-fix"] { display:none!important } .es-m-txt-c, .es-m-txt-c h1, .es-m-txt-c h2, .es-m-txt-c h3 { text-align:center!important } .es-m-txt-r, .es-m-txt-r h1, .es-m-txt-r h2, .es-m-txt-r h3 { text-align:right!important } .es-m-txt-l, .es-m-txt-l h1, .es-m-txt-l h2, .es-m-txt-l h3 { text-align:left!important } .es-m-txt-r img, .es-m-txt-c img, .es-m-txt-l img { display:inline!important } .es-button-border { display:block!important } a.es-button, button.es-button { font-size:20px!important; display:block!important; border-left-width:0px!important; border-right-width:0px!important } .es-adaptive table, .es-left, .es-right { width:100%!important } .es-content table, .es-header table, .es-footer table, .es-content, .es-footer, .es-header { width:100%!important; max-width:600px!important } .es-adapt-td { display:block!important; width:100%!important } .adapt-img { width:100%!important; height:auto!important } .es-m-p0 { padding:0px!important } .es-m-p0r { padding-right:0px!important } .es-m-p0l { padding-left:0px!important } .es-m-p0t { padding-top:0px!important } .es-m-p0b { padding-bottom:0!important } .es-m-p20b { padding-bottom:20px!important } .es-mobile-hidden, .es-hidden { display:none!important } tr.es-desk-hidden, td.es-desk-hidden, table.es-desk-hidden { width:auto!important; overflow:visible!important; float:none!important; max-height:inherit!important; line-height:inherit!important } tr.es-desk-hidden { display:table-row!important } table.es-desk-hidden { display:table!important } td.es-desk-menu-hidden { display:table-cell!important } .es-menu td { width:1%!important } table.es-table-not-adapt, .esd-block-html table { width:auto!important } table.es-social { display:inline-block!important } table.es-social td { display:inline-block!important } }
         </style>
         </head>
-        <body style="width:100%;font-family:'lucida sans unicode', 'lucida grande', sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
+        <body id="body" style="width:100%;font-family:'lucida sans unicode', 'lucida grande', sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
         <span style="display:none !important;font-size:0px;line-height:0;color:#FFFFFF;visibility:hidden;opacity:0;height:0;width:0;mso-hide:all">You've received a ${{amount}} contribution</span>
         <div class="es-wrapper-color" style="background-color:#4F52D1">
         <!--[if gte mso 9]>
@@ -117,7 +136,7 @@ CommitteeReceiptEmail:
         <td align="left" style="padding:0;Margin:0;width:431px">
         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
         <tr>
-        <td align="right" style="padding:0;Margin:0"><h2 style="Margin:0;line-height:29px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:24px;font-style:normal;font-weight:normal;color:#FFFFFF">You've received a new contribution</h2></td>
+        <td align="center" style="padding:0;Margin:0"><h2 style="Margin:0;line-height:29px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:24px;font-style:normal;font-weight:normal;color:#FFFFFF">You've received a new contribution</h2></td>
         </tr>
         <tr>
         <td align="right" style="padding:0;Margin:0;padding-top:40px;padding-bottom:40px"><h1 style="Margin:0;line-height:34px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:28px;font-style:normal;font-weight:normal;color:#FFFFFF;white-space:nowrap"><strong>${{amount}}</strong></h1></td>
@@ -137,24 +156,24 @@ CommitteeReceiptEmail:
         <td align="left" style="padding:0;Margin:0"><h3 style="Margin:0;line-height:22px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:18px;font-style:normal;font-weight:normal;color:#FFFFFF">{{committee}} has received a ${{amount}} contribution from<br></h3></td>
         </tr>
         <tr>
-        <td style="padding:0;Margin:0"><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{firstName}} {{lastName}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{addressLine1}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{addressLine2}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{city}}, {{state}} {{postalCode}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">&nbsp;</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{email}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{phoneNumber}}</p></td>
+        <td style="padding:0;Margin:0"><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{firstName}} {{lastName}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{addressLine1}}</p>{{#if addressLine2}}<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{addressLine2}}</p>{{/if}}<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{city}}, {{state}} {{postalCode}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">&nbsp;</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{email}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{phoneNumber}}</p></td>
         </tr>
         <tr>
         <td style="padding:20px;Margin:0;font-size:0" align="center">
         <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
         <tr>
-        <td style="padding:0;Margin:0;border-bottom:1px solid #C19446;background:#FFFFFF none repeat scroll 0% 0%;height:1px;width:100%;margin:0px"></td>
+        <td style="padding:0;Margin:0;border-bottom:1px solid #c29546;background:#FFFFFF none repeat scroll 0% 0%;height:1px;width:100%;margin:0px"></td>
         </tr>
         </table></td>
         </tr>
         <tr>
-        <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Occupation: {{occupation}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Employer: {{employer}}</p></td>
+        <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">{{#if employer}}Occupation: {{occupation}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Employer: {{employer}}{{else}}{{employmentStatus}}{{/if}}</p></td>
         </tr>
         <tr>
         <td style="padding:20px;Margin:0;font-size:0" align="center">
         <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
         <tr>
-        <td style="padding:0;Margin:0;border-bottom:1px solid #C19446;background:#FFFFFF none repeat scroll 0% 0%;height:1px;width:100%;margin:0px"></td>
+        <td style="padding:0;Margin:0;border-bottom:1px solid #C29546;background:#FFFFFF none repeat scroll 0% 0%;height:1px;width:100%;margin:0px"></td>
         </tr>
         </table></td>
         </tr>
@@ -173,12 +192,12 @@ CommitteeReceiptEmail:
         <td align="center" style="padding:0;Margin:0">
         <!--[if mso]><a href="https://dashboard.4us.net/?committeeId={{committeeId}}" target="_blank">
         <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" stripoVmlButton href="https://dashboard.4us.net/?committeeId={{committeeId}}"
-        style="height:47px;v-text-anchor:middle;width:212px;" arcsize="64%" stroke="f" fillcolor="#c19446">
+        style="height:47px;v-text-anchor:middle;width:212px;" arcsize="64%" stroke="f" fillcolor="#c29546">
         <w:anchorlock></w:anchorlock>
-        <center style='color:#ffffff;font-family:"lucida sans unicode", "lucida grande", sans-serif;font-size:18px;font-weight:400;'>My 4US Dashboard</center>
+        <center style='color:#C29546;font-family:"lucida sans unicode", "lucida grande", sans-serif;font-size:18px;font-weight:400;'>My 4US Dashboard</center>
         </v:roundrect></a>
         <![endif]-->
-        <!--[if !mso]><!-- --><span class="es-button-border msohide" style="border-style:solid;border-color:#C19446;background:#C19446;border-width:0px;display:inline-block;border-radius:30px;width:auto;mso-hide:all"><a href="https://dashboard.4us.net/?committeeId={{committeeId}}" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;border-style:solid;border-color:#C19446;border-width:10px 20px 10px 20px;display:inline-block;background:#C19446;border-radius:30px;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-weight:normal;font-style:normal;line-height:22px;width:auto;text-align:center">My 4US Dashboard</a></span>
+        <!--[if !mso]><!-- --><span class="es-button-border msohide" style="border-style:solid;border-color:#000000;background:#000000;border-width:0px;display:inline-block;border-radius:30px;width:auto;mso-hide:all"><a href="https://dashboard.4us.net/?committeeId={{committeeId}}" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;border-style:solid;border-color:#000000;border-width:10px 20px 10px 20px;display:inline-block;background:#000000;border-radius:30px;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-weight:normal;font-style:normal;line-height:22px;color:#C29546;width:auto;text-align:center">My 4US Dashboard</a></span>
         <!--<![endif]--></td>
         </tr>
         </table></td>
@@ -192,7 +211,7 @@ CommitteeReceiptEmail:
         <td align="left" style="padding:0;Margin:0;width:560px">
         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
         <tr>
-        <td esdev-links-color="#666666" align="center" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">This email is a courtesy because you receive contributions via <a href="https://4us.net" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#C19446;font-size:14px">4us.net</a></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Copyright ©2021 4us.net. All rights reserved.</p></td>
+        <td esdev-links-color="#666666" align="center" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">This email is a courtesy because you receive contributions via <a href="https://4us.net?committeeId={{committeeId}}" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#C29546;font-size:14px">4us.net</a></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;line-height:21px;color:#FFFFFF;font-size:14px">Copyright ©2021 <a href="https://4us.net" style="color:#C29546">4us.net</a>. All rights reserved.</p></td>
         </tr>
         </table></td>
         </tr>
@@ -347,18 +366,14 @@ CommitteeReceiptEmail:
                                           <td style="padding:0;Margin:0">
                                             <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{firstName}} {{lastName}}</p>
                                             <dl>
-                                              <dt>
-                                                Occupation
-                                              </dt>
-                                              <dd>
-                                                {{occupation}}
-                                              </dd>
-                                              <dt>
-                                                Employer
-                                              </dt>
-                                              <dd>
-                                                {{employer}}
-                                              </dd>
+                                              <dt>Occupation</dt>
+                                            {{#if employer }}
+                                              <dd>{{occupation}}</dd>
+                                              <dt>Employer</dt>
+                                              <dd>{{employer}}</dd>
+                                            {{else}}
+                                              <dd>{{employmentStatus}}</dd>
+                                            {{/if}}
                                             </dl>
                                           </td>
                                         </tr>
@@ -374,18 +389,10 @@ CommitteeReceiptEmail:
                                         <tr>
                                           <td style="padding:0;Margin:0">
                                             <dl>
-                                              <dt>
-                                                Date
-                                              </dt>
-                                              <dd>
-                                                {{timestamp}}
-                                              </dd>
-                                              <dt>
-                                                Receipt Number
-                                              </dt>
-                                              <dd>
-                                                {{receipt}}
-                                              </dd>
+                                              <dt>Date</dt>
+                                              <dd>{{timestamp}}</dd>
+                                              <dt>Receipt Number</dt>
+                                              <dd>{{receipt}}</dd>
                                             </dl>
                                           </td>
                                         </tr>
@@ -399,7 +406,7 @@ CommitteeReceiptEmail:
                                           </td>
                                         </tr>
                                         <tr>
-                                          <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Contact Info</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{addressLine1}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{addressLine2}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{city}}, {{state}} {{postalCode}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">&nbsp;</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{email}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{phoneNumber}}</p></td>
+                                          <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Contact Info</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{addressLine1}}</p>{{#if addressLine2}}<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{addressLine2}}</p>{{/if}}<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{city}}, {{state}} {{postalCode}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">&nbsp;</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{email}}</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">{{phoneNumber}}</p></td>
                                         </tr>
                                         <tr>
                                           <td style="padding:20px;Margin:0;font-size:0" align="center">
@@ -427,7 +434,7 @@ CommitteeReceiptEmail:
                                     <td class="es-m-p20b" align="left" style="padding:0;Margin:0;width:356px">
                                       <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                         <tr>
-                                          <td esdev-links-color="#666666" align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">© 2021. All rights reserved.<br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">You're receiving this email because you receive contributions via Policapital.net<br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px"><a target="_blank" href="https://viewstripo.email/" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#2CB543;font-size:14px">Unsubscribe</a><br></p></td>
+                                          <td esdev-links-color="#666666" align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">© 2021. All rights reserved.<br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">You're receiving this email because you receive contributions via Policapital.net<br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px"><a target="_blank" href="https://4us.net/" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#C29546;font-size:14px">Unsubscribe</a><br></p></td>
                                         </tr>
                                       </table>
                                     </td>

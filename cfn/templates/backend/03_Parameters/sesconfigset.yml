@@ -1,0 +1,3 @@
+SESConfigSet:
+  Type: AWS::SSM::Parameter::Value<String>
+  Default: /{{ REGION }}/ses/configurationset

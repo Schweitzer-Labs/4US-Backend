@@ -24,3 +24,10 @@ LambdaBasicPolicy:
             - logs:CreateLogGroup
             - logs:CreateLogStream
             - logs:PutLogEvents
+        - Sid: EnableLambdaDLQ
+          Effect: Allow
+          Resource:
+            - !Ref LambdaDLQ
+            - !Ref LambdaSuccessQueue
+          Action:
+            - sns:Publish

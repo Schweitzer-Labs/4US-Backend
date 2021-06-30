@@ -3,6 +3,7 @@ CommitteeGateway:
   Properties:
     Name: !Sub ${AWS::StackName}-committee
     StageName: !Sub ${LambdaRunEnvironment}
+    TracingEnabled: true
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub committee-api.${Domain}.${TLD}
@@ -15,6 +16,9 @@ CommitteeGateway:
       - LoggingLevel: INFO
         ResourcePath: '/*'
         HttpMethod: '*'
+        CacheDataEncrypted: true
+        MetricsEnabled: true
+        DataTraceEnabled: true
     Auth:
       DefaultAuthorizer: PlatformUserCognitoAuthorizer
       Authorizers:

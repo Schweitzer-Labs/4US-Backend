@@ -4,5 +4,7 @@ EmailQueue:
     QueueName: !Sub ${LambdaRunEnvironment}-${Domain}-ReceiptEmailQueue.fifo
     FifoQueue: true
     ContentBasedDeduplication: true
-    VisibilityTimeout: 900
     KmsMasterKeyId: alias/aws/sqs
+    RedrivePolicy:
+      deadLetterTargetArn: !Ref SQSDLQ
+      maxReceiveCount: 3
