@@ -1,6 +1,5 @@
 LambdaDynamoDBWriterRole:
   Type: AWS::IAM::Role
-  DeletionPolicy: Retain
   Properties:
     ManagedPolicyArns:
       - !Ref LambdaBasicPolicy
