@@ -1,5 +1,5 @@
 PolicapitalAnalyticsFunction:
-  Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  Type: AWS::Serverless::Function
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalAnalyticsFunction
     Description: Log Analytic data for Policapital Contribution activity
@@ -11,7 +11,7 @@ PolicapitalAnalyticsFunction:
     Role: !GetAtt LambdaBasicRole.Arn
     Events:
       PolicapitalAnalytics:
-        Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        Type: Api
         Properties:
           Path: /api/donor/analytics
           Method: post
