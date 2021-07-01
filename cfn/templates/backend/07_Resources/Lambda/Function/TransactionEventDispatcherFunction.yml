@@ -1,6 +1,5 @@
 TransactionEventDispatcherFunction:
   Type: AWS::Serverless::Function
-  DeletionPolicy: Retain
   Properties:
     FunctionName: !Sub ${AWS::StackName}-TransactionEventDispatcherFunction
     Description: Receive DynamoDB events and queues notifications with transaction details

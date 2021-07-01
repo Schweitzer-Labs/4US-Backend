@@ -1,6 +1,5 @@
 PlatformContributeFunction:
   Type: AWS::Serverless::Function
-  DeletionPolicy: Retain
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PlatformContributeFunction
     Description: Donor Facing Contribute Function for 4US Committees
