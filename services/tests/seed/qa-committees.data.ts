@@ -109,8 +109,8 @@ export const qaCommitteesData: ICommittee[] = [
     county: "",
     officeType: "assembly",
     ruleVersion: "nyboe-2020",
-    finicityCustomerId: "5003896371",
-    finicityAccountId: "5015365202",
+    finicityCustomerId: "5007489410",
+    finicityAccountId: "5016000964",
   },
   {
     // required
@@ -137,8 +137,8 @@ export const qaCommitteesData: ICommittee[] = [
     county: "",
     officeType: "assembly",
     ruleVersion: "nyboe-2020",
-    finicityCustomerId: "5003896371",
-    finicityAccountId: "5015365202",
+    finicityCustomerId: "5007489410",
+    finicityAccountId: "5016000964",
   },
   {
     // required
@@ -165,7 +165,7 @@ export const qaCommitteesData: ICommittee[] = [
     county: "",
     officeType: "assembly",
     ruleVersion: "nyboe-2020",
-    finicityCustomerId: "5003896371",
-    finicityAccountId: "5015365202",
+    finicityCustomerId: "5007489410",
+    finicityAccountId: "5016000964",
   },
 ];

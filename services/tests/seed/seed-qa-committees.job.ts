@@ -4,6 +4,7 @@ import * as AWS from "aws-sdk";
 import { qaCommitteesData } from "./qa-committees.data";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
+import { qaUsers } from "./qa-users.data";
 
 AWS.config.update({ region: "us-west-2" });
 
@@ -17,6 +18,7 @@ const run =
   async (committees: ICommittee[]) => {
     for (const committee of committees) {
       console.log("Seeding committee: " + committee.id);
+      committee.members = [...committee.members, ...qaUsers];
       await putCommittee(committeesTableName)(dynamoDB)(committee);
       console.log(committee.id + " seeded");
     }
