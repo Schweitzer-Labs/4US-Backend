@@ -1,15 +1,11 @@
 BillableEvents:
 {% if PRODUCT == '4us' %}
-  Type: AWS::DynamoDB::Table
+  Type: AWS::DynamoDB::GlobalTable
   DeletionPolicy: Retain
   Properties:
+    BillingMode: PAY_PER_REQUEST
     SSESpecification:
       SSEEnabled: true
-    PointInTimeRecoverySpecification:
-      PointInTimeRecoveryEnabled: true
-    ProvisionedThroughput:
-      WriteCapacityUnits: 3
-      ReadCapacityUnits: 3
     AttributeDefinitions:
       - AttributeName: committeeId
         AttributeType: S
@@ -22,4 +18,8 @@ BillableEvents:
         AttributeName: id
     StreamSpecification:
       StreamViewType: NEW_AND_OLD_IMAGES
+    Replicas:
+      - Region: !Ref AWS::Region
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
 {% endif %}
