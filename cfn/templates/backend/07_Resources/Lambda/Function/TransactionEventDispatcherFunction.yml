@@ -15,11 +15,7 @@ TransactionEventDispatcherFunction:
         Properties:
           BatchSize: 1
           StartingPosition: LATEST
-      {% if PRODUCT == '4us' %}
-          Stream: !GetAtt Transactions.StreamArn
-      {% else %}
           Stream: !Ref TransactionsStream
-      {% endif %}
     DeadLetterQueue:
       TargetArn: !Ref LambdaDLQ
       Type: SNS
