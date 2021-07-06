@@ -1,5 +1,4 @@
 BillableEvents:
-{% if PRODUCT == '4us' %}
   Type: AWS::DynamoDB::GlobalTable
   DeletionPolicy: Retain
   Properties:
@@ -20,6 +19,10 @@ BillableEvents:
       StreamViewType: NEW_AND_OLD_IMAGES
     Replicas:
       - Region: !Ref AWS::Region
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+{% if RUNENV == 'prod' %}
+      - Region: !Ref BackupRegion
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
 {% endif %}
