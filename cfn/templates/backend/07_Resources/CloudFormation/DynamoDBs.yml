@@ -7,4 +7,5 @@ DynamoDBsTemplate:
     Parameters:
       LambdaRunEnvironment: !Ref LambdaRunEnvironment
       Product: !Ref Product
+      BackupRegion: us-east-2
 {% endif %}
