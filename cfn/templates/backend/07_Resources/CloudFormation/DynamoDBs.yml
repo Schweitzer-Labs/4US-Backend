@@ -1,0 +1,10 @@
+DynamoDBsTemplate:
+{% if REGION in ['us-east-1', 'us-west-2'] %}
+  Type: AWS::CloudFormation::Stack
+  Properties:
+    TemplateURL: dynamodbs.yml
+    TimeoutInMinutes: 60
+    Parameters:
+      LambdaRunEnvironment: !Ref LambdaRunEnvironment
+      Product: !Ref Product
+{% endif %}

@@ -81,6 +81,8 @@ CONTRIBUTOR_RECEIPT	:= contributor-receipt
 CONTRIBUTOR_TEMPLATE	:= $(CFN_BUILD_DIR)/$(CONTRIBUTOR_RECEIPT).yml
 COMMITTEE_RECEIPT	:= committee-receipt
 COMMITTEE_TEMPLATE	:= $(CFN_BUILD_DIR)/$(COMMITTEE_RECEIPT).yml
+DYNAMO_DBS		:= dynamodbs
+DYNAMODB_TEMPLATE	:= $(CFN_BUILD_DIR)/$(DYNAMO_DBS).yml
 
 IMPORTS			:= $(CFN_BUILD_DIR)/Imports-$(STACK).yml
 
@@ -92,12 +94,12 @@ EMAILER_APP		:= $(EMAILER_DIR)/app.js
 
 JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
 
+CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE) $(DYNAMODB_TEMPLATE)
+
 ifeq ($(REGION), us-west-1)
 	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
 else ifeq ($(REGION), us-east-2)
 	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
-else
-	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
 endif
 
 .PHONY: dep build buildstacks check local import package deploy clean realclean
@@ -121,7 +123,6 @@ buildsam: buildstacks compile $(JS_APPS)
 		--template-file $(BACKEND_TEMPLATE)
 
 buildstacks: mkbuilddir $(CFN_TEMPLATES)
-	echo Built all the stacks
 
 compile:
 	npm -C services run compile

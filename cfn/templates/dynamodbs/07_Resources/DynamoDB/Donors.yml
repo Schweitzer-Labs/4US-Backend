@@ -1,25 +1,25 @@
-BillableEvents:
+Donors:
 {% if PRODUCT == '4us' %}
-  Type: AWS::DynamoDB::Table
+  Type: AWS::DynamoDB::GlobalTable
   DeletionPolicy: Retain
   Properties:
+    BillingMode: PAY_PER_REQUEST
     SSESpecification:
       SSEEnabled: true
-    PointInTimeRecoverySpecification:
-      PointInTimeRecoveryEnabled: true
-    ProvisionedThroughput:
-      WriteCapacityUnits: 3
-      ReadCapacityUnits: 3
     AttributeDefinitions:
-      - AttributeName: committeeId
+      - AttributeName: flacspeeMatch
         AttributeType: S
       - AttributeName: id
         AttributeType: S
     KeySchema:
       - KeyType: HASH
-        AttributeName: committeeId
+        AttributeName: flacspeeMatch
       - KeyType: RANGE
         AttributeName: id
     StreamSpecification:
-      StreamViewType: NEW_AND_OLD_IMAGES
+      StreamViewType: NEW_IMAGE
+    Replicas:
+      - Region: !Ref AWS::Region
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
 {% endif %}

@@ -1,21 +1,21 @@
-Committees:
+Rules:
 {% if PRODUCT == '4us' %}
-  Type: AWS::DynamoDB::Table
+  Type: AWS::DynamoDB::GlobalTable
   DeletionPolicy: Retain
   Properties:
+    BillingMode: PAY_PER_REQUEST
     SSESpecification:
       SSEEnabled: true
-    PointInTimeRecoverySpecification:
-      PointInTimeRecoveryEnabled: true
-    ProvisionedThroughput:
-      WriteCapacityUnits: 5
-      ReadCapacityUnits: 5
     AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: code
         AttributeType: S
     KeySchema:
       - KeyType: HASH
-        AttributeName: id
+        AttributeName: code
     StreamSpecification:
       StreamViewType: NEW_IMAGE
+    Replicas:
+      - Region: !Ref AWS::Region
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
 {% endif %}
