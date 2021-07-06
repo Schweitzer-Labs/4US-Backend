@@ -1,0 +1,7 @@
+LambdaRunEnvironment:
+  Type: String
+  AllowedValues:
+    - prod
+    - qa
+    - dev
+    - demo

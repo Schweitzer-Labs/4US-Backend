@@ -4,7 +4,7 @@ DynamoDBsTemplate:
   Properties:
     TemplateURL: dynamodbs.yml
     TimeoutInMinutes: 60
-#    Parameters:
-#      LambdaRunEnvironment: !Ref LambdaRunEnvironment
-#      Product: !Ref Product
+    Parameters:
+      LambdaRunEnvironment: !Ref LambdaRunEnvironment
+      Product: !Ref Product
 {% endif %}
