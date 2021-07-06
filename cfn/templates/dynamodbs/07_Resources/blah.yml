@@ -1,0 +1,6 @@
+blah:
+  Type: AWS::SSM::Parameter
+  Properties:
+    Name: blah
+    Type: String
+    Value: 'blah'

@@ -2,25 +2,44 @@ PurplePayHostedZone:
   Matcher:
     Id: Z0505014WPG6KZLWPQJF
   Property: [Id, Name]
-{% if RUNENV == 'qa' and PRODUCT == '4us' %}
 BillableEvents:
   Matcher:
+{% if RUNENV == 'qa' %}
     TableName: qa-4us-backend-BillableEvents-TN5QYKT5637O
+{% else %}
+    TableName: prod-4us-backend-BillableEvents-E4NHC0Q9FIR0
+{% endif %}
   Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification, SSESpecification]
 Committees:
   Matcher:
+{% if RUNENV == 'qa' %}
     TableName: qa-4us-backend-Committees-1QNBGOQ2OEBZI
+{% else %}
+    TableName: prod-4us-backend-Committees-1HO9F0CX9Y3VL
+{% endif %}
   Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification, SSESpecification]
 Donors:
   Matcher:
+{% if RUNENV == 'qa' %}
     TableName: qa-4us-backend-Donors-WJ73ERW34MAV
+{% else %}
+    TableName: prod-4us-backend-Donors-19SPRBIC1ML5F
+{% endif %}
   Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification, SSESpecification]
 Rules:
   Matcher:
+{% if RUNENV == 'qa' %}
     TableName: qa-4us-backend-Rules-1SWN4ADOI7MRK
+{% else %}
+    TableName: prod-4us-backend-Rules-1M2YB2SS4K4LZ
+{% endif %}
   Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification, SSESpecification]
 Transactions:
   Matcher:
+{% if RUNENV == 'qa' %}
     TableName: qa-4us-backend-Transactions-1JHQO9WAOZDJD
+{% else %}
+    TableName: prod-4us-backend-Transactions-15F38F51SY0E6
+{% endif %}
   Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification, SSESpecification, GlobalSecondaryIndexes]
 {% endif %}
