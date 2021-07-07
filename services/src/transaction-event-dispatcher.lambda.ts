@@ -18,6 +18,7 @@ import { task, taskEither } from "fp-ts";
 import { PathReporter } from "io-ts/PathReporter";
 import { TaskEither } from "fp-ts/TaskEither";
 import * as dotenv from "dotenv";
+import { TransactionType } from "./utils/enums/transaction-type.enum";
 
 dotenv.config();
 
@@ -105,7 +106,10 @@ const handleInsert =
   (dynamoDB: DynamoDB) =>
   async (txn: ITransaction): Promise<EffectMetadata> => {
     console.log("handleInsert called with transactions:", JSON.stringify(txn));
-    if (txn.source === Source.DONATE_FORM) {
+    if (
+      txn.source === Source.DONATE_FORM &&
+      txn.transactionType === TransactionType.Contribution
+    ) {
       console.log("donate form transaction recognized");
       console.log("initiating pipe");
       return await pipe(
