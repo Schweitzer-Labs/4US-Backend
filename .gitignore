@@ -154,3 +154,4 @@ services/tests/seed/prod/*
 services/tests/seed/rules.data.ts
 
 services/src/debit-angel.ts
+services/tests/seed/4us-committee-data
