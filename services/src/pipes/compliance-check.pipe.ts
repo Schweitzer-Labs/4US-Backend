@@ -74,12 +74,12 @@ const committeeDonorAndRuleToDetermination =
     );
 
 export interface IComplianceResult {
-  donor: IDonor;
+  donor?: IDonor;
   committee: ICommittee;
   createContributionInput: CreateContributionInput;
-  rule: IRule;
-  balance: number;
-  remaining: number;
+  rule?: IRule;
+  balance?: number;
+  remaining?: number;
 }
 
 export const runComplianceCheck =

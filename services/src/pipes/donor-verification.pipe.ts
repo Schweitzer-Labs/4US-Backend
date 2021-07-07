@@ -15,25 +15,51 @@ import { taskEither } from "fp-ts";
 import { donorInputToDonors } from "../queries/search-donors.query";
 import { IDonor, IDonorInput } from "../queries/search-donors.decoder";
 import { ICommittee } from "../queries/get-committee-by-id.query";
+import { Plan } from "../utils/enums/plan.enum";
 
-const instantIdResultToNewDonor =
+const saveDonor =
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (donorInput: IDonorInput) =>
-  (instantIdResult: IInstantIdResult): TaskEither<ApplicationError, IDonor> =>
+  (donor: IDonor): TaskEither<ApplicationError, IDonor> =>
     pipe(
       tryCatch(
-        () =>
-          putDonor(donorsTableName)(dynamoDB)({
-            id: genTxnId(),
-            createdTimestamp: now(),
-            flacspeeMatch: genFlacspee(donorInput),
-            ...donorInput,
-            ...instantIdResult,
-          }),
+        () => putDonor(donorsTableName)(dynamoDB)(donor),
         (e) => new ApplicationError("Put donor failed", e)
       )
     );
+
+const instantIdResultToDonor =
+  (donorInput: IDonorInput) =>
+  (instantIdResult: IInstantIdResult): IDonor => ({
+    id: genTxnId(),
+    createdTimestamp: now(),
+    flacspeeMatch: genFlacspee(donorInput),
+    ...donorInput,
+    ...instantIdResult,
+  });
+
+const donorInputToDonor = (donorInput: IDonorInput): IDonor => ({
+  id: genTxnId(),
+  createdTimestamp: now(),
+  flacspeeMatch: genFlacspee(donorInput),
+  ...donorInput,
+});
+
+const donorInputToVerifiedDonor =
+  (billableEventsTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (config: IInstantIdConfig) =>
+  (committee: ICommittee) =>
+  (donorInput: IDonorInput): TaskEither<ApplicationError, IDonor> =>
+    // Primitive feature configuration support
+    committee.platformPlan === Plan.Policapital
+      ? taskEither.of(donorInputToDonor(donorInput))
+      : pipe(
+          donorInputToInstantIdResult(billableEventsTableName)(dynamoDB)(
+            config
+          )(committee)(donorInput),
+          taskEither.map(instantIdResultToDonor(donorInput))
+        );
 
 const verifyAndCreateDonorIfEmpty =
   (billableEventsTableName: string) =>
@@ -49,12 +75,10 @@ const verifyAndCreateDonorIfEmpty =
       return taskEither.of(matchedDonors[0]);
     } else {
       return pipe(
-        donorInputToInstantIdResult(billableEventsTableName)(dynamoDB)(config)(
+        donorInputToVerifiedDonor(billableEventsTableName)(dynamoDB)(config)(
           committee
         )(donorInput),
-        taskEither.chain(
-          instantIdResultToNewDonor(donorsTableName)(dynamoDB)(donorInput)
-        )
+        taskEither.chain(saveDonor(donorsTableName)(dynamoDB))
       );
     }
   };

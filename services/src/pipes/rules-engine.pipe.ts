@@ -9,6 +9,31 @@ import { IComplianceResult, runComplianceCheck } from "./compliance-check.pipe";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { createContributionInputToDonorInput } from "../utils/model/create-contribution-input-to-donor-input.utils";
+import { Plan } from "../utils/enums/plan.enum";
+import { IDonor } from "../queries/search-donors.decoder";
+
+export const runComplianceCheckOrSkip =
+  (txnsTableName: string) =>
+  (rulesTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (contribInput: CreateContributionInput) =>
+  (committee: ICommittee) =>
+  (donor: IDonor): TaskEither<ApplicationError, IComplianceResult> =>
+    committee.platformPlan === Plan.Policapital
+      ? skipComplianceCheck(committee)(contribInput)(donor)
+      : runComplianceCheck(txnsTableName)(rulesTableName)(dynamoDB)(
+          contribInput
+        )(committee)(donor);
+
+const skipComplianceCheck =
+  (committee: ICommittee) =>
+  (contribInput: CreateContributionInput) =>
+  (donor: IDonor): TaskEither<ApplicationError, IComplianceResult> =>
+    te.of({
+      createContributionInput: contribInput,
+      committee,
+      donor,
+    });
 
 export const runRulesEngine =
   (billableEventsTableName: string) =>
@@ -29,7 +54,7 @@ export const runRulesEngine =
         )(committee)
       ),
       te.chain(
-        runComplianceCheck(txnsTableName)(rulesTableName)(dynamoDB)(
+        runComplianceCheckOrSkip(txnsTableName)(rulesTableName)(dynamoDB)(
           contribInput
         )(committee)
       )

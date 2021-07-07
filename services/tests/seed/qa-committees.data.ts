@@ -142,6 +142,31 @@ export const qaCommitteesData: ICommittee[] = [
   },
   {
     // required
+    id: "ian-cain",
+    committeeName: "The Cain Committee",
+    bankName: "citizens banks",
+    candidateFirstName: "Ian",
+    candidateLastName: "Cain",
+    stripeAccount: "acct_1IjTcsRC8iiQex3V",
+    emailAddresses: "evan@schweitzerlabs.com",
+    platformPlan: Plan.Policapital,
+    members: [
+      "james-martin",
+      "380d0179-d813-445d-9032-fc25249b4de7",
+      "41613d64-a542-4d5d-84f0-372fbdb94326",
+      "86450595-2de6-492b-af6a-5597161ebcda",
+    ],
+    tzDatabaseName: "America/New_York",
+    state: "ma",
+    scope: "local",
+    party: "n/a",
+    race: "general",
+    county: "",
+    officeType: "city council",
+    ruleVersion: "ocpf-2020",
+  },
+  {
+    // required
     id: "seemant-kulleen",
     committeeName: "Seemant Kulleen for Mayor",
     bankName: "chase",
