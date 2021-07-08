@@ -1,4 +1,3 @@
-import { getStripeApiKey } from "./utils/config";
 import { Stripe } from "stripe";
 import { midnightLastNight, milliToEpoch } from "./utils/time.utils";
 import { now } from "fp-ts/Date";
@@ -12,35 +11,35 @@ const stripe = new Stripe(apiKey, {
 
 const committeeAccount = "acct_1IQFp0RNcAftf9zR";
 
-// const createReportRun = async () => {
-//   const res = await stripe.reporting.reportRuns.create({
-//     report_type: "connected_account_payout_reconciliation.itemized.5",
-//     parameters: {
-//       connected_account: committeeAccount,
-//       interval_start: milliToEpoch(now()) - 60 * 60 * 24 * 30,
-//       interval_end: milliToEpoch(midnightLastNight()),
-//       columns: [
-//         "automatic_payout_id",
-//         "automatic_payout_effective_at_utc",
-//         "gross",
-//         "balance_transaction_id",
-//         "payment_intent_id",
-//         "charge_id",
-//         "connected_account",
-//       ],
-//     },
-//   });
-//
-//   console.log(res);
-//
-//   return res;
-// };
-//
+const createReportRun = async () => {
+  const res = await stripe.reporting.reportRuns.create({
+    report_type: "connected_account_payout_reconciliation.itemized.5",
+    parameters: {
+      connected_account: committeeAccount,
+      interval_start: milliToEpoch(now()) - 60 * 60 * 24 * 30,
+      interval_end: milliToEpoch(midnightLastNight()),
+      columns: [
+        "automatic_payout_id",
+        "automatic_payout_effective_at_utc",
+        "gross",
+        "balance_transaction_id",
+        "payment_intent_id",
+        "charge_id",
+        "connected_account",
+      ],
+    },
+  });
+
+  console.log(res);
+
+  return res;
+};
+
 // createReportRun();
 
 const requestReport = async () => {
   const res = await getReport(apiKey)(
-    "https://files.stripe.com/v1/files/file_1J7KvGEUhH8cxK5gGW72V5Em/contents"
+    "https://files.stripe.com/v1/files/file_1JAwB1EUhH8cxK5g2T6KL3cF/contents"
   );
 
   console.log(res);
