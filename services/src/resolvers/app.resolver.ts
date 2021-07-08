@@ -96,7 +96,7 @@ export class AppResolver {
     }
   }
 
-  @Query((returns) => Transaction)
+  @Query((returns) => Transaction, { nullable: true })
   async transaction(
     @Args() transactionArg: TransactionArg,
     @CurrentUser() currentUser: string

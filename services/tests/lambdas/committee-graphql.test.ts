@@ -254,7 +254,6 @@ describe("Committee GraphQL Lambda", function () {
       );
 
       const body = JSON.parse(createRes.body);
-      console.log("lets find the damn id", body);
 
       const tid = body.data.createContribution.id;
 
@@ -286,9 +285,7 @@ describe("Committee GraphQL Lambda", function () {
       );
 
       const txnResBody = JSON.parse(txnRes.body);
-      console.log(txnResBody);
-
-      expect(txnResBody.data).to.equal(null);
+      expect(txnResBody.data.transaction).to.equal(null);
     });
   });
 });
