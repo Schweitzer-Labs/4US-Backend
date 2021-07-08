@@ -49,8 +49,8 @@ export const genCommittee = ({
     stripeAccount: stripeAccount || "acct_1IjTcsRC8iiQex3V",
     members: [
       "evan-piro",
-      "1643f48e-431c-4461-b2cb-b8fce4c939df",
-      "6604131d-1982-4140-9d69-59206766151c",
+      "0db7889c-7527-4df4-97e6-370e9ae78721",
+      "29fb6f85-29c5-4558-9933-89c4bb9020cd",
     ],
     state,
     scope,
