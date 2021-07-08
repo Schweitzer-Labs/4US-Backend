@@ -18,7 +18,6 @@ async function bootstrap() {
     schema,
     playground: true,
     context: ({ event }, context) => {
-      console.log("hello");
       const currentUser = "380d0179-d813-445d-9032-fc25249b4de7";
       return {
         currentUser,

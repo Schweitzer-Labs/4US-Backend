@@ -7,6 +7,8 @@ import { Committee, DDBCommitteeRes } from "./committees.decoders";
 import { validateDDBResponse } from "../ddb.utils";
 import { StatusCodes } from "http-status-codes";
 
+const logPrefix = "Get Committees";
+
 const getCommitteesRes =
   (env = "dev") =>
   (dynamoDB: DynamoDB) =>
@@ -51,6 +53,6 @@ export const getAllCommittees =
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       ),
-      taskEither.chain(validateDDBResponse(DDBCommitteeRes)),
+      taskEither.chain(validateDDBResponse(logPrefix)(DDBCommitteeRes)),
       taskEither.chain(ddbResponseToCommittees)
     );
