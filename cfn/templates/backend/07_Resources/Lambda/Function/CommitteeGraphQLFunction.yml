@@ -1,5 +1,5 @@
 CommitteeGraphQLFunction:
-  Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  Type: AWS::Serverless::Function
   Properties:
     FunctionName: !Sub ${AWS::StackName}-CommitteeGraphQLFunction
     Description: GraphQL API for Committees
@@ -17,6 +17,9 @@ CommitteeGraphQLFunction:
           Path: /api/committee/graphql
           Method: ANY
           RestApiId: !Ref CommitteeGateway
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
@@ -25,3 +28,13 @@ CommitteeGraphQLFunction:
         DONORS_DDB_TABLE_NAME: !Ref Donors
         RULES_DDB_TABLE_NAME: !Ref Rules
         BILLABLE_EVENTS_DDB_TABLE_NAME: !Ref BillableEvents
+
+CommitteeGQLInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref CommitteeGraphQLFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue

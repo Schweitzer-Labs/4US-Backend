@@ -1,7 +1,7 @@
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { Plan } from "../../src/utils/enums/plan.enum";
 
-export const committeesData: ICommittee[] = [
+export const qaCommitteesData: ICommittee[] = [
   {
     // required
     id: "angel-cruz",
@@ -15,8 +15,8 @@ export const committeesData: ICommittee[] = [
     members: [
       "james-martin",
       "380d0179-d813-445d-9032-fc25249b4de7",
+      "41613d64-a542-4d5d-84f0-372fbdb94326",
       "86450595-2de6-492b-af6a-5597161ebcda",
-      "357174a3-c630-4f0f-bf2b-d573e15b1d90",
     ],
     tzDatabaseName: "America/New_York",
     state: "ny",
@@ -41,8 +41,8 @@ export const committeesData: ICommittee[] = [
     members: [
       "james-martin",
       "380d0179-d813-445d-9032-fc25249b4de7",
+      "41613d64-a542-4d5d-84f0-372fbdb94326",
       "86450595-2de6-492b-af6a-5597161ebcda",
-      "357174a3-c630-4f0f-bf2b-d573e15b1d90",
     ],
     tzDatabaseName: "America/New_York",
     state: "ny",
@@ -69,8 +69,8 @@ export const committeesData: ICommittee[] = [
     members: [
       "james-martin",
       "380d0179-d813-445d-9032-fc25249b4de7",
+      "41613d64-a542-4d5d-84f0-372fbdb94326",
       "86450595-2de6-492b-af6a-5597161ebcda",
-      "357174a3-c630-4f0f-bf2b-d573e15b1d90",
     ],
     tzDatabaseName: "America/New_York",
     state: "ny",
@@ -97,8 +97,8 @@ export const committeesData: ICommittee[] = [
     members: [
       "james-martin",
       "380d0179-d813-445d-9032-fc25249b4de7",
+      "41613d64-a542-4d5d-84f0-372fbdb94326",
       "86450595-2de6-492b-af6a-5597161ebcda",
-      "357174a3-c630-4f0f-bf2b-d573e15b1d90",
     ],
     tzDatabaseName: "America/New_York",
     state: "ny",
@@ -109,8 +109,8 @@ export const committeesData: ICommittee[] = [
     county: "",
     officeType: "assembly",
     ruleVersion: "nyboe-2020",
-    finicityCustomerId: "5003896371",
-    finicityAccountId: "5015365202",
+    finicityCustomerId: "5007489410",
+    finicityAccountId: "5016000964",
   },
   {
     // required
@@ -125,8 +125,8 @@ export const committeesData: ICommittee[] = [
     members: [
       "james-martin",
       "380d0179-d813-445d-9032-fc25249b4de7",
+      "41613d64-a542-4d5d-84f0-372fbdb94326",
       "86450595-2de6-492b-af6a-5597161ebcda",
-      "357174a3-c630-4f0f-bf2b-d573e15b1d90",
     ],
     tzDatabaseName: "America/New_York",
     state: "ny",
@@ -137,7 +137,60 @@ export const committeesData: ICommittee[] = [
     county: "",
     officeType: "assembly",
     ruleVersion: "nyboe-2020",
-    finicityCustomerId: "5003896371",
-    finicityAccountId: "5015365202",
+    finicityCustomerId: "5007489410",
+    finicityAccountId: "5016000964",
+  },
+  {
+    // required
+    id: "ian-cain",
+    committeeName: "The Cain Committee",
+    bankName: "citizens banks",
+    candidateFirstName: "Ian",
+    candidateLastName: "Cain",
+    stripeAccount: "acct_1IjTcsRC8iiQex3V",
+    emailAddresses: "evan@schweitzerlabs.com",
+    platformPlan: Plan.Policapital,
+    members: [
+      "james-martin",
+      "380d0179-d813-445d-9032-fc25249b4de7",
+      "41613d64-a542-4d5d-84f0-372fbdb94326",
+      "86450595-2de6-492b-af6a-5597161ebcda",
+    ],
+    tzDatabaseName: "America/New_York",
+    state: "ma",
+    scope: "local",
+    party: "n/a",
+    race: "general",
+    county: "",
+    officeType: "city council",
+    ruleVersion: "ocpf-2020",
+  },
+  {
+    // required
+    id: "seemant-kulleen",
+    committeeName: "Seemant Kulleen for Mayor",
+    bankName: "chase",
+    candidateFirstName: "Seemant",
+    candidateLastName: "Kulleen",
+    stripeAccount: "acct_1IjTcsRC8iiQex3V",
+    emailAddresses: "evan@schweitzerlabs.com",
+    platformPlan: Plan.FourUs,
+    members: [
+      "james-martin",
+      "380d0179-d813-445d-9032-fc25249b4de7",
+      "41613d64-a542-4d5d-84f0-372fbdb94326",
+      "86450595-2de6-492b-af6a-5597161ebcda",
+    ],
+    tzDatabaseName: "America/New_York",
+    state: "ny",
+    scope: "state",
+    party: "democrat",
+    race: "general",
+    district: "35",
+    county: "",
+    officeType: "assembly",
+    ruleVersion: "nyboe-2020",
+    finicityCustomerId: "5007489410",
+    finicityAccountId: "5016000964",
   },
 ];

@@ -16,9 +16,21 @@ PolicapitalContributeFunction:
           Path: /api/donor/contribute
           Method: post
           RestApiId: !Ref DonorGateway
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
         TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
         COMMITTEES_DDB_TABLE_NAME: !Ref Committees
 
+P2ContributeInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref PolicapitalContributeFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue

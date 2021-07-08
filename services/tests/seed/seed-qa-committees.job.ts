@@ -1,9 +1,10 @@
 import { DynamoDB } from "aws-sdk";
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import * as AWS from "aws-sdk";
-import { committeesData } from "./committees.data";
+import { qaCommitteesData } from "./qa-committees.data";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
+import { qaUsers } from "./qa-users.data";
 
 AWS.config.update({ region: "us-west-2" });
 
@@ -18,7 +19,9 @@ const run =
     console.log("running run");
     for (const committee of committees) {
       console.log("seeding committee " + committee.id);
+      committee.members = [...committee.members, ...qaUsers];
       await putCommittee(committeesTableName)(dynamoDB)(committee);
+      console.log(committee.id + " seeded");
     }
   };
 
@@ -28,6 +31,6 @@ AWS.config.apiVersions = {
 const dynamoDB = new DynamoDB();
 
 export const seedCommittees = async () =>
-  run(committeesTableName)(dynamoDB)(committeesData);
+  run(committeesTableName)(dynamoDB)(qaCommitteesData);
 
 seedCommittees();

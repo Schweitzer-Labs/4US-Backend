@@ -16,7 +16,7 @@ export interface Payment extends StrippedContribution {
 export const processPaymentFromCommitteeContribution =
   (stripe: Stripe) =>
   async (committeeContribution: ICommitteeContribution): Promise<Payment> => {
-    console.log("Payment processing");
+    console.log("Payment processing", JSON.stringify(committeeContribution));
     const { contribution, committee } = committeeContribution;
     const {
       amount,
@@ -49,10 +49,6 @@ export const processPaymentFromCommitteeContribution =
         },
       });
 
-      console.log(res);
-
-      console.log("contrib res");
-
       console.log(JSON.stringify(res));
 
       console.log(res.charges.data);
@@ -65,7 +61,7 @@ export const processPaymentFromCommitteeContribution =
         ruleVerified: committee.platformPlan === Plan.FourUs,
       };
 
-      console.log("Payment succeeded", payment);
+      console.log("Payment succeeded", JSON.stringify(payment));
 
       return payment;
     } catch (e) {

@@ -3,6 +3,7 @@ DonorGateway:
   Properties:
     Name: !Sub ${AWS::StackName}-donation
     StageName: !Sub ${LambdaRunEnvironment}
+    TracingEnabled: true
     Domain:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub donate-api.${Domain}.${TLD}
@@ -15,6 +16,9 @@ DonorGateway:
       - LoggingLevel: INFO
         ResourcePath: '/*'
         HttpMethod: '*'
+        CacheDataEncrypted: true
+        MetricsEnabled: true
+        DataTraceEnabled: true
     Models:
       Contribution:
         type: object

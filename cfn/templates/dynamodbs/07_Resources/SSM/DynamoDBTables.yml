@@ -1,6 +1,7 @@
 BillableEventsTable:
 {% if PRODUCT == '4us' %}
   Type: AWS::SSM::Parameter
+  DeletionPolicy: Retain
   Properties:
     Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/billable-events
     Type: String
@@ -10,6 +11,7 @@ BillableEventsTable:
 CommitteesTable:
 {% if PRODUCT == '4us' %}
   Type: AWS::SSM::Parameter
+  DeletionPolicy: Retain
   Properties:
     Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/committees
     Type: String
@@ -19,6 +21,7 @@ CommitteesTable:
 DonorsTable:
 {% if PRODUCT == '4us' %}
   Type: AWS::SSM::Parameter
+  DeletionPolicy: Retain
   Properties:
     Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/donors
     Type: String
@@ -28,6 +31,7 @@ DonorsTable:
 RulesTable:
 {% if PRODUCT == '4us' %}
   Type: AWS::SSM::Parameter
+  DeletionPolicy: Retain
   Properties:
     Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/rules
     Type: String
@@ -37,6 +41,7 @@ RulesTable:
 TransactionsTable:
 {% if PRODUCT == '4us' %}
   Type: AWS::SSM::Parameter
+  DeletionPolicy: Retain
   Properties:
     Name: !Sub /${LambdaRunEnvironment}/dynamodb/table/transactions
     Type: String
@@ -46,6 +51,7 @@ TransactionsTable:
 TransactionsStream:
 {% if PRODUCT == '4us' %}
   Type: AWS::SSM::Parameter
+  DeletionPolicy: Retain
   Properties:
     Name: !Sub /${LambdaRunEnvironment}/dynamodb/stream/transactions
     Type: String

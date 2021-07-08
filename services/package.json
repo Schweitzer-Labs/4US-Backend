@@ -54,8 +54,8 @@
     "test-stripe-webhook": "ts-mocha tests/lambdas/stripe-webhook.test.ts --timeout 10000",
     "test-model-utils": "ts-mocha tests/integration/model-utils.test.ts --timeout 10000",
     "test-server": "ts-node-dev tests/server/graphql.ts --watch",
-    "test-i": "ts-mocha tests/integration/$npm_config_name.test.ts --timeout 30000",
     "test-sync-payout": "ts-mocha tests/integration/sync-payout.test.ts --timeout 30000",
+    "deploy-qa-committees": "ts-node tests/seed/seed-qa-committees.job.ts",
     "compile": "npm install && tsc"
   },
   "devDependencies": {

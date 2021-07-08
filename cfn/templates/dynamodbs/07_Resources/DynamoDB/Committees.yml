@@ -1,0 +1,24 @@
+Committees:
+  Type: AWS::DynamoDB::GlobalTable
+  DeletionPolicy: Retain
+  Properties:
+    BillingMode: PAY_PER_REQUEST
+    SSESpecification:
+      SSEEnabled: true
+    AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+    KeySchema:
+      - KeyType: HASH
+        AttributeName: id
+    StreamSpecification:
+      StreamViewType: NEW_IMAGE
+    Replicas:
+      - Region: !Ref AWS::Region
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+{% if RUNENV == 'prod' %}
+      - Region: !Ref BackupRegion
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+{% endif %}

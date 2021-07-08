@@ -2,7 +2,7 @@ PolicapitalEmailerFunction:
   Type: AWS::Serverless::Function
   Properties:
     FunctionName: !Sub ${AWS::StackName}-PolicapitalEmailerFunction
-    Description: Receive DynamoDB events and sends email with the transaction details
+    Description: Receive DynamoDB events and send email with the transaction details
     CodeUri: lambdas/
     Layers:
       - !Ref ServicesLayer
@@ -15,12 +15,25 @@ PolicapitalEmailerFunction:
         Properties:
           BatchSize: 1
           Queue: !GetAtt EmailQueue.Arn
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         NOTIFICATION_EMAIL_ADDRESS: !Ref NotificationEmailAddress
         RUNENV: !Ref LambdaRunEnvironment
+        SES_CONFIG_SET: !Ref SESConfigSet
 {% if REGION in ['us-east-1', 'us-west-2'] %}
         POS_RECEIPT: !Sub ${ContributorReceiptTemplate.Outputs.SES}
         POS_RECORD: !Sub ${CommitteeReceiptTemplate.Outputs.SES}
 {% endif %}
 
+EmailerInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref PolicapitalEmailerFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue

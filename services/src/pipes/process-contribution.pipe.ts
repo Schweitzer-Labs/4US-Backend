@@ -21,23 +21,30 @@ export const processContribution =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (stripe: Stripe) =>
-  ({
-    createContributionInput: c,
-    committee,
-    donor,
-    rule,
-  }: IComplianceResult): TaskEither<ApplicationError, ITransaction> => {
-    console.log("Contribution processing pipe called.");
+  (
+    complianceResult: IComplianceResult
+  ): TaskEither<ApplicationError, ITransaction> => {
+    const {
+      createContributionInput: c,
+      committee,
+      donor,
+      rule,
+    } = complianceResult;
+
+    console.log(
+      "Contribution processing pipe called.",
+      JSON.stringify(complianceResult)
+    );
     const baseTxn = {
       id: genTxnId(),
       createdByUser: currentUser,
       donorId: donor.id,
-      ruleCode: rule.code,
+      ruleCode: rule?.code,
       initiatedTimestamp: now(),
       direction: Direction.In,
       transactionType: TransactionType.Contribution,
       bankVerified: false,
-      ruleVerified: true,
+      ruleVerified: rule?.code ? true : false,
       source: Source.DASHBOARD,
       ...c,
     };

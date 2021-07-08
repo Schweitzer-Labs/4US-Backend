@@ -16,10 +16,10 @@ const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 
 export default async () => {
-  const res = await reconcileAll(txnsTableName)(committeesTableName)(
-    dynamoDB
-  )();
-  console.log(res);
+  // const res = await reconcileAll(txnsTableName)(committeesTableName)(
+  //   dynamoDB
+  // )();
+  // console.log(res);
 
   return "success";
 };

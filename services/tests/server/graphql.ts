@@ -19,7 +19,7 @@ async function bootstrap() {
     playground: true,
     context: ({ event }, context) => {
       console.log("hello");
-      const currentUser = "b9fa7e9b-e404-4ac8-a9d0-524be2949ef2";
+      const currentUser = "380d0179-d813-445d-9032-fc25249b4de7";
       return {
         currentUser,
       };

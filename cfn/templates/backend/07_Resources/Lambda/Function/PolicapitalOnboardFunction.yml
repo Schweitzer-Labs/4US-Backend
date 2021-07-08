@@ -16,6 +16,19 @@ PolicapitalOnboardFunction:
           Path: /api/onboard
           Method: get
           RestApiId: !Ref DonorGateway
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
     Environment:
       Variables:
         RUNENV: !Ref LambdaRunEnvironment
+
+OnboardInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref PolicapitalOnboardFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue
