@@ -55,6 +55,12 @@ const TransactionOptional = t.partial({
   blockchainMetadata: t.unknown,
   finicityTransactionId: t.number,
   finicityTransactionData: FinicityTransaction,
+  finicityNormalizedPayeeName: t.string,
+  finicityCategory: t.string,
+  finicityBestRepresentation: t.string,
+  finicityDescription: t.string,
+  finicityTransactionDate: t.number,
+  finicityPostedDate: t.number,
   employmentStatus: t.string,
 });
 

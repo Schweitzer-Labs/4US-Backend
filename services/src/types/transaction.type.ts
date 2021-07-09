@@ -137,4 +137,22 @@ export class Transaction implements ITransaction {
 
   @Field((type) => EmploymentStatus, { nullable: true })
   employmentStatus?: string;
+
+  @Field({ nullable: true })
+  finicityNormalizedPayeeName?: string;
+
+  @Field({ nullable: true })
+  finicityCategory?: string;
+
+  @Field({ nullable: true })
+  finicityBestRepresentation?: string;
+
+  @Field({ nullable: true })
+  finicityDescription?: string;
+
+  @Field({ nullable: true })
+  finicityPostedDate?: number;
+
+  @Field({ nullable: true })
+  finicityTransactionDate?: number;
 }

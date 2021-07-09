@@ -86,6 +86,12 @@ const matchAndProcess =
           bankVerified: true,
           finicityTransactionId: fTxn.finicityTransactionId,
           finicityTransactionData: finicityTxn,
+          finicityNormalizedPayeeName: fTxn.finicityNormalizedPayeeName,
+          finicityCategory: fTxn.finicityCategory,
+          finicityBestRepresentation: fTxn.finicityBestRepresentation,
+          finicityDescription: fTxn.finicityDescription,
+          finicityPostedDate: fTxn.finicityPostedDate,
+          finicityTransactionDate: fTxn.finicityTransactionDate,
         });
       case 0:
         return putTransactionAndDecode(txnsTableName)(dynamoDB)(fTxn);
@@ -140,7 +146,7 @@ const finicityTxnToPlatformTxn =
       paymentMethod: finicityTxnToPaymentMethod(fTxn),
       direction: fTxn.amount > 0 ? Direction.In : Direction.Out,
       paymentDate: epochToMilli(fTxn.postedDate),
-      initiatedTimestamp: epochToMilli(fTxn.postedDate),
+      initiatedTimestamp: epochToMilli(fTxn.transactionDate),
       source: Source.FINICITY,
       bankVerified: true,
       ruleVerified: false,
@@ -148,6 +154,12 @@ const finicityTxnToPlatformTxn =
       transactionType: finicityTxnToTransactionType(fTxn),
       finicityTransactionId: fTxn.id,
       finicityTransactionData: fTxn,
+      finicityNormalizedPayeeName: fTxn.categorization.normalizedPayeeName,
+      finicityDescription: fTxn.description,
+      finicityBestRepresentation: fTxn.categorization.bestRepresentation,
+      finicityCategory: fTxn.categorization.category,
+      finicityPostedDate: epochToMilli(fTxn.postedDate),
+      finicityTransactionDate: epochToMilli(fTxn.transactionDate),
     };
   };
 
