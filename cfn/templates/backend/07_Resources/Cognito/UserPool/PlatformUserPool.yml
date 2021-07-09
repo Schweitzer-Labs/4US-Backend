@@ -7,6 +7,12 @@ PlatformUserPool:
         MinimumLength: 8
     UsernameAttributes:
       - email
+    AdminCreateUserConfig:
+      AllowAdminCreateUserOnly: true
+    AccountRecoverySetting:
+      RecoveryMechanisms:
+        - Name: verified_email
+          Priority: 1
     Schema:
       - AttributeDataType: String
         Name: email
