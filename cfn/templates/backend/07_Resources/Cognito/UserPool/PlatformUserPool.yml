@@ -17,3 +17,7 @@ PlatformUserPool:
       - AttributeDataType: String
         Name: email
         Required: false
+{% if RUNENV == 'prod' %}
+    UserPoolAddOns:
+      AdvancedSecurityMode: AUDIT
+% endif %}
