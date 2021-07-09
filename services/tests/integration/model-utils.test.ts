@@ -106,6 +106,7 @@ describe("Model Utils", function () {
       await sleep(1000);
 
       testTxn.stripePayoutId = genTxnId();
+      testTxn.stripeAutomaticPayoutEffectiveAtUtc = 11111111111;
       await updateTxnWithStripePayoutId(txnsTableName)(dynamoDB)(testTxn);
       await sleep(1000);
     });

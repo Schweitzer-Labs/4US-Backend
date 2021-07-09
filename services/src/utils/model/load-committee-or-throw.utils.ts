@@ -17,7 +17,6 @@ export const loadCommitteeOrThrow =
       dynamoDB
     )(committeeId)();
     if (isLeft(eitherCommittees)) {
-      console.log("error gets thrown, committees is left");
       throw new ApplicationError(
         "Committee look up failed",
         eitherCommittees.left,

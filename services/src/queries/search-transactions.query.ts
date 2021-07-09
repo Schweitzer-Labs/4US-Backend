@@ -14,6 +14,8 @@ import { ITransaction, Transactions } from "./search-transactions.decoder";
 import { TransactionsArg } from "../args/transactions.arg";
 import { Order } from "../utils/enums/order.enum";
 
+const logPrefix = "Get Transactions";
+
 export const getTransactionsRes =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -85,5 +87,5 @@ export const searchTransactions =
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       ),
-      taskEither.chain(validateDDBResponse(Transactions))
+      taskEither.chain(validateDDBResponse(logPrefix)(Transactions))
     );

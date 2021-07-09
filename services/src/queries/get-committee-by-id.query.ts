@@ -8,6 +8,10 @@ import { taskEither as te, taskEither } from "fp-ts";
 import { validateDDBResponse } from "../repositories/ddb.utils";
 import { decodeError } from "../utils/decode-error.util";
 
+import { isEmpty } from "../utils/model/get-res-is-empty.utils";
+
+const logPrefix = "Get Committee";
+
 const CommitteeRequired = t.type({
   id: t.string,
   committeeName: t.string,
@@ -84,6 +88,7 @@ export const getCommitteeById =
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       ),
-      taskEither.chain(validateDDBResponse(Committee))
+      taskEither.chain(isEmpty(logPrefix)),
+      taskEither.chain(validateDDBResponse(logPrefix)(Committee))
     );
   };

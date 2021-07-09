@@ -10,6 +10,8 @@ import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
 import { pipe } from "fp-ts/function";
 
+const logPrefix = "Get All 4US Committees";
+
 export const getAll4USCommitteesAndDecode =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB): TaskEither<ApplicationError, ICommittee[]> =>
@@ -18,7 +20,7 @@ export const getAll4USCommitteesAndDecode =
         () => getAll4USCommittees(committeesTableName)(dynamoDB),
         (e) => new ApplicationError("Committee query failed", e)
       ),
-      taskEither.chain(validateDDBResponse(Committees))
+      taskEither.chain(validateDDBResponse(logPrefix)(Committees))
     );
 
 export const getAll4USCommittees =

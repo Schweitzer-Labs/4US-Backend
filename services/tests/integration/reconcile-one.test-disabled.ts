@@ -67,26 +67,24 @@ describe("Reconciles a committees contributions", function () {
     // }
     //
     // await sleep(1000);
-
-    committee.id = "1623932810440-SXSmGW";
-
-    const syncRes = await reconcileCommitteeContributions(txnsTableName)(
-      dynamoDB
-    )(committee)();
-    if (isLeft(syncRes)) {
-      throw syncRes.left;
-    }
-
-    console.log(syncRes.right);
-
+    // committee.id = "1623932810440-SXSmGW";
+    //
+    // const syncRes = await reconcileCommitteeContributions(txnsTableName)(
+    //   dynamoDB
+    // )(committee)();
+    // if (isLeft(syncRes)) {
+    //   throw syncRes.left;
+    // }
+    //
+    // console.log(syncRes.right);
     // Run reconciliation
   });
-  it("Sets contributions for associated payout to bank verified", async () => {
-    console.log(committee.id);
-    expect(false).to.equal(true);
-  });
-  it("Deletes payout transaction", async () => {
-    console.log(committee.id);
-    expect(false).to.equal(true);
-  });
+  // it("Sets contributions for associated payout to bank verified", async () => {
+  //   console.log(committee.id);
+  //   expect(false).to.equal(true);
+  // });
+  // it("Deletes payout transaction", async () => {
+  //   console.log(committee.id);
+  //   expect(false).to.equal(true);
+  // });
 });

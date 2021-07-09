@@ -1,8 +1,9 @@
 import * as t from "io-ts";
 import { left, right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { isLeft } from "fp-ts/Either";
-import { PathReporter } from "io-ts/PathReporter";
+import { pipe } from "fp-ts/function";
+import { taskEither as te } from "fp-ts";
+import { decodeError } from "../utils/decode-error.util";
 
 export const ddbString = t.type({
   S: t.string,
@@ -13,19 +14,13 @@ export const ddbStringList = t.type({
 });
 
 export const validateDDBResponse =
+  (prefix: string) =>
   <T>(type: t.Type<T>) =>
-  (res: any): TaskEither<ApplicationError, T> => {
-    const eitherRes = type.decode(res);
-    if (isLeft(eitherRes)) {
-      return left(
-        new ApplicationError(
-          "Invalid ddb response",
-          PathReporter.report(eitherRes)
-        )
-      );
-    } else {
-      return right(eitherRes.right);
-    }
+  (res: unknown): TaskEither<ApplicationError, T> => {
+    return pipe(
+      te.fromEither(type.decode(res)),
+      te.mapLeft(decodeError(prefix))
+    );
   };
 
 export const toFilterExpression = (name: string, value?: any): string[] =>

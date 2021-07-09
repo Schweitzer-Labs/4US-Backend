@@ -6,8 +6,12 @@ import {
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
+
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
+import { isEmpty } from "./get-res-is-empty.utils";
+
+const logPrefix = "Get Transaction by ID";
 
 export const requestTxnById =
   (txnTableName: string) =>
@@ -25,6 +29,7 @@ export const requestTxnById =
             S: committeeId,
           },
         },
+        ConsistentRead: true,
       })
       .promise();
     return DynamoDB.Converter.unmarshall(res.Item);
@@ -38,8 +43,11 @@ export const getTxnById =
     return pipe(
       tryCatch<ApplicationError, any>(
         () => requestTxnById(txnsTableName)(dynamoDB)(committeeId)(txnId),
-        (e) => new ApplicationError("Get transaction request failed", e)
+        (e) => {
+          return new ApplicationError("Get transaction request failed", e);
+        }
       ),
-      taskEither.chain(validateDDBResponse(Transaction))
+      taskEither.chain(isEmpty(logPrefix)),
+      taskEither.chain(validateDDBResponse(logPrefix)(Transaction))
     );
   };
