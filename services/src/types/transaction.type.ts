@@ -135,6 +135,15 @@ export class Transaction implements ITransaction {
   @Field({ nullable: true })
   donorId?: string;
 
+  @Field({ nullable: true })
+  isSubcontracted?: boolean;
+
+  @Field({ nullable: true })
+  isPartialPayment?: boolean;
+
+  @Field({ nullable: true })
+  isExistingLiability?: boolean;
+
   @Field((type) => EmploymentStatus, { nullable: true })
   employmentStatus?: string;
 
