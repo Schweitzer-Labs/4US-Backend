@@ -31,6 +31,7 @@ import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 import { TransactionArg } from "../args/transaction.arg";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
+import { ReconcileDisbursementInput } from "../input-types/reconcile-disbursement.input-type";
 
 dotenv.config();
 
@@ -254,5 +255,26 @@ export class AppResolver {
     } else {
       return res.right;
     }
+  }
+
+  @Mutation((returns) => Transaction)
+  async reconcileDisbursement(
+    @Arg("committeeId") committeeId: string,
+    @Arg("reconcileDisbursementData") rd: ReconcileDisbursementInput,
+    @CurrentUser() currentUser: string
+  ) {
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
+      currentUser
+    );
+
+    // const res = await verifyDisbursementFromUserAndPut(txnsTableName)(dynamoDB)(
+    //   committeeId
+    // )(txnId)(d)();
+    //
+    // if (isLeft(res)) {
+    //   throw res.left;
+    // } else {
+    //   return res.right;
+    // }
   }
 }
