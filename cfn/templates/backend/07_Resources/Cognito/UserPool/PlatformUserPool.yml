@@ -20,4 +20,4 @@ PlatformUserPool:
 {% if RUNENV == 'prod' %}
     UserPoolAddOns:
       AdvancedSecurityMode: AUDIT
-% endif %}
+{% endif %}
