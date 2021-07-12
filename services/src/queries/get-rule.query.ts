@@ -10,6 +10,8 @@ import { validateDDBResponse } from "../repositories/ddb.utils";
 import { IRule, Rules } from "./get-rule.decoder";
 import { IDonor } from "./search-donors.decoder";
 
+const logPrefix = "Get Rule";
+
 export const queryDDB =
   (rulesTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -55,7 +57,7 @@ export const committeeAndDonorToRule =
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       ),
-      taskEither.chain(validateDDBResponse(Rules)),
+      taskEither.chain(validateDDBResponse(logPrefix)(Rules)),
       taskEither.chain(RulesToRule)
     );
   };

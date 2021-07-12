@@ -9,6 +9,8 @@ import { validateDDBResponse } from "../repositories/ddb.utils";
 import { genFlacspee } from "../utils/model/gen-donor-match.utils";
 import { Donors, IDonor, IDonorInput } from "./search-donors.decoder";
 
+const logPrefix = "Get Donors";
+
 const queryDDB =
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -40,6 +42,6 @@ export const donorInputToDonors =
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       ),
-      taskEither.chain(validateDDBResponse(Donors))
+      taskEither.chain(validateDDBResponse(logPrefix)(Donors))
     );
   };

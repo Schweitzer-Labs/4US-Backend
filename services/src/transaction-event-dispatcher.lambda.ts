@@ -61,6 +61,7 @@ const parseStreamRecord = (record: any): ITransaction => {
     JSON.stringify(unmarshalledTxn)
   );
   const eitherTxn = Transaction.decode(unmarshalledTxn);
+
   if (isLeft(eitherTxn)) {
     throw new ApplicationError(
       "Invalid transaction data",
@@ -106,10 +107,7 @@ const handleInsert =
   (dynamoDB: DynamoDB) =>
   async (txn: ITransaction): Promise<EffectMetadata> => {
     console.log("handleInsert called with transactions:", JSON.stringify(txn));
-    if (
-      txn.source === Source.DONATE_FORM &&
-      txn.transactionType === TransactionType.Contribution
-    ) {
+    if (txn.source === Source.DONATE_FORM) {
       console.log("donate form transaction recognized");
       console.log("initiating pipe");
       return await pipe(
@@ -159,6 +157,7 @@ const formatMessage =
 const sendMessage = (
   message: SendMessageRequest
 ): TaskEither<ApplicationError, any> => {
+  console.log("messa");
   return taskEither.tryCatch(
     () => sqs.sendMessage(message).promise(),
     (e) => new ApplicationError("SQS send failed", e)

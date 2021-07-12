@@ -10,6 +10,8 @@ import { sleep } from "../../src/utils/sleep.utils";
 import { genCommittee } from "../utils/gen-committee.util";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
+import { qaUsers } from "../seed/qa-users.data";
+import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 
 dotenv.config();
 
@@ -21,7 +23,7 @@ const dynamoDB = new DynamoDB();
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 
-const validUsername = "evan-piro";
+const validUsername = qaUsers[0];
 
 const invalidUsername = "james-martin";
 
@@ -59,6 +61,15 @@ const getTransactionsByDonorIdQuery = (donorId: string) => `
       firstName
       amount
       direction
+    }
+  }
+`;
+
+const getTxnQuery = (committeeId) => (tid: string) =>
+  `
+  query {
+    transaction(committeeId: "${committeeId}", id: "${tid}") {
+      id
     }
   }
 `;
@@ -110,8 +121,10 @@ mutation($committeeId: String!) {
     state: "PA"
     postalCode: "13224"
     entityType: Ind
+    employmentStatus: Unemployed
   }) {
     amount
+    id
   }
 }
 `;
@@ -226,6 +239,53 @@ describe("Committee GraphQL Lambda", function () {
       const body = JSON.parse(res.body);
       console.log(res.body);
       expect(body.data.createContribution.amount).to.equal(12000);
+    });
+  });
+  describe("Transaction", function () {
+    it("Gets a transaction by id and committeeId", async () => {
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          createContributionQuery,
+          validUsername,
+          createContributionVariables
+        ),
+        {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      const tid = body.data.createContribution.id;
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTxnQuery(committee.id)(tid),
+          validUsername,
+          createContributionVariables
+        ),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+
+      expect(txnResBody.data.transaction.id).to.equal(tid);
+    });
+    it("Gets a 404 on bad committeeId", async () => {
+      const tid = genTxnId();
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTxnQuery(committee.id)(tid),
+          validUsername,
+          createContributionVariables
+        ),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+      expect(txnResBody.data.transaction).to.equal(null);
     });
   });
 });

@@ -2,6 +2,7 @@ import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import * as faker from "faker";
 import { Plan } from "../../src/utils/enums/plan.enum";
+import { qaUsers } from "../seed/qa-users.data";
 
 interface IGenCommitteeConfig {
   state?: string;
@@ -17,6 +18,9 @@ interface IGenCommitteeConfig {
   platformPlan?: string;
   finicityCustomerId?: string;
   finicityAccountId?: string;
+  stripeAccount?: string;
+  candidateFirstName?: string;
+  candidateLastName?: string;
 }
 
 export const genCommittee = ({
@@ -33,16 +37,19 @@ export const genCommittee = ({
   platformPlan,
   finicityCustomerId,
   finicityAccountId,
+  candidateFirstName,
+  candidateLastName,
+  stripeAccount,
 }: IGenCommitteeConfig): ICommittee => {
-  const candidateFirstName = faker.name.firstName();
-  const candidateLastName = faker.name.lastName();
+  const randomFirstName = faker.name.firstName();
+  const randomLastName = faker.name.lastName();
   return {
     id: genTxnId(),
-    committeeName: `Vote for ${candidateFirstName}`,
-    candidateFirstName,
-    candidateLastName,
-    stripeAccount: "acct_1IjTcsRC8iiQex3V",
-    members: ["evan-piro", "1643f48e-431c-4461-b2cb-b8fce4c939df"],
+    committeeName: `Vote for ${candidateFirstName || randomLastName}`,
+    candidateFirstName: candidateFirstName || randomFirstName,
+    candidateLastName: candidateLastName || randomLastName,
+    stripeAccount: stripeAccount || "acct_1IjTcsRC8iiQex3V",
+    members: qaUsers,
     state,
     scope,
     officeType,

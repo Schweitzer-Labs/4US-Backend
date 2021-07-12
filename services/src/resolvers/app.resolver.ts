@@ -29,6 +29,8 @@ import { Direction } from "../utils/enums/direction.enum";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
+import { TransactionArg } from "../args/transaction.arg";
+import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 
 dotenv.config();
 
@@ -77,16 +79,35 @@ export class AppResolver {
 
   @Query((returns) => [Transaction])
   async transactions(
-    @Args() transactionArgs: TransactionsArg,
+    @Args() transactionsArg: TransactionsArg,
     @CurrentUser() currentUser: string
   ): Promise<Transaction[]> {
     await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      transactionArgs.committeeId
+      transactionsArg.committeeId
     )(currentUser);
 
     const res = await searchTransactions(txnsTableName)(dynamoDB)(
-      transactionArgs
+      transactionsArg
     )();
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      return res.right;
+    }
+  }
+
+  @Query((returns) => Transaction, { nullable: true })
+  async transaction(
+    @Args() transactionArg: TransactionArg,
+    @CurrentUser() currentUser: string
+  ): Promise<Transaction> {
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      transactionArg.committeeId
+    )(currentUser);
+
+    const res = await getTxnById(txnsTableName)(dynamoDB)(
+      transactionArg.committeeId
+    )(transactionArg.id)();
     if (isLeft(res)) {
       throw res.left;
     } else {
