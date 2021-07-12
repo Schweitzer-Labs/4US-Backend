@@ -32,6 +32,7 @@ import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 import { TransactionArg } from "../args/transaction.arg";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 import { ReconcileDisbursementInput } from "../input-types/reconcile-disbursement.input-type";
+import { reconcileDisbursement } from "../pipes/reconcile-disbursement.pipe";
 
 dotenv.config();
 
@@ -267,14 +268,14 @@ export class AppResolver {
       currentUser
     );
 
-    // const res = await verifyDisbursementFromUserAndPut(txnsTableName)(dynamoDB)(
-    //   committeeId
-    // )(txnId)(d)();
-    //
-    // if (isLeft(res)) {
-    //   throw res.left;
-    // } else {
-    //   return res.right;
-    // }
+    const res = await reconcileDisbursement(txnsTableName)(dynamoDB)(
+      committeeId
+    )(rd.bankTransaction)(rd.selectedTransactions)();
+
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      return res.right;
+    }
   }
 }

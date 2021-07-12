@@ -288,4 +288,35 @@ describe("Committee GraphQL Lambda", function () {
       expect(txnResBody.data.transaction).to.equal(null);
     });
   });
+  describe("Reconcile Disbursement", function () {
+    // it("Reconciles a disbursement by transaction id and a list of transaction ids", async () => {
+    //   const createRes: any = await lambdaPromise(
+    //     graphql,
+    //     genGraphQLProxy(
+    //       createContributionQuery,
+    //       validUsername,
+    //       createContributionVariables
+    //     ),
+    //     {}
+    //   );
+    //
+    //   const body = JSON.parse(createRes.body);
+    //
+    //   const tid = body.data.createContribution.id;
+    //
+    //   const txnRes: any = await lambdaPromise(
+    //     graphql,
+    //     genGraphQLProxy(
+    //       getTxnQuery(committee.id)(tid),
+    //       validUsername,
+    //       createContributionVariables
+    //     ),
+    //     {}
+    //   );
+    //
+    //   const txnResBody = JSON.parse(txnRes.body);
+    //
+    //   expect(txnResBody.data.transaction.id).to.equal(tid);
+    // });
+  });
 });

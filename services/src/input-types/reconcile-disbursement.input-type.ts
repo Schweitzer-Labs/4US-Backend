@@ -2,7 +2,7 @@ import { Field, InputType } from "type-graphql";
 
 @InputType()
 export class ReconcileDisbursementInput {
-  @Field()
+  @Field((type) => [String])
   selectedTransactions: string[];
 
   @Field()
