@@ -7,4 +7,7 @@ export class ReconcileDisbursementInput {
 
   @Field()
   bankTransaction: string;
+
+  @Field()
+  committeeId: string;
 }

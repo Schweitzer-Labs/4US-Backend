@@ -13,7 +13,6 @@ import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "../input-types/create-contribution.input-type";
-import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
 import { Stripe } from "stripe";
@@ -25,7 +24,6 @@ import { createDisbursementInputToTransaction } from "../utils/model/create-disb
 import { putTransaction } from "../utils/model/put-transaction.utils";
 import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
 import { verifyDisbursementFromUserAndPut } from "../pipes/verify-disbursement-from-user.pipe";
-import { Direction } from "../utils/enums/direction.enum";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
@@ -260,16 +258,15 @@ export class AppResolver {
 
   @Mutation((returns) => Transaction)
   async reconcileDisbursement(
-    @Arg("committeeId") committeeId: string,
     @Arg("reconcileDisbursementData") rd: ReconcileDisbursementInput,
     @CurrentUser() currentUser: string
   ) {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(rd.committeeId)(
       currentUser
     );
 
     const res = await reconcileDisbursement(txnsTableName)(dynamoDB)(
-      committeeId
+      rd.committeeId
     )(rd.bankTransaction)(rd.selectedTransactions)();
 
     if (isLeft(res)) {
