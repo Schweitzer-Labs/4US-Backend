@@ -4,6 +4,8 @@ import { buildSchema } from "type-graphql";
 import { AppResolver } from "../../src/resolvers/app.resolver";
 import * as dotenv from "dotenv";
 
+dotenv.config();
+
 const GRAPH_QL_PORT = process.env.PORT || 4000;
 const AUTH_REDIRECT_PORT = process.env.PORT || 4500;
 
