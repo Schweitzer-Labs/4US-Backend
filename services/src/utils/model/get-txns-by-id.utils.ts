@@ -9,17 +9,18 @@ import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
+import { ICommittee } from "../../queries/get-committee-by-id.query";
 
 const logPrefix = "Get Txns by Id";
 
 export const getTxnsByIdRequest =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (bankTxn: ITransaction) =>
+  (committeeId: string) =>
   async (txnIds: string[]): Promise<unknown> => {
     const txns = [];
     for (const txnId of txnIds) {
-      const txn = await requestTxnById(txnsTableName)(dynamoDB)(bankTxn.id)(
+      const txn = await requestTxnById(txnsTableName)(dynamoDB)(committeeId)(
         txnId
       );
       txns.push(txn);
@@ -31,11 +32,11 @@ export const getTxnsByIdRequest =
 export const getTxnsById =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (bankTxn: ITransaction) =>
+  (committeeId: string) =>
   (txnIds: string[]): TaskEither<ApplicationError, ITransaction[]> =>
     pipe(
       taskEither.tryCatch(
-        () => getTxnsByIdRequest(txnsTableName)(dynamoDB)(bankTxn)(txnIds),
+        () => getTxnsByIdRequest(txnsTableName)(dynamoDB)(committeeId)(txnIds),
         (e) => new ApplicationError("get txns by id failed", e)
       ),
       taskEither.chain(validateDDBResponse(logPrefix)(Transactions))

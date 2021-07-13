@@ -261,6 +261,9 @@ export class AppResolver {
     @Arg("reconcileDisbursementData") rd: ReconcileDisbursementInput,
     @CurrentUser() currentUser: string
   ) {
+    if (rd.selectedTransactions.length === 0)
+      throw new ValidationError("Selected transactions list cannot be empty");
+
     await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(rd.committeeId)(
       currentUser
     );
