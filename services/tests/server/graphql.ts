@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server";
 import { buildSchema } from "type-graphql";
 import { AppResolver } from "../../src/resolvers/app.resolver";
+import * as dotenv from "dotenv";
 
 const GRAPH_QL_PORT = process.env.PORT || 4000;
 const AUTH_REDIRECT_PORT = process.env.PORT || 4500;
@@ -18,7 +19,7 @@ async function bootstrap() {
     schema,
     playground: true,
     context: ({ event }, context) => {
-      const currentUser = "380d0179-d813-445d-9032-fc25249b4de7";
+      const currentUser = process.env.COGNITO_USER_ID;
       return {
         currentUser,
       };
