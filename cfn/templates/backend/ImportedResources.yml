@@ -42,4 +42,3 @@ Transactions:
     TableName: prod-4us-backend-Transactions-15F38F51SY0E6
 {% endif %}
   Property: [TableName, KeySchema, AttributeDefinitions, ProvisionedThroughput, StreamSpecification, SSESpecification, GlobalSecondaryIndexes]
-{% endif %}
