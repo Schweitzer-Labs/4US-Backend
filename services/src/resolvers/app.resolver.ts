@@ -13,7 +13,6 @@ import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "../input-types/create-contribution.input-type";
-import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
 import { Stripe } from "stripe";
@@ -25,12 +24,13 @@ import { createDisbursementInputToTransaction } from "../utils/model/create-disb
 import { putTransaction } from "../utils/model/put-transaction.utils";
 import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
 import { verifyDisbursementFromUserAndPut } from "../pipes/verify-disbursement-from-user.pipe";
-import { Direction } from "../utils/enums/direction.enum";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 import { TransactionArg } from "../args/transaction.arg";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
+import { ReconcileDisbursementInput } from "../input-types/reconcile-disbursement.input-type";
+import { reconcileDisbursement } from "../pipes/reconcile-disbursement.pipe";
 
 dotenv.config();
 
@@ -248,6 +248,29 @@ export class AppResolver {
     const res = await verifyDisbursementFromUserAndPut(txnsTableName)(dynamoDB)(
       committeeId
     )(txnId)(d)();
+
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      return res.right;
+    }
+  }
+
+  @Mutation((returns) => Transaction)
+  async reconcileDisbursement(
+    @Arg("reconcileDisbursementData") rd: ReconcileDisbursementInput,
+    @CurrentUser() currentUser: string
+  ) {
+    if (rd.selectedTransactions.length === 0)
+      throw new ValidationError("Selected transactions list cannot be empty");
+
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(rd.committeeId)(
+      currentUser
+    );
+
+    const res = await reconcileDisbursement(txnsTableName)(dynamoDB)(
+      rd.committeeId
+    )(rd.bankTransaction)(rd.selectedTransactions)();
 
     if (isLeft(res)) {
       throw res.left;

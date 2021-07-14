@@ -53,7 +53,6 @@ export const txnsToAgg = (txns: ITransaction[]): IAggregations => {
       } else {
         acc.totalDisbursementsInProcessing =
           acc.totalDisbursementsInProcessing + txn.amount;
-        acc.balance = acc.balance - txn.amount;
       }
     }
     if (!txn.ruleVerified) {

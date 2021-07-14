@@ -102,6 +102,10 @@ const createContributionVariables = {
   committeeId,
 };
 
+const generalVariables = {
+  committeeId,
+};
+
 const createContributionQuery = `
 mutation($committeeId: String!) {
   createContribution(createContributionData: {
@@ -122,6 +126,19 @@ mutation($committeeId: String!) {
     postalCode: "13224"
     entityType: Ind
     employmentStatus: Unemployed
+  }) {
+    amount
+    id
+  }
+}
+`;
+
+const reconcileDisbMutation = `
+mutation($committeeId: String!) {
+  reconcileDisbursement(reconcileDisbursementData: {
+    committeeId: $committeeId,
+    bankTransaction: "asdfsdaf",
+    selectedTransactions: []
   }) {
     amount
     id
@@ -286,6 +303,33 @@ describe("Committee GraphQL Lambda", function () {
 
       const txnResBody = JSON.parse(txnRes.body);
       expect(txnResBody.data.transaction).to.equal(null);
+    });
+  });
+  describe("Reconcile Disbursement", function () {
+    it("Reconciles a disbursement by transaction id and a list of transaction ids", async () => {
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(reconcileDisbMutation, validUsername, generalVariables),
+        {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      console.log(createRes.body);
+
+      // const txnRes: any = await lambdaPromise(
+      //   graphql,
+      //   genGraphQLProxy(
+      //     getTxnQuery(committee.id)(tid),
+      //     validUsername,
+      //     createContributionVariables
+      //   ),
+      //   {}
+      // );
+
+      // const txnResBody = JSON.parse(txnRes.body);
+
+      // expect(body.data.transaction.id).to.equal(tid);
     });
   });
 });

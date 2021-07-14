@@ -1,5 +1,8 @@
 import { DynamoDB } from "aws-sdk";
 import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ApplicationError } from "../application-error";
+import { tryCatch } from "fp-ts/TaskEither";
+
 export const deleteTxn =
   (transactionTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -21,3 +24,12 @@ export const deleteTxn =
     console.log("success deleting");
     return txn;
   };
+
+export const deleteTxnPipe =
+  (transactionTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (txn: ITransaction) =>
+    tryCatch(
+      () => deleteTxn(transactionTableName)(dynamoDB)(txn),
+      (e) => new ApplicationError("Txn delete failed", e)
+    );
