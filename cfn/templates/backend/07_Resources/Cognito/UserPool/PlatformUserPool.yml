@@ -5,6 +5,7 @@ PlatformUserPool:
     Policies:
       PasswordPolicy:
         MinimumLength: 8
+        RequireNumbers: true
     UsernameAttributes:
       - email
     AdminCreateUserConfig:
