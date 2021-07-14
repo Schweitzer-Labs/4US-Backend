@@ -11,6 +11,7 @@ const updateExpressionList = [
   "#finicityDescription = :finicityDescription",
   "#finicityPostedDate = :finicityPostedDate",
   "#finicityTransactionDate = :finicityTransactionDate",
+  "#finicityTransactionData = :finicityTransactionData",
 ];
 
 export const reconcileTxnById =
@@ -39,6 +40,7 @@ export const reconcileTxnById =
         "#finicityDescription": "finicityDescription",
         "#finicityPostedDate": "finicityPostedDate",
         "#finicityTransactionDate": "finicityTransactionDate",
+        "#finicityTransactionData": "finicityTransactionData",
       },
       ExpressionAttributeValues: {
         ":bankVerified": {

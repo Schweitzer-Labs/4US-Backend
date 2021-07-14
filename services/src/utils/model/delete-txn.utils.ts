@@ -7,6 +7,7 @@ export const deleteTxn =
   (transactionTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (txn: ITransaction) => {
+    console.log("delete txn is called with ", txn.id);
     await dynamoDB
       .deleteItem({
         TableName: transactionTableName,
@@ -14,9 +15,13 @@ export const deleteTxn =
           id: {
             S: txn.id,
           },
+          committeeId: {
+            S: txn.committeeId,
+          },
         },
       })
       .promise();
+    console.log("success deleting");
     return txn;
   };
 
