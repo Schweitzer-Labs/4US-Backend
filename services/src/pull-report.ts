@@ -39,7 +39,7 @@ const createReportRun = async () => {
 
 const requestReport = async () => {
   const res = await getReport(apiKey)(
-    "https://files.stripe.com/v1/files/file_1JAwB1EUhH8cxK5g2T6KL3cF/contents"
+    "https://files.stripe.com/v1/files/file_1JD8f6EUhH8cxK5g9m3ZhJVG/contents"
   );
 
   console.log(res);

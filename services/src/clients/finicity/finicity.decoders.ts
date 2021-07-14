@@ -56,4 +56,7 @@ export const GetFinicityTransactionsResponse = t.intersection([
 
 export type IFinicityTransaction = t.TypeOf<typeof FinicityTransaction>;
 
-export const payoutDescriptions = ["ORIG CO NAME:Policapital"];
+export const payoutDescriptions = [
+  "ORIG CO NAME:Policapital",
+  "ORIG CO NAME:4US",
+];
