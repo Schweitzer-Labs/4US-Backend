@@ -1,3 +1,5 @@
 SESConfigSet:
+{% if RUNENV != 'demo' %}
   Type: AWS::SSM::Parameter::Value<String>
   Default: /{{ REGION }}/ses/configurationset
+{% endif %}
