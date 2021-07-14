@@ -21,9 +21,12 @@ PolicapitalContributeFunction:
       Type: SNS
     Environment:
       Variables:
-        RUNENV: !Ref LambdaRunEnvironment
-        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
-        COMMITTEES_DDB_TABLE_NAME: !Ref Committees
+        RUNENV:
+          !Ref LambdaRunEnvironment
+        TRANSACTIONS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
+        COMMITTEES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
 
 P2ContributeInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig
