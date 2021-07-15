@@ -6,9 +6,9 @@ DynamoDBStreamReaderPolicy:
       Statement:
           Effect: Allow
           Resource:
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}/stream/*
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Committees}
+            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsStream
+            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
           Action:
             - dynamodb:GetRecords
             - dynamodb:GetShardIterator

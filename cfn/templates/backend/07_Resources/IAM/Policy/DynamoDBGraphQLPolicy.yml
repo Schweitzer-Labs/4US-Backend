@@ -1,17 +1,18 @@
 DynamoDBGraphQLPolicy:
   Type: AWS::IAM::ManagedPolicy
+  DependsOn: DynamoDBsTemplate
   Properties:
     PolicyDocument:
       Version: 2012-10-17
       Statement:
           Effect: Allow
           Resource:
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BillableEvents}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}/index/TransactionsByCommitteeDonorIndex
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Committees}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Donors}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Rules}
+            - !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
+            - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByCommitteeDonorIndex
+            - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.DonorsTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.RulesTableArn
           Action:
             - dynamodb:PartiQLSelect
             - dynamodb:Query
