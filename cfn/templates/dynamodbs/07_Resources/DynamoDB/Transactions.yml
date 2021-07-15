@@ -4,7 +4,7 @@ Transactions:
   DeletionPolicy: Retain
 {% endif %}
   Properties:
-{% if RUNENV == 'demo' %}
+{% if RUNENV != 'prod' %}
     BillingMode: PAY_PER_REQUEST
 {% endif %}
     SSESpecification:
