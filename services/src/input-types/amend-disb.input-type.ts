@@ -14,7 +14,7 @@ registerEnumType(PaymentMethod, {
 });
 
 @InputType()
-export class VerifyDisbursementInput implements Partial<ITransaction> {
+export class AmendDisbInput implements Partial<ITransaction> {
   @Field({ nullable: true })
   entityName?: string;
 
@@ -27,10 +27,10 @@ export class VerifyDisbursementInput implements Partial<ITransaction> {
   @Field({ nullable: true })
   isExistingLiability?: boolean;
 
-  @Field((type) => PaymentMethod)
+  @Field((type) => PaymentMethod, { nullable: true })
   paymentMethod?: PaymentMethod;
 
-  @Field((type) => PurposeCode)
+  @Field((type) => PurposeCode, { nullable: true })
   purposeCode?: PurposeCode;
 
   @Field({ nullable: true })

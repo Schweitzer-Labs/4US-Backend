@@ -22,8 +22,6 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
 import { createDisbursementInputToTransaction } from "../utils/model/create-disbursement-input-to-transaction.utils";
 import { putTransaction } from "../utils/model/put-transaction.utils";
-import { VerifyDisbursementInput } from "../input-types/verify-disbursement.input-type";
-import { verifyDisbursementFromUserAndPut } from "../pipes/verify-disbursement-from-user.pipe";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
@@ -31,6 +29,8 @@ import { TransactionArg } from "../args/transaction.arg";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 import { ReconcileDisbursementInput } from "../input-types/reconcile-disbursement.input-type";
 import { reconcileDisbursement } from "../pipes/reconcile-disbursement.pipe";
+import { AmendDisbInput } from "../input-types/amend-disb.input-type";
+import { amendDisb } from "../pipes/amend-disb.pipe";
 
 dotenv.config();
 
@@ -235,19 +235,19 @@ export class AppResolver {
   }
 
   @Mutation((returns) => Transaction)
-  async verifyDisbursement(
+  async amendDisbursement(
     @Arg("committeeId") committeeId: string,
     @Arg("transactionId") txnId: string,
-    @Arg("verifyDisbursementData") d: VerifyDisbursementInput,
+    @Arg("amendDisbursementData") d: AmendDisbInput,
     @CurrentUser() currentUser: string
   ) {
     await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
       currentUser
     );
 
-    const res = await verifyDisbursementFromUserAndPut(txnsTableName)(dynamoDB)(
-      committeeId
-    )(txnId)(d)();
+    const res = await amendDisb(txnsTableName)(dynamoDB)(committeeId)(txnId)(
+      d
+    )();
 
     if (isLeft(res)) {
       throw res.left;
