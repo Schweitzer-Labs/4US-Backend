@@ -20,12 +20,18 @@ BankSyncFunction:
       Type: SNS
     Environment:
       Variables:
-        RUNENV: !Ref LambdaRunEnvironment
-        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
-        COMMITTEES_DDB_TABLE_NAME: !Ref Committees
-        DONORS_DDB_TABLE_NAME: !Ref Donors
-        RULES_DDB_TABLE_NAME: !Ref Rules
-        BILLABLE_EVENTS_DDB_TABLE_NAME: !Ref BillableEvents
+        RUNENV:
+          !Ref LambdaRunEnvironment
+        TRANSACTIONS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
+        COMMITTEES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+        DONORS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.DonorsTableName
+        RULES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.RulesTableName
+        BILLABLE_EVENTS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableName
 
 BankSyncInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig

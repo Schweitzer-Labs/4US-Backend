@@ -1,5 +1,6 @@
 TransactionsTableWriteCapacityScalableTarget:
   Type: AWS::ApplicationAutoScaling::ScalableTarget
+  Condition: Production
   DependsOn: Transactions
   Properties:
     MaxCapacity: 100
@@ -11,6 +12,7 @@ TransactionsTableWriteCapacityScalableTarget:
 
 TransactionsTableWriteScalingPolicy:
   Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  Condition: Production
   Properties:
     PolicyName: WriteAutoScalingPolicy
     PolicyType: TargetTrackingScaling
@@ -24,6 +26,7 @@ TransactionsTableWriteScalingPolicy:
 
 TransactionsIndexWriteCapacityScalableTarget:
   Type: AWS::ApplicationAutoScaling::ScalableTarget
+  Condition: Production
   DependsOn: Transactions
   Properties:
     MaxCapacity: 100
@@ -35,6 +38,7 @@ TransactionsIndexWriteCapacityScalableTarget:
 
 TransactionsIndexWriteScalingPolicy:
   Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  Condition: Production
   Properties:
     PolicyName: WriteAutoScalingPolicy
     PolicyType: TargetTrackingScaling
@@ -48,6 +52,7 @@ TransactionsIndexWriteScalingPolicy:
 
 TransactionsTableReadCapacityScalableTarget:
   Type: AWS::ApplicationAutoScaling::ScalableTarget
+  Condition: Production
   DependsOn: Transactions
   Properties:
     MaxCapacity: 100
@@ -59,6 +64,7 @@ TransactionsTableReadCapacityScalableTarget:
 
 TransactionsTableReadScalingPolicy:
   Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  Condition: Production
   Properties:
     PolicyName: ReadAutoScalingPolicy
     PolicyType: TargetTrackingScaling
@@ -72,6 +78,7 @@ TransactionsTableReadScalingPolicy:
 
 TransactionsIndexReadCapacityScalableTarget:
   Type: AWS::ApplicationAutoScaling::ScalableTarget
+  Condition: Production
   DependsOn: Transactions
   Properties:
     MaxCapacity: 100
@@ -83,6 +90,7 @@ TransactionsIndexReadCapacityScalableTarget:
 
 TransactionsIndexReadScalingPolicy:
   Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  Condition: Production
   Properties:
     PolicyName: ReadAutoScalingPolicy
     PolicyType: TargetTrackingScaling

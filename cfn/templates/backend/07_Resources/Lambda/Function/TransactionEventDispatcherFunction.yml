@@ -15,16 +15,20 @@ TransactionEventDispatcherFunction:
         Properties:
           BatchSize: 1
           StartingPosition: LATEST
-          Stream: !Ref TransactionsStream
+          Stream: !GetAtt DynamoDBsTemplate.Outputs.TransactionsStream
     DeadLetterQueue:
       TargetArn: !Ref LambdaDLQ
       Type: SNS
     Environment:
       Variables:
-        RUNENV: !Ref LambdaRunEnvironment
-        SQSQUEUE: !Ref EmailQueue
-        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
-        COMMITTEES_DDB_TABLE_NAME: !Ref Committees
+        RUNENV:
+          !Ref LambdaRunEnvironment
+        SQSQUEUE:
+          !Ref EmailQueue
+        TRANSACTIONS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
+        COMMITTEES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
 
 TxnDispatcherInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig
