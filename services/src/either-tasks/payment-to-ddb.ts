@@ -1,7 +1,6 @@
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { StatusCodes } from "http-status-codes";
-import { v4 as uuidv4 } from "uuid";
 import { Payment } from "./contribution-to-payment";
 import { DynamoDB } from "aws-sdk";
 import { ITransaction } from "../queries/search-transactions.decoder";
@@ -11,7 +10,6 @@ import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Direction } from "../utils/enums/direction.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { putTransaction } from "../utils/model/put-transaction.utils";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 
 const savePayment =
   (transactionsTableName: string) =>
@@ -20,6 +18,7 @@ const savePayment =
     console.log("Payment saving to transactions able");
     const transaction: ITransaction = {
       ...payment,
+      paymentDate: now(),
       id: genTxnId(),
       source: Source.DONATE_FORM,
       direction: Direction.In,

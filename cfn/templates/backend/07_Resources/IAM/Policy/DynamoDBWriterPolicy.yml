@@ -1,5 +1,6 @@
 DynamoDBWriterPolicy:
   Type: AWS::IAM::ManagedPolicy
+  DependsOn: DynamoDBsTemplate
   Properties:
     PolicyDocument:
       Version: '2012-10-17'
@@ -7,12 +8,12 @@ DynamoDBWriterPolicy:
         - Sid: WriteTransaction
           Effect: Allow
           Resource:
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
+            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
           Action:
             - dynamodb:putItem
         - Sid: FetchCommittee
           Effect: Allow
           Resource:
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Committees}
+            - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
           Action:
             - dynamodb:getItem

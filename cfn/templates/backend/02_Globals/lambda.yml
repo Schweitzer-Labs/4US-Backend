@@ -5,3 +5,6 @@ Function:
     SecurityGroupIds:
       - !Ref LambdaSecurityGroup
     SubnetIds: !Ref PrivateSubnets
+
+Api:
+  OpenApiVersion: 3.0.1

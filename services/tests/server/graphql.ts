@@ -19,7 +19,7 @@ async function bootstrap() {
   // Create the GraphQL server
   const server = new ApolloServer({
     schema,
-    playground: true,
+    introspection: true,
     context: ({ event }, context) => {
       const currentUser = process.env.COGNITO_USER_ID;
       return {
