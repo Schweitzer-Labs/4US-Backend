@@ -6,7 +6,10 @@ import { validateDisbursement } from "../utils/model/validate-disbursement.utils
 import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { AmendDisbInput } from "../input-types/amend-disb.input-type";
-import { isNonBankVerifiedDisb } from "../utils/model/is-non-verified-disbursement.utils";
+import {
+  isNonBankVerifiedDisb,
+  isNotABankVerifiedRuleUnverifiedDisb,
+} from "../utils/model/is-non-verified-disbursement.utils";
 
 export const amendDisb =
   (txnsTableName: string) =>
@@ -16,7 +19,7 @@ export const amendDisb =
   (disbursementInput: AmendDisbInput) =>
     pipe(
       getTxnById(txnsTableName)(dynamoDB)(committeeId)(txnId),
-      te.chain(isNonBankVerifiedDisb),
+      te.chain(isNotABankVerifiedRuleUnverifiedDisb),
       te.map(mergeDisbInputWithTxn(disbursementInput)),
       te.chain(validateDisbursement),
       te.chain(putTransactionAndDecode(txnsTableName)(dynamoDB))

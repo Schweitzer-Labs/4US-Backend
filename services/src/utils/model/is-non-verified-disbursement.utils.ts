@@ -35,3 +35,23 @@ export const isNonBankVerifiedDisb = (
     );
   }
 };
+
+const isBankVerifiedAndRuleUnverified = (
+  bankVerified: boolean,
+  ruleVerified: boolean
+) => bankVerified && !ruleVerified;
+
+export const isNotABankVerifiedRuleUnverifiedDisb = (
+  t: ITransaction
+): TaskEither<ApplicationError, ITransaction> => {
+  if (
+    t.transactionType === TransactionType.Disbursement &&
+    !isBankVerifiedAndRuleUnverified(t.bankVerified, t.ruleVerified)
+  ) {
+    return taskEither.right(t);
+  } else {
+    return taskEither.left(
+      new ApplicationError("Transaction is not an unverified disbursement.", {})
+    );
+  }
+};
