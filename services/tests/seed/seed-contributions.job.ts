@@ -13,7 +13,7 @@ dotenv.config();
 const txnsTableName = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 
 const run = async (dynamoDB: DynamoDB, sequence: number) => {
-  const list = data.slice(25 * sequence - 25, 25 * sequence);
+  const list = data.slice(25 * sequenFce - 25, 25 * sequence);
   const committeeId = "pat-miller";
   const now = new Date().getTime();
   const items = list.map((txn) => {

@@ -71,10 +71,10 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @IsEmail()
   emailAddress?: string;
 
-  @Field({ nullable: true })
+  @Field()
   @IsNumber()
   @Min(1)
-  paymentDate?: number;
+  paymentDate: number;
 
   // Required for PaymentMethod.Credit
   @Field({ nullable: true })

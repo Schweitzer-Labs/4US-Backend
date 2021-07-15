@@ -12,6 +12,7 @@ import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
 import { qaUsers } from "../seed/qa-users.data";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { now } from "../../src/utils/time.utils";
 
 dotenv.config();
 
@@ -126,6 +127,7 @@ mutation($committeeId: String!) {
     postalCode: "13224"
     entityType: Ind
     employmentStatus: Unemployed
+    paymentDate: ${now()}
   }) {
     amount
     id

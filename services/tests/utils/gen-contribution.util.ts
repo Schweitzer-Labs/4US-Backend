@@ -7,6 +7,7 @@ import * as faker from "faker";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { CreateContributionInput } from "../../src/input-types/create-contribution.input-type";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { now } from "../../src/utils/time.utils";
 
 export const genContributionRecord = (
   committeeId: string,
@@ -20,6 +21,7 @@ export const genContributionRecord = (
       paymentMethod: PaymentMethod.Credit,
       ruleVerified: true,
       bankVerified: false,
+      paymentDate: now(),
     }),
     transactionType: TransactionType.Contribution,
     committeeId,
