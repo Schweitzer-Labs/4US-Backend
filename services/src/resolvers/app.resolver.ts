@@ -236,18 +236,16 @@ export class AppResolver {
 
   @Mutation((returns) => Transaction)
   async amendDisbursement(
-    @Arg("committeeId") committeeId: string,
-    @Arg("transactionId") txnId: string,
     @Arg("amendDisbursementData") d: AmendDisbInput,
     @CurrentUser() currentUser: string
   ) {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(d.committeeId)(
       currentUser
     );
 
-    const res = await amendDisb(txnsTableName)(dynamoDB)(committeeId)(txnId)(
-      d
-    )();
+    const res = await amendDisb(txnsTableName)(dynamoDB)(d.committeeId)(
+      d.transactionId
+    )(d)();
 
     if (isLeft(res)) {
       throw res.left;

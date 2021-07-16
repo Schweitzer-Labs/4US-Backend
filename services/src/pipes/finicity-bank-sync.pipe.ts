@@ -77,31 +77,10 @@ const matchAndProcess =
   ): TaskEither<ApplicationError, ITransaction> => {
     const fTxn = finicityTxnToPlatformTxn(committee)(finicityTxn);
     const pTxnRes = matchToPlatformTxn(platformTxns)(fTxn);
-
-    switch (pTxnRes.length) {
-      case 1:
-        const [txn] = pTxnRes;
-        return putTransactionAndDecode(txnsTableName)(dynamoDB)({
-          ...txn,
-          bankVerified: true,
-          finicityTransactionId: fTxn.finicityTransactionId,
-          finicityTransactionData: finicityTxn,
-          finicityNormalizedPayeeName: fTxn.finicityNormalizedPayeeName,
-          finicityCategory: fTxn.finicityCategory,
-          finicityBestRepresentation: fTxn.finicityBestRepresentation,
-          finicityDescription: fTxn.finicityDescription,
-          finicityPostedDate: fTxn.finicityPostedDate,
-          finicityTransactionDate: fTxn.finicityTransactionDate,
-        });
-      case 0:
-        return putTransactionAndDecode(txnsTableName)(dynamoDB)(fTxn);
-      default:
-        return taskEither.left(
-          new ApplicationError(
-            "Unhandled duplicates found",
-            JSON.stringify(pTxnRes)
-          )
-        );
+    if (pTxnRes.length === 0) {
+      return putTransactionAndDecode(txnsTableName)(dynamoDB)(fTxn);
+    } else {
+      return taskEither.right(fTxn);
     }
   };
 
