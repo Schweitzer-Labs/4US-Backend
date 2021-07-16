@@ -9,13 +9,14 @@ DynamoDBGraphQLPolicy:
           Resource:
             - !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
-            - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByCommitteeDonorIndex
             - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.DonorsTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.RulesTableArn
+            - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByCommitteeDonorIndex
           Action:
-            - dynamodb:PartiQLSelect
+            - dynamodb:Scan
             - dynamodb:Query
             - dynamodb:GetItem
             - dynamodb:PutItem
-            - dynamodb:Scan
+            - dynamodb:UpdateItem
+            - dynamodb:PartiQLSelect
