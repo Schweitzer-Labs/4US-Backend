@@ -80,6 +80,7 @@ describe("Model Utils", function () {
     for (const txn of unverifiedContributionsData) {
       txn.committeeId = committee.id;
       txn.id = genTxnId();
+      txn.paymentDate = txn.initiatedTimestamp;
       await putTransaction(txnsTableName)(dynamoDB)(txn);
     }
 
