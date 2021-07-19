@@ -1,0 +1,29 @@
+name: 4US Backend
+on:
+  push:
+    branches:
+      - FUS-300
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@qa
+      - name: AWS IAM Role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          role-duration-seconds: 1200
+          role-session-name: GH-Actions-${{ env.project }}
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+        run: |
+          pip3 install -r requirements.txt
+      - name: Assemble CloudFormation Stacks
+        run: |
+          make package
