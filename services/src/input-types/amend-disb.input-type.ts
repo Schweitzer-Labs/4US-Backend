@@ -15,6 +15,12 @@ registerEnumType(PaymentMethod, {
 
 @InputType()
 export class AmendDisbInput implements Partial<ITransaction> {
+  @Field()
+  transactionId?: string;
+
+  @Field()
+  committeeId?: string;
+
   @Field({ nullable: true })
   entityName?: string;
 

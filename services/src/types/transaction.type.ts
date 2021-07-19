@@ -165,6 +165,6 @@ export class Transaction implements ITransaction {
   @Field({ nullable: true })
   finicityTransactionDate?: number;
 
-  @Field()
+  @Field({ nullable: true })
   paymentDate: number;
 }
