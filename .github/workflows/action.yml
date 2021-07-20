@@ -22,6 +22,14 @@ jobs:
       - name: Install Python libs
         run: |
           pip3 install -r requirements.txt
-      - name: Assemble CloudFormation Stacks
+      - name: Set environment to QA
+        if: endsWith(github.ref, '/qa')
         run: |
-          make clean deploy
+          echo "RUNENV=qa" >> $GITHUB_ENV
+      - name: Set environment to Production
+        if: endsWith(github.ref, '/prod')
+        run: |
+          echo "RUNENV=prod" >> $GITHUB_ENV
+      - name: Assemble and Deploy CloudFormation Stacks
+        run: |
+          make RUNENV=${{ env.RUNENV }} clean deploy
