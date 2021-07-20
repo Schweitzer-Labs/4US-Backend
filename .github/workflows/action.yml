@@ -1,0 +1,36 @@
+name: 4US Backend
+on:
+  push:
+    branches:
+      - qa
+      - prod
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: AWS IAM Role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python libs
+        run: |
+          pip3 install -r requirements.txt
+      - name: Set environment to QA
+        if: endsWith(github.ref, '/qa')
+        run: |
+          echo "RUNENV=qa" >> $GITHUB_ENV
+      - name: Set environment to Production
+        if: endsWith(github.ref, '/prod')
+        run: |
+          echo "RUNENV=prod" >> $GITHUB_ENV
+      - name: Assemble and Deploy CloudFormation Stacks
+        run: |
+          make RUNENV=${{ env.RUNENV }} clean deploy
