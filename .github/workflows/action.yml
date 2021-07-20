@@ -2,7 +2,8 @@ name: 4US Backend
 on:
   push:
     branches:
-      - FUS-300
+      - qa
+      - prod
 jobs:
   deploy:
     runs-on: ubuntu-latest
