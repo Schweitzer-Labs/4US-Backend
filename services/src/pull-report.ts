@@ -16,7 +16,7 @@ const createReportRun = async () => {
     report_type: "connected_account_payout_reconciliation.itemized.5",
     parameters: {
       connected_account: committeeAccount,
-      interval_start: milliToEpoch(now()) - 60 * 60 * 24 * 30,
+      interval_start: milliToEpoch(now()) - 60 * 60 * 24 * 90,
       interval_end: milliToEpoch(midnightLastNight()),
       columns: [
         "automatic_payout_id",
@@ -39,7 +39,7 @@ const createReportRun = async () => {
 
 const requestReport = async () => {
   const res = await getReport(apiKey)(
-    "https://files.stripe.com/v1/files/file_1JD8f6EUhH8cxK5g9m3ZhJVG/contents"
+    "https://files.stripe.com/v1/files/file_1JEzOmEUhH8cxK5gn4KKyrsq/contents"
   );
 
   console.log(res);
