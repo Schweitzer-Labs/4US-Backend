@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "RUNENV=qa" >> $GITHUB_ENV
       - name: Set environment to Production
-        if: env-prod
+        id: env-prod
         if: endsWith(github.ref, '/prod')
         run: |
           echo "RUNENV=prod" >> $GITHUB_ENV
