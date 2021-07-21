@@ -39,6 +39,7 @@ export const processContribution =
       id: genTxnId(),
       createdByUser: currentUser,
       donorId: donor.id,
+      donorVerificationScore: donor.instantIdComprehensiveVerificationScore,
       ruleCode: rule?.code,
       initiatedTimestamp: now(),
       direction: Direction.In,
@@ -57,8 +58,6 @@ export const processContribution =
             committee,
             contribution: {
               ...baseTxn,
-              // @ToDo Make source dynamic to support email on public donations
-              source: Source.DASHBOARD,
             },
           }),
           taskEither.chain(paymentToDDB(txnsTableName)(dynamoDB))

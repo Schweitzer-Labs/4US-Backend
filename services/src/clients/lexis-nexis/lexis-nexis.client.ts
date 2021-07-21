@@ -16,6 +16,9 @@ import {
 import { DynamoDB } from "aws-sdk";
 import { genTxnId } from "../../utils/gen-txn-id.utils";
 import axios from "axios";
+import { decodeError } from "../../utils/decode-error.util";
+
+const prefix = "Lexis-nexis";
 
 const instantIdEndpoint =
   "https://wsonline.seisint.com/WsIdentity/InstantID?&ver_=2.80&_product_code=false&json_test_";
@@ -112,11 +115,12 @@ const resToInstantIdResult = (
   if (isLeft(res)) {
     new ApplicationError(
       "Invalid lexis-nexis response",
-      PathReporter.report(res)
+      decodeError(prefix)(res.left)
     );
     return taskEither.of({
       instantIdRawResponse: data,
       instantIdRequestTimestamp,
+      instantIdComprehensiveVerificationScore: 0,
     });
   } else {
     return taskEither.of({
