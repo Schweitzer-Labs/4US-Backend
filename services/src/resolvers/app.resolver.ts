@@ -31,6 +31,9 @@ import { ReconcileDisbursementInput } from "../input-types/reconcile-disbursemen
 import { reconcileDisbursement } from "../pipes/reconcile-disbursement.pipe";
 import { AmendDisbInput } from "../input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
+import { AmendContributionInput } from "../input-types/amend-contrib.input-type";
+import { amendContrib } from "../pipes/amend-contrib.pipe";
+import { validateContribOrThrow } from "../utils/validate-contrib-or-throw.util";
 
 dotenv.config();
 
@@ -163,23 +166,16 @@ export class AppResolver {
       createContributionInput.committeeId
     )(currentUser);
 
+    validateContribOrThrow(createContributionInput);
+
     const {
       paymentMethod,
-      entityType,
-      entityName,
       cardCVC,
       cardNumber,
       cardExpirationMonth,
       cardExpirationYear,
-      paymentDate,
-      checkNumber,
     } = createContributionInput;
 
-    if (![EntityType.Ind, EntityType.Fam].includes(entityType) && !entityName) {
-      throw new ValidationError(
-        "Entity name must be provided for non-individual and non-family contributions"
-      );
-    }
     if ([PaymentMethod.Credit, PaymentMethod.Debit].includes(paymentMethod)) {
       if (
         !cardCVC ||
@@ -189,20 +185,6 @@ export class AppResolver {
       )
         throw new ValidationError(
           "Card info must be provided for contributions in credit and debit"
-        );
-    }
-
-    if (paymentMethod === PaymentMethod.Check) {
-      if (!checkNumber)
-        throw new ValidationError(
-          "Check number must be provided for contributions by check"
-        );
-    }
-
-    if ([PaymentMethod.Check, PaymentMethod.Ach].includes(paymentMethod)) {
-      if (!paymentDate)
-        throw new ValidationError(
-          "Payment date must be provided for contributions by check or ACH"
         );
     }
 
@@ -246,6 +228,28 @@ export class AppResolver {
     const res = await amendDisb(txnsTableName)(dynamoDB)(d.committeeId)(
       d.transactionId
     )(d)();
+
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      return res.right;
+    }
+  }
+
+  @Mutation((returns) => Transaction)
+  async amendContribution(
+    @Arg("amendContributionData") c: AmendContributionInput,
+    @CurrentUser() currentUser: string
+  ) {
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(c.committeeId)(
+      currentUser
+    );
+
+    validateContribOrThrow(c);
+
+    const res = await amendContrib(txnsTableName)(dynamoDB)(c.committeeId)(
+      c.transactionId
+    )(c)();
 
     if (isLeft(res)) {
       throw res.left;
