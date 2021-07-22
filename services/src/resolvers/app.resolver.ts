@@ -27,13 +27,15 @@ import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 import { TransactionArg } from "../args/transaction.arg";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
-import { ReconcileDisbursementInput } from "../input-types/reconcile-disbursement.input-type";
+import { ReconcileTxnInput } from "../input-types/reconcile-txn.input-type";
 import { reconcileDisbursement } from "../pipes/reconcile-disbursement.pipe";
 import { AmendDisbInput } from "../input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
 import { AmendContributionInput } from "../input-types/amend-contrib.input-type";
 import { amendContrib } from "../pipes/amend-contrib.pipe";
 import { validateContribOrThrow } from "../utils/validate-contrib-or-throw.util";
+import { reconcileTxnByTxnType } from "../pipes/reconcile-txn.pipe";
+import { TransactionType } from "../utils/enums/transaction-type.enum";
 
 dotenv.config();
 
@@ -260,7 +262,7 @@ export class AppResolver {
 
   @Mutation((returns) => Transaction)
   async reconcileDisbursement(
-    @Arg("reconcileDisbursementData") rd: ReconcileDisbursementInput,
+    @Arg("reconcileDisbursementData") rd: ReconcileTxnInput,
     @CurrentUser() currentUser: string
   ) {
     if (rd.selectedTransactions.length === 0)
@@ -273,6 +275,29 @@ export class AppResolver {
     const res = await reconcileDisbursement(txnsTableName)(dynamoDB)(
       rd.committeeId
     )(rd.bankTransaction)(rd.selectedTransactions)();
+
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      return res.right;
+    }
+  }
+
+  @Mutation((returns) => Transaction)
+  async reconcileContribution(
+    @Arg("reconcileContributionData") rd: ReconcileTxnInput,
+    @CurrentUser() currentUser: string
+  ) {
+    if (rd.selectedTransactions.length === 0)
+      throw new ValidationError("Selected transactions list cannot be empty");
+
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(rd.committeeId)(
+      currentUser
+    );
+
+    const res = await reconcileTxnByTxnType(TransactionType.Contribution)(
+      txnsTableName
+    )(dynamoDB)(rd.committeeId)(rd.bankTransaction)(rd.selectedTransactions)();
 
     if (isLeft(res)) {
       throw res.left;
