@@ -16,7 +16,6 @@ import { CreateContributionInput } from "../input-types/create-contribution.inpu
 import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
 import { Stripe } from "stripe";
-import { EntityType } from "../utils/enums/entity-type.enum";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
@@ -28,14 +27,12 @@ import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 import { TransactionArg } from "../args/transaction.arg";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 import { ReconcileTxnInput } from "../input-types/reconcile-txn.input-type";
-import { reconcileDisbursement } from "../pipes/reconcile-disbursement.pipe";
 import { AmendDisbInput } from "../input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
 import { AmendContributionInput } from "../input-types/amend-contrib.input-type";
 import { amendContrib } from "../pipes/amend-contrib.pipe";
 import { validateContribOrThrow } from "../utils/validate-contrib-or-throw.util";
-import { reconcileTxnByTxnType } from "../pipes/reconcile-txn.pipe";
-import { TransactionType } from "../utils/enums/transaction-type.enum";
+import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 
 dotenv.config();
 
@@ -261,8 +258,8 @@ export class AppResolver {
   }
 
   @Mutation((returns) => Transaction)
-  async reconcileDisbursement(
-    @Arg("reconcileDisbursementData") rd: ReconcileTxnInput,
+  async reconcileTransaction(
+    @Arg("reconcileTransactionData") rd: ReconcileTxnInput,
     @CurrentUser() currentUser: string
   ) {
     if (rd.selectedTransactions.length === 0)
@@ -272,32 +269,9 @@ export class AppResolver {
       currentUser
     );
 
-    const res = await reconcileDisbursement(txnsTableName)(dynamoDB)(
+    const res = await reconcileTxnWithTxns(txnsTableName)(dynamoDB)(
       rd.committeeId
     )(rd.bankTransaction)(rd.selectedTransactions)();
-
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      return res.right;
-    }
-  }
-
-  @Mutation((returns) => Transaction)
-  async reconcileContribution(
-    @Arg("reconcileContributionData") rd: ReconcileTxnInput,
-    @CurrentUser() currentUser: string
-  ) {
-    if (rd.selectedTransactions.length === 0)
-      throw new ValidationError("Selected transactions list cannot be empty");
-
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(rd.committeeId)(
-      currentUser
-    );
-
-    const res = await reconcileTxnByTxnType(TransactionType.Contribution)(
-      txnsTableName
-    )(dynamoDB)(rd.committeeId)(rd.bankTransaction)(rd.selectedTransactions)();
 
     if (isLeft(res)) {
       throw res.left;

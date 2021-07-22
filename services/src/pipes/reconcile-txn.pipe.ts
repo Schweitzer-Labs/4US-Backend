@@ -11,8 +11,7 @@ import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { getTxnsById } from "../utils/model/get-txns-by-id.utils";
 
 // @Todo Add validation
-export const reconcileTxnByTxnType =
-  (txnType: TransactionType) =>
+export const reconcileTxnWithTxns =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committeeId: string) =>
@@ -20,7 +19,6 @@ export const reconcileTxnByTxnType =
   (selectedTxnIds: string[]) =>
     pipe(
       getTxnById(txnsTableName)(dynamoDB)(committeeId)(txnId),
-      taskEither.chain(assertTxnAsTxnType(txnType)),
       taskEither.chain(assertTxnAsBankTxn),
       taskEither.chain(
         assertTxnsCanBeReconciled(txnsTableName)(dynamoDB)(committeeId)(
@@ -97,14 +95,19 @@ const testTxns =
       true
     );
 
-    const haveSamePaymentType = selectedTxns.every(
+    const haveSameTxnType = selectedTxns.every(
       (val) => val.transactionType === bankTxn.transactionType
+    );
+
+    const haveSamePaymentType = selectedTxns.every(
+      (val) => val.paymentMethod === bankTxn.paymentMethod
     );
 
     if (
       selectedSum === bankTxn.amount &&
       haveSamePaymentType &&
-      areUnreconciledTxns
+      areUnreconciledTxns &&
+      haveSameTxnType
     ) {
       return taskEither.right(bankTxn);
     } else {
