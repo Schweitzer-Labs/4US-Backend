@@ -34,6 +34,7 @@ export interface IContribution {
   ruleCode?: string;
   source?: Source;
   createdByUser?: string;
+  donorVerificationScore?: number;
 }
 
 const contribSchema = Joi.object({

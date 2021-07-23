@@ -35,7 +35,6 @@ $(template): $(SRCS)
 	@echo $@
 	@$(CREPES) . \
 		$(CREPES_PARAMS) \
-		--runenv $(RUNENV) \
 		--output $@
 
 
@@ -91,7 +90,7 @@ package:
 		--output-template-file $(PACKAGE)
 
 deploy:
-	@aws cloudformation deploy \
+	aws cloudformation deploy \
 		--endpoint-url $(ENDPOINT) \
 		--region $(REGION) \
 		--template-file $(PACKAGE) \

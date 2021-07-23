@@ -18,5 +18,6 @@ DynamoDBGraphQLPolicy:
             - dynamodb:Query
             - dynamodb:GetItem
             - dynamodb:PutItem
+            - dynamodb:DeleteItem
             - dynamodb:UpdateItem
             - dynamodb:PartiQLSelect

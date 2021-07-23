@@ -167,4 +167,7 @@ export class Transaction implements ITransaction {
 
   @Field({ nullable: true })
   paymentDate: number;
+
+  @Field({ nullable: true })
+  donorVerificationScore?: number;
 }
