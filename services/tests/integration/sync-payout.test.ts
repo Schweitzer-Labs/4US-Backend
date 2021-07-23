@@ -184,6 +184,12 @@ const runRec =
             ...pTxn,
             finicityTransactionData: txn.finicityTransactionData,
             finicityTransactionId: txn.finicityTransactionId,
+            finicityCategory: txn.finicityCategory,
+            finicityBestRepresentation: txn.finicityBestRepresentation,
+            finicityPostedDate: txn.finicityPostedDate,
+            finicityTransactionDate: txn.finicityTransactionDate,
+            finicityNormalizedPayeeName: txn.finicityNormalizedPayeeName,
+            finicityDescription: txn.finicityDescription,
             bankVerified: true,
           });
           reconCount++;
