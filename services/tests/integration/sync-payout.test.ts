@@ -52,18 +52,20 @@ const config = {
 const stripeAccount = genTxnId();
 
 const committee = genCommittee({
-  district: "53",
-  officeType: "supervisor",
-  party: "democrat",
-  race: "primary",
-  ruleVersion: "nyboe-2020",
-  scope: "state",
-  state: "ny",
   stripeAccount,
   finicityCustomerId: "5007489410",
   finicityAccountId: "5016000964",
   candidateLastName: "Schweitzer",
   candidateFirstName: "Will",
+  tzDatabaseName: "America/New_York",
+  state: "ny",
+  scope: "local",
+  party: "republican",
+  race: "general",
+  district: "",
+  county: "saratoga",
+  officeType: "supervisor",
+  ruleVersion: "nyboe-2020",
 });
 
 const disableFinicity = ({
