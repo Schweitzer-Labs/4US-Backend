@@ -37,17 +37,18 @@ export default async (
 
   switch (payload?.type) {
     case "reporting.report_run.succeeded":
-      console.log("reporting.report_type.succeeded event happened");
-      if (
-        payload?.data?.object?.report_type ===
-        "connected_account_payout_reconciliation.itemized.5"
-      ) {
-        return await handleReportRunSucceeded(txnsTableName)(
-          committeeTableName
-        )(dynamoDB)(stripeApiKey)(payload);
-      } else {
-        return successResponse;
-      }
+      // console.log("reporting.report_type.succeeded event happened");
+      // if (
+      //   payload?.data?.object?.report_type ===
+      //   "connected_account_payout_reconciliation.itemized.5"
+      // ) {
+      //   return await handleReportRunSucceeded(txnsTableName)(
+      //     committeeTableName
+      //   )(dynamoDB)(stripeApiKey)(payload);
+      // } else {
+      //   return successResponse;
+      // }
+      return successResponse;
     case "payout.paid":
       return await handlePayoutPaid(stripe)(payload);
     default:
