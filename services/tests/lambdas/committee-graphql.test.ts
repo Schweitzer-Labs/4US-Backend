@@ -689,8 +689,6 @@ describe("Committee GraphQL Lambda", function () {
   //
   //     // expect(body.data.transaction.id).to.equal(tid);
   //   });
-  });
-
   after(async () => {
     await deleteCommittee(committeesTableName)(dynamoDB)(committee);
   });
