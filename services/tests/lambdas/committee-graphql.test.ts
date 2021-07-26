@@ -16,8 +16,12 @@ import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { genAmendDisbInput } from "../utils/gen-amend-disb-input.util";
 import * as faker from "faker";
 import { genContributionRecord } from "../utils/gen-contribution.util";
-import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
+import { genFinicityTxn } from "../utils/gen-finicity-txn.util";
+import { Direction } from "../../src/utils/enums/direction.enum";
+import { ReconcileTxnInput } from "../../src/input-types/reconcile-txn.input-type";
+import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
 
@@ -79,6 +83,15 @@ const getTxnQuery = (committeeId) => (tid: string) =>
     transaction(committeeId: "${committeeId}", id: "${tid}") {
       id
       entityName
+      addressLine1
+      finicityCategory
+      finicityBestRepresentation
+      finicityPostedDate
+      finicityTransactionDate
+      finicityNormalizedPayeeName
+      finicityDescription
+      ruleVerified
+      bankVerified
     }
   }
 `;
@@ -337,17 +350,22 @@ mutation($committeeId: String!) {
 }
 `;
 
-const recDisbMutation = `
-mutation($committeeId: String!) {
-  reconcileDisbursement(reconcileDisbursementData: {
-    committeeId: $committeeId,
-    bankTransaction: "asdfsdaf",
-    selectedTransactions: []
-  }) {
-    amount
-    id
-  }
-}
+const recTxnMutation = `
+    mutation(
+      $committeeId: String!,
+      $selectedTransactions: [String!]!,
+      $bankTransaction: String!
+    ) {
+      reconcileTransaction(
+        reconcileTransactionData: {
+            selectedTransactions: $selectedTransactions,
+            bankTransaction: $bankTransaction,
+            committeeId: $committeeId
+        }
+      ) {
+        id
+      }
+    }
 `;
 
 const recDisbVar = {};
@@ -563,6 +581,99 @@ describe("Committee GraphQL Lambda", function () {
       );
     });
   });
+  describe("Reconcile Transactions", function () {
+    let bankTxn: ITransaction;
+    let selectTxnId: string;
+
+    before(async () => {
+      const paymentDate = now();
+      const paymentMethod = PaymentMethod.Debit;
+      // Create bank txn
+      bankTxn = genFinicityTxn({
+        paymentDate,
+        direction: Direction.Out,
+        paymentMethod,
+        committeeId,
+      });
+
+      const res = await putTransaction(txnsTableName)(dynamoDB)(bankTxn);
+
+      console.log("prodata", res);
+
+      // Create Disb
+      const createInputVar = genCreateDisbInput({
+        committeeId,
+        amount: bankTxn.amount,
+        paymentDate,
+        paymentMethod,
+      });
+
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(createDisb, validUsername, createInputVar),
+        {}
+      );
+
+      const createBody = JSON.parse(createRes.body);
+
+      selectTxnId = createBody.data.createDisbursement.id;
+
+      // Reconcile disb with bank txn
+
+      const recDisbVars: ReconcileTxnInput = {
+        committeeId,
+        bankTransaction: bankTxn.id,
+        selectedTransactions: [selectTxnId],
+      };
+
+      const recRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(recTxnMutation, validUsername, recDisbVars),
+        {}
+      );
+    });
+    it("Deletes the matching bank transaction", async () => {
+      const getTxnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTxnQuery(committee.id)(bankTxn.id),
+          validUsername,
+          {}
+        ),
+        {}
+      );
+
+      const txnResBody = JSON.parse(getTxnRes.body);
+      expect(txnResBody.errors.length > 0).to.equal(true);
+    });
+    it("Verified matching transaction and attaches bank data", async () => {
+      const getTxnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTxnQuery(committeeId)(selectTxnId),
+          validUsername,
+          {}
+        ),
+        {}
+      );
+
+      const txnResBody = JSON.parse(getTxnRes.body);
+
+      console.log("next one", txnResBody);
+
+      const data = txnResBody.data.transaction;
+
+      expect(data.finicityBestRepresentation).to.equal(
+        bankTxn.finicityBestRepresentation
+      );
+      expect(data.finicityNormalizedPayeeName).to.equal(
+        bankTxn.finicityNormalizedPayeeName
+      );
+      expect(data.finicityDescription).to.equal(bankTxn.finicityDescription);
+      expect(data.ruleVerified).to.equal(true);
+      expect(data.bankVerified).to.equal(true);
+    });
+  });
   describe("Amend Contribution", function () {
     it("Supports amending a contribution", async () => {
       // Create Contrib
@@ -663,32 +774,6 @@ describe("Committee GraphQL Lambda", function () {
       expect(txnResBody.data.transaction).to.equal(null);
     });
   });
-  // describe("Reconcile Disbursement", function () {
-  //   it("Reconciles a disbursement by transaction id and a list of transaction ids", async () => {
-  //     const createRes: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(reconcileDisbMutation, validUsername, generalVariables),
-  //       {}
-  //     );
-  //
-  //     const body = JSON.parse(createRes.body);
-  //
-  //     console.log(createRes.body);
-  //
-  //     // const txnRes: any = await lambdaPromise(
-  //     //   graphql,
-  //     //   genGraphQLProxy(
-  //     //     getTxnQuery(committee.id)(tid),
-  //     //     validUsername,
-  //     //     createContributionVariables
-  //     //   ),
-  //     //   {}
-  //     // );
-  //
-  //     // const txnResBody = JSON.parse(txnRes.body);
-  //
-  //     // expect(body.data.transaction.id).to.equal(tid);
-  //   });
   after(async () => {
     await deleteCommittee(committeesTableName)(dynamoDB)(committee);
   });

@@ -4,6 +4,11 @@ import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import * as faker from "faker";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { Direction } from "../../src/utils/enums/direction.enum";
+import {
+  FinicityTransaction,
+  IFinicityTransaction,
+} from "../../src/clients/finicity/finicity.decoders";
+import * as t from "io-ts";
 
 interface GenFinicityTxn {
   committeeId: string;
@@ -19,25 +24,46 @@ export const genFinicityTxn = ({
   paymentDate,
   paymentMethod,
   direction,
-}: GenFinicityTxn): ITransaction => ({
-  ...genTransaction({
-    bankVerified: true,
-    ruleVerified: false,
-    committeeId,
-    amount,
-    paymentDate,
-    paymentMethod,
-    initiatedTimestamp: paymentDate,
-    direction,
-  }),
-  transactionType: dirToTxnType(direction),
-  finicityCategory: faker.commerce.department(),
-  finicityBestRepresentation: faker.commerce.productDescription(),
-  finicityPostedDate: paymentDate,
-  finicityTransactionDate: paymentDate,
-  finicityNormalizedPayeeName: faker.commerce.product(),
-  finicityDescription: faker.commerce.productName(),
-});
+}: GenFinicityTxn): ITransaction => {
+  const fData: IFinicityTransaction = {
+    id: faker.datatype.number(5000000),
+    amount: faker.datatype.number(5000000),
+    accountId: faker.datatype.number(5000000),
+    status: "complete",
+    description: faker.commerce.productDescription(),
+    postedDate: paymentDate,
+    transactionDate: paymentDate,
+    createdDate: paymentDate,
+    categorization: {
+      normalizedPayeeName: faker.commerce.product(),
+      category: faker.commerce.department(),
+      bestRepresentation: faker.commerce.productDescription(),
+      country: "US",
+    },
+  };
+
+  return {
+    ...genTransaction({
+      bankVerified: true,
+      ruleVerified: false,
+      committeeId,
+      amount,
+      paymentDate,
+      paymentMethod,
+      initiatedTimestamp: paymentDate,
+      direction,
+    }),
+    finicityTransactionData: fData,
+    transactionType: dirToTxnType(direction),
+    finicityCategory: fData.categorization.category,
+    finicityBestRepresentation: fData.categorization.bestRepresentation,
+    finicityPostedDate: fData.postedDate,
+    finicityTransactionDate: fData.transactionDate,
+    finicityNormalizedPayeeName: fData.categorization.normalizedPayeeName,
+    finicityDescription: fData.description,
+    finicityTransactionId: fData.id,
+  };
+};
 
 const dirToTxnType = (dir: Direction) =>
   dir === Direction.In
