@@ -38,25 +38,3 @@ export const genContributionRecord = (
       : {}),
   };
 };
-
-export const genCreateContributionInput = (
-  committeeId: string,
-  amount: number,
-  entityType?: EntityType
-): CreateContributionInput => {
-  return {
-    amount,
-    committeeId,
-    entityType,
-    paymentMethod: PaymentMethod.Credit,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    addressLine1: faker.address.streetAddress(),
-    city: faker.address.city(),
-    state: faker.address.state(),
-    postalCode: faker.address.zipCode(),
-    ...(![EntityType.Ind, EntityType.Fam].includes(entityType)
-      ? { entityName: faker.company.companyName() }
-      : {}),
-  };
-};

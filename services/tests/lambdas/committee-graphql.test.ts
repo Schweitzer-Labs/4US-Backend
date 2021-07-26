@@ -10,14 +10,16 @@ import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
 import { qaUsers } from "../seed/qa-users.data";
 import { now } from "../../src/utils/time.utils";
-import {
-  genCreateDisbInput,
-  genDisbInput,
-} from "../utils/gen-create-disb-input.util";
+import { genCreateDisbInput } from "../utils/gen-create-disb-input.util";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { genAmendDisbInput } from "../utils/gen-amend-disb-input.util";
 import * as faker from "faker";
+import { genContributionRecord } from "../utils/gen-contribution.util";
+import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
+import { putTransaction } from "../../src/utils/model/put-transaction.utils";
+import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
 
 dotenv.config();
 
@@ -185,6 +187,120 @@ const amendDisbMut = `
     }
 `;
 
+const createContribMut = `
+mutation(
+      $committeeId: String!
+      $amount: Float!
+      $paymentMethod: PaymentMethod!
+      $firstName: String!
+      $lastName: String!
+      $addressLine1: String!
+      $city: String!
+      $state: String!
+      $postalCode: String!
+      $entityType: EntityType!
+      $emailAddress: String
+      $paymentDate: Float!
+      $cardNumber: String
+      $cardExpirationMonth: Float
+      $cardExpirationYear: Float
+      $cardCVC: String
+      $checkNumber: String
+      $entityName: String
+      $employer: String
+      $occupation: String
+      $middleName: String
+      $refCode: String
+    ) {
+      createContribution(createContributionData: {
+        committeeId: $committeeId
+        amount: $amount
+        paymentMethod: $paymentMethod
+        firstName: $firstName
+        lastName: $lastName
+        addressLine1: $addressLine1
+        city: $city
+        state: $state
+        postalCode: $postalCode
+        entityType: $entityType
+        emailAddress: $emailAddress
+        paymentDate: $paymentDate
+        cardNumber: $cardNumber
+        cardExpirationMonth: $cardExpirationMonth
+        cardExpirationYear: $cardExpirationYear
+        cardCVC: $cardCVC
+        checkNumber: $checkNumber
+        entityName: $entityName
+        employer: $employer
+        occupation: $occupation
+        middleName: $middleName
+        refCode: $refCode
+      }) {
+        id
+      }
+    }
+`;
+
+const amendContribMut = `
+  mutation(
+      $committeeId: String!
+      $transactionId: String!
+      $amount: Float!
+      $paymentMethod: PaymentMethod!
+      $firstName: String!
+      $lastName: String!
+      $addressLine1: String!
+      $city: String!
+      $state: String!
+      $postalCode: String!
+      $entityType: EntityType
+      $emailAddress: String
+      $paymentDate: Float
+      $checkNumber: String
+      $entityName: String
+      $employer: String
+      $occupation: String
+      $middleName: String
+      $refCode: String
+      $addressLine2: String
+      $companyName: String
+      $phoneNumber: String
+      $attestsToBeingAnAdultCitizen: Boolean
+      $employmentStatus: EmploymentStatus
+    ) {
+      amendContribution(
+        amendContributionData: {
+          committeeId: $committeeId
+          transactionId: $transactionId
+          amount: $amount
+          paymentMethod: $paymentMethod
+          firstName: $firstName
+          lastName: $lastName
+          addressLine1: $addressLine1
+          city: $city
+          state: $state
+          postalCode: $postalCode
+          entityType: $entityType
+          emailAddress: $emailAddress
+          paymentDate: $paymentDate
+          checkNumber: $checkNumber
+          entityName: $entityName
+          employer: $employer
+          occupation: $occupation
+          middleName: $middleName
+          refCode: $refCode
+          addressLine2: $addressLine2
+          companyName: $companyName
+          phoneNumber: $phoneNumber
+          attestsToBeingAnAdultCitizen: $attestsToBeingAnAdultCitizen
+          employmentStatus: $employmentStatus
+        }
+      ) {
+        id
+      }
+    }
+`;
+
 const createContributionVariables = {
   committeeId,
 };
@@ -249,151 +365,149 @@ describe("Committee GraphQL Lambda", function () {
     await putCommittee(committeesTableName)(dynamoDB)(committee);
     await sleep(1000);
   });
-  // describe("Permissions", function () {
-  //   it("Prevents a non-member user from querying a committee", async () => {
-  //     const res: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(getCommitteeQuery, invalidUsername),
-  //       {}
-  //     );
-  //     const body = JSON.parse(res.body);
-  //     expect(body.errors[0].message).to.equal(expectedForbiddenText);
-  //   });
-  //   it("Prevents a non-member user from querying a transaction", async () => {
-  //     const res: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(getAllTransactionsQuery, invalidUsername),
-  //       {}
-  //     );
-  //     const body = JSON.parse(res.body);
-  //     expect(body.errors[0].message).to.equal(expectedForbiddenText);
-  //   });
-  //   it("Prevents a non-member user from querying an aggregation", async () => {
-  //     const res: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(aggregationsQuery, invalidUsername),
-  //       {}
-  //     );
-  //     const body = JSON.parse(res.body);
-  //     expect(body.errors[0].message).to.equal(expectedForbiddenText);
-  //   });
-  // });
-  // describe("Transactions", function () {
-  //   it("Get by Committee ID", async () => {
-  //     const txn = genContributionRecord(committeeId);
-  //     await putTransaction(txnsTableName)(dynamoDB)(txn);
-  //     await sleep(1000);
-  //     const res: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(getAllTransactionsQuery, validUsername),
-  //       {}
-  //     );
-  //     const body = JSON.parse(res.body);
-  //     console.log(res.body);
-  //     expect(body.data.transactions.length > 0).to.equal(true);
-  //   });
-  //   it("Get by Committee ID and Donor ID", async () => {
-  //     const txn = genContributionRecord(committeeId);
-  //     await putTransaction(txnsTableName)(dynamoDB)(txn);
-  //     await sleep(1000);
-  //
-  //     const res: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(
-  //         getTransactionsByDonorIdQuery(txn.donorId),
-  //         validUsername
-  //       ),
-  //       {}
-  //     );
-  //     const body: any = JSON.parse(res.body);
-  //     expect(body.data.transactions[0].donorId).to.equal(txn.donorId);
-  //   });
-  // });
-  // describe("Committee", function () {
-  //   it("Get by Committee ID", async () => {
-  //     const res: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(getCommitteeQuery, validUsername),
-  //       {}
-  //     );
-  //     const body = JSON.parse(res.body);
-  //     expect(body.data.committee.id).to.equal(committee.id);
-  //   });
-  // });
-  // describe("Aggregations", function () {
-  //   it("Get by Committee ID", async () => {
-  //     const query = genGraphQLProxy(aggregationsQuery, validUsername);
-  //     console.log(query);
-  //     const res: any = await lambdaPromise(graphql, query, {});
-  //
-  //     const body = JSON.parse(res.body);
-  //     expect(body.data.aggregations.balance).to.be.a("number");
-  //   });
-  // });
-  //
-  // describe("Create Contributions", function () {
-  //   it("Supports the creation of a contribution", async () => {
-  //     const res: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(
-  //         createContributionQuery,
-  //         validUsername,
-  //         createContributionVariables
-  //       ),
-  //       {}
-  //     );
-  //
-  //     const body = JSON.parse(res.body);
-  //     console.log(res.body);
-  //     expect(body.data.createContribution.amount).to.equal(12000);
-  //   });
-  // });
-  // describe("Create Disbursement", function () {
-  //   it("Supports the creation of a disbursement", async () => {
-  //     const inputVar = genCreateDisbInput({
-  //       committeeId,
-  //     });
-  //
-  //     const createRes: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(createDisb, validUsername, inputVar),
-  //       {}
-  //     );
-  //
-  //     const body = JSON.parse(createRes.body);
-  //
-  //     const tid = body.data.createDisbursement.id;
-  //
-  //     const txnRes: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {
-  //
-  //       }),
-  //       {}
-  //     );
-  //
-  //     const txnResBody = JSON.parse(txnRes.body);
-  //
-  //     expect(txnResBody.data.transaction.id).to.equal(tid);
-  //   });
-  //   it("Rejects a check disbursement missing a check number", async () => {
-  //     const inputVar = genCreateDisbInput({
-  //       committeeId,
-  //       paymentMethod: PaymentMethod.Check,
-  //     });
-  //
-  //     const createRes: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(createDisb, validUsername, inputVar),
-  //       {}
-  //     );
-  //     console.log(createRes);
-  //
-  //     const resBody = JSON.parse(createRes.body);
-  //
-  //     expect(resBody.errors.length > 0).to.equal(true);
-  //   });
-  // });
+  describe("Permissions", function () {
+    it("Prevents a non-member user from querying a committee", async () => {
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getCommitteeQuery, invalidUsername),
+        {}
+      );
+      const body = JSON.parse(res.body);
+      expect(body.errors[0].message).to.equal(expectedForbiddenText);
+    });
+    it("Prevents a non-member user from querying a transaction", async () => {
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getAllTransactionsQuery, invalidUsername),
+        {}
+      );
+      const body = JSON.parse(res.body);
+      expect(body.errors[0].message).to.equal(expectedForbiddenText);
+    });
+    it("Prevents a non-member user from querying an aggregation", async () => {
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(aggregationsQuery, invalidUsername),
+        {}
+      );
+      const body = JSON.parse(res.body);
+      expect(body.errors[0].message).to.equal(expectedForbiddenText);
+    });
+  });
+  describe("Transactions", function () {
+    it("Get by Committee ID", async () => {
+      const txn = genContributionRecord(committeeId);
+      await putTransaction(txnsTableName)(dynamoDB)(txn);
+      await sleep(1000);
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getAllTransactionsQuery, validUsername),
+        {}
+      );
+      const body = JSON.parse(res.body);
+      console.log(res.body);
+      expect(body.data.transactions.length > 0).to.equal(true);
+    });
+    it("Get by Committee ID and Donor ID", async () => {
+      const txn = genContributionRecord(committeeId);
+      await putTransaction(txnsTableName)(dynamoDB)(txn);
+      await sleep(1000);
+
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTransactionsByDonorIdQuery(txn.donorId),
+          validUsername
+        ),
+        {}
+      );
+      const body: any = JSON.parse(res.body);
+      expect(body.data.transactions[0].donorId).to.equal(txn.donorId);
+    });
+  });
+  describe("Committee", function () {
+    it("Get by Committee ID", async () => {
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getCommitteeQuery, validUsername),
+        {}
+      );
+      const body = JSON.parse(res.body);
+      expect(body.data.committee.id).to.equal(committee.id);
+    });
+  });
+  describe("Aggregations", function () {
+    it("Get by Committee ID", async () => {
+      const query = genGraphQLProxy(aggregationsQuery, validUsername);
+      console.log(query);
+      const res: any = await lambdaPromise(graphql, query, {});
+
+      const body = JSON.parse(res.body);
+      expect(body.data.aggregations.balance).to.be.a("number");
+    });
+  });
+
+  describe("Create Contributions", function () {
+    it("Supports the creation of a contribution", async () => {
+      const res: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          createContributionQuery,
+          validUsername,
+          createContributionVariables
+        ),
+        {}
+      );
+
+      const body = JSON.parse(res.body);
+      console.log(res.body);
+      expect(body.data.createContribution.amount).to.equal(12000);
+    });
+  });
+  describe("Create Disbursement", function () {
+    it("Supports the creation of a disbursement", async () => {
+      const inputVar = genCreateDisbInput({
+        committeeId,
+      });
+
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(createDisb, validUsername, inputVar),
+        {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      const tid = body.data.createDisbursement.id;
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {}),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+
+      expect(txnResBody.data.transaction.id).to.equal(tid);
+    });
+    it("Rejects a check disbursement missing a check number", async () => {
+      const inputVar = genCreateDisbInput({
+        committeeId,
+        paymentMethod: PaymentMethod.Check,
+      });
+
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(createDisb, validUsername, inputVar),
+        {}
+      );
+      console.log(createRes);
+
+      const resBody = JSON.parse(createRes.body);
+
+      expect(resBody.errors.length > 0).to.equal(true);
+    });
+  });
   describe("Amend Disbursement", function () {
     it("Supports amending a disbursement", async () => {
       // Create Disb
@@ -449,53 +563,106 @@ describe("Committee GraphQL Lambda", function () {
       );
     });
   });
-  // describe("Transaction", function () {
-  //   it("Gets a transaction by id and committeeId", async () => {
-  //     const createRes: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(
-  //         createContributionQuery,
-  //         validUsername,
-  //         createContributionVariables
-  //       ),
-  //       {}
-  //     );
-  //
-  //     const body = JSON.parse(createRes.body);
-  //
-  //     const tid = body.data.createContribution.id;
-  //
-  //     const txnRes: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(
-  //         getTxnQuery(committee.id)(tid),
-  //         validUsername,
-  //         createContributionVariables
-  //       ),
-  //       {}
-  //     );
-  //
-  //     const txnResBody = JSON.parse(txnRes.body);
-  //
-  //     expect(txnResBody.data.transaction.id).to.equal(tid);
-  //   });
-  //   it("Gets a 404 on bad committeeId", async () => {
-  //     const tid = genTxnId();
-  //
-  //     const txnRes: any = await lambdaPromise(
-  //       graphql,
-  //       genGraphQLProxy(
-  //         getTxnQuery(committee.id)(tid),
-  //         validUsername,
-  //         createContributionVariables
-  //       ),
-  //       {}
-  //     );
-  //
-  //     const txnResBody = JSON.parse(txnRes.body);
-  //     expect(txnResBody.data.transaction).to.equal(null);
-  //   });
-  // });
+  describe("Amend Contribution", function () {
+    it("Supports amending a contribution", async () => {
+      // Create Contrib
+      const createInputVar = genCreateContribInput(committee.id);
+
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(createContribMut, validUsername, createInputVar),
+        {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      const tid = body.data.createContribution.id;
+
+      // Amend Disb
+      await sleep(1000);
+
+      const amendInput = genAmendContribInput({
+        committeeId: committee.id,
+        transactionId: tid,
+        addressLine1: faker.address.streetAddress(),
+      });
+
+      const amendRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(amendContribMut, validUsername, amendInput),
+        {}
+      );
+
+      const amendResBody = JSON.parse(amendRes.body);
+
+      console.log(amendResBody);
+
+      await sleep(1000);
+
+      // Get Contrib
+
+      const getTxnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {}),
+        {}
+      );
+
+      const txnResBody = JSON.parse(getTxnRes.body);
+
+      console.log(amendResBody);
+
+      expect(txnResBody.data.transaction.addressLine1).to.equal(
+        amendInput.addressLine1
+      );
+    });
+  });
+  describe("Transaction", function () {
+    it("Gets a transaction by id and committeeId", async () => {
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          createContributionQuery,
+          validUsername,
+          createContributionVariables
+        ),
+        {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      const tid = body.data.createContribution.id;
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTxnQuery(committee.id)(tid),
+          validUsername,
+          createContributionVariables
+        ),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+
+      expect(txnResBody.data.transaction.id).to.equal(tid);
+    });
+    it("Gets a 404 on bad committeeId", async () => {
+      const tid = genTxnId();
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTxnQuery(committee.id)(tid),
+          validUsername,
+          createContributionVariables
+        ),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+      expect(txnResBody.data.transaction).to.equal(null);
+    });
+  });
   // describe("Reconcile Disbursement", function () {
   //   it("Reconciles a disbursement by transaction id and a list of transaction ids", async () => {
   //     const createRes: any = await lambdaPromise(
@@ -522,7 +689,7 @@ describe("Committee GraphQL Lambda", function () {
   //
   //     // expect(body.data.transaction.id).to.equal(tid);
   //   });
-  // });
+  });
 
   after(async () => {
     await deleteCommittee(committeesTableName)(dynamoDB)(committee);

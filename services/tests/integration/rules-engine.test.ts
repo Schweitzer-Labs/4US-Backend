@@ -9,8 +9,8 @@ import { runRulesEngine } from "../../src/pipes/rules-engine.pipe";
 import { IInstantIdConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
 import { Env } from "../../src/utils/enums/env.enum";
 import { task, taskEither } from "fp-ts";
-import { genCreateContributionInput } from "../utils/gen-contribution.util";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
+import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
 
 dotenv.config();
 
@@ -49,11 +49,7 @@ describe("Rules engine", function () {
   });
 
   it("Disallows a contribution in excess of a committee's limit", async () => {
-    const contrib = genCreateContributionInput(
-      committee.id,
-      750001,
-      EntityType.Ind
-    );
+    const contrib = genCreateContribInput(committee.id, 750001, EntityType.Ind);
 
     const res = await pipe(
       runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
@@ -73,11 +69,7 @@ describe("Rules engine", function () {
   it("Allows a contribution within committee's limit", async () => {
     await putCommittee(comsTable)(dynamoDB)(committee);
 
-    const contrib = genCreateContributionInput(
-      committee.id,
-      750000,
-      EntityType.Ind
-    );
+    const contrib = genCreateContribInput(committee.id, 750000, EntityType.Ind);
 
     const res = await pipe(
       runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
