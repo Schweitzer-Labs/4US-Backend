@@ -210,6 +210,10 @@ export class AppResolver {
       currentUser
     );
 
+    if (d.paymentMethod === PaymentMethod.Check && !d.checkNumber)
+      throw new ValidationError(
+        "Check number must be provided for check disbursements"
+      );
     const txn = createDisbursementInputToTransaction(currentUser)(d);
 
     return await putTransaction(txnsTableName)(dynamoDB)(txn);
