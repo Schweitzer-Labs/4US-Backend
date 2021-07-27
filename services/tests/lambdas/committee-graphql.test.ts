@@ -686,7 +686,6 @@ describe("Committee GraphQL Lambda", function () {
       );
 
       const body = JSON.parse(createRes.body);
-
       const tid = body.data.createContribution.id;
 
       // Amend Disb
