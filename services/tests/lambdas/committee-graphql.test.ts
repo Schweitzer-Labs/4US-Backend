@@ -258,14 +258,14 @@ const amendContribMut = `
   mutation(
       $committeeId: String!
       $transactionId: String!
-      $amount: Float!
-      $paymentMethod: PaymentMethod!
-      $firstName: String!
-      $lastName: String!
-      $addressLine1: String!
-      $city: String!
-      $state: String!
-      $postalCode: String!
+      $amount: Float
+      $paymentMethod: PaymentMethod
+      $firstName: String
+      $lastName: String
+      $addressLine1: String
+      $city: String
+      $state: String
+      $postalCode: String
       $entityType: EntityType
       $emailAddress: String
       $paymentDate: Float
@@ -689,7 +689,6 @@ describe("Committee GraphQL Lambda", function () {
       const tid = body.data.createContribution.id;
 
       // Amend Disb
-      await sleep(1000);
 
       const amendInput = genAmendContribInput({
         committeeId: committee.id,
@@ -704,8 +703,6 @@ describe("Committee GraphQL Lambda", function () {
       );
 
       const amendResBody = JSON.parse(amendRes.body);
-
-      console.log(amendResBody);
 
       await sleep(1000);
 

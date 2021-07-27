@@ -10,7 +10,11 @@ export const validateContribOrThrow = (
   const { paymentMethod, entityType, entityName, paymentDate, checkNumber } =
     input;
 
-  if (![EntityType.Ind, EntityType.Fam].includes(entityType) && !entityName) {
+  if (
+    entityType &&
+    ![EntityType.Ind, EntityType.Fam].includes(entityType) &&
+    !entityName
+  ) {
     throw new ValidationError(
       "Entity name must be provided for non-individual and non-family contributions"
     );
