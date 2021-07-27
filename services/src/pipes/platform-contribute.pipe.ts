@@ -12,7 +12,6 @@ import { CreateContributionInput } from "../input-types/create-contribution.inpu
 import { ApplicationError } from "../utils/application-error";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
-import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { taskEither as te } from "fp-ts";
 import { getCommitteeById } from "../queries/get-committee-by-id.query";
@@ -20,6 +19,7 @@ import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 
 const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
 const stringReq = (min = 1, max = 200) =>
@@ -128,7 +128,7 @@ export const platformContribute =
   (rulesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (stripe: Stripe) =>
-  (instantIdConfig: IInstantIdConfig) =>
+  (lnConfig: ILexisNexisConfig) =>
   (event: any): TaskEither<ApplicationError, ITransaction> => {
     console.log("Platform contribute pipe initiated", JSON.stringify(event));
     return pipe(
@@ -143,7 +143,7 @@ export const platformContribute =
             pipe(
               runRulesAndProcess(billableEventsTableName)(donorsTableName)(
                 txnsTableName
-              )(rulesTableName)(dynamoDB)(stripe)(instantIdConfig)(ANONYMOUS)(
+              )(rulesTableName)(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(
                 committee
               )(contrib)
             )

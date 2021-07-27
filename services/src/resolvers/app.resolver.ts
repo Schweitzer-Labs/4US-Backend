@@ -13,14 +13,16 @@ import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "../input-types/create-contribution.input-type";
-import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
 import { Stripe } from "stripe";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
-import { createDisbursementInputToTransaction } from "../utils/model/create-disbursement-input-to-transaction.utils";
-import { putTransaction } from "../utils/model/put-transaction.utils";
+import { createDisbInputToTxn } from "../utils/model/create-disbursement-input-to-transaction.utils";
+import {
+  putTransaction,
+  putTransactionAndDecode,
+} from "../utils/model/put-transaction.utils";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
@@ -33,6 +35,8 @@ import { AmendContributionInput } from "../input-types/amend-contrib.input-type"
 import { amendContrib } from "../pipes/amend-contrib.pipe";
 import { validateContribOrThrow } from "../utils/validate-contrib-or-throw.util";
 import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
+import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
 
 dotenv.config();
 
@@ -156,7 +160,7 @@ export class AppResolver {
         apiVersion: "2020-08-27",
       });
     }
-    const instantIdConfig: IInstantIdConfig = {
+    const lnConfig: ILexisNexisConfig = {
       username: this.lnUsername,
       password: this.lnPassword,
     };
@@ -189,7 +193,7 @@ export class AppResolver {
 
     const res = await runRulesAndProcess(billableEventsTableName)(
       donorsTableName
-    )(txnsTableName)(rulesTableName)(dynamoDB)(this.stripe)(instantIdConfig)(
+    )(txnsTableName)(rulesTableName)(dynamoDB)(this.stripe)(lnConfig)(
       currentUser
     )(committee)(createContributionInput)();
 
@@ -205,18 +209,34 @@ export class AppResolver {
     @Arg("createDisbursementData")
     d: CreateDisbursementInput,
     @CurrentUser() currentUser: string
-  ) {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(d.committeeId)(
-      currentUser
-    );
+  ): Promise<Transaction> {
+    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      d.committeeId
+    )(currentUser);
+
+    if (!this.lnUsername || !this.lnPassword) {
+      this.lnUsername = await getLNUsername(runenv);
+      this.lnPassword = await getLNPassword(runenv);
+    }
+    const lnConfig: ILexisNexisConfig = {
+      username: this.lnUsername,
+      password: this.lnPassword,
+    };
 
     if (d.paymentMethod === PaymentMethod.Check && !d.checkNumber)
       throw new ValidationError(
         "Check number must be provided for check disbursements"
       );
-    const txn = createDisbursementInputToTransaction(currentUser)(d);
 
-    return await putTransaction(txnsTableName)(dynamoDB)(txn);
+    const res = await verifyAndCreateDisb(currentUser)(txnsTableName)(
+      billableEventsTableName
+    )(dynamoDB)(lnConfig)(committee)(d)();
+
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      return res.right;
+    }
   }
 
   @Mutation((returns) => Transaction)

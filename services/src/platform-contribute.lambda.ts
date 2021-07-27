@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import { getLNPassword, getLNUsername, getStripeApiKey } from "./utils/config";
 import { Stripe } from "stripe";
-import { IInstantIdConfig } from "./clients/lexis-nexis/lexis-nexis.client";
 import * as dotenv from "dotenv";
 import { platformContribute } from "./pipes/platform-contribute.pipe";
 import * as AWS from "aws-sdk";
@@ -11,6 +10,7 @@ import { task, taskEither } from "fp-ts";
 import { successResponse } from "./utils/success-response";
 import { errorResponse } from "./utils/error-response.utils";
 import { StatusCodes } from "http-status-codes";
+import { ILexisNexisConfig } from "./clients/lexis-nexis/lexis-nexis.client";
 
 dotenv.config();
 
@@ -43,7 +43,7 @@ export default async (event: any) => {
     });
     console.log("Configuration values have been set");
   }
-  const instantIdConfig: IInstantIdConfig = {
+  const instantIdConfig: ILexisNexisConfig = {
     username: lnUsername,
     password: lnPassword,
   };

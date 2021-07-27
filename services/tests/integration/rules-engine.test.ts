@@ -6,11 +6,10 @@ import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { pipe } from "fp-ts/function";
 import { runRulesEngine } from "../../src/pipes/rules-engine.pipe";
-import { IInstantIdConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
-import { Env } from "../../src/utils/enums/env.enum";
 import { task, taskEither } from "fp-ts";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
+import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
 
 dotenv.config();
 
@@ -22,7 +21,7 @@ const comsTable = process.env.COMMITTEES_DDB_TABLE_NAME;
 const lnUsername = process.env.LN_USERNAME;
 const lnPassword = process.env.LN_PASSWORD;
 
-const instantIdConfig: IInstantIdConfig = {
+const instantIdConfig: ILexisNexisConfig = {
   username: lnUsername,
   password: lnPassword,
 };

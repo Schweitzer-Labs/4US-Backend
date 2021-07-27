@@ -63,6 +63,9 @@ const TransactionOptional = t.partial({
   finicityPostedDate: t.number,
   employmentStatus: t.string,
   donorVerificationScore: t.number,
+  businessIdVerificationScore: t.unknown,
+  businessIdRequestTimestamp: t.number,
+  businessIdRawResponse: t.unknown,
 });
 
 export const Transaction = t.intersection([
