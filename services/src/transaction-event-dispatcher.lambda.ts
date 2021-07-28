@@ -39,16 +39,25 @@ export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
     switch (stream.eventName) {
       case DdbEventName.INSERT:
         console.log("INSERT event emitted");
-        return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
-          streamRecordToTxn(record.NewImage)
-        );
+        const insertRes = await handleInsert(sqsUrl)(committeesTableName)(
+          dynamoDB
+        )(streamRecordToTxn(record.NewImage));
+        console.log(insertRes);
+        return insertRes;
       case DdbEventName.MODIFY:
         const newImageTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
         const oldImageTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
         const newTxn = streamRecordToTxn(newImageTxn);
         const oldTxn = streamRecordToTxn(oldImageTxn);
 
-        return await handleModify(auditLogsTableName)(dynamoDB)(oldTxn)(newTxn);
+        console.log("modified event called");
+        console.log("new txn", JSON.stringify(newTxn));
+        console.log("modified event called", JSON.stringify(oldTxn));
+        const modifyRes = await handleModify(auditLogsTableName)(dynamoDB)(
+          oldTxn
+        )(newTxn);
+        console.log(modifyRes);
+        return modifyRes;
       default:
         return;
     }
