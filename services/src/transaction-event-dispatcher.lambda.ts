@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
 import { DynamoDBStreamEvent } from "aws-lambda";
-import { SendMessageRequest } from "aws-sdk/clients/sqs";
+
 import {
   ITransaction,
   Transaction,
@@ -9,16 +9,11 @@ import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "./utils/application-error";
 import { Source } from "./utils/enums/source.enum";
 import { DynamoDB } from "aws-sdk";
-import {
-  getCommitteeById,
-  ICommittee,
-} from "./queries/get-committee-by-id.query";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import { PathReporter } from "io-ts/PathReporter";
-import { TaskEither } from "fp-ts/TaskEither";
 import * as dotenv from "dotenv";
-import { TransactionType } from "./utils/enums/transaction-type.enum";
+import { sendContribSuccessMsgs } from "./pipes/send-contrib-success-msgs.pipe";
 
 dotenv.config();
 
@@ -30,10 +25,7 @@ const dynamoDB = new DynamoDB();
 const sqsUrl: any = process.env.SQSQUEUE;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 
-export default async (
-  event: DynamoDBStreamEvent,
-  context
-): Promise<EffectMetadata> => {
+export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
   console.log(JSON.stringify(event));
   console.log("initiating ddb update loop");
 
@@ -46,6 +38,10 @@ export default async (
           parseStreamRecord(record)
         );
       case "MODIFY":
+        const newImage = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
+        const oldImage = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
+        console.log("modify event data new image:", JSON.stringify(newImage));
+        console.log("modify event data old image:", JSON.stringify(oldImage));
         console.log("MODIFY event emitted");
         return;
       default:
@@ -110,10 +106,9 @@ const handleInsert =
     if (txn.source === Source.DONATE_FORM) {
       console.log("donate form transaction recognized");
       console.log("initiating pipe");
-      return await pipe(
-        getCommitteeById(committeesTableName)(dynamoDB)(txn.committeeId),
-        taskEither.map(formatMessage(sqsUrl)(txn)),
-        taskEither.chain(sendMessage),
+
+      return pipe(
+        sendContribSuccessMsgs(committeesTableName)(dynamoDB)(sqsUrl)(sqs)(txn),
         taskEither.fold(
           () => task.of(failedSend),
           () => task.of(successfulSend)
@@ -121,45 +116,3 @@ const handleInsert =
       )();
     }
   };
-
-const formatMessage =
-  (sqsUrl: string) =>
-  (txn: ITransaction) =>
-  (committee: ICommittee): SendMessageRequest => {
-    console.log(
-      "formatMessage called",
-      sqsUrl,
-      JSON.stringify(txn),
-      JSON.stringify(committee)
-    );
-    const { tzDatabaseName, emailAddresses, committeeName } = committee;
-    return {
-      MessageAttributes: {
-        committeeEmailAddress: {
-          DataType: "String",
-          StringValue: emailAddresses,
-        },
-        committeeTzDatabaseName: {
-          DataType: "String",
-          StringValue: tzDatabaseName,
-        },
-        committeeName: {
-          DataType: "String",
-          StringValue: committeeName,
-        },
-      },
-      MessageBody: JSON.stringify(txn),
-      MessageDeduplicationId: txn.id,
-      MessageGroupId: txn.committeeId,
-      QueueUrl: sqsUrl,
-    };
-  };
-const sendMessage = (
-  message: SendMessageRequest
-): TaskEither<ApplicationError, any> => {
-  console.log("messa");
-  return taskEither.tryCatch(
-    () => sqs.sendMessage(message).promise(),
-    (e) => new ApplicationError("SQS send failed", e)
-  );
-};
