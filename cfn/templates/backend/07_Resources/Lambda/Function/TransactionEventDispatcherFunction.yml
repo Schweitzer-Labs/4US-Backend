@@ -8,7 +8,7 @@ TransactionEventDispatcherFunction:
       - !Ref ServicesLayer
     Handler: app.transactionEventDispatcherHandler
     Runtime: nodejs12.x
-    Role: !GetAtt LambdaDonationReceiverRole.Arn
+    Role: !GetAtt LambdaGraphQLRole.Arn
     Events:
       TransactionRecorded:
         Type: DynamoDB
@@ -29,6 +29,9 @@ TransactionEventDispatcherFunction:
           !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+        AUDIT_LOGS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableName
+
 
 TxnDispatcherInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig

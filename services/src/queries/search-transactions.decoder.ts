@@ -1,6 +1,12 @@
 import * as t from "io-ts";
 import { FinicityTransaction } from "../clients/finicity/finicity.decoders";
 
+export enum SchemaVersion {
+  V1 = "v1",
+}
+
+export const currentVersion = SchemaVersion.V1;
+
 const TransactionRequired = t.type({
   id: t.string,
   committeeId: t.string,
