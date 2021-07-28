@@ -704,8 +704,6 @@ describe("Committee GraphQL Lambda", function () {
 
       const amendResBody = JSON.parse(amendRes.body);
 
-      await sleep(1000);
-
       // Get Contrib
 
       const getTxnRes: any = await lambdaPromise(
