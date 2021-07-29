@@ -7,6 +7,9 @@ LambdaDonationReceiverRole:
       - !Ref LambdaSNSWriterPolicy
       - !Ref LambdaSQSPolicy
       - !Ref DynamoDBStreamReaderPolicy
+      - !Ref DynamoDBReadCommitteesPolicy
+      - !Ref DynamoDBReadTransactionsPolicy
+      - !Ref DynamoDBAuditLogsPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:
