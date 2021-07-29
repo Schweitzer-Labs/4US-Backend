@@ -3,7 +3,6 @@ import { Arg, Args, Mutation, Query, Resolver } from "type-graphql";
 import { Committee } from "../types/committee.type";
 import { Transaction } from "../types/transaction.type";
 import { Aggregations } from "../types/aggregations.type";
-import { Service } from "typedi";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
@@ -58,7 +57,6 @@ const dynamoDB = new DynamoDB({
   },
 });
 
-@Service()
 @Resolver()
 export class AppResolver {
   private stripeApiKey: string;
