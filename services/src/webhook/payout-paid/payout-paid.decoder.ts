@@ -4,7 +4,6 @@ import { ApplicationError } from "../../utils/application-error";
 import { pipe } from "fp-ts/function";
 import { taskEither, taskEither as te } from "fp-ts";
 import { decodeError } from "../../utils/decode-error.util";
-import csvToJson from "csvtojson";
 
 export const ReportRunEvent = t.type({
   type: t.string,

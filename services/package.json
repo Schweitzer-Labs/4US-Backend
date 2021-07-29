@@ -7,6 +7,7 @@
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
+    "@types/jsonexport": "^3.0.2",
     "apollo-server": "^2.25.0",
     "apollo-server-lambda": "^2.25.0",
     "axios": "^0.21.1",
@@ -20,11 +21,11 @@
     "http-status-codes": "^2.1.4",
     "io-ts": "^2.2.16",
     "joi": "^17.4.0",
+    "jsonexport": "^3.2.0",
     "node-fetch": "^2.6.1",
     "reflect-metadata": "^0.1.13",
     "stripe": "^8.151.0",
     "type-graphql": "^1.1.1",
-    "typedi": "^0.10.0",
     "ua-parser-js": "^0.7.28"
   },
   "scripts": {
