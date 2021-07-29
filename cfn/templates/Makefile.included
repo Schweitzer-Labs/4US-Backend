@@ -80,10 +80,12 @@ import: $(IMPORTED_RESOURCES)
 		--stack-name=$(STACK) \
 		--region=$(REGION)
 
-package:
+package: $(PACKAGE)
+
+$(PACKAGE): $(SAM_TEMPLATE)
 	@aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
-		--template-file $(SAM_BUILD_DIR)/template.yaml \
+		--template-file $(SAM_TEMPLATE) \
 		--region $(REGION) \
 		--s3-bucket $(CFN_BUCKET) \
 		--s3-prefix $(STACK) \
