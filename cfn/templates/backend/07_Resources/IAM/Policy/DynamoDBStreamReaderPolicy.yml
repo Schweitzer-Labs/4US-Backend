@@ -4,15 +4,11 @@ DynamoDBStreamReaderPolicy:
     PolicyDocument:
       Version: 2012-10-17
       Statement:
-          Effect: Allow
+        - Effect: Allow
           Resource:
-            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsStream
-            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
-            - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
+            - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/stream/*
           Action:
             - dynamodb:GetRecords
             - dynamodb:GetShardIterator
             - dynamodb:DescribeStream
-            - dynamodb:ListShards
             - dynamodb:ListStreams
-            - dynamodb:GetItem

@@ -1,4 +1,4 @@
-DynamoDBGraphQLPolicy:
+DynamoDBAuditLogsPolicy:
   Type: AWS::IAM::ManagedPolicy
   DependsOn: DynamoDBsTemplate
   Properties:
@@ -7,13 +7,7 @@ DynamoDBGraphQLPolicy:
       Statement:
         - Effect: Allow
           Resource:
-            - !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableArn
-            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
-            - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
-            - !GetAtt DynamoDBsTemplate.Outputs.DonorsTableArn
-            - !GetAtt DynamoDBsTemplate.Outputs.RulesTableArn
-            - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByCommitteeDonorIndex
           Action:
             - dynamodb:Scan
             - dynamodb:Query
@@ -22,3 +16,4 @@ DynamoDBGraphQLPolicy:
             - dynamodb:DeleteItem
             - dynamodb:UpdateItem
             - dynamodb:PartiQLSelect
+
