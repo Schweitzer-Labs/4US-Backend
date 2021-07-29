@@ -18,11 +18,7 @@ import { Stripe } from "stripe";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
-import { createDisbInputToTxn } from "../utils/model/create-disbursement-input-to-transaction.utils";
-import {
-  putTransaction,
-  putTransactionAndDecode,
-} from "../utils/model/put-transaction.utils";
+import * as jsonexport from "jsonexport";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
@@ -37,6 +33,7 @@ import { validateContribOrThrow } from "../utils/validate-contrib-or-throw.util"
 import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
+import { Report } from "../types/report.type";
 
 dotenv.config();
 
@@ -81,6 +78,30 @@ export class AppResolver {
     console.log("committee response", res);
 
     return res;
+  }
+
+  @Query((returns) => Report)
+  async report(
+    @Arg("committeeId") committeeId: string,
+    @CurrentUser() currentUser: string
+  ) {
+    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
+      currentUser
+    );
+
+    const res = await searchTransactions(txnsTableName)(dynamoDB)({
+      committeeId,
+    })();
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      const txns = res.right;
+
+      const csvData = await jsonexport.default(txns);
+      return {
+        csvData,
+      };
+    }
   }
 
   @Query((returns) => [Transaction])
