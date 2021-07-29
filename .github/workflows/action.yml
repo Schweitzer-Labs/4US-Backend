@@ -65,7 +65,7 @@ jobs:
         id: generate-and-upload-cloudformation-package-template
         run: |
           make RUNENV=${{ env.RUNENV }} package
-      - name: Deploy Backend
+      - name: Deploy Cloudformation template
         id: generate-and-upload-cloudformation-package-template
         run: |
           make RUNENV=${{ env.RUNENV }} deploy
