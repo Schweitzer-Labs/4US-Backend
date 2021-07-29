@@ -1,6 +1,106 @@
 import * as jsonexport from "jsonexport";
 import { ITransaction } from "../queries/search-transactions.decoder";
 
+export const generateDisclosure = async (
+  transactions: ITransaction[]
+): Promise<string> => {
+  const disclosures: DisclosureRecord[] = transactions.map(
+    ({
+      entityType: contributorType,
+      id: transactionId,
+      firstName,
+      lastName,
+      addressLine1,
+      city,
+      state,
+      postalCode,
+      paymentMethod,
+      amount,
+      companyName,
+      entityName,
+    }) => {
+      return {
+        // @Todo implement
+        ["FILER_ID"]: 123,
+        // @Todo implement
+        ["FILING_PERIOD_ID"]: 123,
+        // @Todo implement
+        ["FILING_CAT_ID"]: 1,
+        // @Todo implement
+        ["ELECT_ID"]: 9,
+        ["RESIG_TERM_TYPE_ID"]: "NULL",
+        // @Todo implement
+        ["R_FILING_DATE"]: "3-18-2021",
+        ["FILING_SCHED_ID"]: 1,
+        // getFilingScheduleIdByContributorType(contributorType),
+        ["LOAN_LIB_NUMBER"]: "NULL",
+        ["TRANS_NUMBER"]: transactionId,
+        ["TRANS_MAPPING"]: "NULL",
+        // @Todo implement
+        ["SCHED_DATE"]: "3-18-2021",
+        ["ORG_DATE"]: "NULL",
+        ["CNTRBR_TYPE_ID"]: 3,
+        // getContributorTypeIdByContributorType(contributorType),
+        ["CNTRBN_TYPE_ID"]: "NULL",
+        ["TRANSFER_TYPE_ID"]: "NULL",
+        ["RECEIPT_TYPE_ID"]: "NULL",
+        ["RECEIPT_CODE_ID"]: "NULL",
+        ["PURPOSE_CODE_ID"]: "NULL",
+        ["Is Expenditure Subcontracted?"]: "NULL",
+        ["Is Expenditure a Partial Payment?"]: "NULL",
+        ["Is this existing Liability?"]: "NULL",
+        ["Is Liability a Partial Forgiven?"]: "NULL",
+        ["FLNG_ENT_NAME"]: `${firstName} ${lastName}`,
+
+        //   getEntityName(
+        //   contributorType,
+        //   firstName,
+        //   lastName,
+        //   companyName
+        // ),
+        ["FLNG_ENT_FIRST_NAME"]: firstName, // isPerson(contributorType) ? firstName : "NULL",
+        ["FLNG_ENT_MIDDLE_NAME"]: "NULL",
+        ["FLNG_ENT_LAST_NAME"]: lastName, // isPerson(contributorType) ? lastName : "NULL",
+        ["FLNG_ENT_ADD1"]: addressLine1,
+        ["FLNG_ENT_CITY"]: city,
+        ["FLNG_ENT_STATE"]: state,
+        ["FLNG_ENT_ZIP"]: postalCode,
+        ["FLNG_ENT_COUNTRY"]: "US",
+        ["PAYMENT_TYPE_ID"]: 1, //getPaymentTypeIdFromPaymentMethod(paymentMethod),
+        ["PAY_NUMBER"]: "NULL",
+        ["OWED_AMT"]: "NULL",
+        ["ORG_AMT"]: centsToDollars(amount),
+        ["TRANS_EXPLNTN"]: "NULL",
+        ["LOAN_OTHER_ID"]: "NULL",
+        ["R_ITEMIZED"]: "R_ITEMIZED",
+        ["R_LIABILITY"]: "NULL",
+        ["ELECTION_DATE"]: "NULL",
+        ["ELECTION_TYPE"]: "NULL",
+        ["ELECTION_YEAR"]: "NULL",
+        ["TREAS_ID"]: "NULL",
+        ["TREAS_OCCUPATION"]: "NULL",
+        ["TREAS_EMPLOYER"]: "NULL",
+        ["TREAS_ADD1"]: "NULL",
+        ["TREAS_CITY"]: "NULL",
+        ["TREAS_STATE"]: "NULL",
+        ["TREAS_ZIP"]: "NULL",
+        ["PART_FLNG_ENT_ID"]: "NULL",
+        ["OFFICE_ID"]: "NULL",
+        ["DISTRICT"]: "NULL",
+        ["DIST_OFF_CAND_BAL_PROP"]: "NULL",
+        ["IE_CNTRBR_OCC"]: "NULL",
+        ["IE_CNTRBR_EMP"]: "NULL",
+        ["IE_DESC"]: "NULL",
+        ["R_IE_SUPPORTED"]: "NULL",
+        ["R_IE_INCLUDED"]: "NULL",
+        ["R_PARENT"]: "NULL",
+      };
+    }
+  );
+
+  return await jsonexport.default(disclosures);
+};
+
 export enum AggregateDuration {
   AGGREGATE_LIMIT = "aggregate_limit",
   CALENDAR_YEAR = "calendar_year",
@@ -109,106 +209,6 @@ export const NYSContributorTypeFields = new Map<string, Field[]>([
   [ContributorType.PLC, scheduleBandCFields],
   [ContributorType.OTH, scheduleBandCFields],
 ]);
-
-export const generateDisclosure = async (
-  transactions: ITransaction[]
-): Promise<string> => {
-  const disclosures: DisclosureRecord[] = transactions.map(
-    ({
-      entityType: contributorType,
-      id: transactionId,
-      firstName,
-      lastName,
-      addressLine1,
-      city,
-      state,
-      postalCode,
-      paymentMethod,
-      amount,
-      companyName,
-      entityName,
-    }) => {
-      return {
-        // @Todo implement
-        ["FILER_ID"]: 123,
-        // @Todo implement
-        ["FILING_PERIOD_ID"]: 123,
-        // @Todo implement
-        ["FILING_CAT_ID"]: 1,
-        // @Todo implement
-        ["ELECT_ID"]: 9,
-        ["RESIG_TERM_TYPE_ID"]: "NULL",
-        // @Todo implement
-        ["R_FILING_DATE"]: "3-18-2021",
-        ["FILING_SCHED_ID"]: 1,
-        // getFilingScheduleIdByContributorType(contributorType),
-        ["LOAN_LIB_NUMBER"]: "NULL",
-        ["TRANS_NUMBER"]: transactionId,
-        ["TRANS_MAPPING"]: "NULL",
-        // @Todo implement
-        ["SCHED_DATE"]: "3-18-2021",
-        ["ORG_DATE"]: "NULL",
-        ["CNTRBR_TYPE_ID"]: 3,
-        // getContributorTypeIdByContributorType(contributorType),
-        ["CNTRBN_TYPE_ID"]: "NULL",
-        ["TRANSFER_TYPE_ID"]: "NULL",
-        ["RECEIPT_TYPE_ID"]: "NULL",
-        ["RECEIPT_CODE_ID"]: "NULL",
-        ["PURPOSE_CODE_ID"]: "NULL",
-        ["Is Expenditure Subcontracted?"]: "NULL",
-        ["Is Expenditure a Partial Payment?"]: "NULL",
-        ["Is this existing Liability?"]: "NULL",
-        ["Is Liability a Partial Forgiven?"]: "NULL",
-        ["FLNG_ENT_NAME"]: `${firstName} ${lastName}`,
-
-        //   getEntityName(
-        //   contributorType,
-        //   firstName,
-        //   lastName,
-        //   companyName
-        // ),
-        ["FLNG_ENT_FIRST_NAME"]: firstName, // isPerson(contributorType) ? firstName : "NULL",
-        ["FLNG_ENT_MIDDLE_NAME"]: "NULL",
-        ["FLNG_ENT_LAST_NAME"]: lastName, // isPerson(contributorType) ? lastName : "NULL",
-        ["FLNG_ENT_ADD1"]: addressLine1,
-        ["FLNG_ENT_CITY"]: city,
-        ["FLNG_ENT_STATE"]: state,
-        ["FLNG_ENT_ZIP"]: postalCode,
-        ["FLNG_ENT_COUNTRY"]: "US",
-        ["PAYMENT_TYPE_ID"]: 1, //getPaymentTypeIdFromPaymentMethod(paymentMethod),
-        ["PAY_NUMBER"]: "NULL",
-        ["OWED_AMT"]: "NULL",
-        ["ORG_AMT"]: centsToDollars(amount),
-        ["TRANS_EXPLNTN"]: "NULL",
-        ["LOAN_OTHER_ID"]: "NULL",
-        ["R_ITEMIZED"]: "R_ITEMIZED",
-        ["R_LIABILITY"]: "NULL",
-        ["ELECTION_DATE"]: "NULL",
-        ["ELECTION_TYPE"]: "NULL",
-        ["ELECTION_YEAR"]: "NULL",
-        ["TREAS_ID"]: "NULL",
-        ["TREAS_OCCUPATION"]: "NULL",
-        ["TREAS_EMPLOYER"]: "NULL",
-        ["TREAS_ADD1"]: "NULL",
-        ["TREAS_CITY"]: "NULL",
-        ["TREAS_STATE"]: "NULL",
-        ["TREAS_ZIP"]: "NULL",
-        ["PART_FLNG_ENT_ID"]: "NULL",
-        ["OFFICE_ID"]: "NULL",
-        ["DISTRICT"]: "NULL",
-        ["DIST_OFF_CAND_BAL_PROP"]: "NULL",
-        ["IE_CNTRBR_OCC"]: "NULL",
-        ["IE_CNTRBR_EMP"]: "NULL",
-        ["IE_DESC"]: "NULL",
-        ["R_IE_SUPPORTED"]: "NULL",
-        ["R_IE_INCLUDED"]: "NULL",
-        ["R_PARENT"]: "NULL",
-      };
-    }
-  );
-
-  return await jsonexport.default(disclosures);
-};
 
 const isPerson = (contributorType: ContributorType) =>
   [ContributorType.IND, ContributorType.FAM].includes(contributorType);

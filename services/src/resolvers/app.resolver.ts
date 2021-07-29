@@ -17,7 +17,6 @@ import { Stripe } from "stripe";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
-import * as jsonexport from "jsonexport";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
@@ -268,9 +267,9 @@ export class AppResolver {
       currentUser
     );
 
-    const res = await amendDisb(txnsTableName)(dynamoDB)(d.committeeId)(
-      d.transactionId
-    )(d)();
+    const res = await amendDisb(txnsTableName)(dynamoDB)(currentUser)(
+      d.committeeId
+    )(d.transactionId)(d)();
 
     if (isLeft(res)) {
       throw res.left;
@@ -290,9 +289,9 @@ export class AppResolver {
 
     validateContribOrThrow(c);
 
-    const res = await amendContrib(txnsTableName)(dynamoDB)(c.committeeId)(
-      c.transactionId
-    )(c)();
+    const res = await amendContrib(txnsTableName)(dynamoDB)(currentUser)(
+      c.committeeId
+    )(c.transactionId)(c)();
 
     if (isLeft(res)) {
       throw res.left;
