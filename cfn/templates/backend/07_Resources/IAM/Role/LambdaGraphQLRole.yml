@@ -4,6 +4,7 @@ LambdaGraphQLRole:
     ManagedPolicyArns:
       - !Ref LambdaBasicPolicy
       - !Ref DynamoDBGraphQLPolicy
+      - !Ref DynamoDBAuditLogsPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:
