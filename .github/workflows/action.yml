@@ -19,37 +19,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: AWS IAM Role
+        id: setup-aws-access
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
       - name: Setup Python
-        id: pysetup
+        id: setup-python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
       - name: Install Python libs
-        id: pip
+        id: install-python-libs
         run: |
           pip3 install -r requirements.txt
       - name: Set environment to QA
-        id: env-qa
+        id: set-deployment-target-to-qa
         if: endsWith(github.ref, '/qa')
         run: |
           echo "RUNENV=qa" >> $GITHUB_ENV
       - name: Set environment to Production
-        id: env-prod
+        id: set-deployment-target-to-prod
         if: endsWith(github.ref, '/prod')
         run: |
           echo "RUNENV=prod" >> $GITHUB_ENV
       - name: Set environment to Demo
-        id: env-demo
+        id: set-deployment-target-to-demo
         if: endsWith(github.ref, '/demo')
         run: |
           echo "RUNENV=demo" >> $GITHUB_ENV
       - name: Assemble and Deploy CloudFormation Stacks
-        id: deploy
+        id: deploy-to-aws
         run: |
           make RUNENV=${{ env.RUNENV }} clean deploy
       - uses: act10ns/slack@v1
