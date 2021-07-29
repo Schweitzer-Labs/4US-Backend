@@ -53,12 +53,12 @@ jobs:
         id: assemble-cloudformation-stacks
         run: |
           make RUNENV=${{ env.RUNENV }} build-stacks
-      - name: Compile TypeScript source code
-        id: compile-typescript-source-code
+      - name: Transpile TypeScript source code
+        id: transpile-typescript-source-code
         run: |
           make RUNENV=${{ env.RUNENV }} compile
-      - name: Compile and assemble SAM template
-        id: compile-and-assemble-sam-template
+      - name: Compile JavaScript code and assemble SAM template
+        id: compile-javascript-and-assemble-sam-template
         run: |
           make RUNENV=${{ env.RUNENV }} build-sam
       - name: Generate CloudFormation package
