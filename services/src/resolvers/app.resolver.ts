@@ -33,6 +33,7 @@ import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
 import { Report } from "../types/report.type";
+import { generateDisclosure } from "../pipes/generate-disclosure.pipe";
 
 dotenv.config();
 
@@ -95,7 +96,7 @@ export class AppResolver {
     } else {
       const txns = res.right;
 
-      const csvData = await jsonexport.default(txns);
+      const csvData = await generateDisclosure(txns);
       return {
         csvData,
       };
