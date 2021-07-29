@@ -2,7 +2,6 @@ import * as AWS from "aws-sdk";
 import { DynamoDBStreamEvent } from "aws-lambda";
 
 import {
-  currentVersion,
   ITransaction,
   Transaction,
 } from "./queries/search-transactions.decoder";
@@ -12,12 +11,10 @@ import { Source } from "./utils/enums/source.enum";
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
-import { PathReporter } from "io-ts/PathReporter";
 import * as dotenv from "dotenv";
 import { sendContribSuccessMsgs } from "./pipes/send-contrib-success-msgs.pipe";
-import { now } from "./utils/time.utils";
-import { ITxnAuditLog } from "./queries/get-audit-logs.decoders";
-import { putTxnAuditLogAndDecode } from "./utils/model/put-txn-audit-log.utils";
+import { validateDDBResponse } from "./repositories/ddb.utils";
+import { auditTxnStream, DdbEventName } from "./pipes/audit-txn-stream.pipe";
 
 dotenv.config();
 
@@ -39,44 +36,39 @@ export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
     switch (stream.eventName) {
       case DdbEventName.INSERT:
         console.log("INSERT event emitted");
-        const insertRes = await handleInsert(sqsUrl)(committeesTableName)(
-          dynamoDB
-        )(streamRecordToTxn(record.NewImage));
-        console.log(insertRes);
-        return insertRes;
+        const insertedTxn = await streamRecordToTxn(record.NewImage);
+        return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
+          insertedTxn
+        );
       case DdbEventName.MODIFY:
-        const newImageTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
-        const oldImageTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
-        const newTxn = streamRecordToTxn(newImageTxn);
-        const oldTxn = streamRecordToTxn(oldImageTxn);
-
-        console.log("modified event called");
-        console.log("new txn", JSON.stringify(newTxn));
-        console.log("modified event called", JSON.stringify(oldTxn));
-        const modifyRes = await handleModify(auditLogsTableName)(dynamoDB)(
-          oldTxn
-        )(newTxn);
-        console.log(modifyRes);
-        return modifyRes;
+        return await pipe(
+          auditTxnStream(auditLogsTableName)(dynamoDB)(DdbEventName.MODIFY)(
+            record.OldImage
+          )(record.NewImage),
+          taskEither.fold(
+            (err) => task.of(failedAuditPut(DdbEventName.MODIFY)(err)),
+            (log) => task.of(successfulAuditPut(DdbEventName.MODIFY)(log))
+          )
+        )();
       default:
         return;
     }
   }
 };
 
-const streamRecordToTxn = (record: any): ITransaction => {
-  const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(record);
+const streamRecordToTxn = async (txnRecord: any): Promise<ITransaction> => {
+  const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(txnRecord);
   console.log(
     "Transaction record unmarshalled",
     JSON.stringify(unmarshalledTxn)
   );
-  const eitherTxn = Transaction.decode(unmarshalledTxn);
+
+  const eitherTxn = await validateDDBResponse("txn inserted")(Transaction)(
+    unmarshalledTxn
+  )();
 
   if (isLeft(eitherTxn)) {
-    throw new ApplicationError(
-      "Invalid transaction data",
-      PathReporter.report(eitherTxn)
-    );
+    throw new ApplicationError("Invalid transaction data", {});
   }
   return eitherTxn.right;
 };
@@ -84,11 +76,6 @@ const streamRecordToTxn = (record: any): ITransaction => {
 enum Effect {
   SQS_RECEIPT_MESSAGE_SENT = "sqs_receipt_message_sent",
   DDB_AUDIT_LOG_RECORDED = "ddb_audit_log_recorded",
-}
-
-enum DdbEventName {
-  MODIFY = "MODIFY",
-  INSERT = "INSERT",
 }
 
 enum Status {
@@ -120,50 +107,23 @@ const failedSend: EffectMetadata = {
 
 const successfulAuditPut =
   (ddbEventName: DdbEventName) =>
-  (auditLog: ITxnAuditLog): EffectMetadata => ({
+  (res: any): EffectMetadata => ({
     status: Status.SUCCESS,
     ddbEventName: ddbEventName,
     message: "ddb audit log recorded succeeded",
     effect: Effect.DDB_AUDIT_LOG_RECORDED,
-    metadata: JSON.stringify(auditLog),
+    metadata: JSON.stringify(res),
   });
 
 const failedAuditPut =
   (ddbEventName: DdbEventName) =>
-  (auditLog: ITxnAuditLog): EffectMetadata => ({
+  (res: any): EffectMetadata => ({
     status: Status.FAILURE,
     ddbEventName: ddbEventName,
     message: "ddb audit log recorded failed",
     effect: Effect.DDB_AUDIT_LOG_RECORDED,
-    metadata: JSON.stringify(auditLog),
+    metadata: JSON.stringify(res),
   });
-
-const handleModify =
-  (txnAuditLogs: string) =>
-  (ddb: DynamoDB) =>
-  (oldTransaction: ITransaction) =>
-  (newTransaction: ITransaction): Promise<EffectMetadata> => {
-    const ddbEvent = DdbEventName.MODIFY;
-
-    const auditLog: ITxnAuditLog = {
-      committeeId: newTransaction.committeeId,
-      id: newTransaction.id,
-      newTransaction,
-      oldTransaction,
-      version: currentVersion,
-      type: "Transaction",
-      ddbEvent: ddbEvent,
-      timestamp: now(),
-    };
-
-    return pipe(
-      putTxnAuditLogAndDecode(txnAuditLogs)(ddb)(auditLog),
-      taskEither.fold(
-        () => task.of(successfulAuditPut(ddbEvent)(auditLog)),
-        () => task.of(failedAuditPut(ddbEvent)(auditLog))
-      )
-    )();
-  };
 
 const handleInsert =
   (sqsUrl: string) =>
