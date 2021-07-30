@@ -1,12 +1,17 @@
 import * as jsonexport from "jsonexport";
 import { ITransaction } from "../queries/search-transactions.decoder";
+import { EntityType } from "../utils/enums/entity-type.enum";
+import { PurposeCode } from "../utils/enums/purpose-code.enum";
+import { TransactionType } from "../utils/enums/transaction-type.enum";
+import { isBool } from "../utils/is-bool.utils";
+import { PaymentMethod } from "../utils/enums/payment-method.enum";
 
 export const generateDisclosure = async (
   transactions: ITransaction[]
 ): Promise<string> => {
   const disclosures: DisclosureRecord[] = transactions.map(
     ({
-      entityType: contributorType,
+      entityType: entityTypeStr,
       id: transactionId,
       firstName,
       lastName,
@@ -14,59 +19,74 @@ export const generateDisclosure = async (
       city,
       state,
       postalCode,
-      paymentMethod,
+      paymentMethod: paymentMethodStr,
       amount,
-      companyName,
       entityName,
+      transactionType,
+      purposeCode: purposeCodeString,
+      isSubcontracted,
+      isPartialPayment,
+      isExistingLiability,
     }) => {
+      const entityType: any = entityTypeStr;
+      const paymentMethod: any = paymentMethodStr;
+      const purposeCode: any = purposeCodeString;
       return {
         // @Todo implement
-        ["FILER_ID"]: 123,
+        ["FILER_ID"]: 0,
         // @Todo implement
-        ["FILING_PERIOD_ID"]: 123,
+        ["FILING_PERIOD_ID"]: 0,
         // @Todo implement
-        ["FILING_CAT_ID"]: 1,
+        ["FILING_CAT_ID"]: 0,
         // @Todo implement
-        ["ELECT_ID"]: 9,
+        ["ELECT_ID"]: 139,
         ["RESIG_TERM_TYPE_ID"]: "NULL",
         // @Todo implement
-        ["R_FILING_DATE"]: "3-18-2021",
-        ["FILING_SCHED_ID"]: 1,
-        // getFilingScheduleIdByContributorType(contributorType),
+        ["R_FILING_DATE"]: "9-1-2021",
+        ["FILING_SCHED_ID"]: getFilingScheduleIdByEntityType(entityType),
         ["LOAN_LIB_NUMBER"]: "NULL",
         ["TRANS_NUMBER"]: transactionId,
         ["TRANS_MAPPING"]: "NULL",
         // @Todo implement
-        ["SCHED_DATE"]: "3-18-2021",
+        ["SCHED_DATE"]: "9-1-2021",
         ["ORG_DATE"]: "NULL",
-        ["CNTRBR_TYPE_ID"]: 3,
-        // getContributorTypeIdByContributorType(contributorType),
+        ["CNTRBR_TYPE_ID"]: getEntityTypeIdByEntityType(entityType),
         ["CNTRBN_TYPE_ID"]: "NULL",
         ["TRANSFER_TYPE_ID"]: "NULL",
         ["RECEIPT_TYPE_ID"]: "NULL",
         ["RECEIPT_CODE_ID"]: "NULL",
-        ["PURPOSE_CODE_ID"]: "NULL",
-        ["Is Expenditure Subcontracted?"]: "NULL",
-        ["Is Expenditure a Partial Payment?"]: "NULL",
-        ["Is this existing Liability?"]: "NULL",
+        ["PURPOSE_CODE_ID"]:
+          transactionType === TransactionType.Disbursement
+            ? getPurposeCodeIdByPurposeCode(purposeCode)
+            : "NULL",
+        ["Is Expenditure Subcontracted?"]:
+          transactionType == TransactionType.Disbursement
+            ? boolToYesNo(isSubcontracted)
+            : "NULL",
+        ["Is Expenditure a Partial Payment?"]:
+          transactionType == TransactionType.Disbursement
+            ? boolToYesNo(isPartialPayment)
+            : "NULL",
+        ["Is this existing Liability?"]:
+          transactionType == TransactionType.Disbursement
+            ? boolToYesNo(isExistingLiability)
+            : "NULL",
         ["Is Liability a Partial Forgiven?"]: "NULL",
-        ["FLNG_ENT_NAME"]: `${firstName} ${lastName}`,
-
-        //   getEntityName(
-        //   contributorType,
-        //   firstName,
-        //   lastName,
-        //   companyName
-        // ),
-        ["FLNG_ENT_FIRST_NAME"]: firstName, // isPerson(contributorType) ? firstName : "NULL",
+        ["FLNG_ENT_NAME"]: getEntityName(
+          entityType,
+          firstName,
+          lastName,
+          entityName
+        ),
+        ["FLNG_ENT_FIRST_NAME"]: isPerson(entityType) ? firstName : "NULL",
         ["FLNG_ENT_MIDDLE_NAME"]: "NULL",
-        ["FLNG_ENT_LAST_NAME"]: lastName, // isPerson(contributorType) ? lastName : "NULL",
+        ["FLNG_ENT_LAST_NAME"]: isPerson(entityType) ? lastName : "NULL",
         ["FLNG_ENT_ADD1"]: addressLine1,
         ["FLNG_ENT_CITY"]: city,
         ["FLNG_ENT_STATE"]: state,
         ["FLNG_ENT_ZIP"]: postalCode,
         ["FLNG_ENT_COUNTRY"]: "US",
-        ["PAYMENT_TYPE_ID"]: 1, //getPaymentTypeIdFromPaymentMethod(paymentMethod),
+        ["PAYMENT_TYPE_ID"]: getPaymentTypeIdFromPaymentMethod(paymentMethod),
         ["PAY_NUMBER"]: "NULL",
         ["OWED_AMT"]: "NULL",
         ["ORG_AMT"]: centsToDollars(amount),
@@ -101,6 +121,8 @@ export const generateDisclosure = async (
   return await jsonexport.default(disclosures);
 };
 
+const boolToYesNo = (val: any) => (val ? "yes" : "no");
+
 export enum AggregateDuration {
   AGGREGATE_LIMIT = "aggregate_limit",
   CALENDAR_YEAR = "calendar_year",
@@ -115,144 +137,168 @@ export enum Field {
   PRINCIPAL_OFFICER_FULL_NAME = "principal_officer_full_name",
 }
 
-export enum PaymentMethodType {
-  ACH = "ach",
-  Wire = "wire",
-  Check = "check",
-  Debit = "debit",
-  Credit = "credit",
-  Transfer = "transfer",
-}
-
-export enum ContributorType {
-  CAN = "can",
-  FAM = "fam",
-  IND = "ind",
-  SOLEP = "solep",
-  PART = "part",
-  CORP = "corp",
-  COMM = "comm",
-  UNION = "union",
-  ASSOC = "assoc",
-  LLC = "llc",
-  PAC = "pac",
-  PLC = "plc",
-  OTH = "oth",
-}
-
-export const ContributorTypeDescription = new Map<string, string>([
-  [ContributorType.CAN, "Candidate/Candidate Spouse"],
-  [ContributorType.FAM, "Candidate Family Member"],
-  [ContributorType.IND, "Individual"],
-  [ContributorType.SOLEP, "Sole Proprietorship"],
-  [ContributorType.PART, "Partnership, including LLPs"],
-  [ContributorType.CORP, "Corporation"],
-  [ContributorType.COMM, "Committee"],
-  [ContributorType.UNION, "Union"],
-  [ContributorType.ASSOC, "Association"],
-  [ContributorType.LLC, "Professional/Limited Liability Company (PLLC/LLC)"],
-  [ContributorType.PAC, "Political Action Committee (PAC)"],
-  [ContributorType.PLC, "Political Committee"],
-  [ContributorType.OTH, "Other"],
+export const EntityTypeDescription = new Map<string, string>([
+  [EntityType.Can, "Candidate/Candidate Spouse"],
+  [EntityType.Fam, "Candidate Family Member"],
+  [EntityType.Ind, "Individual"],
+  [EntityType.Solep, "Sole Proprietorship"],
+  [EntityType.Part, "Partnership, including LLPs"],
+  [EntityType.Corp, "Corporation"],
+  [EntityType.Comm, "Committee"],
+  [EntityType.Union, "Union"],
+  [EntityType.Assoc, "Association"],
+  [EntityType.Llc, "Professional/Limited Liability Company (PLLC/LLC)"],
+  [EntityType.Pac, "Political Action Committee (PAC)"],
+  [EntityType.Plc, "Political Committee"],
+  [EntityType.Oth, "Other"],
 ]);
 
-export const NYSContributorTypeId = new Map<ContributorType, number>([
-  [ContributorType.CAN, 1],
-  [ContributorType.FAM, 2],
-  [ContributorType.IND, 3],
-  [ContributorType.SOLEP, 4],
-  [ContributorType.PART, 5],
-  [ContributorType.CORP, 6],
-  [ContributorType.COMM, 7],
-  [ContributorType.UNION, 9],
-  [ContributorType.ASSOC, 10],
-  [ContributorType.LLC, 11],
-  [ContributorType.PAC, 12],
-  [ContributorType.PLC, 13],
-  [ContributorType.OTH, 14],
+export const NYSEntityTypeId = new Map<EntityType, number>([
+  [EntityType.Can, 1],
+  [EntityType.Fam, 2],
+  [EntityType.Ind, 3],
+  [EntityType.Solep, 4],
+  [EntityType.Part, 5],
+  [EntityType.Corp, 6],
+  [EntityType.Comm, 7],
+  [EntityType.Union, 9],
+  [EntityType.Assoc, 10],
+  [EntityType.Llc, 11],
+  [EntityType.Pac, 12],
+  [EntityType.Plc, 13],
+  [EntityType.Oth, 14],
 ]);
 
-export const NYSContributorTypeAggregateDuration = new Map<
+export const NYSEntityTypeAggregateDuration = new Map<
   string,
   AggregateDuration
 >([
-  [ContributorType.FAM, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.IND, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.SOLEP, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.PART, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.CORP, AggregateDuration.CALENDAR_YEAR],
-  [ContributorType.COMM, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.UNION, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.ASSOC, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.LLC, AggregateDuration.CALENDAR_YEAR],
-  [ContributorType.PAC, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.PLC, AggregateDuration.AGGREGATE_LIMIT],
-  [ContributorType.OTH, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Can, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Fam, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Ind, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Solep, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Part, AggregateDuration.CALENDAR_YEAR],
+  [EntityType.Corp, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Comm, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Union, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Assoc, AggregateDuration.CALENDAR_YEAR],
+  [EntityType.Llc, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Pac, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Plc, AggregateDuration.AGGREGATE_LIMIT],
 ]);
 
 const scheduleAFields = [Field.DONOR_FULL_NAME, Field.DONOR_ADDRESS];
 
 const scheduleBandCFields = [Field.ENTITY_NAME, Field.DONOR_ADDRESS];
 
-export const NYSContributorTypeFields = new Map<string, Field[]>([
-  [ContributorType.CAN, scheduleBandCFields],
-  [ContributorType.FAM, scheduleAFields],
-  [ContributorType.IND, scheduleAFields],
-  [ContributorType.SOLEP, scheduleBandCFields],
-  [ContributorType.PART, scheduleBandCFields],
-  [ContributorType.CORP, scheduleBandCFields],
-  [ContributorType.COMM, scheduleBandCFields],
-  [ContributorType.UNION, scheduleBandCFields],
-  [ContributorType.ASSOC, scheduleBandCFields],
-  [ContributorType.LLC, scheduleBandCFields],
-  [ContributorType.PAC, scheduleBandCFields],
-  [ContributorType.PLC, scheduleBandCFields],
-  [ContributorType.OTH, scheduleBandCFields],
+export const NYSEntityTypeFields = new Map<string, Field[]>([
+  [EntityType.Can, scheduleBandCFields],
+  [EntityType.Fam, scheduleAFields],
+  [EntityType.Ind, scheduleAFields],
+  [EntityType.Solep, scheduleBandCFields],
+  [EntityType.Part, scheduleBandCFields],
+  [EntityType.Corp, scheduleBandCFields],
+  [EntityType.Comm, scheduleBandCFields],
+  [EntityType.Union, scheduleBandCFields],
+  [EntityType.Assoc, scheduleBandCFields],
+  [EntityType.Llc, scheduleBandCFields],
+  [EntityType.Pac, scheduleBandCFields],
+  [EntityType.Plc, scheduleBandCFields],
+  [EntityType.Oth, scheduleBandCFields],
 ]);
 
-const isPerson = (contributorType: ContributorType) =>
-  [ContributorType.IND, ContributorType.FAM].includes(contributorType);
+export const NYSPurposeCodeId = new Map<PurposeCode, number>([
+  [PurposeCode.CMAIL, 1],
+  [PurposeCode.CONSL, 2],
+  [PurposeCode.CONSV, 3],
+  [PurposeCode.CNTRB, 4],
+  [PurposeCode.FUNDR, 5],
+  [PurposeCode.LITER, 6],
+  [PurposeCode.OFFICE, 7],
+  [PurposeCode.OTHER, 8],
+  [PurposeCode.PETIT, 9],
+  [PurposeCode.INT, 10],
+  [PurposeCode.REIMB, 11],
+  [PurposeCode.RDET, 12],
+  [PurposeCode.POLLS, 13],
+  [PurposeCode.POSTA, 14],
+  [PurposeCode.PRINT, 15],
+  [PurposeCode.PROFL, 16],
+  [PurposeCode.RADIO, 17],
+  [PurposeCode.RENTO, 18],
+  [PurposeCode.TVADS, 19],
+  [PurposeCode.VOTER, 20],
+  [PurposeCode.WAGES, 21],
+  [PurposeCode.BKFEE, 22],
+  [PurposeCode.LWNSN, 23],
+  [PurposeCode.UTILS, 24],
+  [PurposeCode.PAYRL, 25],
+  [PurposeCode.MAILS, 26],
+  [PurposeCode.LOAN, 27],
+  [PurposeCode.CCDET, 28],
+  [PurposeCode.CCP, 29],
+  [PurposeCode.OTH, 30],
+  [PurposeCode.BKKP, 31],
+  [PurposeCode.CAR, 32],
+  [PurposeCode.CARSVC, 33],
+  [PurposeCode.CELL, 34],
+  [PurposeCode.EADS, 35],
+  [PurposeCode.EMAIL, 36],
+  [PurposeCode.GAS, 37],
+  [PurposeCode.LODG, 38],
+  [PurposeCode.MEALS, 40],
+  [PurposeCode.MLGE, 41],
+  [PurposeCode.MTG, 42],
+  [PurposeCode.PARK, 43],
+  [PurposeCode.TOLLS, 45],
+  [PurposeCode.XPORT, 46],
+  [PurposeCode.BLBD, 47],
+  [PurposeCode.WAGE, 48],
+  [PurposeCode.NPD, 49],
+]);
+
+const isPerson = (entityType: EntityType) =>
+  [EntityType.Ind, EntityType.Fam].includes(entityType);
 
 const getEntityName = (
-  contributorType: ContributorType,
+  entityType: EntityType,
   firstName: string,
   lastName: string,
   companyName?: string
 ) => {
-  if (isPerson(contributorType)) {
+  if (isPerson(entityType)) {
     return `${firstName} ${lastName}`;
   } else {
     return companyName;
   }
 };
 
-const getFilingScheduleIdByContributorType = (
-  contributorType: ContributorType
-): number => {
-  switch (contributorType) {
-    case ContributorType.IND:
-    case ContributorType.PART:
+const getFilingScheduleIdByEntityType = (entityType: EntityType): number => {
+  switch (entityType) {
+    case EntityType.Ind:
+    case EntityType.Part:
       return 1;
-    case ContributorType.CORP:
+    case EntityType.Corp:
       return 2;
     default:
       return 3;
   }
 };
 
-const getContributorTypeIdByContributorType = (
-  contributorType: ContributorType
-) => {
-  return NYSContributorTypeId.get(contributorType);
+const getEntityTypeIdByEntityType = (entityType: EntityType) => {
+  return NYSEntityTypeId.get(entityType);
 };
 
+const getPurposeCodeIdByPurposeCode = (purposeCode: PurposeCode) => {
+  return NYSPurposeCodeId.get(purposeCode);
+};
 const getPaymentTypeIdFromPaymentMethod = (
-  paymentMethod: PaymentMethodType
+  paymentMethod: PaymentMethod
 ): number => {
   switch (paymentMethod) {
-    case PaymentMethodType.Check:
+    case PaymentMethod.Check:
       return 1;
-    case PaymentMethodType.Credit:
+    case PaymentMethod.Credit:
       return 2;
     default:
       return 7;
@@ -281,7 +327,7 @@ interface DisclosureRecord {
   ["TRANSFER_TYPE_ID"]: string;
   ["RECEIPT_TYPE_ID"]: string;
   ["RECEIPT_CODE_ID"]: string;
-  ["PURPOSE_CODE_ID"]: string;
+  ["PURPOSE_CODE_ID"]: any;
   ["Is Expenditure Subcontracted?"]: string;
   ["Is Expenditure a Partial Payment?"]: string;
   ["Is this existing Liability?"]: string;
