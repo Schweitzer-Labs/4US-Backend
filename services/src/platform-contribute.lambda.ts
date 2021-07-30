@@ -32,12 +32,14 @@ let stripe: Stripe;
 let lnUsername: string;
 let lnPassword: string;
 
+const ps = new AWS.SSM();
+
 export default async (event: any) => {
   if (!stripeApiKey || !stripe || !lnUsername || !lnPassword) {
     console.log("Setting up configuration");
-    stripeApiKey = await getStripeApiKey(runenv);
-    lnUsername = await getLNUsername(runenv);
-    lnPassword = await getLNPassword(runenv);
+    stripeApiKey = await getStripeApiKey(ps)(runenv);
+    lnUsername = await getLNUsername(ps)(runenv);
+    lnPassword = await getLNPassword(ps)(runenv);
     stripe = new Stripe(stripeApiKey, {
       apiVersion: "2020-08-27",
     });

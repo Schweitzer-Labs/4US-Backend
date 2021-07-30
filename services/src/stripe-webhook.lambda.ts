@@ -3,7 +3,6 @@ import { Stripe } from "stripe";
 import { DynamoDB } from "aws-sdk";
 import { getStripeApiKey } from "./utils/config";
 import * as AWS from "aws-sdk";
-import { handleReportRunSucceeded } from "./webhook/run-report-succeeded/report-run-succeeded.handler";
 import { handlePayoutPaid } from "./webhook/payout-paid/payout-paid.handler";
 import { successResponse } from "./utils/success-response";
 
@@ -12,11 +11,11 @@ AWS.config.apiVersions = {
 };
 
 const runenv: any = process.env.RUNENV;
-const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
-const committeeTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 let stripe: Stripe;
 let stripeApiKey: string;
 let dynamoDB: DynamoDB;
+
+const ps = new AWS.SSM();
 
 export default async (
   event: APIGatewayEvent
@@ -24,7 +23,7 @@ export default async (
   console.log("Event: ", event.body);
   if (!stripeApiKey || !stripe) {
     console.log("Setting up configuration");
-    stripeApiKey = await getStripeApiKey(runenv);
+    stripeApiKey = await getStripeApiKey(ps)(runenv);
     stripe = new Stripe(stripeApiKey, {
       apiVersion: "2020-08-27",
     });

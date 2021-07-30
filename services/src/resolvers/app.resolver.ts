@@ -57,6 +57,8 @@ const dynamoDB = new DynamoDB({
   },
 });
 
+const parameterStore = new AWS.SSM();
+
 @Resolver()
 export class AppResolver {
   private stripeApiKey: string;
@@ -172,9 +174,9 @@ export class AppResolver {
       !this.lnUsername ||
       !this.lnPassword
     ) {
-      this.stripeApiKey = await getStripeApiKey(runenv);
-      this.lnUsername = await getLNUsername(runenv);
-      this.lnPassword = await getLNPassword(runenv);
+      this.stripeApiKey = await getStripeApiKey(parameterStore)(runenv);
+      this.lnUsername = await getLNUsername(parameterStore)(runenv);
+      this.lnPassword = await getLNPassword(parameterStore)(runenv);
       this.stripe = new Stripe(this.stripeApiKey, {
         apiVersion: "2020-08-27",
       });
@@ -234,8 +236,8 @@ export class AppResolver {
     )(currentUser);
 
     if (!this.lnUsername || !this.lnPassword) {
-      this.lnUsername = await getLNUsername(runenv);
-      this.lnPassword = await getLNPassword(runenv);
+      this.lnUsername = await getLNUsername(parameterStore)(runenv);
+      this.lnPassword = await getLNPassword(parameterStore)(runenv);
     }
     const lnConfig: ILexisNexisConfig = {
       username: this.lnUsername,
