@@ -20,6 +20,7 @@ import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import {states} from "../utils/enums/state.enum";
 
 const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
 const stringReq = (min = 1, max = 200) =>
@@ -32,7 +33,7 @@ const schema = Joi.object({
   lastName: stringReq(),
   addressLine1: stringReq(),
   city: stringReq(),
-  state: stringReq(2, 2),
+  state: Joi.string().valid(...states).required(),
   postalCode: stringReq(5, 10),
   entityType: Joi.string()
     .valid(...entityTypes)

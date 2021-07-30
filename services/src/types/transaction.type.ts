@@ -8,6 +8,7 @@ import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { EmploymentStatus } from "../utils/enums/employment-status";
+import {State} from "../utils/enums/state.enum";
 
 registerEnumType(Direction, {
   name: "Direction",
@@ -31,6 +32,10 @@ registerEnumType(TransactionType, {
 
 registerEnumType(EmploymentStatus, {
   name: "EmploymentStatus",
+});
+
+registerEnumType(State, {
+  name: "State",
 });
 
 @ObjectType()
@@ -93,7 +98,7 @@ export class Transaction implements ITransaction {
   @Field({ nullable: true })
   city?: string;
 
-  @Field({ nullable: true })
+  @Field((type) => State, { nullable: true })
   state?: string;
 
   @Field({ nullable: true })
