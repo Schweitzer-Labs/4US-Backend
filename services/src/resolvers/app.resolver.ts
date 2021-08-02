@@ -91,6 +91,8 @@ export class AppResolver {
 
     const res = await searchTransactions(txnsTableName)(dynamoDB)({
       committeeId,
+      bankVerified: true,
+      ruleVerified: true,
     })();
     if (isLeft(res)) {
       throw res.left;
