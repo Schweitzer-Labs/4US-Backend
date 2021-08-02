@@ -3,7 +3,6 @@ import { ITransaction } from "../queries/search-transactions.decoder";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { isBool } from "../utils/is-bool.utils";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 
 export const generateDisclosure = async (
@@ -50,14 +49,14 @@ export const generateDisclosure = async (
         // @Todo implement
         ["SCHED_DATE"]: "9-1-2021",
         ["ORG_DATE"]: "NULL",
-        ["CNTRBR_TYPE_ID"]: getEntityTypeIdByEntityType(entityType),
+        ["CNTRBR_TYPE_ID"]: NYSEntityTypeId.get(entityType),
         ["CNTRBN_TYPE_ID"]: "NULL",
         ["TRANSFER_TYPE_ID"]: "NULL",
         ["RECEIPT_TYPE_ID"]: "NULL",
         ["RECEIPT_CODE_ID"]: "NULL",
         ["PURPOSE_CODE_ID"]:
           transactionType === TransactionType.Disbursement
-            ? getPurposeCodeIdByPurposeCode(purposeCode)
+            ? NYSPurposeCodeId.get(purposeCode)
             : "NULL",
         ["Is Expenditure Subcontracted?"]:
           transactionType == TransactionType.Disbursement
@@ -86,7 +85,7 @@ export const generateDisclosure = async (
         ["FLNG_ENT_STATE"]: state,
         ["FLNG_ENT_ZIP"]: postalCode,
         ["FLNG_ENT_COUNTRY"]: "US",
-        ["PAYMENT_TYPE_ID"]: getPaymentTypeIdFromPaymentMethod(paymentMethod),
+        ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
         ["PAY_NUMBER"]: "NULL",
         ["OWED_AMT"]: "NULL",
         ["ORG_AMT"]: centsToDollars(amount),
@@ -219,7 +218,6 @@ export const NYSPurposeCodeId = new Map<PurposeCode, number>([
   [PurposeCode.PETIT, 9],
   [PurposeCode.INT, 10],
   [PurposeCode.REIMB, 11],
-  [PurposeCode.RDET, 12],
   [PurposeCode.POLLS, 13],
   [PurposeCode.POSTA, 14],
   [PurposeCode.PRINT, 15],
@@ -232,12 +230,7 @@ export const NYSPurposeCodeId = new Map<PurposeCode, number>([
   [PurposeCode.BKFEE, 22],
   [PurposeCode.LWNSN, 23],
   [PurposeCode.UTILS, 24],
-  [PurposeCode.PAYRL, 25],
-  [PurposeCode.MAILS, 26],
-  [PurposeCode.LOAN, 27],
-  [PurposeCode.CCDET, 28],
   [PurposeCode.CCP, 29],
-  [PurposeCode.OTH, 30],
   [PurposeCode.BKKP, 31],
   [PurposeCode.CAR, 32],
   [PurposeCode.CARSVC, 33],
@@ -255,6 +248,17 @@ export const NYSPurposeCodeId = new Map<PurposeCode, number>([
   [PurposeCode.BLBD, 47],
   [PurposeCode.WAGE, 48],
   [PurposeCode.NPD, 49],
+  [PurposeCode.PIDA, 50],
+]);
+
+export const NYSPaymentTypeId = new Map<PaymentMethod, number>([
+  [PaymentMethod.Check, 1],
+  [PaymentMethod.Credit, 2],
+  [PaymentMethod.Debit, 3],
+  [PaymentMethod.OnlineProcessor, 4],
+  [PaymentMethod.Wire, 5],
+  [PaymentMethod.Cash, 6],
+  [PaymentMethod.Other, 7],
 ]);
 
 const isPerson = (entityType: EntityType) =>
@@ -282,26 +286,6 @@ const getFilingScheduleIdByEntityType = (entityType: EntityType): number => {
       return 2;
     default:
       return 3;
-  }
-};
-
-const getEntityTypeIdByEntityType = (entityType: EntityType) => {
-  return NYSEntityTypeId.get(entityType);
-};
-
-const getPurposeCodeIdByPurposeCode = (purposeCode: PurposeCode) => {
-  return NYSPurposeCodeId.get(purposeCode);
-};
-const getPaymentTypeIdFromPaymentMethod = (
-  paymentMethod: PaymentMethod
-): number => {
-  switch (paymentMethod) {
-    case PaymentMethod.Check:
-      return 1;
-    case PaymentMethod.Credit:
-      return 2;
-    default:
-      return 7;
   }
 };
 
