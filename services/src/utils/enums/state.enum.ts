@@ -1,6 +1,6 @@
 export enum State {
   AL = "al",
-  AK ="ak",
+  AK = "ak",
   AZ = "az",
   AR = "ar",
   CA = "ca",
@@ -49,7 +49,7 @@ export enum State {
   WA = "wa",
   WV = "wv",
   WI = "wi",
-  WY = "wy"
+  WY = "wy",
 }
 
-export const states = Object.values(State)
+export const states = Object.values(State);
