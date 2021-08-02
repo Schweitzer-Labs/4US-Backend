@@ -61,6 +61,7 @@ const txnsToAuditLog =
     ITransaction
   ]): ITxnAuditLog => ({
     committeeId: newTransaction.committeeId,
+    userId: newTransaction.modifiedByUser,
     id: newTransaction.id,
     newTransaction,
     oldTransaction,

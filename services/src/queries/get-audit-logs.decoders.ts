@@ -9,6 +9,7 @@ const TxnAuditLogRequired = t.type({
   ddbEvent: t.string,
   timestamp: t.number,
   newTransaction: Transaction,
+  userId: t.string,
 });
 
 const TxnAuditLogOptional = t.type({

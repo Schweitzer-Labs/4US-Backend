@@ -1,7 +1,5 @@
 import * as AWS from "aws-sdk";
 
-const ps = new AWS.SSM();
-
 enum ConfigKeys {
   stripeApiKey = "/lambda/stripe/apikey",
   lnUsername = "/lambda/ln/username",
@@ -12,7 +10,7 @@ enum ConfigKeys {
   stripeWebhookEndpointSecret = "/lambda/stripe/webhookEndpointSecret",
 }
 
-const retrieveConfig = async (env: string, name: string) => {
+const retrieveConfig = (ps: AWS.SSM) => async (env: string, name: string) => {
   const fullKey = `/${env}${name}`;
   console.log("Config look up initiated on key: ", fullKey);
   const res = await ps
@@ -24,41 +22,44 @@ const retrieveConfig = async (env: string, name: string) => {
   return res.Parameter.Value;
 };
 
-const getConfig = async (env: string, name: string): Promise<string> => {
-  console.log(`/${env}${name}`);
-  switch (name) {
-    case ConfigKeys.stripeApiKey:
-    case ConfigKeys.lnUsername:
-    case ConfigKeys.lnPassword:
-    case ConfigKeys.finicityPartnerId:
-    case ConfigKeys.finicityPartnerSecret:
-    case ConfigKeys.finicityAppKey:
-    case ConfigKeys.stripeWebhookEndpointSecret:
-      return retrieveConfig(env, name);
+const getConfig =
+  (ps: AWS.SSM) =>
+  async (env: string, name: string): Promise<string> => {
+    console.log(`/${env}${name}`);
+    switch (name) {
+      case ConfigKeys.stripeApiKey:
+      case ConfigKeys.lnUsername:
+      case ConfigKeys.lnPassword:
+      case ConfigKeys.finicityPartnerId:
+      case ConfigKeys.finicityPartnerSecret:
+      case ConfigKeys.finicityAppKey:
+      case ConfigKeys.stripeWebhookEndpointSecret:
+        return retrieveConfig(ps)(env, name);
 
-    default:
-      console.error("Config not found");
-      throw new Error("Config not found");
-  }
-};
+      default:
+        console.error("Config not found");
+        throw new Error("Config not found");
+    }
+  };
 
-export const getStripeApiKey = async (env: string) =>
-  await getConfig(env, ConfigKeys.stripeApiKey);
+export const getStripeApiKey = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.stripeApiKey);
 
-export const getStripeWebhookEndpointSecret = async (env: string) =>
-  await getConfig(env, ConfigKeys.stripeWebhookEndpointSecret);
+export const getStripeWebhookEndpointSecret =
+  (ps: AWS.SSM) => async (env: string) =>
+    await getConfig(ps)(env, ConfigKeys.stripeWebhookEndpointSecret);
 
-export const getLNUsername = async (env: string) =>
-  await getConfig(env, ConfigKeys.lnUsername);
+export const getLNUsername = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.lnUsername);
 
-export const getLNPassword = async (env: string) =>
-  await getConfig(env, ConfigKeys.lnPassword);
+export const getLNPassword = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.lnPassword);
 
-export const getFinicityPartnerId = async (env: string) =>
-  await getConfig(env, ConfigKeys.finicityPartnerId);
+export const getFinicityPartnerId = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.finicityPartnerId);
 
-export const getFinicityPartnerSecret = async (env: string) =>
-  await getConfig(env, ConfigKeys.finicityPartnerSecret);
+export const getFinicityPartnerSecret = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.finicityPartnerSecret);
 
-export const getFinicityAppKey = async (env: string) =>
-  await getConfig(env, ConfigKeys.finicityAppKey);
+export const getFinicityAppKey = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.finicityAppKey);

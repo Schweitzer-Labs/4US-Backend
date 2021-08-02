@@ -11,20 +11,23 @@ import { isNotABankVerifiedRuleUnverifiedDisb } from "../utils/model/is-non-veri
 export const amendDisb =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
+  (modifiedByUser: string) =>
   (committeeId: string) =>
   (txnId: string) =>
   (disbursementInput: AmendDisbInput) =>
     pipe(
       getTxnById(txnsTableName)(dynamoDB)(committeeId)(txnId),
       te.chain(isNotABankVerifiedRuleUnverifiedDisb),
-      te.map(mergeDisbInputWithTxn(disbursementInput)),
+      te.map(mergeDisbInputWithTxn(modifiedByUser)(disbursementInput)),
       te.chain(validateDisbursement),
       te.chain(putTransactionAndDecode(txnsTableName)(dynamoDB))
     );
 
 const mergeDisbInputWithTxn =
+  (modifiedByUser: string) =>
   (disbursementInput: AmendDisbInput) =>
   (txn: ITransaction): ITransaction => ({
     ...txn,
     ...disbursementInput,
+    modifiedByUser,
   });
