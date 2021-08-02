@@ -128,7 +128,7 @@ const createDisb = `
       $entityName: String!
       $addressLine1: String!
       $city: String!
-      $state: String!
+      $state: State!
       $postalCode: String!
       $isSubcontracted: Boolean!
       $isPartialPayment: Boolean!
@@ -168,7 +168,7 @@ const amendDisbMut = `
       $addressLine1: String
       $addressLine2: String
       $city: String
-      $state: String
+      $state: State
       $postalCode: String
       $paymentDate: Float
       $checkNumber: String
@@ -209,7 +209,7 @@ mutation(
       $lastName: String!
       $addressLine1: String!
       $city: String!
-      $state: String!
+      $state: State!
       $postalCode: String!
       $entityType: EntityType!
       $emailAddress: String
@@ -264,7 +264,7 @@ const amendContribMut = `
       $lastName: String
       $addressLine1: String
       $city: String
-      $state: String
+      $state: State
       $postalCode: String
       $entityType: EntityType
       $emailAddress: String
