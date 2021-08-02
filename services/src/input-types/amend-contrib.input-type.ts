@@ -58,7 +58,7 @@ export class AmendContributionInput implements Partial<ITransaction> {
 
 
   @Field((type) => State)
-  state: State;
+  state?: State;
 
   @Field({ nullable: true })
   @MinLength(5)

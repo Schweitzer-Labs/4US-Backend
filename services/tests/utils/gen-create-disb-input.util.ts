@@ -6,6 +6,7 @@ import {
   purposeCodes,
 } from "../../src/utils/enums/purpose-code.enum";
 import { now } from "../../src/utils/time.utils";
+import {State, states} from "../../src/utils/enums/state.enum"
 
 interface GenCreateDisbConfig {
   committeeId: string;
@@ -14,7 +15,7 @@ interface GenCreateDisbConfig {
   entityName?: string;
   addressLine1?: string;
   city?: string;
-  state?: string;
+  state?: State;
   postalCode?: string;
   isSubcontracted?: boolean;
   isPartialPayment?: boolean;
@@ -35,7 +36,6 @@ export const genCreateDisbInput = ({
   paymentMethod = PaymentMethod.Debit,
   addressLine1 = faker.address.streetAddress(),
   city = faker.address.city(),
-  state = faker.address.stateAbbr().toLowerCase(),
   postalCode = faker.address.zipCode(),
   paymentDate = now(),
 }: GenCreateDisbConfig): CreateDisbursementInput => ({
@@ -45,7 +45,7 @@ export const genCreateDisbInput = ({
   entityName,
   addressLine1,
   city,
-  state,
+  state: faker.random.arrayElement(states),
   postalCode,
   isSubcontracted: false,
   isPartialPayment: false,

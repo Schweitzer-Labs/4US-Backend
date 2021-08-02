@@ -3,6 +3,7 @@ import { CreateContributionInput } from "../../src/input-types/create-contributi
 import * as faker from "faker";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { now } from "../../src/utils/time.utils";
+import {states} from "../../src/utils/enums/state.enum";
 
 export const genCreateContribInput = (
   committeeId: string,
@@ -24,7 +25,7 @@ export const genCreateContribInput = (
     lastName: faker.name.lastName(),
     addressLine1: faker.address.streetAddress(),
     city: faker.address.city(),
-    state: faker.address.state(),
+    state: faker.random.arrayElement(states),
     postalCode: faker.address.zipCode(),
     cardNumber: "4242 4242 4242 4242",
     cardExpirationYear: 2026,
