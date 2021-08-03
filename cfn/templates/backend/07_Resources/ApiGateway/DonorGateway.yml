@@ -8,10 +8,18 @@ DonorGateway:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub donate-api.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
+{% if RUNENV != 'demo' %}
       DistributionDomainName: !Sub donate.${Domain}.${TLD}
       Route53:
         EvaluateTargetHealth: true
         HostedZoneId: !Ref HostedZone
+{% else %}
+    Cors:
+      AllowCredentials: true
+      AllowOrigin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
+      AllowMethods: "'OPTIONS,GET,PUT,POST'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+{% endif %}
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
