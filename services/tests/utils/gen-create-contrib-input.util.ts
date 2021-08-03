@@ -3,6 +3,7 @@ import { CreateContributionInput } from "../../src/input-types/create-contributi
 import * as faker from "faker";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { now } from "../../src/utils/time.utils";
+import { EmploymentStatus } from "../../src/utils/enums/employment-status";
 
 export const genCreateContribInput = (
   committeeId: string,
@@ -30,6 +31,7 @@ export const genCreateContribInput = (
     cardExpirationYear: 2026,
     cardExpirationMonth: 12,
     cardCVC: "123",
+    employmentStatus: EmploymentStatus.Unemployed,
     paymentDate: paymentDate || now(),
     ...(![EntityType.Ind, EntityType.Fam].includes(entityType)
       ? { entityName: faker.company.companyName() }

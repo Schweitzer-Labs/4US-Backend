@@ -39,6 +39,8 @@ const CommitteeOptional = t.partial({
   chainId: t.string,
   emailAddresses: t.string,
   employmentStatus: t.string,
+  efsFilerId: t.number,
+  efsElectionId: t.number,
 });
 
 export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);
