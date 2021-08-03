@@ -24,6 +24,8 @@ import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
+import {EntityType} from "../../src/utils/enums/entity-type.enum";
+import {State} from "../../src/utils/enums/state.enum";
 
 dotenv.config();
 
@@ -480,6 +482,23 @@ describe("Committee GraphQL Lambda", function () {
       const body = JSON.parse(res.body);
       console.log(res.body);
       expect(body.data.createContribution.amount).to.equal(12000);
+    });
+    it("Rejects a faulty State value", async () => {
+
+      const inputVar = {...createContributionVariables, state:  ""}
+
+      const createRes: any = await lambdaPromise(
+          graphql,
+          genGraphQLProxy(createContribMut,
+              validUsername,
+              inputVar),
+          {}
+      );
+      console.log(createRes);
+
+      const body = JSON.parse(createRes.body);
+
+      expect(body.errors.length > 0).to.equal(true);
     });
   });
   describe("Create Disbursement", function () {
