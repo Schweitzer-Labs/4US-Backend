@@ -8,7 +8,7 @@ import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { EmploymentStatus } from "../utils/enums/employment-status";
-import {State} from "../utils/enums/state.enum";
+import { State } from "../utils/enums/state.enum";
 
 registerEnumType(Direction, {
   name: "Direction",

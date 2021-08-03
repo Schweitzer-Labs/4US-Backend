@@ -6,7 +6,8 @@ import {
   purposeCodes,
 } from "../../src/utils/enums/purpose-code.enum";
 import { now } from "../../src/utils/time.utils";
-import {State, states} from "../../src/utils/enums/state.enum"
+import { State, states } from "../../src/utils/enums/state.enum";
+import { enumToKeys } from "../../src/utils/enums/poly.util";
 
 interface GenCreateDisbConfig {
   committeeId: string;
@@ -38,18 +39,21 @@ export const genCreateDisbInput = ({
   city = faker.address.city(),
   postalCode = faker.address.zipCode(),
   paymentDate = now(),
-}: GenCreateDisbConfig): CreateDisbursementInput => ({
-  committeeId,
-  amount,
-  paymentMethod,
-  entityName,
-  addressLine1,
-  city,
-  state: faker.random.arrayElement(states),
-  postalCode,
-  isSubcontracted: false,
-  isPartialPayment: false,
-  isExistingLiability: false,
-  purposeCode: faker.random.arrayElement(purposeCodes),
-  paymentDate: paymentDate,
-});
+}: GenCreateDisbConfig): CreateDisbursementInput => {
+  const state: any = faker.random.arrayElement(enumToKeys(State));
+  return {
+    committeeId,
+    amount,
+    paymentMethod,
+    entityName,
+    addressLine1,
+    city,
+    state,
+    postalCode,
+    isSubcontracted: false,
+    isPartialPayment: false,
+    isExistingLiability: false,
+    purposeCode: faker.random.arrayElement(purposeCodes),
+    paymentDate: paymentDate,
+  };
+};

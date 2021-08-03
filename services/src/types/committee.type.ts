@@ -52,4 +52,10 @@ export class Committee {
 
   @Field({ nullable: true })
   emailAddresses?: string;
+
+  @Field({ nullable: true })
+  efsFilerId?: number;
+
+  @Field({ nullable: true })
+  efsElectionId?: number;
 }

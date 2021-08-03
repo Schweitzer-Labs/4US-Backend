@@ -3,7 +3,9 @@ import { CreateContributionInput } from "../../src/input-types/create-contributi
 import * as faker from "faker";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { now } from "../../src/utils/time.utils";
-import {states} from "../../src/utils/enums/state.enum";
+import { EmploymentStatus } from "../../src/utils/enums/employment-status";
+import { enumToKeys } from "../../src/utils/enums/poly.util";
+import { State } from "../../src/utils/enums/state.enum";
 
 export const genCreateContribInput = (
   committeeId: string,
@@ -11,6 +13,7 @@ export const genCreateContribInput = (
   entityType?: EntityType,
   paymentDate?: number
 ): CreateContributionInput => {
+  const stateStr: any = faker.random.arrayElement(enumToKeys(State));
   return {
     amount:
       amount ||
@@ -25,12 +28,13 @@ export const genCreateContribInput = (
     lastName: faker.name.lastName(),
     addressLine1: faker.address.streetAddress(),
     city: faker.address.city(),
-    state: faker.random.arrayElement(states),
+    state: stateStr,
     postalCode: faker.address.zipCode(),
     cardNumber: "4242 4242 4242 4242",
     cardExpirationYear: 2026,
     cardExpirationMonth: 12,
     cardCVC: "123",
+    employmentStatus: EmploymentStatus.Unemployed,
     paymentDate: paymentDate || now(),
     ...(![EntityType.Ind, EntityType.Fam].includes(entityType)
       ? { entityName: faker.company.companyName() }
