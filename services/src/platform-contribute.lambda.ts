@@ -11,6 +11,7 @@ import { task, taskEither } from "fp-ts";
 import { successResponse } from "./utils/success-response";
 import { errorResponse } from "./utils/error-response.utils";
 import { StatusCodes } from "http-status-codes";
+import headers from "./utils/headers";
 
 dotenv.config();
 
@@ -65,6 +66,7 @@ export default async (event: any) => {
             message,
             ...remaining,
           },
+	  headers
         };
 
         return task.of(errorResponse(res));
