@@ -57,7 +57,7 @@ export class AmendContributionInput implements Partial<ITransaction> {
   city?: string;
 
 
-  @Field((type) => State)
+  @Field((type) => State, {nullable: true})
   state?: State;
 
   @Field({ nullable: true })

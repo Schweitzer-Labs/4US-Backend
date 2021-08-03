@@ -168,7 +168,7 @@ const amendDisbMut = `
       $addressLine1: String
       $addressLine2: String
       $city: String
-      $state: State!
+      $state: State
       $postalCode: String
       $paymentDate: Float
       $checkNumber: String
@@ -264,7 +264,7 @@ const amendContribMut = `
       $lastName: String
       $addressLine1: String
       $city: String
-      $state: State!
+      $state: State
       $postalCode: String
       $entityType: EntityType
       $emailAddress: String
@@ -338,7 +338,7 @@ mutation($committeeId: String!) {
     addressLine1: "43 Lane"
     addressLine2: "2FL"
     city: "Downingtown"
-    state: "pa"
+    state: PA
     postalCode: "13224"
     entityType: Ind
     employmentStatus: Unemployed

@@ -1,3 +1,4 @@
+import {AmendDisbInput} from "../../src/input-types/amend-disb.input-type";
 interface GenAmendDisbConfig {
   committeeId: string;
   transactionId: string;
@@ -8,7 +9,7 @@ export const genAmendDisbInput = ({
   committeeId,
   transactionId,
   entityName,
-}: GenAmendDisbConfig) => ({
+}: GenAmendDisbConfig): AmendDisbInput => ({
   committeeId,
   transactionId,
   entityName,

@@ -55,8 +55,8 @@ export class AmendDisbInput implements Partial<ITransaction> {
   @Field({ nullable: true })
   city?: string;
 
-  @Field((type) => State)
-  state: State;
+  @Field((type) => State, {nullable: true})
+  state?: State;
 
 
   @Field({ nullable: true })
