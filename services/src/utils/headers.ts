@@ -1,4 +1,4 @@
-const allow_origin = "https://" + process.env.DNS_URL
+const allow_origin = "https://" + process.env.CORS_ORIGIN
 
 export default {
   "Access-Control-Allow-Headers": "Content-Type",
