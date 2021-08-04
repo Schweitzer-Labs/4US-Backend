@@ -24,6 +24,7 @@ import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
+import { EntityType } from "../../src/utils/enums/entity-type.enum";
 
 dotenv.config();
 
@@ -487,7 +488,6 @@ describe("Committee GraphQL Lambda", function () {
   describe("Create Contributions", function () {
     it("Supports the creation of a contribution", async () => {
       const vars = genCreateContribInput(committeeId);
-      console.log(vars);
       const res: any = await lambdaPromise(
         graphql,
         genGraphQLProxy(createContributionQuery, validUsername, vars),
