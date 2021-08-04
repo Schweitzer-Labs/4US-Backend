@@ -4,6 +4,8 @@ import * as faker from "faker";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { now } from "../../src/utils/time.utils";
 import { EmploymentStatus } from "../../src/utils/enums/employment-status";
+import { enumToKeys } from "../../src/utils/enums/poly.util";
+import { State } from "../../src/utils/enums/state.enum";
 
 export const genCreateContribInput = (
   committeeId: string,
@@ -11,6 +13,7 @@ export const genCreateContribInput = (
   entityType?: EntityType,
   paymentDate?: number
 ): CreateContributionInput => {
+  const stateStr: any = faker.random.arrayElement(enumToKeys(State));
   return {
     amount:
       amount ||
@@ -25,7 +28,7 @@ export const genCreateContribInput = (
     lastName: faker.name.lastName(),
     addressLine1: faker.address.streetAddress(),
     city: faker.address.city(),
-    state: faker.address.state(),
+    state: stateStr,
     postalCode: faker.address.zipCode(),
     cardNumber: "4242 4242 4242 4242",
     cardExpirationYear: 2026,

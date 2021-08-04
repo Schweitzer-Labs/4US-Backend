@@ -129,7 +129,7 @@ const createDisb = `
       $entityName: String!
       $addressLine1: String!
       $city: String!
-      $state: String!
+      $state: State!
       $postalCode: String!
       $isSubcontracted: Boolean!
       $isPartialPayment: Boolean!
@@ -169,7 +169,7 @@ const amendDisbMut = `
       $addressLine1: String
       $addressLine2: String
       $city: String
-      $state: String
+      $state: State
       $postalCode: String
       $paymentDate: Float
       $checkNumber: String
@@ -210,7 +210,7 @@ mutation(
       $lastName: String!
       $addressLine1: String!
       $city: String!
-      $state: String!
+      $state: State!
       $postalCode: String!
       $entityType: EntityType!
       $emailAddress: String
@@ -265,7 +265,7 @@ const amendContribMut = `
       $lastName: String
       $addressLine1: String
       $city: String
-      $state: String
+      $state: State
       $postalCode: String
       $entityType: EntityType
       $emailAddress: String
@@ -324,7 +324,7 @@ mutation(
       $lastName: String!
       $addressLine1: String!
       $city: String!
-      $state: String!
+      $state: State!
       $postalCode: String!
       $entityType: EntityType!
       $employmentStatus: EmploymentStatus
@@ -389,8 +389,6 @@ const recTxnMutation = `
       }
     }
 `;
-
-const recDisbVar = {};
 
 const lambdaPromise = (lambda, event, context) => {
   return new Promise((resolve, reject) => {
@@ -500,6 +498,20 @@ describe("Committee GraphQL Lambda", function () {
       console.log(res.body);
       expect(body.data.createContribution.amount).to.equal(vars.amount);
     });
+    // it("Rejects a faulty State value", async () => {
+    //   const inputVar = { ...genCreateContribInput(committeeId), state: "" };
+    //
+    //   const createRes: any = await lambdaPromise(
+    //     graphql,
+    //     genGraphQLProxy(createContribMut, validUsername, inputVar),
+    //     {}
+    //   );
+    //   console.log(createRes);
+    //
+    //   const body = JSON.parse(createRes.body);
+    //
+    //   expect(body.errors.length > 0).to.equal(true);
+    // });
   });
   describe("Create Disbursement", function () {
     it("Supports the creation of a disbursement", async () => {

@@ -6,6 +6,8 @@ import {
   purposeCodes,
 } from "../../src/utils/enums/purpose-code.enum";
 import { now } from "../../src/utils/time.utils";
+import { State, states } from "../../src/utils/enums/state.enum";
+import { enumToKeys } from "../../src/utils/enums/poly.util";
 
 interface GenCreateDisbConfig {
   committeeId: string;
@@ -14,7 +16,7 @@ interface GenCreateDisbConfig {
   entityName?: string;
   addressLine1?: string;
   city?: string;
-  state?: string;
+  state?: State;
   postalCode?: string;
   isSubcontracted?: boolean;
   isPartialPayment?: boolean;
@@ -35,21 +37,23 @@ export const genCreateDisbInput = ({
   paymentMethod = PaymentMethod.Debit,
   addressLine1 = faker.address.streetAddress(),
   city = faker.address.city(),
-  state = faker.address.stateAbbr().toLowerCase(),
   postalCode = faker.address.zipCode(),
   paymentDate = now(),
-}: GenCreateDisbConfig): CreateDisbursementInput => ({
-  committeeId,
-  amount,
-  paymentMethod,
-  entityName,
-  addressLine1,
-  city,
-  state,
-  postalCode,
-  isSubcontracted: false,
-  isPartialPayment: false,
-  isExistingLiability: false,
-  purposeCode: faker.random.arrayElement(purposeCodes),
-  paymentDate: paymentDate,
-});
+}: GenCreateDisbConfig): CreateDisbursementInput => {
+  const state: any = faker.random.arrayElement(enumToKeys(State));
+  return {
+    committeeId,
+    amount,
+    paymentMethod,
+    entityName,
+    addressLine1,
+    city,
+    state,
+    postalCode,
+    isSubcontracted: false,
+    isPartialPayment: false,
+    isExistingLiability: false,
+    purposeCode: faker.random.arrayElement(purposeCodes),
+    paymentDate: paymentDate,
+  };
+};

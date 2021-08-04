@@ -29,7 +29,7 @@
     "ua-parser-js": "^0.7.28"
   },
   "scripts": {
-    "test": "ts-mocha tests/**/*.test.ts --timeout 30000",
+    "test": "ts-mocha tests/**/*.test.ts --timeout 60000",
     "test-gql": "ts-mocha tests/lambdas/committee-graphql.test.ts --timeout 10000",
     "integ-test": "mocha tests/integration",
     "seed-contrib": "ts-node tests/seed/seed-contributions.job.ts",
@@ -48,7 +48,7 @@
     "test-disbver": "ts-mocha tests/integration/verify-disbursment-from-user.test.ts --timeout 10000",
     "test-dapp": "ts-mocha tests/integration/dapp.test.ts --timeout 10000",
     "test-sync": "ts-mocha tests/lambdas/bank-sync.test.ts --timeout 10000",
-    "test-4us-contribute": "ts-mocha tests/lambdas/platform-contribute.test.ts --timeout 10000",
+    "test-4us-contribute": "ts-mocha tests/lambdas/platform-contribute.test.ts --timeout 40000",
     "test-committee-sync": "ts-mocha tests/integration/committee-sync.test.ts --timeout 10000",
     "test-reconcile-contrib": "ts-mocha tests/integration/reconcile-contrib.test.ts --timeout 10000",
     "test-rec-one": "ts-mocha tests/integration/reconcile-one.test.ts --timeout 10000",
