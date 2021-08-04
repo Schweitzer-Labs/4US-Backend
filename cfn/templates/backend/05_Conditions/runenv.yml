@@ -2,7 +2,7 @@ Production:
   !Equals [!Ref LambdaRunEnvironment, prod]
 QA:
   !Equals [!Ref LambdaRunEnvironment, qa]
-Dev:
-  !Equals [!Ref LambdaRunEnvironment, dev]
+Demo:
+  !Equals [!Ref LambdaRunEnvironment, demo]
 NonProduction:
   !Not [Condition: Production]
