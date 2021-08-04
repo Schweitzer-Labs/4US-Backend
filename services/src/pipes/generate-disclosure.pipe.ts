@@ -5,52 +5,55 @@ import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { AggregateDuration } from "../queries/get-rule.decoder";
+import { ICommittee } from "../queries/get-committee-by-id.query";
+import { now } from "../utils/time.utils";
+import { ApplicationError } from "../utils/application-error";
 
-export const generateDisclosure = async (
-  transactions: ITransaction[]
-): Promise<string> => {
-  const disclosures: DisclosureRecord[] = transactions.map(
-    ({
-      entityType: entityTypeStr,
-      id: transactionId,
-      firstName,
-      lastName,
-      addressLine1,
-      city,
-      state,
-      postalCode,
-      paymentMethod: paymentMethodStr,
-      amount,
-      entityName,
-      transactionType,
-      purposeCode: purposeCodeString,
-      isSubcontracted,
-      isPartialPayment,
-      isExistingLiability,
-    }) => {
+export const generateDisclosure =
+  (committee: ICommittee) =>
+  async (transactions: ITransaction[]): Promise<string> => {
+    const disclosures: DisclosureRecord[] = transactions.map((txn) => {
+      const {
+        entityType: entityTypeStr,
+        id: transactionId,
+        firstName,
+        lastName,
+        addressLine1,
+        city,
+        state,
+        postalCode,
+        paymentMethod: paymentMethodStr,
+        amount,
+        entityName,
+        transactionType,
+        purposeCode: purposeCodeString,
+        isSubcontracted,
+        isPartialPayment,
+        isExistingLiability,
+      } = txn;
       const entityType: any = entityTypeStr;
       const paymentMethod: any = paymentMethodStr;
       const purposeCode: any = purposeCodeString;
+      const filingPeriod = getFilingPeriod(committee);
       return {
         // @Todo implement
-        ["FILER_ID"]: 0,
+        ["FILER_ID"]: committee.efsFilerId,
         // @Todo implement
-        ["FILING_PERIOD_ID"]: 0,
-        // @Todo implement
-        ["FILING_CAT_ID"]: 0,
-        // @Todo implement
-        ["ELECT_ID"]: 139,
+        ["FILING_PERIOD_ID"]: filingPeriod.id,
+        ["FILING_CAT_ID"]: 1,
+        ["ELECT_ID"]: committee.efsElectionId,
         ["RESIG_TERM_TYPE_ID"]: "NULL",
         // @Todo implement
-        ["R_FILING_DATE"]: "9-1-2021",
+        ["R_FILING_DATE"]: millisToDateStr(filingPeriod.filingDate),
         ["FILING_SCHED_ID"]: getFilingScheduleIdByEntityType(entityType),
         ["LOAN_LIB_NUMBER"]: "NULL",
         ["TRANS_NUMBER"]: transactionId,
         ["TRANS_MAPPING"]: "NULL",
         // @Todo implement
-        ["SCHED_DATE"]: "9-1-2021",
+        ["SCHED_DATE"]: millisToDateStr(txn.paymentDate),
         ["ORG_DATE"]: "NULL",
         ["CNTRBR_TYPE_ID"]: NYSEntityTypeId.get(entityType),
+        // @ToDo add in-kind field
         ["CNTRBN_TYPE_ID"]: "NULL",
         ["TRANSFER_TYPE_ID"]: "NULL",
         ["RECEIPT_TYPE_ID"]: "NULL",
@@ -87,7 +90,8 @@ export const generateDisclosure = async (
         ["FLNG_ENT_ZIP"]: postalCode,
         ["FLNG_ENT_COUNTRY"]: "US",
         ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
-        ["PAY_NUMBER"]: "NULL",
+        ["PAY_NUMBER"]:
+          txn.paymentMethod === PaymentMethod.Check ? txn.checkNumber : "NULL",
         ["OWED_AMT"]: "NULL",
         ["ORG_AMT"]: centsToDollars(amount),
         ["TRANS_EXPLNTN"]: "NULL",
@@ -115,38 +119,63 @@ export const generateDisclosure = async (
         ["R_IE_INCLUDED"]: "NULL",
         ["R_PARENT"]: "NULL",
       };
-    }
-  );
+    });
 
-  return await jsonexport.default(disclosures);
-};
+    return await jsonexport.default(disclosures);
+  };
 
 const boolToYesNo = (val: any) => (val ? "yes" : "no");
 
-export enum Field {
-  DONOR_FULL_NAME = "donor_full_name",
-  DONOR_ADDRESS = "donor_address",
-  ENTITY_NAME = "entity_name",
-  EMPLOYER_NAME = "employer_name",
-  CPF_ID = "cpf_id",
-  PRINCIPAL_OFFICER_FULL_NAME = "principal_officer_full_name",
+interface FilingPeriod {
+  id: number;
+  cutOffDate: number;
+  filingDate: number;
+  scopes: string[];
+  race: string;
+  desc: string;
 }
 
-export const EntityTypeDescription = new Map<string, string>([
-  [EntityType.Can, "Candidate/Candidate Spouse"],
-  [EntityType.Fam, "Candidate Family Member"],
-  [EntityType.Ind, "Individual"],
-  [EntityType.Solep, "Sole Proprietorship"],
-  [EntityType.Part, "Partnership, including LLPs"],
-  [EntityType.Corp, "Corporation"],
-  [EntityType.Comm, "Committee"],
-  [EntityType.Union, "Union"],
-  [EntityType.Assoc, "Association"],
-  [EntityType.Llc, "Professional/Limited Liability Company (PLLC/LLC)"],
-  [EntityType.Pac, "Political Action Committee (PAC)"],
-  [EntityType.Plc, "Political Committee"],
-  [EntityType.Oth, "Other"],
-]);
+const millisToDateStr = (millis: number): string =>
+  `${new Date(millis).getMonth() + 1}/${
+    new Date(millis).getDay() + 1
+  }/${new Date(millis).getFullYear()}`;
+
+const filingDates: FilingPeriod[] = [
+  {
+    id: 682,
+    desc: "32-Day Pre-General",
+    scopes: ["local", "state"],
+    race: "general",
+    cutOffDate: new Date("September 27, 2021").getTime(),
+    filingDate: new Date("October 01, 2021").getTime(),
+  },
+  {
+    id: 683,
+    desc: "11 Day Pre-General",
+    scopes: ["local", "state"],
+    race: "general",
+    cutOffDate: new Date("October 18, 2021").getTime(),
+    filingDate: new Date("October 22, 2021").getTime(),
+  },
+  {
+    id: 683,
+    desc: "27-Day Post-General",
+    scopes: ["local", "state"],
+    race: "general",
+    cutOffDate: new Date("November 25, 2021").getTime(),
+    filingDate: new Date("November 29, 2021").getTime(),
+  },
+];
+
+const getFilingPeriod = (committee: ICommittee): FilingPeriod => {
+  const currentTime = now();
+  const fps = filingDates.filter(
+    (fp) => currentTime < fp.cutOffDate && fp.scopes.includes(committee.scope)
+  );
+  if (fps.length === 0)
+    throw new ApplicationError("Filing period not found", {});
+  return fps[0];
+};
 
 export const NYSEntityTypeId = new Map<EntityType, number>([
   [EntityType.Can, 1],
@@ -162,44 +191,6 @@ export const NYSEntityTypeId = new Map<EntityType, number>([
   [EntityType.Pac, 12],
   [EntityType.Plc, 13],
   [EntityType.Oth, 14],
-]);
-
-export const NYSEntityTypeAggregateDuration = new Map<
-  string,
-  AggregateDuration
->([
-  [EntityType.Can, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Fam, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Ind, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Solep, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Part, AggregateDuration.CALENDAR_YEAR],
-  [EntityType.Corp, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Comm, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Union, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Assoc, AggregateDuration.CALENDAR_YEAR],
-  [EntityType.Llc, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Pac, AggregateDuration.AGGREGATE_LIMIT],
-  [EntityType.Plc, AggregateDuration.AGGREGATE_LIMIT],
-]);
-
-const scheduleAFields = [Field.DONOR_FULL_NAME, Field.DONOR_ADDRESS];
-
-const scheduleBandCFields = [Field.ENTITY_NAME, Field.DONOR_ADDRESS];
-
-export const NYSEntityTypeFields = new Map<string, Field[]>([
-  [EntityType.Can, scheduleBandCFields],
-  [EntityType.Fam, scheduleAFields],
-  [EntityType.Ind, scheduleAFields],
-  [EntityType.Solep, scheduleBandCFields],
-  [EntityType.Part, scheduleBandCFields],
-  [EntityType.Corp, scheduleBandCFields],
-  [EntityType.Comm, scheduleBandCFields],
-  [EntityType.Union, scheduleBandCFields],
-  [EntityType.Assoc, scheduleBandCFields],
-  [EntityType.Llc, scheduleBandCFields],
-  [EntityType.Pac, scheduleBandCFields],
-  [EntityType.Plc, scheduleBandCFields],
-  [EntityType.Oth, scheduleBandCFields],
 ]);
 
 export const NYSPurposeCodeId = new Map<PurposeCode, number>([
@@ -349,4 +340,83 @@ interface DisclosureRecord {
   ["R_IE_SUPPORTED"]: string;
   ["R_IE_INCLUDED"]: string;
   ["R_PARENT"]: string;
+}
+
+// @ToDo Figure out proper place to document / archive this code
+
+export enum Field {
+  DONOR_FULL_NAME = "donor_full_name",
+  DONOR_ADDRESS = "donor_address",
+  ENTITY_NAME = "entity_name",
+  EMPLOYER_NAME = "employer_name",
+  CPF_ID = "cpf_id",
+  PRINCIPAL_OFFICER_FULL_NAME = "principal_officer_full_name",
+}
+
+const scheduleAFields = [Field.DONOR_FULL_NAME, Field.DONOR_ADDRESS];
+
+const scheduleBandCFields = [Field.ENTITY_NAME, Field.DONOR_ADDRESS];
+
+export const NYSEntityTypeFields = new Map<string, Field[]>([
+  [EntityType.Can, scheduleBandCFields],
+  [EntityType.Fam, scheduleAFields],
+  [EntityType.Ind, scheduleAFields],
+  [EntityType.Solep, scheduleBandCFields],
+  [EntityType.Part, scheduleBandCFields],
+  [EntityType.Corp, scheduleBandCFields],
+  [EntityType.Comm, scheduleBandCFields],
+  [EntityType.Union, scheduleBandCFields],
+  [EntityType.Assoc, scheduleBandCFields],
+  [EntityType.Llc, scheduleBandCFields],
+  [EntityType.Pac, scheduleBandCFields],
+  [EntityType.Plc, scheduleBandCFields],
+  [EntityType.Oth, scheduleBandCFields],
+]);
+
+export const NYSEntityTypeAggregateDuration = new Map<
+  string,
+  AggregateDuration
+>([
+  [EntityType.Can, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Fam, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Ind, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Solep, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Part, AggregateDuration.CALENDAR_YEAR],
+  [EntityType.Corp, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Comm, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Union, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Assoc, AggregateDuration.CALENDAR_YEAR],
+  [EntityType.Llc, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Pac, AggregateDuration.AGGREGATE_LIMIT],
+  [EntityType.Plc, AggregateDuration.AGGREGATE_LIMIT],
+]);
+
+export const EntityTypeDescription = new Map<string, string>([
+  [EntityType.Can, "Candidate/Candidate Spouse"],
+  [EntityType.Fam, "Candidate Family Member"],
+  [EntityType.Ind, "Individual"],
+  [EntityType.Solep, "Sole Proprietorship"],
+  [EntityType.Part, "Partnership, including LLPs"],
+  [EntityType.Corp, "Corporation"],
+  [EntityType.Comm, "Committee"],
+  [EntityType.Union, "Union"],
+  [EntityType.Assoc, "Association"],
+  [EntityType.Llc, "Professional/Limited Liability Company (PLLC/LLC)"],
+  [EntityType.Pac, "Political Action Committee (PAC)"],
+  [EntityType.Plc, "Political Committee"],
+  [EntityType.Oth, "Other"],
+]);
+
+enum OfficeType {
+  StateLocal = "StateLocal",
+  Village = "Village",
+  Federal = "Federal",
+}
+
+enum ElectionType {
+  General = "General",
+  Periodic = "Periodic",
+  Special = "Special",
+  Primary = "Primary",
+  PresidentialPrimary = "PresidentialPrimary",
 }
