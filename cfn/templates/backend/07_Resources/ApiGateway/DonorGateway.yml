@@ -8,6 +8,7 @@ DonorGateway:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub donate-api.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
+      SecurityPolicy: TLS_1_2
 {% if RUNENV != 'demo' %}
       DistributionDomainName: !Sub donate.${Domain}.${TLD}
       Route53:
