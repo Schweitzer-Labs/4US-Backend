@@ -4,6 +4,7 @@ import { EntityType } from "../utils/enums/entity-type.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { AggregateDuration } from "../queries/get-rule.decoder";
 
 export const generateDisclosure = async (
   transactions: ITransaction[]
@@ -121,11 +122,6 @@ export const generateDisclosure = async (
 };
 
 const boolToYesNo = (val: any) => (val ? "yes" : "no");
-
-export enum AggregateDuration {
-  AGGREGATE_LIMIT = "aggregate_limit",
-  CALENDAR_YEAR = "calendar_year",
-}
 
 export enum Field {
   DONOR_FULL_NAME = "donor_full_name",

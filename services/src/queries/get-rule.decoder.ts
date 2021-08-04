@@ -22,3 +22,8 @@ const RuleOptional = t.partial({
 export const Rule = t.intersection([RuleRequired, RuleOptional]);
 export const Rules = t.array(Rule);
 export type IRule = t.TypeOf<typeof Rule>;
+
+export enum AggregateDuration {
+  AGGREGATE_LIMIT = "aggregate_limit",
+  CALENDAR_YEAR = "calendar_year",
+}

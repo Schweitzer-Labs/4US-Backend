@@ -10,6 +10,11 @@ import { task, taskEither } from "fp-ts";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
 import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
+import { millisToYearStart, now } from "../../src/utils/time.utils";
+import { getStripeApiKey } from "../../src/utils/config";
+import { runRulesAndProcess } from "../../src/pipes/run-rules-and-process.pipe";
+import { Stripe } from "stripe";
+import { ApplicationError } from "../../src/utils/application-error";
 
 dotenv.config();
 
@@ -83,5 +88,66 @@ describe("Rules engine", function () {
     )();
 
     expect(res).to.equal(0);
+  });
+
+  describe("Aggregate Duration", function () {
+    it("Stops contribution exceeding aggregate duration of calendar year for corp donors", async () => {
+      // Set Up
+
+      const ps = new AWS.SSM();
+      const stripeApiKey = await getStripeApiKey(ps)("qa");
+      const stripe = new Stripe(stripeApiKey, {
+        apiVersion: "2020-08-27",
+      });
+      const currentUser = "me";
+
+      const paymentDateOfToday = now();
+      const paymentDateOfLastYear =
+        millisToYearStart(paymentDateOfToday) - 1000;
+
+      const thisYearContrib = genCreateContribInput(
+        committee.id,
+        500000,
+        EntityType.Corp,
+        paymentDateOfToday
+      );
+
+      const lastYearContrib = {
+        ...thisYearContrib,
+        paymentDate: paymentDateOfLastYear,
+        amount: 500001,
+      };
+
+      // Run
+
+      const stagingRes = await pipe(
+        runRulesAndProcess(billableEventsTableName)(donorsTable)(txnsTable)(
+          rulesTable
+        )(dynamoDB)(stripe)(instantIdConfig)(currentUser)(committee)(
+          thisYearContrib
+        ),
+        taskEither.fold(
+          (e) => task.of("fail"),
+          (res) => task.of("success")
+        )
+      )();
+
+      if (stagingRes === "fail")
+        throw new ApplicationError("staging failed", {});
+
+      const res = await pipe(
+        runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
+          rulesTable
+        )(dynamoDB)(instantIdConfig)(committee)(lastYearContrib),
+        taskEither.fold(
+          (e) => {
+            return task.of(e.data.remaining);
+          },
+          (s) => task.of("worked")
+        )
+      )();
+
+      expect(res).to.equal(500000);
+    });
   });
 });

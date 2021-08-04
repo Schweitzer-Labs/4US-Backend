@@ -6,6 +6,9 @@ import { DynamoDB } from "aws-sdk";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { TaskEither } from "fp-ts/TaskEither";
+import { ApplicationError } from "../utils/application-error";
+import { ITransaction } from "../queries/search-transactions.decoder";
 
 export const runRulesAndProcess =
   (billableEventsTableName: string) =>
@@ -17,7 +20,7 @@ export const runRulesAndProcess =
   (lnConfig: ILexisNexisConfig) =>
   (currentUser: string) =>
   (committee: ICommittee) =>
-  (createContributionInput) =>
+  (createContributionInput): TaskEither<ApplicationError, ITransaction> =>
     pipe(
       runRulesEngine(billableEventsTableName)(donorsTableName)(txnsTableName)(
         rulesTableName
