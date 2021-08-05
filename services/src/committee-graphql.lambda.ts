@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server-lambda";
 import { buildSchemaSync } from "type-graphql";
 import { AppResolver } from "./resolvers/app.resolver";
+import headers from "./utils/headers";
 
 const schema = buildSchemaSync({
   resolvers: [AppResolver],
