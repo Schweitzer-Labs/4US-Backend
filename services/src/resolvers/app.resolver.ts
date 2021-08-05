@@ -85,9 +85,9 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ) {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
-      currentUser
-    );
+    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      committeeId
+    )(currentUser);
 
     const res = await searchTransactions(txnsTableName)(dynamoDB)({
       committeeId,
@@ -99,7 +99,7 @@ export class AppResolver {
     } else {
       const txns = res.right;
 
-      const csvData = await generateDisclosure(txns);
+      const csvData = await generateDisclosure(committee)(txns);
       return {
         csvData,
       };

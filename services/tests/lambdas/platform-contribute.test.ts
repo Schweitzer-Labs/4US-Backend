@@ -1,9 +1,26 @@
 import { expect } from "chai";
 import platformContribute from "../../src/platform-contribute.lambda";
 import { EmploymentStatus } from "../../src/utils/enums/employment-status";
+import * as faker from "faker";
+import { genCommittee } from "../utils/gen-committee.util";
+import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { sleep } from "../../src/utils/sleep.utils";
+import * as dotenv from "dotenv";
+import * as AWS from "aws-sdk";
+import { DynamoDB } from "aws-sdk";
+import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+
+dotenv.config();
+
+AWS.config.apiVersions = {
+  dynamodb: "2012-08-10",
+};
+const dynamoDB = new DynamoDB();
+
+const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 
 interface GenPlatformContribConfig {
-  committeeId: string;
+  committeeId?: string;
   amount: number;
   firstName?: string;
   lastName?: string;
@@ -25,12 +42,24 @@ interface GenPlatformContribConfig {
   cardNumber?: string;
 }
 
+const committee = genCommittee({
+  state: "ny",
+  scope: "local",
+  party: "republican",
+  race: "general",
+  district: "",
+  county: "saratoga",
+  officeType: "supervisor",
+  ruleVersion: "nyboe-2020",
+});
+
 const genPlatformContribution = (config: GenPlatformContribConfig) => ({
-  firstName: "Evan",
-  lastName: "Piro",
-  addressLine1: "123 street",
+  committeeId: committee.id,
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
+  addressLine1: faker.address.streetAddress(),
   city: "downingtown",
-  state: "pa",
+  state: "PA",
   postalCode: "11324",
   employmentStatus: EmploymentStatus.SelfEmployed,
   employer: "hello",
@@ -50,17 +79,14 @@ const genEvent = (payload: object) => {
   };
 };
 
-const contrib = genPlatformContribution({
-  committeeId: "john-safford",
-  amount: 2000,
-});
-
-const testEvent = genEvent(contrib);
-
 describe("Platform Contribute", function () {
+  before(async () => {
+    await putCommittee(committeesTableName)(dynamoDB)(committee);
+    await sleep(1000);
+  });
   it("Accepts a valid contribution", async () => {
     const contrib = genPlatformContribution({
-      committeeId: "john-safford",
+      committeeId: committee.id,
       amount: 100,
     });
 
@@ -75,7 +101,7 @@ describe("Platform Contribute", function () {
 
   it("Reject an excess contribution", async () => {
     const contrib = genPlatformContribution({
-      committeeId: "john-safford",
+      committeeId: committee.id,
       amount: 480100,
     });
 
@@ -91,7 +117,7 @@ describe("Platform Contribute", function () {
 
   it("Reject bad card info", async () => {
     const contrib = genPlatformContribution({
-      committeeId: "john-safford",
+      committeeId: committee.id,
       amount: 100,
       cardNumber: "4242424241414141",
     });
@@ -108,24 +134,11 @@ describe("Platform Contribute", function () {
   });
 
   it("Accepts a family contribution", async () => {
-    const req = {
-      committeeId: "john-safford",
+    const req = genPlatformContribution({
       amount: 2500,
-      firstName: "Evan",
-      lastName: "Piro",
-      addressLine1: "1687 Gates Ave 1R",
-      city: "Ridgewood",
-      state: "ny",
-      postalCode: "11385",
       entityType: "Fam",
-      emailAddress: "dev.evanpiro@gmail.com",
-      cardNumber: "4242424242424242",
-      cardExpirationMonth: 12,
-      cardExpirationYear: 2023,
-      cardCVC: "123",
-      employmentStatus: "Unemployed",
       attestsToBeingAnAdultCitizen: true,
-    };
+    });
 
     const event = genEvent(req);
 
@@ -137,26 +150,12 @@ describe("Platform Contribute", function () {
   });
 
   it("Accepts a union contribution", async () => {
-    const req = {
+    const req = genPlatformContribution({
       committeeId: "will-schweitzer",
       amount: 51,
-      firstName: "Evan",
-      lastName: "Piro",
-      addressLine1: "448 Stockholm St",
-      city: "Ridgewood",
-      state: "ny",
-      postalCode: "11385",
       entityType: "Union",
-      emailAddress: "evanpirollc@gmail.com",
-      cardNumber: "4242424242424242",
-      cardExpirationMonth: 10,
-      cardExpirationYear: 2023,
-      cardCVC: "622",
-      employmentStatus: "Employed",
-      attestsToBeingAnAdultCitizen: true,
-      entityName: "United Workers Union",
-      addressLine2: "2fl",
-    };
+      entityName: faker.company.companyName(),
+    });
 
     const event = genEvent(req);
 
@@ -176,7 +175,7 @@ describe("Platform Contribute", function () {
         lastName: "Piro",
         addressLine1: "1364 asdfsadf",
         city: "adsfadsf",
-        state: "ca",
+        state: "CA",
         postalCode: "13224",
         entityType: "Ind",
         emailAddress: "dev.evanpiro@gmail.com",
@@ -194,5 +193,8 @@ describe("Platform Contribute", function () {
 
       expect(res.statusCode).to.equal(200);
     });
+  });
+  after(async () => {
+    await deleteCommittee(committeesTableName)(dynamoDB)(committee);
   });
 });

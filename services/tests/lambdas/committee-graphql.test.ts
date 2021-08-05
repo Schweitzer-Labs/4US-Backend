@@ -128,7 +128,7 @@ const createDisb = `
       $entityName: String!
       $addressLine1: String!
       $city: String!
-      $state: String!
+      $state: State!
       $postalCode: String!
       $isSubcontracted: Boolean!
       $isPartialPayment: Boolean!
@@ -168,7 +168,7 @@ const amendDisbMut = `
       $addressLine1: String
       $addressLine2: String
       $city: String
-      $state: String
+      $state: State
       $postalCode: String
       $paymentDate: Float
       $checkNumber: String
@@ -209,7 +209,7 @@ mutation(
       $lastName: String!
       $addressLine1: String!
       $city: String!
-      $state: String!
+      $state: State!
       $postalCode: String!
       $entityType: EntityType!
       $emailAddress: String
@@ -264,7 +264,7 @@ const amendContribMut = `
       $lastName: String
       $addressLine1: String
       $city: String
-      $state: String
+      $state: State
       $postalCode: String
       $entityType: EntityType
       $emailAddress: String
@@ -314,40 +314,61 @@ const amendContribMut = `
     }
 `;
 
-const createContributionVariables = {
-  committeeId,
-};
-
-const generalVariables = {
-  committeeId,
-};
-
 const createContributionQuery = `
-mutation($committeeId: String!) {
-  createContribution(createContributionData: {
-    committeeId: $committeeId
-    amount: 12000
-    paymentMethod: Credit
-    cardCVC: "321"
-    cardNumber: "4242424242424242"
-    cardExpirationMonth: 12
-    cardExpirationYear: 2023
-    emailAddress: "dev.evanpiro@gmail.com"
-    firstName: "Carvin"
-    lastName: "Brierson"
-    addressLine1: "43 Lane"
-    addressLine2: "2FL"
-    city: "Downingtown"
-    state: "PA"
-    postalCode: "13224"
-    entityType: Ind
-    employmentStatus: Unemployed
-    paymentDate: ${now()}
-  }) {
-    amount
-    id
-  }
-}
+mutation(
+      $committeeId: String!
+      $amount: Float!
+      $paymentMethod: PaymentMethod!
+      $firstName: String!
+      $lastName: String!
+      $addressLine1: String!
+      $city: String!
+      $state: State!
+      $postalCode: String!
+      $entityType: EntityType!
+      $employmentStatus: EmploymentStatus
+      $emailAddress: String
+      $paymentDate: Float!
+      $cardNumber: String
+      $cardExpirationMonth: Float
+      $cardExpirationYear: Float
+      $cardCVC: String
+      $checkNumber: String
+      $entityName: String
+      $employer: String
+      $occupation: String
+      $middleName: String
+      $refCode: String
+    ) {
+      createContribution(createContributionData: {
+        committeeId: $committeeId
+        amount: $amount
+        paymentMethod: $paymentMethod
+        firstName: $firstName
+        lastName: $lastName
+        addressLine1: $addressLine1
+        city: $city
+        state: $state
+        postalCode: $postalCode
+        entityType: $entityType
+        employmentStatus: $employmentStatus
+        emailAddress: $emailAddress
+        paymentDate: $paymentDate
+        cardNumber: $cardNumber
+        cardExpirationMonth: $cardExpirationMonth
+        cardExpirationYear: $cardExpirationYear
+        cardCVC: $cardCVC
+        checkNumber: $checkNumber
+        entityName: $entityName
+        employer: $employer
+        occupation: $occupation
+        middleName: $middleName
+        refCode: $refCode
+      }) {
+        id
+        amount
+      }
+    }
 `;
 
 const recTxnMutation = `
@@ -367,8 +388,6 @@ const recTxnMutation = `
       }
     }
 `;
-
-const recDisbVar = {};
 
 const lambdaPromise = (lambda, event, context) => {
   return new Promise((resolve, reject) => {
@@ -467,20 +486,31 @@ describe("Committee GraphQL Lambda", function () {
 
   describe("Create Contributions", function () {
     it("Supports the creation of a contribution", async () => {
+      const vars = genCreateContribInput(committeeId);
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          createContributionQuery,
-          validUsername,
-          createContributionVariables
-        ),
+        genGraphQLProxy(createContributionQuery, validUsername, vars),
         {}
       );
 
       const body = JSON.parse(res.body);
       console.log(res.body);
-      expect(body.data.createContribution.amount).to.equal(12000);
+      expect(body.data.createContribution.amount).to.equal(vars.amount);
     });
+    // it("Rejects a faulty State value", async () => {
+    //   const inputVar = { ...genCreateContribInput(committeeId), state: "" };
+    //
+    //   const createRes: any = await lambdaPromise(
+    //     graphql,
+    //     genGraphQLProxy(createContribMut, validUsername, inputVar),
+    //     {}
+    //   );
+    //   console.log(createRes);
+    //
+    //   const body = JSON.parse(createRes.body);
+    //
+    //   expect(body.errors.length > 0).to.equal(true);
+    // });
   });
   describe("Create Disbursement", function () {
     it("Supports the creation of a disbursement", async () => {
@@ -597,8 +627,6 @@ describe("Committee GraphQL Lambda", function () {
       });
 
       const res = await putTransaction(txnsTableName)(dynamoDB)(bankTxn);
-
-      console.log("prodata", res);
 
       // Create Disb
       const createInputVar = genCreateDisbInput({
@@ -728,7 +756,7 @@ describe("Committee GraphQL Lambda", function () {
         genGraphQLProxy(
           createContributionQuery,
           validUsername,
-          createContributionVariables
+          genCreateContribInput(committeeId)
         ),
         {}
       );
@@ -739,11 +767,7 @@ describe("Committee GraphQL Lambda", function () {
 
       const txnRes: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          getTxnQuery(committee.id)(tid),
-          validUsername,
-          createContributionVariables
-        ),
+        genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {}),
         {}
       );
 
@@ -751,16 +775,12 @@ describe("Committee GraphQL Lambda", function () {
 
       expect(txnResBody.data.transaction.id).to.equal(tid);
     });
-    it("Gets a 404 on bad committeeId", async () => {
+    it("Gets a 404 on bad txn id", async () => {
       const tid = genTxnId();
 
       const txnRes: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(
-          getTxnQuery(committee.id)(tid),
-          validUsername,
-          createContributionVariables
-        ),
+        genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {}),
         {}
       );
 

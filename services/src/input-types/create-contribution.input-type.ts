@@ -11,6 +11,7 @@ import {
   MaxLength,
 } from "class-validator";
 import { EmploymentStatus } from "../utils/enums/employment-status";
+import {State} from "../utils/enums/state.enum";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -26,6 +27,11 @@ registerEnumType(EmploymentStatus, {
   name: "EmploymentStatus",
   description: "Employment status of donor",
 });
+
+registerEnumType(State, {
+  name: "State",
+  description: "State location of donor"
+})
 
 @InputType()
 export class CreateContributionInput implements Partial<ITransaction> {
@@ -56,9 +62,8 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @MinLength(1)
   city: string;
 
-  @Field()
-  @MinLength(2)
-  state: string;
+  @Field((type) => State)
+  state: State;
 
   @Field()
   @MinLength(5)

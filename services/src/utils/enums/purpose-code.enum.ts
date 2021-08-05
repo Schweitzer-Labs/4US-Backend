@@ -43,4 +43,4 @@ export enum PurposeCode {
   PIDA = "PIDA",
 }
 
-export const purposeCodes = Object.keys(PurposeCode);
+export const purposeCodes = Object.values(PurposeCode);
