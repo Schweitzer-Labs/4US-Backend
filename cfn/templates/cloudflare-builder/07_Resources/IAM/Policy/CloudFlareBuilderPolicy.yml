@@ -1,0 +1,16 @@
+CloudFlareBuilderPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  Properties:
+    ManagedPolicyName: !Sub ${AWS::StackName}-${AWS::Region}-CloudFlareBuilder
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Effect: Allow
+          Action: cognito-idp:ListUserPools
+          Resource: '*'
+          Condition:
+            StringEquals:
+              aws:RequestedRegion: !Ref AWS::Region
+        - Effect: Allow
+          Action: cognito-idp:ListUserPoolClients
+          Resource: !Ref CognitoUserPool

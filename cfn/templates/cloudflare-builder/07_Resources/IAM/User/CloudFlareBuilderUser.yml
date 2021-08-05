@@ -1,0 +1,6 @@
+CloudFlareBuilderUser:
+  Type: AWS::IAM::User
+  Properties:
+    UserName: !Sub CloudFlareBuilder-${AWS::Region}
+    Groups:
+      - !Ref CloudFlareBuilderGroup
