@@ -1,0 +1,8 @@
+CloudFlareBuilder:
+  Type: AWS::CloudFormation::Stack
+  Properties:
+    TemplateURL: cloudflare-builder.yml
+    TimeoutInMinutes: 60
+    Parameters:
+      LambdaRunEnvironment: !Ref LambdaRunEnvironment
+      CognitoUserPool: !GetAtt PlatformUserPool.Arn
