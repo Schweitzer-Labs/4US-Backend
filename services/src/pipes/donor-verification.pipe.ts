@@ -1,9 +1,8 @@
 import { DynamoDB } from "aws-sdk";
 import {
   donorInputToInstantIdResult,
-  IInstantIdConfig,
   IInstantIdResult,
-} from "../clients/lexis-nexis/lexis-nexis.client";
+} from "../clients/lexis-nexis/consumer-id.request";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { pipe } from "fp-ts/function";
@@ -16,6 +15,7 @@ import { donorInputToDonors } from "../queries/search-donors.query";
 import { IDonor, IDonorInput } from "../queries/search-donors.decoder";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import { Plan } from "../utils/enums/plan.enum";
+import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 
 const saveDonor =
   (donorsTableName: string) =>
@@ -48,7 +48,7 @@ const donorInputToDonor = (donorInput: IDonorInput): IDonor => ({
 const donorInputToVerifiedDonor =
   (billableEventsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (config: IInstantIdConfig) =>
+  (config: ILexisNexisConfig) =>
   (committee: ICommittee) =>
   (donorInput: IDonorInput): TaskEither<ApplicationError, IDonor> =>
     // Primitive feature configuration support
@@ -65,7 +65,7 @@ const verifyAndCreateDonorIfEmpty =
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (config: IInstantIdConfig) =>
+  (config: ILexisNexisConfig) =>
   (committee: ICommittee) =>
   (donorInput: IDonorInput) =>
   (matchedDonors: IDonor[]): TaskEither<ApplicationError, IDonor> => {
@@ -87,7 +87,7 @@ export const verifyDonor =
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (config: IInstantIdConfig) =>
+  (config: ILexisNexisConfig) =>
   (committee: ICommittee) =>
   (donorInput: IDonorInput): TaskEither<ApplicationError, IDonor> =>
     pipe(

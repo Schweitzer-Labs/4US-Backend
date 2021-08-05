@@ -5,10 +5,6 @@ import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { genCommittee } from "../utils/gen-committee.util";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
-import { genTransaction } from "../utils/gen-transaction.util";
-import { Direction } from "../../src/utils/enums/direction.enum";
-import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
-import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { syncCommittee } from "../../src/pipes/finicity-bank-sync.pipe";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
@@ -50,7 +46,6 @@ const committee = genCommittee({
   finicityAccountId: "5016000964",
 });
 
-let syncRes;
 let pTxns;
 let fTxns;
 
@@ -61,14 +56,11 @@ describe("Syncs transactions with a platform account", function () {
     const lazyRes = await syncCommittee(config)(txnsTableName)(dynamoDB)(
       committee
     )();
-
     if (isLeft(lazyRes)) {
       throw new ApplicationError("sync failed", lazyRes.left);
     }
-
     const m = lazyRes.right;
-
-    syncRes = await Promise.all(m.map((f) => f()).map(async (f) => await f));
+    await Promise.all(m.map((f) => f()).map(async (f) => await f));
 
     await sleep(1000);
 

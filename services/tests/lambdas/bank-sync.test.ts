@@ -4,11 +4,9 @@ import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { genCommittee } from "../utils/gen-committee.util";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import { genTransaction } from "../utils/gen-transaction.util";
 import { Direction } from "../../src/utils/enums/direction.enum";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
-import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import bankSync from "../../src/bank-sync.lambda";
 

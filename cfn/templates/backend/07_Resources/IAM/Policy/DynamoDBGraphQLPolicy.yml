@@ -5,9 +5,10 @@ DynamoDBGraphQLPolicy:
     PolicyDocument:
       Version: 2012-10-17
       Statement:
-          Effect: Allow
+        - Effect: Allow
           Resource:
             - !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.DonorsTableArn

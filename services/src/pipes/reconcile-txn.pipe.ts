@@ -99,13 +99,13 @@ const testTxns =
       (val) => val.transactionType === bankTxn.transactionType
     );
 
-    const haveSamePaymentType = selectedTxns.every(
-      (val) => val.paymentMethod === bankTxn.paymentMethod
-    );
+    // const haveSamePaymentType = selectedTxns.every(
+    //   (val) => val.paymentMethod === bankTxn.paymentMethod
+    // );
 
     if (
       selectedSum === bankTxn.amount &&
-      haveSamePaymentType &&
+      // haveSamePaymentType &&
       areUnreconciledTxns &&
       haveSameTxnType
     ) {

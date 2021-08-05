@@ -9,7 +9,6 @@ import { pipe } from "fp-ts/function";
 
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
-import { StatusCodes } from "http-status-codes";
 import { isEmpty } from "./get-res-is-empty.utils";
 
 const logPrefix = "Get Transaction by ID";

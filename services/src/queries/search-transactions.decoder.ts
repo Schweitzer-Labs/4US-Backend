@@ -1,6 +1,12 @@
 import * as t from "io-ts";
 import { FinicityTransaction } from "../clients/finicity/finicity.decoders";
 
+export enum SchemaVersion {
+  V1 = "v1",
+}
+
+export const currentVersion = SchemaVersion.V1;
+
 const TransactionRequired = t.type({
   id: t.string,
   committeeId: t.string,
@@ -41,10 +47,15 @@ const TransactionOptional = t.partial({
   stripePaymentIntentId: t.string,
   stripeBalanceTransactionId: t.string,
   stripeChargeId: t.string,
+  stripeTransferId: t.string,
+  stripePaymentId: t.string,
+  stripePayoutId: t.string,
+  stripeAutomaticPayoutEffectiveAtUtc: t.number,
   cardNumberLastFourDigits: t.string,
   entityName: t.string,
   ruleCode: t.string,
   createdByUser: t.string,
+  modifiedByUser: t.string,
   isSubcontracted: t.boolean,
   isPartialPayment: t.boolean,
   isExistingLiability: t.boolean,
@@ -59,6 +70,9 @@ const TransactionOptional = t.partial({
   finicityPostedDate: t.number,
   employmentStatus: t.string,
   donorVerificationScore: t.number,
+  businessIdVerificationScore: t.unknown,
+  businessIdRequestTimestamp: t.number,
+  businessIdRawResponse: t.unknown,
 });
 
 export const Transaction = t.intersection([

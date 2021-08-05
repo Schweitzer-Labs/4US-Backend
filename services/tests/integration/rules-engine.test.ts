@@ -6,11 +6,15 @@ import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { pipe } from "fp-ts/function";
 import { runRulesEngine } from "../../src/pipes/rules-engine.pipe";
-import { IInstantIdConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
-import { Env } from "../../src/utils/enums/env.enum";
 import { task, taskEither } from "fp-ts";
-import { genCreateContributionInput } from "../utils/gen-contribution.util";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
+import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
+import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
+import { millisToYearStart, now } from "../../src/utils/time.utils";
+import { getStripeApiKey } from "../../src/utils/config";
+import { runRulesAndProcess } from "../../src/pipes/run-rules-and-process.pipe";
+import { Stripe } from "stripe";
+import { ApplicationError } from "../../src/utils/application-error";
 
 dotenv.config();
 
@@ -22,7 +26,7 @@ const comsTable = process.env.COMMITTEES_DDB_TABLE_NAME;
 const lnUsername = process.env.LN_USERNAME;
 const lnPassword = process.env.LN_PASSWORD;
 
-const instantIdConfig: IInstantIdConfig = {
+const instantIdConfig: ILexisNexisConfig = {
   username: lnUsername,
   password: lnPassword,
 };
@@ -49,11 +53,7 @@ describe("Rules engine", function () {
   });
 
   it("Disallows a contribution in excess of a committee's limit", async () => {
-    const contrib = genCreateContributionInput(
-      committee.id,
-      750001,
-      EntityType.Ind
-    );
+    const contrib = genCreateContribInput(committee.id, 750001, EntityType.Ind);
 
     const res = await pipe(
       runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
@@ -73,11 +73,7 @@ describe("Rules engine", function () {
   it("Allows a contribution within committee's limit", async () => {
     await putCommittee(comsTable)(dynamoDB)(committee);
 
-    const contrib = genCreateContributionInput(
-      committee.id,
-      750000,
-      EntityType.Ind
-    );
+    const contrib = genCreateContribInput(committee.id, 750000, EntityType.Ind);
 
     const res = await pipe(
       runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
@@ -92,5 +88,66 @@ describe("Rules engine", function () {
     )();
 
     expect(res).to.equal(0);
+  });
+
+  describe("Aggregate Duration", function () {
+    it("Stops contribution exceeding aggregate duration of calendar year for corp donors", async () => {
+      // Set Up
+
+      const ps = new AWS.SSM();
+      const stripeApiKey = await getStripeApiKey(ps)("qa");
+      const stripe = new Stripe(stripeApiKey, {
+        apiVersion: "2020-08-27",
+      });
+      const currentUser = "me";
+
+      const paymentDateOfToday = now();
+      const paymentDateOfLastYear =
+        millisToYearStart(paymentDateOfToday) - 1000;
+
+      const thisYearContrib = genCreateContribInput(
+        committee.id,
+        500000,
+        EntityType.Corp,
+        paymentDateOfToday
+      );
+
+      const lastYearContrib = {
+        ...thisYearContrib,
+        paymentDate: paymentDateOfLastYear,
+        amount: 500001,
+      };
+
+      // Run
+
+      const stagingRes = await pipe(
+        runRulesAndProcess(billableEventsTableName)(donorsTable)(txnsTable)(
+          rulesTable
+        )(dynamoDB)(stripe)(instantIdConfig)(currentUser)(committee)(
+          thisYearContrib
+        ),
+        taskEither.fold(
+          (e) => task.of("fail"),
+          (res) => task.of("success")
+        )
+      )();
+
+      if (stagingRes === "fail")
+        throw new ApplicationError("staging failed", {});
+
+      const res = await pipe(
+        runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
+          rulesTable
+        )(dynamoDB)(instantIdConfig)(committee)(lastYearContrib),
+        taskEither.fold(
+          (e) => {
+            return task.of(e.data.remaining);
+          },
+          (s) => task.of("worked")
+        )
+      )();
+
+      expect(res).to.equal(500000);
+    });
   });
 });

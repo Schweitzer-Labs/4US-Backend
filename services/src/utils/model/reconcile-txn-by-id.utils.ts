@@ -84,10 +84,7 @@ export const reconcileTxnsByIds =
   (txn: ITransaction) =>
   async (txnIds: string[]): Promise<any> => {
     for (const txnId of txnIds) {
-      console.log(
-        "Attempting to update txn with stripe payout ID",
-        JSON.stringify(txn)
-      );
+      console.log("Reconciling txns", JSON.stringify(txn));
       const res = await reconcileTxnById(txnsTableName)(dynamoDB)(txn)(txnId);
       console.log("Update result", res);
     }

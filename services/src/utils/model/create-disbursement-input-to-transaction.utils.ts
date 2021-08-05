@@ -6,7 +6,7 @@ import { now } from "../time.utils";
 import { Source } from "../enums/source.enum";
 import { TransactionType } from "../enums/transaction-type.enum";
 
-export const createDisbursementInputToTransaction =
+export const createDisbInputToTxn =
   (createdByUser: string) =>
   (d: CreateDisbursementInput): ITransaction => ({
     id: genTxnId(),

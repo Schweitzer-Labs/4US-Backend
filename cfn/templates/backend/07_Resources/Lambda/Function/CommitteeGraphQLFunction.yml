@@ -34,6 +34,8 @@ CommitteeGraphQLFunction:
           !GetAtt DynamoDBsTemplate.Outputs.RulesTableName
         BILLABLE_EVENTS_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableName
+        AUDIT_LOGS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableName
 
 CommitteeGQLInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig

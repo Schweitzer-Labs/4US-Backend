@@ -98,6 +98,7 @@ JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAI
 
 EMAIL_TEMPLATES		:= $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
 CFN_TEMPLATES 		:= $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(EMAIL_TEMPLATES) $(CLOUDFLARE_TEMPLATE)
+export SAM_TEMPLATE	:= $(SAM_BUILD_DIR)/template.yaml
 
 ifeq ($(REGION), us-west-1)
 	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(CLOUDFLARE_TEMPLATE)
@@ -105,7 +106,7 @@ else ifeq ($(REGION), us-east-2)
 	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
 endif
 
-.PHONY: dep build buildstacks check local import package deploy clean realclean
+.PHONY: dep build build-stacks check local import package deploy clean realclean
 
 # Make targets
 all: build
@@ -114,9 +115,11 @@ all: build
 mkbuilddir:
 	@mkdir -p $(SAM_BUILD_DIR) $(CFN_BUILD_DIR)
 
-build: clean mkbuilddir buildstacks buildsam
+build: mkbuilddir build-stacks build-sam
 
-buildsam: buildstacks compile $(JS_APPS)
+build-sam: build-stacks $(SAM_TEMPLATE)
+
+$(SAM_TEMPLATE): $(JS_APPS)
 	sam build \
 		--cached \
 		--parallel \
@@ -125,7 +128,7 @@ buildsam: buildstacks compile $(JS_APPS)
 		--cache-dir $(SAM_CACHE_DIR) \
 		--template-file $(BACKEND_TEMPLATE)
 
-buildstacks: mkbuilddir $(CFN_TEMPLATES)
+build-stacks: mkbuilddir $(CFN_TEMPLATES)
 
 compile:
 	npm -C services run compile
@@ -148,7 +151,7 @@ local: build
 	@sam local start-api --warm-containers EAGER --template-file $(SAM_BUILD_DIR)/template.yaml
 
 
-check: buildstacks
+check: build-stacks
 	$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
 
 import: mkbuilddir

@@ -5,6 +5,7 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { IsEmail, IsNumber, Min, MinLength } from "class-validator";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { EmploymentStatus } from "../utils/enums/employment-status";
+import {State} from "../utils/enums/state.enum";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -15,6 +16,13 @@ registerEnumType(EmploymentStatus, {
   name: "EmploymentStatus",
   description: "Employment status of donor",
 });
+
+
+registerEnumType(State, {
+  name: "State",
+  description: "State location of donor"
+})
+
 
 @InputType()
 export class AmendContributionInput implements Partial<ITransaction> {
@@ -27,37 +35,37 @@ export class AmendContributionInput implements Partial<ITransaction> {
 
   @Field({ nullable: true })
   @Min(50)
-  amount: number;
+  amount?: number;
 
   @Field((type) => PaymentMethod, { nullable: true })
-  paymentMethod: PaymentMethod;
+  paymentMethod?: PaymentMethod;
 
   @Field({ nullable: true })
   @MinLength(1)
-  firstName: string;
+  firstName?: string;
 
   @Field({ nullable: true })
   @MinLength(1)
-  lastName: string;
+  lastName?: string;
 
   @Field({ nullable: true })
   @MinLength(1)
-  addressLine1: string;
+  addressLine1?: string;
 
   @Field({ nullable: true })
   @MinLength(1)
-  city: string;
+  city?: string;
 
-  @Field({ nullable: true })
-  @MinLength(2)
-  state: string;
+
+  @Field((type) => State, {nullable: true})
+  state?: State;
 
   @Field({ nullable: true })
   @MinLength(5)
-  postalCode: string;
+  postalCode?: string;
 
   @Field((type) => EntityType, { nullable: true })
-  entityType: EntityType;
+  entityType?: EntityType;
 
   @Field({ nullable: true })
   @IsEmail()
@@ -66,7 +74,7 @@ export class AmendContributionInput implements Partial<ITransaction> {
   @Field({ nullable: true })
   @IsNumber()
   @Min(1)
-  paymentDate: number;
+  paymentDate?: number;
 
   // Required for PaymentMethod.ACH and Check
   @Field({ nullable: true })

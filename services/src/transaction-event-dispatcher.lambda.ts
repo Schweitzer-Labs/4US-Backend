@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
 import { DynamoDBStreamEvent } from "aws-lambda";
-import { SendMessageRequest } from "aws-sdk/clients/sqs";
+
 import {
   ITransaction,
   Transaction,
@@ -9,16 +9,12 @@ import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "./utils/application-error";
 import { Source } from "./utils/enums/source.enum";
 import { DynamoDB } from "aws-sdk";
-import {
-  getCommitteeById,
-  ICommittee,
-} from "./queries/get-committee-by-id.query";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
-import { PathReporter } from "io-ts/PathReporter";
-import { TaskEither } from "fp-ts/TaskEither";
 import * as dotenv from "dotenv";
-import { TransactionType } from "./utils/enums/transaction-type.enum";
+import { sendContribSuccessMsgs } from "./pipes/send-contrib-success-msgs.pipe";
+import { validateDDBResponse } from "./repositories/ddb.utils";
+import { auditTxnStream, DdbEventName } from "./pipes/audit-txn-stream.pipe";
 
 dotenv.config();
 
@@ -29,50 +25,57 @@ const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 const dynamoDB = new DynamoDB();
 const sqsUrl: any = process.env.SQSQUEUE;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
+const auditLogsTableName: any = process.env.AUDIT_LOGS_DDB_TABLE_NAME;
 
-export default async (
-  event: DynamoDBStreamEvent,
-  context
-): Promise<EffectMetadata> => {
+export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
   console.log(JSON.stringify(event));
   console.log("initiating ddb update loop");
 
   for (const stream of event.Records) {
     const record = stream.dynamodb;
     switch (stream.eventName) {
-      case "INSERT":
+      case DdbEventName.INSERT:
         console.log("INSERT event emitted");
+        const insertedTxn = await streamRecordToTxn(record.NewImage);
         return await handleInsert(sqsUrl)(committeesTableName)(dynamoDB)(
-          parseStreamRecord(record)
+          insertedTxn
         );
-      case "MODIFY":
-        console.log("MODIFY event emitted");
-        return;
+      case DdbEventName.MODIFY:
+        return await pipe(
+          auditTxnStream(auditLogsTableName)(dynamoDB)(DdbEventName.MODIFY)(
+            record.OldImage
+          )(record.NewImage),
+          taskEither.fold(
+            (err) => task.of(failedAuditPut(DdbEventName.MODIFY)(err)),
+            (log) => task.of(successfulAuditPut(DdbEventName.MODIFY)(log))
+          )
+        )();
       default:
         return;
     }
   }
 };
 
-const parseStreamRecord = (record: any): ITransaction => {
-  const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(record.NewImage);
+const streamRecordToTxn = async (txnRecord: any): Promise<ITransaction> => {
+  const unmarshalledTxn = AWS.DynamoDB.Converter.unmarshall(txnRecord);
   console.log(
     "Transaction record unmarshalled",
     JSON.stringify(unmarshalledTxn)
   );
-  const eitherTxn = Transaction.decode(unmarshalledTxn);
+
+  const eitherTxn = await validateDDBResponse("txn inserted")(Transaction)(
+    unmarshalledTxn
+  )();
 
   if (isLeft(eitherTxn)) {
-    throw new ApplicationError(
-      "Invalid transaction data",
-      PathReporter.report(eitherTxn)
-    );
+    throw new ApplicationError("Invalid transaction data", {});
   }
   return eitherTxn.right;
 };
 
 enum Effect {
   SQS_RECEIPT_MESSAGE_SENT = "sqs_receipt_message_sent",
+  DDB_AUDIT_LOG_RECORDED = "ddb_audit_log_recorded",
 }
 
 enum Status {
@@ -82,24 +85,45 @@ enum Status {
 
 interface EffectMetadata {
   status: Status;
-  ddbEventName: string;
+  ddbEventName: DdbEventName;
   message: string;
   effect: Effect;
+  metadata?: any;
 }
 
 const successfulSend: EffectMetadata = {
   status: Status.SUCCESS,
-  ddbEventName: "INSERT",
+  ddbEventName: DdbEventName.INSERT,
   message: "message send succeeded",
   effect: Effect.SQS_RECEIPT_MESSAGE_SENT,
 };
 
 const failedSend: EffectMetadata = {
   status: Status.FAILURE,
-  ddbEventName: "INSERT",
+  ddbEventName: DdbEventName.INSERT,
   message: "message send failed",
   effect: Effect.SQS_RECEIPT_MESSAGE_SENT,
 };
+
+const successfulAuditPut =
+  (ddbEventName: DdbEventName) =>
+  (res: any): EffectMetadata => ({
+    status: Status.SUCCESS,
+    ddbEventName: ddbEventName,
+    message: "ddb audit log recorded succeeded",
+    effect: Effect.DDB_AUDIT_LOG_RECORDED,
+    metadata: JSON.stringify(res),
+  });
+
+const failedAuditPut =
+  (ddbEventName: DdbEventName) =>
+  (res: any): EffectMetadata => ({
+    status: Status.FAILURE,
+    ddbEventName: ddbEventName,
+    message: "ddb audit log recorded failed",
+    effect: Effect.DDB_AUDIT_LOG_RECORDED,
+    metadata: JSON.stringify(res),
+  });
 
 const handleInsert =
   (sqsUrl: string) =>
@@ -110,10 +134,9 @@ const handleInsert =
     if (txn.source === Source.DONATE_FORM) {
       console.log("donate form transaction recognized");
       console.log("initiating pipe");
-      return await pipe(
-        getCommitteeById(committeesTableName)(dynamoDB)(txn.committeeId),
-        taskEither.map(formatMessage(sqsUrl)(txn)),
-        taskEither.chain(sendMessage),
+
+      return pipe(
+        sendContribSuccessMsgs(committeesTableName)(dynamoDB)(sqsUrl)(sqs)(txn),
         taskEither.fold(
           () => task.of(failedSend),
           () => task.of(successfulSend)
@@ -121,45 +144,3 @@ const handleInsert =
       )();
     }
   };
-
-const formatMessage =
-  (sqsUrl: string) =>
-  (txn: ITransaction) =>
-  (committee: ICommittee): SendMessageRequest => {
-    console.log(
-      "formatMessage called",
-      sqsUrl,
-      JSON.stringify(txn),
-      JSON.stringify(committee)
-    );
-    const { tzDatabaseName, emailAddresses, committeeName } = committee;
-    return {
-      MessageAttributes: {
-        committeeEmailAddress: {
-          DataType: "String",
-          StringValue: emailAddresses,
-        },
-        committeeTzDatabaseName: {
-          DataType: "String",
-          StringValue: tzDatabaseName,
-        },
-        committeeName: {
-          DataType: "String",
-          StringValue: committeeName,
-        },
-      },
-      MessageBody: JSON.stringify(txn),
-      MessageDeduplicationId: txn.id,
-      MessageGroupId: txn.committeeId,
-      QueueUrl: sqsUrl,
-    };
-  };
-const sendMessage = (
-  message: SendMessageRequest
-): TaskEither<ApplicationError, any> => {
-  console.log("messa");
-  return taskEither.tryCatch(
-    () => sqs.sendMessage(message).promise(),
-    (e) => new ApplicationError("SQS send failed", e)
-  );
-};

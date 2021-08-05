@@ -64,5 +64,7 @@ export const genCommittee = ({
     finicityCustomerId,
     finicityAccountId,
     bankName: "chase",
+    efsElectionId: faker.datatype.number(5000000),
+    efsFilerId: faker.datatype.number(5000000),
   };
 };

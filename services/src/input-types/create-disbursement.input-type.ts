@@ -3,6 +3,7 @@ import { ITransaction } from "../queries/search-transactions.decoder";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { Min, MinLength } from "class-validator";
+import {State} from "../utils/enums/state.enum";
 
 registerEnumType(PurposeCode, {
   name: "PurposeCode",
@@ -13,6 +14,11 @@ registerEnumType(PaymentMethod, {
   name: "PaymentMethod",
   description: "Payment method used in an expenditure",
 });
+
+registerEnumType(State, {
+  name: "State",
+  description: "State location of donor"
+})
 
 @InputType()
 export class CreateDisbursementInput implements Partial<ITransaction> {
@@ -39,9 +45,9 @@ export class CreateDisbursementInput implements Partial<ITransaction> {
   @MinLength(1)
   city: string;
 
-  @Field()
-  @MinLength(2)
-  state: string;
+  @Field((type) => State)
+  state: State;
+
 
   @Field()
   @MinLength(5)

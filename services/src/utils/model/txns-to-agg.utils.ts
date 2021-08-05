@@ -55,7 +55,7 @@ export const txnsToAgg = (txns: ITransaction[]): IAggregations => {
           acc.totalDisbursementsInProcessing + txn.amount;
       }
     }
-    if (!txn.ruleVerified) {
+    if (!txn.ruleVerified || !txn.bankVerified) {
       acc.needsReviewCount++;
     }
 

@@ -1,1 +1,1 @@
-module.exports = require("/opt/nodejs")
+module.exports = require("/opt/nodejs");
