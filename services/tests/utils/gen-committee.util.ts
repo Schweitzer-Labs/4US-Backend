@@ -21,6 +21,8 @@ interface IGenCommitteeConfig {
   stripeAccount?: string;
   candidateFirstName?: string;
   candidateLastName?: string;
+  efsElectionId?: number;
+  efsFilerId?: number;
 }
 
 export const genCommittee = ({
@@ -40,6 +42,8 @@ export const genCommittee = ({
   candidateFirstName,
   candidateLastName,
   stripeAccount,
+  efsElectionId,
+  efsFilerId,
 }: IGenCommitteeConfig): ICommittee => {
   const randomFirstName = faker.name.firstName();
   const randomLastName = faker.name.lastName();
@@ -64,7 +68,7 @@ export const genCommittee = ({
     finicityCustomerId,
     finicityAccountId,
     bankName: "chase",
-    efsElectionId: faker.datatype.number(5000000),
-    efsFilerId: faker.datatype.number(5000000),
+    efsElectionId: efsElectionId || faker.datatype.number(5000000),
+    efsFilerId: efsFilerId || faker.datatype.number(5000000),
   };
 };

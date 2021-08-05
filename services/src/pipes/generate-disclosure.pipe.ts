@@ -45,14 +45,17 @@ export const generateDisclosure =
         ["RESIG_TERM_TYPE_ID"]: "NULL",
         // @Todo implement
         ["R_FILING_DATE"]: millisToDateStr(filingPeriod.filingDate),
-        ["FILING_SCHED_ID"]: getFilingScheduleIdByEntityType(entityType),
+        ["FILING_SCHED_ID"]: getFilingScheduleId(txn),
         ["LOAN_LIB_NUMBER"]: "NULL",
         ["TRANS_NUMBER"]: transactionId,
         ["TRANS_MAPPING"]: "NULL",
         // @Todo implement
         ["SCHED_DATE"]: millisToDateStr(txn.paymentDate),
         ["ORG_DATE"]: "NULL",
-        ["CNTRBR_TYPE_ID"]: NYSEntityTypeId.get(entityType),
+        ["CNTRBR_TYPE_ID"]:
+          txn.transactionType === TransactionType.Contribution
+            ? NYSEntityTypeId.get(entityType)
+            : "NULL",
         // @ToDo add in-kind field
         ["CNTRBN_TYPE_ID"]: "NULL",
         ["TRANSFER_TYPE_ID"]: "NULL",
@@ -96,7 +99,7 @@ export const generateDisclosure =
         ["ORG_AMT"]: centsToDollars(amount),
         ["TRANS_EXPLNTN"]: "NULL",
         ["LOAN_OTHER_ID"]: "NULL",
-        ["R_ITEMIZED"]: "R_ITEMIZED",
+        ["R_ITEMIZED"]: "y",
         ["R_LIABILITY"]: "NULL",
         ["ELECTION_DATE"]: "NULL",
         ["ELECTION_TYPE"]: "NULL",
@@ -124,27 +127,30 @@ export const generateDisclosure =
     return await jsonexport.default(disclosures);
   };
 
-const boolToYesNo = (val: any) => (val ? "yes" : "no");
+const boolToYesNo = (val: any) => (val ? "y" : "n");
 
 interface FilingPeriod {
   id: number;
   cutOffDate: number;
   filingDate: number;
   scopes: string[];
+  state: string;
   race: string;
   desc: string;
 }
 
-const millisToDateStr = (millis: number): string =>
-  `${new Date(millis).getMonth() + 1}/${
-    new Date(millis).getDay() + 1
-  }/${new Date(millis).getFullYear()}`;
+const millisToDateStr = (millis: number): string => {
+  const date = new Date(millis);
+
+  return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+};
 
 const filingDates: FilingPeriod[] = [
   {
     id: 682,
     desc: "32-Day Pre-General",
     scopes: ["local", "state"],
+    state: "ny",
     race: "general",
     cutOffDate: new Date("September 27, 2021").getTime(),
     filingDate: new Date("October 01, 2021").getTime(),
@@ -153,6 +159,7 @@ const filingDates: FilingPeriod[] = [
     id: 683,
     desc: "11 Day Pre-General",
     scopes: ["local", "state"],
+    state: "ny",
     race: "general",
     cutOffDate: new Date("October 18, 2021").getTime(),
     filingDate: new Date("October 22, 2021").getTime(),
@@ -161,6 +168,7 @@ const filingDates: FilingPeriod[] = [
     id: 683,
     desc: "27-Day Post-General",
     scopes: ["local", "state"],
+    state: "ny",
     race: "general",
     cutOffDate: new Date("November 25, 2021").getTime(),
     filingDate: new Date("November 29, 2021").getTime(),
@@ -264,15 +272,26 @@ const getEntityName = (
   }
 };
 
-const getFilingScheduleIdByEntityType = (entityType: EntityType): number => {
-  switch (entityType) {
-    case EntityType.Ind:
-    case EntityType.Part:
-      return 1;
-    case EntityType.Corp:
-      return 2;
-    default:
-      return 3;
+const getFilingScheduleId = (txn: ITransaction): number => {
+  if (txn.transactionType === TransactionType.Contribution) {
+    if (txn.paymentMethod === PaymentMethod.InKind) {
+      return 4;
+    } else {
+      switch (txn.entityType) {
+        case EntityType.Ind:
+        case EntityType.Part:
+          return 1;
+        case EntityType.Corp:
+          return 2;
+        case EntityType.Llc:
+          return 15;
+        default:
+          return 3;
+      }
+    }
+  } else {
+    // Expenditure
+    return 6;
   }
 };
 
@@ -293,7 +312,7 @@ interface DisclosureRecord {
   ["TRANS_MAPPING"]: string;
   ["SCHED_DATE"]: string;
   ["ORG_DATE"]: string;
-  ["CNTRBR_TYPE_ID"]: number;
+  ["CNTRBR_TYPE_ID"]: number | string;
   ["CNTRBN_TYPE_ID"]: string;
   ["TRANSFER_TYPE_ID"]: string;
   ["RECEIPT_TYPE_ID"]: string;
