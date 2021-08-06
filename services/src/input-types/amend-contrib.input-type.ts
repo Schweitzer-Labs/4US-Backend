@@ -124,6 +124,6 @@ export class AmendContributionInput implements Partial<ITransaction> {
   @Field((type) => EmploymentStatus, { nullable: true })
   employmentStatus?: EmploymentStatus;
 
-  @Field({ nullable: true })
+  @Field((type) => InKindDescription, { nullable: true })
   inKindDescription?: InKindDescription;
 }
