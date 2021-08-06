@@ -2,6 +2,7 @@ import { ITransaction } from "../../queries/search-transactions.decoder";
 import { TransactionType } from "../enums/transaction-type.enum";
 import { Direction } from "../enums/direction.enum";
 import { Field } from "type-graphql";
+import { PaymentMethod } from "../enums/payment-method.enum";
 
 export interface IAggregations {
   balance: number;
@@ -32,7 +33,9 @@ export const txnsToAgg = (txns: ITransaction[]): IAggregations => {
     if (txn.transactionType === TransactionType.Contribution) {
       if (txn.bankVerified) {
         acc.totalRaised = acc.totalRaised + txn.amount;
-        acc.balance = acc.balance + txn.amount;
+        if (txn.paymentMethod !== PaymentMethod.InKind) {
+          acc.balance = acc.balance + txn.amount;
+        }
       } else {
         acc.totalContributionsInProcessing =
           acc.totalContributionsInProcessing + txn.amount;
