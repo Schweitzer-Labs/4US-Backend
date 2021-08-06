@@ -1,11 +1,14 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import {
+  InKindDescription,
+  PaymentMethod,
+} from "../utils/enums/payment-method.enum";
 
 import { IsEmail, IsNumber, Min, MinLength } from "class-validator";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { EmploymentStatus } from "../utils/enums/employment-status";
-import {State} from "../utils/enums/state.enum";
+import { State } from "../utils/enums/state.enum";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -17,12 +20,15 @@ registerEnumType(EmploymentStatus, {
   description: "Employment status of donor",
 });
 
-
 registerEnumType(State, {
   name: "State",
-  description: "State location of donor"
-})
+  description: "State location of donor",
+});
 
+registerEnumType(InKindDescription, {
+  name: "InKindDescription",
+  description: "Type of In-kind contribution",
+});
 
 @InputType()
 export class AmendContributionInput implements Partial<ITransaction> {
@@ -56,8 +62,7 @@ export class AmendContributionInput implements Partial<ITransaction> {
   @MinLength(1)
   city?: string;
 
-
-  @Field((type) => State, {nullable: true})
+  @Field((type) => State, { nullable: true })
   state?: State;
 
   @Field({ nullable: true })
@@ -118,4 +123,7 @@ export class AmendContributionInput implements Partial<ITransaction> {
 
   @Field((type) => EmploymentStatus, { nullable: true })
   employmentStatus?: EmploymentStatus;
+
+  @Field({ nullable: true })
+  inKindDescription?: InKindDescription;
 }
