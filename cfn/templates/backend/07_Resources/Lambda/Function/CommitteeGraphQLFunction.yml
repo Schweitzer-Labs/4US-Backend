@@ -25,7 +25,7 @@ CommitteeGraphQLFunction:
         RUNENV:
           !Ref LambdaRunEnvironment
         CORS_ORIGIN:
-          !Sub dashboard.${Domain}.${TLD}
+          !Sub https://dashboard.${Domain}.${TLD}
         TRANSACTIONS_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
         COMMITTEES_DDB_TABLE_NAME:
