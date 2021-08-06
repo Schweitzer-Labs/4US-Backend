@@ -192,7 +192,6 @@ export const NYSEntityTypeId = new Map<EntityType, number>([
   [EntityType.Solep, 4],
   [EntityType.Part, 5],
   [EntityType.Corp, 6],
-  [EntityType.Comm, 7],
   [EntityType.Union, 9],
   [EntityType.Assoc, 10],
   [EntityType.Llc, 11],

@@ -2,7 +2,7 @@ import { Field, InputType, registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
-import {State} from "../utils/enums/state.enum";
+import { State } from "../utils/enums/state.enum";
 
 registerEnumType(PurposeCode, {
   name: "PurposeCode",
@@ -16,9 +16,8 @@ registerEnumType(PaymentMethod, {
 
 registerEnumType(State, {
   name: "State",
-  description: "State location of donor"
-})
-
+  description: "State location of donor",
+});
 
 @InputType()
 export class AmendDisbInput implements Partial<ITransaction> {
@@ -55,9 +54,8 @@ export class AmendDisbInput implements Partial<ITransaction> {
   @Field({ nullable: true })
   city?: string;
 
-  @Field((type) => State, {nullable: true})
+  @Field((type) => State, { nullable: true })
   state?: State;
-
 
   @Field({ nullable: true })
   postalCode?: string;
