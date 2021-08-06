@@ -24,7 +24,7 @@ export const paymentMethods: PaymentMethod[] = [
   PaymentMethod.Other,
 ];
 
-export enum InKindDescription {
+export enum InKindType {
   ServicesFacilitiesProvided = "ServicesFacilitiesProvided",
   CampaignExpensesPaid = "CampaignExpensesPaid",
   PropertyGiven = "PropertyGiven",

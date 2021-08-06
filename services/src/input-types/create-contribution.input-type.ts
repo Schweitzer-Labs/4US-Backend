@@ -1,9 +1,6 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
-import {
-  InKindDescription,
-  PaymentMethod,
-} from "../utils/enums/payment-method.enum";
+import { InKindType, PaymentMethod } from "../utils/enums/payment-method.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import {
   MinLength,
@@ -36,8 +33,8 @@ registerEnumType(State, {
   description: "State location of donor",
 });
 
-registerEnumType(InKindDescription, {
-  name: "InKindDescription",
+registerEnumType(InKindType, {
+  name: "InKindType",
   description: "Type of In-kind contribution",
 });
 
@@ -155,6 +152,10 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @Field((type) => EmploymentStatus, { nullable: true })
   employmentStatus?: EmploymentStatus;
 
-  @Field((type) => InKindDescription, { nullable: true })
-  inKindDescription?: InKindDescription;
+  @Field((type) => InKindType, { nullable: true })
+  inKindType?: InKindType;
+
+  @Field({ nullable: true })
+  @MinLength(2)
+  inKindDescription?: string;
 }

@@ -3,7 +3,7 @@ import { ITransaction } from "../queries/search-transactions.decoder";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { InKindType, PaymentMethod } from "../utils/enums/payment-method.enum";
 import { AggregateDuration } from "../queries/get-rule.decoder";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import { now } from "../utils/time.utils";
@@ -35,6 +35,7 @@ export const generateDisclosure =
       const paymentMethod: any = paymentMethodStr;
       const purposeCode: any = purposeCodeString;
       const filingPeriod = getFilingPeriod(committee);
+      const inKindType: any = txn.inKindType;
       return {
         // @Todo implement
         ["FILER_ID"]: committee.efsFilerId,
@@ -57,7 +58,10 @@ export const generateDisclosure =
             ? NYSEntityTypeId.get(entityType)
             : "NULL",
         // @ToDo add in-kind field
-        ["CNTRBN_TYPE_ID"]: "NULL",
+        ["CNTRBN_TYPE_ID"]:
+          txn.paymentMethod === PaymentMethod.InKind
+            ? NYSInKindTypeId.get(inKindType)
+            : "NULL",
         ["TRANSFER_TYPE_ID"]: "NULL",
         ["RECEIPT_TYPE_ID"]: "NULL",
         ["RECEIPT_CODE_ID"]: "NULL",
@@ -97,7 +101,10 @@ export const generateDisclosure =
           txn.paymentMethod === PaymentMethod.Check ? txn.checkNumber : "NULL",
         ["OWED_AMT"]: "NULL",
         ["ORG_AMT"]: centsToDollars(amount),
-        ["TRANS_EXPLNTN"]: "NULL",
+        ["TRANS_EXPLNTN"]:
+          txn.paymentMethod === PaymentMethod.InKind
+            ? txn.inKindDescription
+            : "NULL",
         ["LOAN_OTHER_ID"]: "NULL",
         ["R_ITEMIZED"]: "y",
         ["R_LIABILITY"]: "NULL",
@@ -245,6 +252,12 @@ export const NYSPurposeCodeId = new Map<PurposeCode, number>([
   [PurposeCode.PIDA, 50],
 ]);
 
+export const NYSInKindTypeId = new Map<InKindType, number>([
+  [InKindType.ServicesFacilitiesProvided, 1],
+  [InKindType.PropertyGiven, 2],
+  [InKindType.CampaignExpensesPaid, 3],
+]);
+
 export const NYSPaymentTypeId = new Map<PaymentMethod, number>([
   [PaymentMethod.Check, 1],
   [PaymentMethod.Credit, 2],
@@ -312,7 +325,7 @@ interface DisclosureRecord {
   ["SCHED_DATE"]: string;
   ["ORG_DATE"]: string;
   ["CNTRBR_TYPE_ID"]: number | string;
-  ["CNTRBN_TYPE_ID"]: string;
+  ["CNTRBN_TYPE_ID"]: number | string;
   ["TRANSFER_TYPE_ID"]: string;
   ["RECEIPT_TYPE_ID"]: string;
   ["RECEIPT_CODE_ID"]: string;
