@@ -3,7 +3,10 @@ import { Field, ID, ObjectType } from "type-graphql";
 import { registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { Direction } from "../utils/enums/direction.enum";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import {
+  InKindDescription,
+  PaymentMethod,
+} from "../utils/enums/payment-method.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
@@ -24,6 +27,7 @@ registerEnumType(PurposeCode, {
 
 registerEnumType(EntityType, {
   name: "EntityType",
+  description: "Type of entity involved in the transaction",
 });
 
 registerEnumType(TransactionType, {
@@ -32,10 +36,17 @@ registerEnumType(TransactionType, {
 
 registerEnumType(EmploymentStatus, {
   name: "EmploymentStatus",
+  description: "Employment status of donor",
 });
 
 registerEnumType(State, {
   name: "State",
+  description: "State location of donor",
+});
+
+registerEnumType(InKindDescription, {
+  name: "InKindDescription",
+  description: "Type of In-kind contribution",
 });
 
 @ObjectType()
@@ -175,4 +186,7 @@ export class Transaction implements ITransaction {
 
   @Field({ nullable: true })
   donorVerificationScore?: number;
+
+  @Field({ nullable: true })
+  inKindDescription?: string;
 }
