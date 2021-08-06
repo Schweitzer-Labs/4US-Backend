@@ -1,4 +1,3 @@
-import headers from "./headers";
 import { StatusCodes } from "http-status-codes";
 
 export class ApplicationError extends Error {
@@ -16,7 +15,6 @@ export class ApplicationError extends Error {
       body: JSON.stringify({
         message: this.message,
       }),
-      headers,
     };
   }
 }

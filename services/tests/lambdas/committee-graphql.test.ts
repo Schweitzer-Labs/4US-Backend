@@ -24,6 +24,7 @@ import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
+import { lambdaPromise } from "../../src/utils/lambda-promise.util";
 
 dotenv.config();
 
@@ -389,14 +390,6 @@ const recTxnMutation = `
     }
 `;
 
-const lambdaPromise = (lambda, event, context) => {
-  return new Promise((resolve, reject) => {
-    lambda(event, context, (error, res) => {
-      resolve(res);
-    });
-  });
-};
-
 describe("Committee GraphQL Lambda", function () {
   before(async () => {
     await putCommittee(committeesTableName)(dynamoDB)(committee);
@@ -497,20 +490,20 @@ describe("Committee GraphQL Lambda", function () {
       console.log(res.body);
       expect(body.data.createContribution.amount).to.equal(vars.amount);
     });
-    // it("Rejects a faulty State value", async () => {
-    //   const inputVar = { ...genCreateContribInput(committeeId), state: "" };
-    //
-    //   const createRes: any = await lambdaPromise(
-    //     graphql,
-    //     genGraphQLProxy(createContribMut, validUsername, inputVar),
-    //     {}
-    //   );
-    //   console.log(createRes);
-    //
-    //   const body = JSON.parse(createRes.body);
-    //
-    //   expect(body.errors.length > 0).to.equal(true);
-    // });
+    it("Rejects a faulty State value", async () => {
+      const inputVar = { ...genCreateContribInput(committeeId), state: "" };
+
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(createContribMut, validUsername, inputVar),
+        {}
+      );
+      console.log(createRes);
+
+      const body = JSON.parse(createRes.body);
+
+      expect(body.errors.length > 0).to.equal(true);
+    });
   });
   describe("Create Disbursement", function () {
     it("Supports the creation of a disbursement", async () => {

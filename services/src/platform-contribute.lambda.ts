@@ -11,7 +11,7 @@ import { successResponse } from "./utils/success-response";
 import { errorResponse } from "./utils/error-response.utils";
 import { StatusCodes } from "http-status-codes";
 import { ILexisNexisConfig } from "./clients/lexis-nexis/lexis-nexis.client";
-import headers from "./utils/headers";
+import { headers } from "./utils/headers";
 
 dotenv.config();
 
@@ -27,6 +27,7 @@ const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const donorsTableName: any = process.env.DONORS_DDB_TABLE_NAME;
 const rulesTableName: any = process.env.RULES_DDB_TABLE_NAME;
 const runenv: any = process.env.RUNENV;
+const corsOrigin = process.env.CORS_ORIGIN;
 
 let stripeApiKey: string;
 let stripe: Stripe;
@@ -68,12 +69,18 @@ export default async (event: any) => {
             message,
             ...remaining,
           },
-	  headers
         };
 
-        return task.of(errorResponse(res));
+        return task.of({
+          ...errorResponse(res),
+          headers: headers(corsOrigin),
+        });
       },
-      (result) => task.of(successResponse)
+      (result) =>
+        task.of({
+          ...successResponse,
+          headers: headers(corsOrigin),
+        })
     )
   )();
 };
