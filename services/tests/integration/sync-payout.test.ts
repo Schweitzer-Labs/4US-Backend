@@ -65,6 +65,7 @@ const committee = genCommittee({
   county: "saratoga",
   officeType: "supervisor",
   ruleVersion: "nyboe-2020",
+  efsFilerId: 161,
 });
 
 const disableFinicity = ({

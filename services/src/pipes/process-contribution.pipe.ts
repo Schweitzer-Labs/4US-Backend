@@ -62,6 +62,22 @@ export const processContribution =
           }),
           taskEither.chain(paymentToDDB(txnsTableName)(dynamoDB))
         );
+      case PaymentMethod.InKind:
+        return pipe(
+          taskEither.tryCatch(
+            () =>
+              putTransaction(txnsTableName)(dynamoDB)({
+                ...baseTxn,
+                bankVerified: true,
+                bankVerifiedTimestamp: now(),
+              }),
+            (e) =>
+              new ApplicationError(
+                "Failed to write rules compliant transaction to DDB.",
+                e
+              )
+          )
+        );
       default:
         return pipe(
           taskEither.tryCatch(

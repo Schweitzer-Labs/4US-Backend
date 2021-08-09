@@ -73,6 +73,7 @@ const TransactionOptional = t.partial({
   businessIdVerificationScore: t.unknown,
   businessIdRequestTimestamp: t.number,
   businessIdRawResponse: t.unknown,
+  inKindType: t.string,
   inKindDescription: t.string,
 });
 
