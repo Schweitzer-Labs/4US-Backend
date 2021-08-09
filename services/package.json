@@ -56,6 +56,7 @@
     "test-model-utils": "ts-mocha tests/integration/model-utils.test.ts --timeout 10000",
     "test-server": "ts-node-dev tests/server/graphql.ts --watch",
     "test-sync-payout": "ts-mocha tests/integration/sync-payout.test.ts --timeout 60000",
+    "test-in-kind": "ts-mocha tests/integration/in-kind.test.ts --timeout 60000",
     "deploy-qa-committees": "ts-node tests/seed/seed-qa-committees.job.ts",
     "compile": "npm install && tsc"
   },
