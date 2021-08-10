@@ -8,11 +8,11 @@ Aggregates:
     SSESpecification:
       SSEEnabled: true
     AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: committeeId
         AttributeType: S
     KeySchema:
       - KeyType: HASH
-        AttributeName: id
+        AttributeName: committeeId
     StreamSpecification:
       StreamViewType: NEW_IMAGE
     Replicas:
