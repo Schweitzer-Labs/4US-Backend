@@ -99,6 +99,7 @@ const commitTransactionToChain =
   (committee: ICommittee) =>
   (t: ITransaction) =>
   async (user: ICreateUserResponse): Promise<any> => {
+    console.log("strato config", config);
     const contract = {
       name: "CommitteeContract",
       address: "0000000000000000000000000000000000000100",
@@ -125,6 +126,8 @@ const commitTransactionToChain =
     };
     const res = await rest.call(user, callArgs, options);
 
+    console.log("blockchain res", res);
+
     return res;
   };
 
@@ -145,10 +148,13 @@ const commitTransactionToChainAndDecode =
 const addBlockchainMetadataToTransaction =
   (txn: ITransaction) =>
   (commitTransactionsRes: ICommitTransactionResponse): ITransaction => {
-    return {
+    const newTxn = {
       ...txn,
       blockchainMetadata: commitTransactionsRes,
     };
+    console.log("new txn", newTxn);
+
+    return newTxn;
   };
 
 export const callMethodOnContract =
@@ -171,12 +177,10 @@ export const callMethodOnContract =
         num: 55555,
       },
     };
+
     const res = await rest.call(user, callArgs, options);
 
     await sleep(1000);
-
-    const state = await rest.getState(user, contract, options);
-
     return res;
   };
 

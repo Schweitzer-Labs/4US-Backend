@@ -9,7 +9,6 @@ export const putTxnAuditLog =
   (auditLogsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (auditLog: ITxnAuditLog) => {
-    console.log("Txn audit log writing to ddb");
     const marshalledLog = DynamoDB.Converter.marshall(auditLog);
     await dynamoDB
       .putItem({
@@ -27,6 +26,6 @@ export const putTxnAuditLogAndDecode =
     pipe(
       te.tryCatch(
         () => putTxnAuditLog(auditLogsTableName)(dynamoDB)(auditLog),
-        (e) => new ApplicationError("Put txn audit log failed", {})
+        (e) => new ApplicationError("Put txn audit log failed", e)
       )
     );

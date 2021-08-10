@@ -16,6 +16,7 @@ const FinicityTransactionRequired = t.type({
   description: t.string,
   postedDate: t.number,
   transactionDate: t.number,
+  customerId: t.number,
   createdDate: t.number,
   categorization: t.type({
     normalizedPayeeName: t.string,
@@ -26,6 +27,7 @@ const FinicityTransactionRequired = t.type({
 });
 
 const FinicityTransactionOptional = t.partial({
+  memo: t.string,
   lastUpdatedDate: t.number,
   type: t.string,
   checkNum: t.string,

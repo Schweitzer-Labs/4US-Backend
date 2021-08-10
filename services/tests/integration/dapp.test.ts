@@ -151,6 +151,7 @@ describe("DAPP Tests", async () => {
       if (isLeft(eitherChainCommittee)) {
         throw Error("test failed");
       }
+
       console.log("test res here", eitherChainCommittee);
 
       expect(eitherChainCommittee.right.chainId).to.be.a("string");
