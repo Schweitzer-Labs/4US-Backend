@@ -52,7 +52,7 @@ let txn = genTransaction({
 });
 describe("Aggregates Cache", function () {
   before(async () => {
-    console.log("test committee", committee);
+    console.log("Test committee", committee);
     await putCommittee(comTable)(dynamoDB)(committee);
     await putTransaction(txnTable)(dynamoDB)(txn);
     await sleep(1000);
