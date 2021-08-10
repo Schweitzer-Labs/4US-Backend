@@ -72,7 +72,12 @@ export const committeeIdToDDBRes =
         },
       })
       .promise();
-    return DynamoDB.Converter.unmarshall(res.Item);
+
+    const committee = DynamoDB.Converter.unmarshall(res.Item);
+
+    console.log("Get committee res", committee);
+
+    return committee;
   };
 
 export const getCommitteeById =

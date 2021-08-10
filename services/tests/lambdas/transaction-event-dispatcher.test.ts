@@ -18,11 +18,7 @@ import { initStratoConfig } from "../../src/clients/dapp/dapp.decoders";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
 import { isLeft } from "fp-ts/Either";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
-import {
-  getTxnById,
-  requestTxnById,
-} from "../../src/utils/model/get-txn-by-id.utils";
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { requestTxnById } from "../../src/utils/model/get-txn-by-id.utils";
 
 dotenv.config();
 

@@ -4,31 +4,35 @@ import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
-import { get_committee_by_stripe_account_and_decode } from "../../src/utils/model/get-committee-by-stripe-account.utils";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
 import { genCommittee } from "../utils/gen-committee.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
-import { get_bank_unverified_contributions_not_paid_out } from "../../src/utils/model/get-bank-unverified-contributions.utils";
-import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import { syncCommittee } from "../../src/pipes/finicity-bank-sync.pipe";
-import { updateTxnWithStripePayoutId } from "../../src/utils/model/update-txns.utils";
-import { genContributionRecord } from "../utils/gen-contribution.util";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 
 import { deleteTxn } from "../../src/utils/model/delete-txn.utils";
 import * as dotenv from "dotenv";
 import { unverifiedContributionsData } from "../seed/unverified-contributions.data";
-import {
-  decodeCSVAndSyncPayouts,
-  syncPayout,
-} from "../../src/webhook/run-report-succeeded/report-run-succeeded.handler";
+import { decodeCSVAndSyncPayouts } from "../../src/webhook/run-report-succeeded/report-run-succeeded.handler";
 import { payoutReconcilationReportData } from "../seed/payout-reconcilation-report.data";
 import { searchTransactions } from "../../src/queries/search-transactions.query";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { groupTxnsByPayout } from "../../src/utils/model/group-txns-by-payout.utils";
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { isPayout } from "../../src/pipes/reconcile-contributions.pipe";
+import { launchCommittee } from "../../src/clients/dapp/dapp.client";
+import {
+  initStratoConfig,
+  IStratoSDKConfig,
+} from "../../src/clients/dapp/dapp.decoders";
+import {
+  getStratoENodeUrl,
+  getStratoNodeUrl,
+  getStratoOAuthClientId,
+  getStratoOauthClientSecret,
+  getStratoOAuthOpenIdDiscoveryUrl,
+} from "../../src/utils/config";
 
 dotenv.config();
 
@@ -74,9 +78,50 @@ const disableFinicity = ({
   ...rest
 }: ICommittee) => rest;
 
+let nodeUrl: string;
+let eNodeUrl: string;
+let oauthClientId: string;
+let oauthClientSecret: string;
+let oauthOpenIdDiscoveryUrl: string;
+let stratoConf: IStratoSDKConfig;
+
+const ps = new AWS.SSM();
+
 describe("Model Utils", function () {
   before(async () => {
-    await putCommittee(committeesTableName)(dynamoDB)(committee);
+    if (
+      !nodeUrl ||
+      !eNodeUrl ||
+      !oauthClientId ||
+      !oauthClientSecret ||
+      !oauthOpenIdDiscoveryUrl
+    ) {
+      nodeUrl = await getStratoNodeUrl(ps)(runenv);
+      eNodeUrl = await getStratoENodeUrl(ps)(runenv);
+      oauthClientId = await getStratoOAuthClientId(ps)(runenv);
+      oauthClientSecret = await getStratoOauthClientSecret(ps)(runenv);
+      oauthOpenIdDiscoveryUrl = await getStratoOAuthOpenIdDiscoveryUrl(ps)(
+        runenv
+      );
+    }
+
+    stratoConf = initStratoConfig({
+      nodeUrl,
+      eNodeUrl,
+      oauthClientId,
+      oauthClientSecret,
+      oauthOpenIdDiscoveryUrl,
+    });
+
+    const eitherChainCommittee = await launchCommittee(stratoConf)(
+      committeesTableName
+    )(dynamoDB)(committee)();
+
+    if (isLeft(eitherChainCommittee)) {
+      throw Error("test failed");
+    }
+
+    console.log("test res here", eitherChainCommittee);
 
     // Add contribution data
     for (const txn of unverifiedContributionsData) {
