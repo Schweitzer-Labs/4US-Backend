@@ -104,6 +104,7 @@ const commitTransactionToChain =
       name: "CommitteeContract",
       address: "0000000000000000000000000000000000000100",
     };
+    console.log("committee chain id", committee.chainId);
     const options = {
       config,
       isDetailed: true,
