@@ -40,7 +40,6 @@ export const getClientUserAndDecode = (
   );
 
 export const deployCommitteeChain =
-  (enode: string) =>
   (config: IStratoSDKConfig) =>
   (committee: ICommittee) =>
   async (user: ICreateUserResponse) => {
@@ -55,7 +54,7 @@ export const deployCommitteeChain =
       members: [
         {
           address: dappUser.address,
-          enode,
+          enode: config.eNodeUrl,
         },
       ],
       balances: [
@@ -77,13 +76,12 @@ export const deployCommitteeChain =
   };
 
 const deployCommitteeChainAndDecode =
-  (enode: string) =>
   (config: IStratoSDKConfig) =>
   (committee: ICommittee) =>
   (user: ICreateUserResponse): TaskEither<ApplicationError, string> =>
     pipe(
       te.tryCatch(
-        () => deployCommitteeChain(enode)(config)(committee)(user),
+        () => deployCommitteeChain(config)(committee)(user),
         (e) => new ApplicationError("Strato chain deployment failed", e)
       ),
       te.chain(decodeCreateChainResponse)
@@ -183,14 +181,13 @@ export const callMethodOnContract =
   };
 
 export const launchCommittee =
-  (enode: string) =>
   (config: IStratoSDKConfig) =>
   (committeeTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committee: ICommittee): TaskEither<ApplicationError, ICommittee> =>
     pipe(
       getClientUserAndDecode(config),
-      te.chain(deployCommitteeChainAndDecode(enode)(config)(committee)),
+      te.chain(deployCommitteeChainAndDecode(config)(committee)),
       te.map(addChainToCommittee(committee)),
       te.chain(putCommitteeAndDecode(committeeTableName)(dynamoDB))
     );

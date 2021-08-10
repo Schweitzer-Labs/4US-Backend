@@ -10,24 +10,71 @@ import { ApplicationError } from "./utils/application-error";
 import { Source } from "./utils/enums/source.enum";
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
-import { task, taskEither } from "fp-ts";
+import { task, taskEither as te, taskEither } from "fp-ts";
 import * as dotenv from "dotenv";
 import { sendContribSuccessMsgs } from "./pipes/send-contrib-success-msgs.pipe";
 import { validateDDBResponse } from "./repositories/ddb.utils";
 import { auditTxnStream, DdbEventName } from "./pipes/audit-txn-stream.pipe";
+import {
+  initStratoConfig,
+  IStratoSDKConfig,
+} from "./clients/dapp/dapp.decoders";
+import { ICommittee } from "./queries/get-committee-by-id.query";
+import { TaskEither } from "fp-ts/TaskEither";
+import {
+  getStratoENodeUrl,
+  getStratoNodeUrl,
+  getStratoOAuthClientId,
+  getStratoOauthClientSecret,
+  getStratoOAuthOpenIdDiscoveryUrl,
+} from "./utils/config";
 
 dotenv.config();
 
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
+const ps = new AWS.SSM();
+
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 const dynamoDB = new DynamoDB();
 const sqsUrl: any = process.env.SQSQUEUE;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const auditLogsTableName: any = process.env.AUDIT_LOGS_DDB_TABLE_NAME;
+const txnTable: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
+const runEnv: any = process.env.RUNENV;
+
+let nodeUrl: string;
+let eNodeUrl: string;
+let oauthClientId: string;
+let oauthClientSecret: string;
+let oauthOpenIdDiscoveryUrl: string;
 
 export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
+  if (
+    !nodeUrl ||
+    !eNodeUrl ||
+    !oauthClientId ||
+    !oauthClientSecret ||
+    !oauthOpenIdDiscoveryUrl
+  ) {
+    nodeUrl = await getStratoNodeUrl(ps)(runEnv);
+    eNodeUrl = await getStratoENodeUrl(ps)(runEnv);
+    oauthClientId = await getStratoOAuthClientId(ps)(runEnv);
+    oauthClientSecret = await getStratoOauthClientSecret(ps)(runEnv);
+    oauthOpenIdDiscoveryUrl = await getStratoOAuthOpenIdDiscoveryUrl(ps)(
+      runEnv
+    );
+  }
+
+  const stratoConf = initStratoConfig({
+    nodeUrl,
+    eNodeUrl,
+    oauthClientId,
+    oauthClientSecret,
+    oauthOpenIdDiscoveryUrl,
+  });
+
   console.log(JSON.stringify(event));
   console.log("initiating ddb update loop");
 
@@ -41,10 +88,12 @@ export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
           insertedTxn
         );
       case DdbEventName.MODIFY:
+        console.log("modify call");
+        console.log("record: ", JSON.stringify(record));
         return await pipe(
-          auditTxnStream(auditLogsTableName)(dynamoDB)(DdbEventName.MODIFY)(
-            record.OldImage
-          )(record.NewImage),
+          auditTxnStream(stratoConf)(committeesTableName)(txnTable)(
+            auditLogsTableName
+          )(dynamoDB)(DdbEventName.MODIFY)(record.OldImage)(record.NewImage),
           taskEither.fold(
             (err) => task.of(failedAuditPut(DdbEventName.MODIFY)(err)),
             (log) => task.of(successfulAuditPut(DdbEventName.MODIFY)(log))

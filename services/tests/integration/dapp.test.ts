@@ -5,21 +5,25 @@ import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as AWS from "aws-sdk";
 import * as dotenv from "dotenv";
 import { DynamoDB } from "aws-sdk";
-import { IStratoSDKConfig } from "../../src/clients/dapp/dapp.decoders";
 import {
-  callMethodOnContract,
+  initStratoConfig,
+  IStratoSDKConfig,
+} from "../../src/clients/dapp/dapp.decoders";
+import {
   commitTransaction,
-  deployCommitteeChain,
-  getClientUser,
-  getClientUserAndDecode,
   launchCommittee,
 } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
 import { isLeft } from "fp-ts/Either";
-import { sleep } from "../../src/utils/sleep.utils";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import { ApplicationError } from "../../src/utils/application-error";
+import {
+  getStratoENodeUrl,
+  getStratoNodeUrl,
+  getStratoOAuthClientId,
+  getStratoOauthClientSecret,
+  getStratoOAuthOpenIdDiscoveryUrl,
+} from "../../src/utils/config";
 
 dotenv.config();
 
@@ -30,27 +34,49 @@ const dynamoDB = new DynamoDB();
 
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
-// // Dev
-const config: IStratoSDKConfig = {
-  apiDebug: false,
-  timeout: 600000,
-  nodes: [
-    {
-      id: 0,
-      url: "https://schweitzerlabs-dev1.partnernet.blockapps.net:8080",
-      port: 8080,
-      oauth: {
-        clientId: "dev",
-        clientSecret: "cc89585a-8841-43ee-814e-97d217d4c016",
-        openIdDiscoveryUrl:
-          "https://keycloak.blockapps.net/auth/realms/hosting-schweitzer-labs/.well-known/openid-configuration",
-      },
-    },
-  ],
-};
+const env: any = process.env.RUNENV;
 
-const eNodeURL =
-  "enode://042cf697543c8b1d1f64e531af83f5f78d2d0d9bb77e42c5d366092b13eec4ed6f418c5a1036feccfc9b234ce1d7dc4edbb22516dfa37cf269ae11e3dac0394112@54.80.236.98:30303";
+// const eNodeUrl =
+//   "enode://042cf697543c8b1d1f64e531af83f5f78d2d0d9bb77e42c5d366092b13eec4ed6f418c5a1036feccfc9b234ce1d7dc4edbb22516dfa37cf269ae11e3dac0394112@54.80.236.98:30303";
+//
+// // // Dev
+// const config: IStratoSDKConfig = {
+//   apiDebug: false,
+//   timeout: 600000,
+//   nodes: [
+//     {
+//       id: 0,
+//       url: "https://schweitzerlabs-dev1.partnernet.blockapps.net:8080",
+//       oauth: {
+//         clientId: "dev",
+//         clientSecret: "cc89585a-8841-43ee-814e-97d217d4c016",
+//         openIdDiscoveryUrl:
+//           "https://keycloak.blockapps.net/auth/realms/hosting-schweitzer-labs/.well-known/openid-configuration",
+//       },
+//     },
+//   ],
+//   eNodeUrl,
+// };
+
+let nodeUrl: string;
+let eNodeUrl: string;
+let oauthClientId: string;
+let oauthClientSecret: string;
+let oauthOpenIdDiscoveryUrl: string;
+let stratoConf: any;
+
+const ps = new AWS.SSM();
+
+//
+// const config: IStratoSDKConfig = initStratoConfig({
+//   nodeId: number;
+//   nodeUrl: string;
+//   eNodeUrl: string;
+//   port: number;
+//   oauthClientId: string;
+//   oauthClientSecret: string;
+//   oauthOpenIdDiscoveryUrl: string;
+// })
 
 // Prod
 // const config: IStratoSDKConfig = {
@@ -85,6 +111,29 @@ const genNYCommittee = () =>
   });
 
 describe("DAPP Tests", async () => {
+  before(async () => {
+    if (
+      !nodeUrl ||
+      !eNodeUrl ||
+      !oauthClientId ||
+      !oauthClientSecret ||
+      !oauthOpenIdDiscoveryUrl
+    ) {
+      nodeUrl = await getStratoNodeUrl(ps)(env);
+      eNodeUrl = await getStratoENodeUrl(ps)(env);
+      oauthClientId = await getStratoOAuthClientId(ps)(env);
+      oauthClientSecret = await getStratoOauthClientSecret(ps)(env);
+      oauthOpenIdDiscoveryUrl = await getStratoOAuthOpenIdDiscoveryUrl(ps)(env);
+    }
+
+    stratoConf = initStratoConfig({
+      nodeUrl,
+      eNodeUrl,
+      oauthClientId,
+      oauthClientSecret,
+      oauthOpenIdDiscoveryUrl,
+    });
+  });
   // describe("Initialize app user", async () => {
   //   it("Initializes dapp user with client credentials", async () => {
   //     const res = await getClientUser(config);
@@ -92,40 +141,28 @@ describe("DAPP Tests", async () => {
   //   });
   // });
   describe("Committee Contract", async () => {
-    // it("Assigns a committee a private chain", async () => {
-    //   const committee = genNYCommittee();
-    //
-    //   const eitherChainCommittee = await launchCommittee(eNodeURL)(config)(
-    //     committeesTableName
-    //   )(dynamoDB)(committee)();
-    //
-    //   if (isLeft(eitherChainCommittee)) {
-    //     throw Error("test failed");
-    //   }
-    //
-    //   expect(eitherChainCommittee.right.chainId).to.be.a("string");
-    // });
-    // it("Contains the proper committee info", async () => {
-    //   expect(false).to.equal(true);
-    // });
-    it("Supports committing a transaction", async () => {
+    it("Assigns a committee a private chain", async () => {
       const committee = genNYCommittee();
-      const txn = genContributionRecord(committee.id);
 
-      const eitherChainCommittee = await launchCommittee(eNodeURL)(config)(
+      const eitherChainCommittee = await launchCommittee(stratoConf)(
         committeesTableName
       )(dynamoDB)(committee)();
 
       if (isLeft(eitherChainCommittee)) {
         throw Error("test failed");
       }
+      console.log("test res here", eitherChainCommittee);
+
+      expect(eitherChainCommittee.right.chainId).to.be.a("string");
+    });
+    it("Supports committing a transaction", async () => {
+      const committee = genNYCommittee();
+      const txn = genContributionRecord(committee.id);
 
       const res = await pipe(
-        launchCommittee(eNodeURL)(config)(committeesTableName)(dynamoDB)(
-          committee
-        ),
+        launchCommittee(stratoConf)(committeesTableName)(dynamoDB)(committee),
         taskEither.chain((committeeWithChain) =>
-          commitTransaction(config)(txnsTableName)(dynamoDB)(
+          commitTransaction(stratoConf)(txnsTableName)(dynamoDB)(
             committeeWithChain
           )(txn)
         )

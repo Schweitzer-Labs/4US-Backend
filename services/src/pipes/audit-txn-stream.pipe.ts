@@ -13,6 +13,12 @@ import {
 } from "../queries/search-transactions.decoder";
 import { validateDDBResponse } from "../repositories/ddb.utils";
 import { now } from "../utils/time.utils";
+import { IStratoSDKConfig } from "../clients/dapp/dapp.decoders";
+import {
+  getCommitteeById,
+  ICommittee,
+} from "../queries/get-committee-by-id.query";
+import { commitTransaction } from "../clients/dapp/dapp.client";
 
 const logPrefix = "Audit Logs";
 
@@ -23,6 +29,9 @@ export enum DdbEventName {
 }
 
 export const auditTxnStream =
+  (stratoConf: IStratoSDKConfig) =>
+  (comTable: string) =>
+  (txnsTable: string) =>
   (auditLogsTable: string) =>
   (ddb: DynamoDB) =>
   (ddbEvent: DdbEventName) =>
@@ -32,8 +41,35 @@ export const auditTxnStream =
       taskEither.of(imgsToRaw([oldImg, newImg])),
       taskEither.chain(rawToTxns),
       taskEither.map(txnsToAuditLog(ddbEvent)),
+      taskEither.chain(
+        commitTxnToLedgerIfVerified(stratoConf)(comTable)(txnsTable)(ddb)
+      ),
       taskEither.chain(putTxnAuditLogAndDecode(auditLogsTable)(ddb))
     );
+
+const isVerified = (txn: ITransaction) => txn.bankVerified && txn.ruleVerified;
+
+const commitTxnToLedgerIfVerified =
+  (config: IStratoSDKConfig) =>
+  (comTable: string) =>
+  (txnsTableName: string) =>
+  (ddb: DynamoDB) =>
+  (auditLog: ITxnAuditLog): TaskEither<ApplicationError, ITxnAuditLog> => {
+    if (
+      isVerified(auditLog.newTransaction) &&
+      !isVerified(auditLog.oldTransaction)
+    )
+      return pipe(
+        getCommitteeById(comTable)(ddb)(auditLog.committeeId),
+        taskEither.chain((committee) =>
+          commitTransaction(config)(txnsTableName)(ddb)(committee)(
+            auditLog.newTransaction
+          )
+        ),
+        () => taskEither.of(auditLog)
+      );
+    else return taskEither.of(auditLog);
+  };
 
 const imgsToRaw = ([oldImg, newImg]: [any, any]): [unknown, unknown] => [
   AWS.DynamoDB.Converter.unmarshall(oldImg),

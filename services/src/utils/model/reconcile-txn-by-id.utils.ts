@@ -86,6 +86,7 @@ export const reconcileTxnsByIds =
     for (const txnId of txnIds) {
       console.log("Reconciling txns", JSON.stringify(txn));
       const res = await reconcileTxnById(txnsTableName)(dynamoDB)(txn)(txnId);
+
       console.log("Update result", res);
     }
     return true;
