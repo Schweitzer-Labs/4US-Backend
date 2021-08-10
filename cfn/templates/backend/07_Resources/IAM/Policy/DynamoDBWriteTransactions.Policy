@@ -1,4 +1,4 @@
-DynamoDBWriterPolicy:
+DynamoDBWriteTransactionsPolicy:
   Type: AWS::IAM::ManagedPolicy
   DependsOn: DynamoDBsTemplate
   Properties:
