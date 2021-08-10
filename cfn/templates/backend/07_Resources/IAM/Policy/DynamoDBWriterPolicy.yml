@@ -11,9 +11,3 @@ DynamoDBWriterPolicy:
             - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
           Action:
             - dynamodb:putItem
-        - Sid: FetchCommittee
-          Effect: Allow
-          Resource:
-            - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
-          Action:
-            - dynamodb:getItem
