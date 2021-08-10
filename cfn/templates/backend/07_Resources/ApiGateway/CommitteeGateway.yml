@@ -43,6 +43,7 @@ CommitteeGateway:
         DataTraceEnabled: true
     Auth:
       DefaultAuthorizer: PlatformUserCognitoAuthorizer
+      AddDefaultAuthorizerToCorsPreflight: false
       Authorizers:
         PlatformUserCognitoAuthorizer:
         {% if PRODUCT == '4us' %}
