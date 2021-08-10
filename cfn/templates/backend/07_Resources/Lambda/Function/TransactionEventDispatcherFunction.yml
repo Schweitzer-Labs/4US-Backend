@@ -29,6 +29,8 @@ TransactionEventDispatcherFunction:
           !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+        AGGREGATES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.AggregatesTableName
         AUDIT_LOGS_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableName
 

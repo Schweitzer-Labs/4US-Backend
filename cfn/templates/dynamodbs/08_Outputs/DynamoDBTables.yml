@@ -17,6 +17,12 @@ CommitteesTableName:
 CommitteesTableArn:
   Description: Committees table for use by both products in this region
   Value: !GetAtt Committees.Arn
+AggregatesTableName:
+  Description: Aggregates table for caching committee aggregates
+  Value: !Ref Aggregates
+AggregatesTableArn:
+  Description: Aggregates table for caching committee aggregates
+  Value: !GetAtt Aggregates.Arn
 DonorsTableName:
   Description: Donors table for use by both products in this region
   Value: !Ref Donors

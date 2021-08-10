@@ -11,6 +11,7 @@ DynamoDBGraphQLPolicy:
             - !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.AggregatesTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.DonorsTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.RulesTableArn
             - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByCommitteeDonorIndex
