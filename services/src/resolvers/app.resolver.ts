@@ -161,7 +161,7 @@ export class AppResolver {
     }
 
     const txns = res.right;
-    return txnsToAgg(txns);
+    return txnsToAgg(committeeId)(txns);
   }
 
   @Mutation((returns) => Transaction)
