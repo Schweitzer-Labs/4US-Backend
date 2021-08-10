@@ -34,6 +34,7 @@ export const genFinicityTxn = ({
     postedDate: paymentDate,
     transactionDate: paymentDate,
     createdDate: paymentDate,
+    customerId: 123,
     categorization: {
       normalizedPayeeName: faker.commerce.product(),
       category: faker.commerce.department(),

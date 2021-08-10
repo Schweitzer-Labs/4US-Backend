@@ -497,20 +497,20 @@ describe("Committee GraphQL Lambda", function () {
       console.log(res.body);
       expect(body.data.createContribution.amount).to.equal(vars.amount);
     });
-    // it("Rejects a faulty State value", async () => {
-    //   const inputVar = { ...genCreateContribInput(committeeId), state: "" };
-    //
-    //   const createRes: any = await lambdaPromise(
-    //     graphql,
-    //     genGraphQLProxy(createContribMut, validUsername, inputVar),
-    //     {}
-    //   );
-    //   console.log(createRes);
-    //
-    //   const body = JSON.parse(createRes.body);
-    //
-    //   expect(body.errors.length > 0).to.equal(true);
-    // });
+    it("Rejects a faulty State value", async () => {
+      const inputVar = { ...genCreateContribInput(committeeId), state: "" };
+
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(createContribMut, validUsername, inputVar),
+        {}
+      );
+      console.log(createRes);
+
+      const body = JSON.parse(createRes.body);
+
+      expect(body.errors.length > 0).to.equal(true);
+    });
   });
   describe("Create Disbursement", function () {
     it("Supports the creation of a disbursement", async () => {
@@ -626,7 +626,7 @@ describe("Committee GraphQL Lambda", function () {
         committeeId,
       });
 
-      const res = await putTransaction(txnsTableName)(dynamoDB)(bankTxn);
+      await putTransaction(txnsTableName)(dynamoDB)(bankTxn);
 
       // Create Disb
       const createInputVar = genCreateDisbInput({

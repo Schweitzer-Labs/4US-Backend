@@ -55,10 +55,14 @@ const commitTxnToLedgerIfVerified =
   (txnsTableName: string) =>
   (ddb: DynamoDB) =>
   (auditLog: ITxnAuditLog): TaskEither<ApplicationError, ITxnAuditLog> => {
+    console.log("checking verification for rules run");
+    console.log("new txn is verified", isVerified(auditLog.newTransaction));
+    console.log("old txn is verified", isVerified(auditLog.oldTransaction));
     if (
       isVerified(auditLog.newTransaction) &&
       !isVerified(auditLog.oldTransaction)
-    )
+    ) {
+      console.log("picked up a verified txn");
       return pipe(
         getCommitteeById(comTable)(ddb)(auditLog.committeeId),
         taskEither.chain((committee) =>
@@ -66,9 +70,9 @@ const commitTxnToLedgerIfVerified =
             auditLog.newTransaction
           )
         ),
-        () => taskEither.of(auditLog)
+        taskEither.chain(() => taskEither.of(auditLog))
       );
-    else return taskEither.of(auditLog);
+    } else return taskEither.of(auditLog);
   };
 
 const imgsToRaw = ([oldImg, newImg]: [any, any]): [unknown, unknown] => [
