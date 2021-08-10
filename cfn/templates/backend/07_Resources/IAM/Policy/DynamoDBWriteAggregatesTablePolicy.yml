@@ -1,0 +1,13 @@
+DynamoDBWriteAggregatesPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  DependsOn: DynamoDBsTemplate
+  Properties:
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Sid: WriteAggregate
+          Effect: Allow
+          Resource:
+            - !GetAtt DynamoDBsTemplate.Outputs.AggregatesTableArn
+          Action:
+            - dynamodb:putItem

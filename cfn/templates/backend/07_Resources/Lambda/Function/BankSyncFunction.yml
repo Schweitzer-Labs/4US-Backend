@@ -26,6 +26,8 @@ BankSyncFunction:
           !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+        AGGREGATES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.AggregatesTableName
         DONORS_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.DonorsTableName
         RULES_DDB_TABLE_NAME:

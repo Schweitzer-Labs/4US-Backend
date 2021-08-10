@@ -11,6 +11,7 @@ LambdaDonationReceiverRole:
       - !Ref DynamoDBReadCommitteesPolicy
       - !Ref DynamoDBReadTransactionsPolicy
       - !Ref DynamoDBWriteTransactionsPolicy
+      - !Ref DynamoDBWriteAggregatesPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:
