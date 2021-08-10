@@ -54,7 +54,7 @@ const config = {
 
 const stripeAccount = genTxnId();
 
-const committee = genCommittee({
+let committee = genCommittee({
   stripeAccount,
   finicityCustomerId: "5007489410",
   finicityAccountId: "5016000964",
@@ -120,6 +120,8 @@ describe("Model Utils", function () {
     if (isLeft(eitherChainCommittee)) {
       throw Error("test failed");
     }
+
+    committee = eitherChainCommittee.right;
 
     console.log("test res here", eitherChainCommittee);
 
