@@ -24,13 +24,13 @@ CommitteeGateway:
       DEFAULT_4XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
+            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
         ResponseTemplates:
           "application/json": "{ \"message\": 4xx error }"
       DEFAULT_5XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
+            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
         ResponseTemplates:
           "application/json": "{ \"message\": 5xx error }"
 {% endif %}
@@ -43,6 +43,7 @@ CommitteeGateway:
         DataTraceEnabled: true
     Auth:
       DefaultAuthorizer: PlatformUserCognitoAuthorizer
+      AddDefaultAuthorizerToCorsPreflight: false
       Authorizers:
         PlatformUserCognitoAuthorizer:
         {% if PRODUCT == '4us' %}

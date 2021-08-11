@@ -2,6 +2,11 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server-lambda";
 import { buildSchemaSync } from "type-graphql";
 import { AppResolver } from "./resolvers/app.resolver";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const corsOrigin = process.env.CORS_ORIGIN;
 
 const schema = buildSchemaSync({
   resolvers: [AppResolver],
@@ -20,4 +25,10 @@ const server = new ApolloServer({
   },
 });
 
-export default server.createHandler();
+const lambda = server.createHandler({
+  cors: {
+    origin: corsOrigin,
+  },
+});
+
+export default lambda;
