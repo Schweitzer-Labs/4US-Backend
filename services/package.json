@@ -54,6 +54,7 @@
     "test-rec-one": "ts-mocha tests/integration/reconcile-one.test.ts --timeout 10000",
     "test-stripe-webhook": "ts-mocha tests/lambdas/stripe-webhook.test.ts --timeout 10000",
     "test-model-utils": "ts-mocha tests/integration/model-utils.test.ts --timeout 10000",
+    "test-cors": "ts-mocha tests/integration/cors.test.ts --timeout 10000",
     "test-server": "ts-node-dev tests/server/graphql.ts --watch",
     "test-sync-payout": "ts-mocha tests/integration/sync-payout.test.ts --timeout 60000",
     "test-in-kind": "ts-mocha tests/integration/in-kind.test.ts --timeout 60000",

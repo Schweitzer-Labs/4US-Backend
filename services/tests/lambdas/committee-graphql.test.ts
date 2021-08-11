@@ -24,6 +24,7 @@ import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
+import { lambdaPromise } from "../../src/utils/lambda-promise.util";
 
 dotenv.config();
 
@@ -388,14 +389,6 @@ const recTxnMutation = `
       }
     }
 `;
-
-const lambdaPromise = (lambda, event, context) => {
-  return new Promise((resolve, reject) => {
-    lambda(event, context, (error, res) => {
-      resolve(res);
-    });
-  });
-};
 
 describe("Committee GraphQL Lambda", function () {
   before(async () => {
