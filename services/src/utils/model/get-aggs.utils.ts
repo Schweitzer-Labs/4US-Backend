@@ -29,7 +29,7 @@ export const committeeIdToDDBRes =
       .getItem({
         TableName: aggTable,
         Key: {
-          id: {
+          committeeId: {
             S: committeeId,
           },
         },
