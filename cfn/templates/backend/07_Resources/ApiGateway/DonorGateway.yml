@@ -9,12 +9,6 @@ DonorGateway:
       DomainName: !Sub donate-api.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
       SecurityPolicy: TLS_1_2
-{% if RUNENV != 'demo' %}
-      DistributionDomainName: !Sub donate.${Domain}.${TLD}
-      Route53:
-        EvaluateTargetHealth: true
-        HostedZoneId: !Ref HostedZone
-{% else %}
     Cors:
       AllowCredentials: true
       AllowOrigin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
@@ -33,7 +27,6 @@ DonorGateway:
             Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
         ResponseTemplates:
           "application/json": "{ \"message\": 5xx error }"
-{% endif %}
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'

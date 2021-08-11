@@ -9,12 +9,6 @@ CommitteeGateway:
       DomainName: !Sub committee-api.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
       SecurityPolicy: TLS_1_2
-{% if RUNENV != 'demo' %}
-      DistributionDomainName: !Sub candidate.${Domain}.${TLD}
-      Route53:
-        EvaluateTargetHealth: true
-        HostedZoneId: !Ref HostedZone
-{% else %}
     Cors:
       AllowCredentials: true
       AllowOrigin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
@@ -24,16 +18,15 @@ CommitteeGateway:
       DEFAULT_4XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
+            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
         ResponseTemplates:
           "application/json": "{ \"message\": 4xx error }"
       DEFAULT_5XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
+            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
         ResponseTemplates:
           "application/json": "{ \"message\": 5xx error }"
-{% endif %}
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
@@ -43,10 +36,7 @@ CommitteeGateway:
         DataTraceEnabled: true
     Auth:
       DefaultAuthorizer: PlatformUserCognitoAuthorizer
+      AddDefaultAuthorizerToCorsPreflight: false
       Authorizers:
         PlatformUserCognitoAuthorizer:
-        {% if PRODUCT == '4us' %}
           UserPoolArn: !GetAtt PlatformUserPool.Arn
-        {% else %}
-          UserPoolArn: !Ref PlatformUserPoolArn
-        {% endif %}
