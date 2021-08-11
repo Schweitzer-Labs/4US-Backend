@@ -9,13 +9,16 @@ export const putCommittee =
   (committeeTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (committee: ICommittee) => {
+    console.log("put committee might be failing", committee);
     const marshalledCommittee = DynamoDB.Converter.marshall(committee);
+    console.log("marshalled committee", JSON.stringify(marshalledCommittee));
     await dynamoDB
       .putItem({
         TableName: committeeTableName,
         Item: marshalledCommittee,
       })
       .promise();
+    console.log("put committee ddb call passed");
     return committee;
   };
 

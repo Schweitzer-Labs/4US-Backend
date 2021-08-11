@@ -93,7 +93,7 @@ describe("Syncs transactions with a platform account", function () {
   });
   it("Total balance equal after sync", async () => {
     const fBalance = fTxns.reduce((acc, { amount }) => acc + amount, 0);
-    const pAggs = txnsToAgg(pTxns);
+    const pAggs = txnsToAgg(committee.id)(pTxns);
     expect(Math.round(fBalance * 100)).to.equal(pAggs.balance);
   });
 

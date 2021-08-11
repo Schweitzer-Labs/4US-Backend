@@ -28,6 +28,7 @@ export const getTransactionsRes =
     donorId,
     entityType,
   }: TransactionsArg): Promise<ITransaction[]> => {
+    console.log("search txn arg committeeId", committeeId);
     const byDonorIndex = donorId
       ? { IndexName: "TransactionsByCommitteeDonorIndex" }
       : {};
