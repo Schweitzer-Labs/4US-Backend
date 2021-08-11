@@ -33,6 +33,7 @@ import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
 import { Report } from "../types/report.type";
 import { generateDisclosure } from "../pipes/generate-disclosure.pipe";
+import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const donorsTableName: any = process.env.DONORS_DDB_TABLE_NAME;
 const rulesTableName: any = process.env.RULES_DDB_TABLE_NAME;
+const aggTable: any = process.env.AGGREGATES_DDB_TABLE_NAME;
 const runenv: any = process.env.RUNENV;
 
 AWS.config.apiVersions = {
@@ -153,15 +155,13 @@ export class AppResolver {
       currentUser
     );
 
-    const args = new TransactionsArg();
-    args.committeeId = committeeId;
-    const res = await searchTransactions(txnsTableName)(dynamoDB)(args)();
+    const res = await getAggsByCommitteeId(aggTable)(dynamoDB)(committeeId)();
     if (isLeft(res)) {
       throw res.left;
     }
 
-    const txns = res.right;
-    return txnsToAgg(committeeId)(txns);
+    const aggs = res.right;
+    return aggs;
   }
 
   @Mutation((returns) => Transaction)

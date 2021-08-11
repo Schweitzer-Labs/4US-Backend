@@ -7,6 +7,7 @@ import { ApplicationError } from "../application-error";
 import { Aggs, IAggs } from "../../queries/get-aggs.decoders";
 import { isEmpty } from "./get-res-is-empty.utils";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
+import * as t from "io-ts";
 
 const logPrefix = "Get Aggs";
 
@@ -47,7 +48,25 @@ export const getAggsByCommitteeId =
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       ),
-      taskEither.chain(isEmpty(logPrefix)),
+      taskEither.map(zeroEmpties(committeeId)),
       taskEither.chain(validateDDBResponse(logPrefix)(Aggs))
     );
+  };
+
+export const zeroEmpties =
+  (committeeId: string) =>
+  (val: IAggs): IAggs => {
+    return Object.keys(val)?.length > 0
+      ? val
+      : {
+          balance: 0,
+          totalRaised: 0,
+          totalSpent: 0,
+          totalDonors: 0,
+          totalTransactions: 0,
+          totalContributionsInProcessing: 0,
+          totalDisbursementsInProcessing: 0,
+          needsReviewCount: 0,
+          committeeId,
+        };
   };
