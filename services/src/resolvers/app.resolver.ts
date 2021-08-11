@@ -34,6 +34,7 @@ import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
 import { Report } from "../types/report.type";
 import { generateDisclosure } from "../pipes/generate-disclosure.pipe";
 import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
+import { refreshAggs } from "../pipes/refresh-aggs.pipe";
 
 dotenv.config();
 
@@ -223,6 +224,7 @@ export class AppResolver {
     if (isLeft(res)) {
       throw res.left;
     } else {
+      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
       return res.right;
     }
   }
@@ -258,6 +260,7 @@ export class AppResolver {
     if (isLeft(res)) {
       throw res.left;
     } else {
+      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
       return res.right;
     }
   }
@@ -267,9 +270,9 @@ export class AppResolver {
     @Arg("amendDisbursementData") d: AmendDisbInput,
     @CurrentUser() currentUser: string
   ) {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(d.committeeId)(
-      currentUser
-    );
+    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      d.committeeId
+    )(currentUser);
 
     const res = await amendDisb(txnsTableName)(dynamoDB)(currentUser)(
       d.committeeId
@@ -278,6 +281,7 @@ export class AppResolver {
     if (isLeft(res)) {
       throw res.left;
     } else {
+      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
       return res.right;
     }
   }
@@ -287,9 +291,9 @@ export class AppResolver {
     @Arg("amendContributionData") c: AmendContributionInput,
     @CurrentUser() currentUser: string
   ) {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(c.committeeId)(
-      currentUser
-    );
+    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      c.committeeId
+    )(currentUser);
 
     validateContribOrThrow(c);
 
@@ -300,6 +304,7 @@ export class AppResolver {
     if (isLeft(res)) {
       throw res.left;
     } else {
+      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
       return res.right;
     }
   }
@@ -312,9 +317,9 @@ export class AppResolver {
     if (rd.selectedTransactions.length === 0)
       throw new ValidationError("Selected transactions list cannot be empty");
 
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(rd.committeeId)(
-      currentUser
-    );
+    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      rd.committeeId
+    )(currentUser);
 
     const res = await reconcileTxnWithTxns(txnsTableName)(dynamoDB)(
       rd.committeeId
@@ -323,6 +328,7 @@ export class AppResolver {
     if (isLeft(res)) {
       throw res.left;
     } else {
+      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
       return res.right;
     }
   }
