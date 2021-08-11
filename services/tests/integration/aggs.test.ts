@@ -19,6 +19,7 @@ import { getAggsByCommitteeId } from "../../src/utils/model/get-aggs.utils";
 import { isLeft } from "fp-ts/Either";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { sleep } from "../../src/utils/sleep.utils";
+import { refreshAggs } from "../../src/pipes/refresh-aggs.pipe";
 
 dotenv.config();
 
@@ -30,17 +31,6 @@ const dynamoDB = new DynamoDB();
 const txnTable = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const comTable = process.env.COMMITTEES_DDB_TABLE_NAME;
 const aggTable = process.env.AGGREGATES_DDB_TABLE_NAME;
-
-const refreshAggs =
-  (aggTable: string) =>
-  (txnTable: string) =>
-  (ddb: DynamoDB) =>
-  (committeeId: string): TaskEither<ApplicationError, IAggs> =>
-    pipe(
-      searchTransactions(txnTable)(ddb)({ committeeId }),
-      taskEither.map(txnsToAgg(committeeId)),
-      taskEither.chain(putAggAndDecode(aggTable)(ddb))
-    );
 
 const committee = genCommittee({});
 let txn = genTransaction({
