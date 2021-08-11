@@ -191,15 +191,16 @@ const handleInsert =
       console.log("donate form transaction recognized");
       console.log("initiating pipe");
 
-      return pipe(
+      const res = await pipe(
         sendContribSuccessMsgs(committeesTableName)(dynamoDB)(sqsUrl)(sqs)(txn),
-        taskEither.chain(() =>
-          refreshAggs(aggsTable)(txnTable)(dynamoDB)(txn.committeeId)
-        ),
         taskEither.fold(
           () => task.of(failedSend),
           () => task.of(successfulSend)
         )
       )();
+
+      await refreshAggs(aggsTable)(txnTable)(dynamoDB)(txn.committeeId)();
+
+      return res;
     }
   };
