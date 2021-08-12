@@ -7,7 +7,7 @@ PolicapitalEmailerFunction:
     Layers:
       - !Ref ServicesLayer
     Handler: app.policapitalEmailerHandler
-    Runtime: nodejs12.x
+    Runtime: nodejs14.x
     Role: !GetAtt LambdaSESRole.Arn
     Events:
       ContributionMade:

@@ -8,7 +8,7 @@ CommitteeGraphQLFunction:
     Layers:
       - !Ref ServicesLayer
     Handler: app.committeeGraphQLHandler
-    Runtime: nodejs12.x
+    Runtime: nodejs14.x
     Role: !GetAtt LambdaGraphQLRole.Arn
     Events:
       GraphQLAny:
