@@ -89,10 +89,14 @@ export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
     resCol.push(await handlerWithConf(stream));
   }
 
-  const exampleTxn: any = event.Records[0].dynamodb.NewImage;
+  const newTxn: any = event.Records[0].dynamodb.NewImage;
+
+  const oldTxn: any = event.Records[0].dynamodb.OldImage;
+
+  const txn = newTxn || oldTxn;
 
   await pipe(
-    taskEither.of(AWS.DynamoDB.Converter.unmarshall(exampleTxn)),
+    taskEither.of(AWS.DynamoDB.Converter.unmarshall(txn)),
     taskEither.chain(validateDDBResponse("Txn")(Transaction)),
     taskEither.map((txn) => txn.committeeId),
     taskEither.chain(refreshAggs(aggsTable)(txnTable)(dynamoDB))

@@ -16,7 +16,7 @@ import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
 import { searchTransactions } from "../queries/search-transactions.query";
 import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import { Direction } from "../utils/enums/direction.enum";
-import { genTxnId } from "../utils/gen-txn-id.utils";
+import { dateToTxnId, genTxnId } from "../utils/gen-txn-id.utils";
 import { Source } from "../utils/enums/source.enum";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
@@ -117,14 +117,16 @@ const finicityTxnToPlatformTxn =
     const checkNumber = fTxn.checkNum
       ? { checkNumber: fTxn.checkNum + "" }
       : {};
+
+    const paymentDate = epochToMilli(fTxn.postedDate);
     return {
       entityName: fTxn.categorization.normalizedPayeeName,
       committeeId: committee.id,
-      id: genTxnId(),
+      id: dateToTxnId(paymentDate),
       amount,
       paymentMethod: finicityTxnToPaymentMethod(fTxn),
       direction: fTxn.amount > 0 ? Direction.In : Direction.Out,
-      paymentDate: epochToMilli(fTxn.postedDate),
+      paymentDate,
       initiatedTimestamp: epochToMilli(fTxn.transactionDate),
       source: Source.FINICITY,
       bankVerified: true,

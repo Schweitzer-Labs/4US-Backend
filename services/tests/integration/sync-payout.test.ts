@@ -7,7 +7,7 @@ import { ApplicationError } from "../../src/utils/application-error";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
 import { genCommittee } from "../utils/gen-committee.util";
-import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { dateToTxnId, genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { syncCommittee } from "../../src/pipes/finicity-bank-sync.pipe";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 
@@ -128,7 +128,7 @@ describe("Model Utils", function () {
     // Add contribution data
     for (const txn of unverifiedContributionsData) {
       txn.committeeId = committee.id;
-      txn.id = genTxnId();
+      txn.id = dateToTxnId(txn.initiatedTimestamp);
       txn.paymentDate = txn.initiatedTimestamp;
       await putTransaction(txnsTableName)(dynamoDB)(txn);
     }
