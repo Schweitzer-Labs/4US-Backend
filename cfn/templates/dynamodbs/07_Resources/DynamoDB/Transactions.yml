@@ -1,12 +1,8 @@
 Transactions:
   Type: AWS::DynamoDB::GlobalTable
-{% if RUNENV == 'prod' %}
   DeletionPolicy: Retain
-{% endif %}
   Properties:
-{% if RUNENV != 'prod' %}
     BillingMode: PAY_PER_REQUEST
-{% endif %}
     SSESpecification:
       SSEEnabled: true
     AttributeDefinitions:
