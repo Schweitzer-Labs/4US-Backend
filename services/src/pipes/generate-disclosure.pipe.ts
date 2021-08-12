@@ -97,14 +97,10 @@ export const generateDisclosure =
         ["FLNG_ENT_ZIP"]: postalCode,
         ["FLNG_ENT_COUNTRY"]: "US",
         ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
-        ["PAY_NUMBER"]:
-          txn.paymentMethod === PaymentMethod.Check ? txn.checkNumber : "NULL",
+        ["PAY_NUMBER"]: txnToPayNumber(txn),
         ["OWED_AMT"]: "NULL",
         ["ORG_AMT"]: centsToDollars(amount),
-        ["TRANS_EXPLNTN"]:
-          txn.paymentMethod === PaymentMethod.InKind
-            ? txn.inKindDescription
-            : "NULL",
+        ["TRANS_EXPLNTN"]: txnToMemo(txn),
         ["LOAN_OTHER_ID"]: "NULL",
         ["R_ITEMIZED"]: "y",
         ["R_LIABILITY"]: "NULL",
@@ -190,6 +186,29 @@ const getFilingPeriod = (committee: ICommittee): FilingPeriod => {
   if (fps.length === 0)
     throw new ApplicationError("Filing period not found", {});
   return fps[0];
+};
+
+const txnToPayNumber = (txn: ITransaction): string => {
+  txn.paymentMethod === PaymentMethod.Check ? txn.checkNumber : "NULL";
+
+  switch (txn.paymentMethod) {
+    case PaymentMethod.Check:
+      return `CHK${txn.checkNumber}`;
+    case PaymentMethod.Ach:
+      return "ACH";
+    case PaymentMethod.Wire:
+      return "WXF";
+    default:
+      return "NULL";
+  }
+};
+
+const txnToMemo = (txn: ITransaction): string => {
+  switch (txn.paymentMethod) {
+    case PaymentMethod.InKind:
+    default:
+      return "NULL";
+  }
 };
 
 export const NYSEntityTypeId = new Map<EntityType, number>([
