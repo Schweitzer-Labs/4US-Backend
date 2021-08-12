@@ -4,6 +4,6 @@ ServicesLayer:
     LayerName: !Sub ${AWS::StackName}-ServicesLayer
     ContentUri: ./services
     CompatibleRuntimes:
-      - nodejs12.x
+      - nodejs14.x
   Metadata:
-    BuildMethod: nodejs12.x
+    BuildMethod: nodejs14.x
