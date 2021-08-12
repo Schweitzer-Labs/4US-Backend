@@ -260,6 +260,7 @@ export const NYSInKindTypeId = new Map<InKindType, number>([
 
 export const NYSPaymentTypeId = new Map<PaymentMethod, number>([
   [PaymentMethod.Check, 1],
+  [PaymentMethod.Ach, 1],
   [PaymentMethod.Credit, 2],
   [PaymentMethod.Debit, 3],
   [PaymentMethod.OnlineProcessor, 4],
