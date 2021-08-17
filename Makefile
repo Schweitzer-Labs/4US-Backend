@@ -10,32 +10,18 @@ endif
 
 ifeq ($(RUNENV), qa)
         export REGION   := us-west-2
-	ifeq ($(PRODUCT), 4us)
-		export DOMAIN   := build4
-		export TLD      := us
-		export HOSTID   := Z06902431WSK3XW3K83J3
-	else # PRODUCT = p2
-		export DOMAIN   := purplepay
-		export TLD      := us
-	endif
+	export DOMAIN   := build4
+	export TLD      := us
+	export HOSTID   := Z06902431WSK3XW3K83J3
 else ifeq ($(RUNENV), prod)
         export REGION   := us-east-1
-	ifeq ($(PRODUCT), 4us)
 		export DOMAIN   := 4us
 		export TLD      := net
-	else
-		export DOMAIN   := policapital
-		export TLD      := net
-	endif
 else ifeq ($(RUNENV), demo)
         export REGION   := us-west-1
 	export DOMAIN   := 4usdemo
 	export TLD      := com
 	export PRODUCT	:= 4us
-else # backup
-        export REGION   := us-east-2
-        export DOMAIN   := purplepay
-        export TLD      := us
 endif
 
 export CONTRIB_DIR	:= lambdas
