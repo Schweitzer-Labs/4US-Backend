@@ -1,17 +1,6 @@
-import {
-  getStratoENodeUrl,
-  getStratoNodeUrl,
-  getStratoOAuthClientId,
-  getStratoOauthClientSecret,
-  getStratoOAuthOpenIdDiscoveryUrl,
-} from "../utils/config";
-import {
-  initStratoConfig,
-  IStratoSDKConfig,
-} from "../clients/dapp/dapp.decoders";
+import { IStratoSDKConfig } from "../clients/dapp/dapp.decoders";
 import { launchCommittee } from "../clients/dapp/dapp.client";
 import { isLeft } from "fp-ts/Either";
-import { unverifiedContributionsData } from "../../tests/seed/unverified-contributions.data";
 import { dateToTxnId, genTxnId } from "../utils/gen-txn-id.utils";
 import { putTransaction } from "../utils/model/put-transaction.utils";
 import { sleep } from "../utils/sleep.utils";
@@ -21,7 +10,18 @@ import { decodeCSVAndSyncPayouts } from "../webhook/run-report-succeeded/report-
 import { payoutReconcilationReportData } from "../../tests/seed/payout-reconcilation-report.data";
 import { putCommittee } from "../utils/model/put-committee.utils";
 import { DynamoDB } from "aws-sdk";
-import { genCommittee } from "../../tests/utils/gen-committee.util";
+
+import { disableFinicity } from "../utils/disable-finicity.utils";
+import { FinicityConfig } from "../clients/finicity/finicity.decoders";
+import { ICommittee } from "../queries/get-committee-by-id.query";
+import { genCommittee } from "./utils/gen-committee.util";
+import { unverifiedContributionsData } from "./data/unverified-contributions.data";
+import { searchTransactions } from "../queries/search-transactions.query";
+import { TransactionType } from "../utils/enums/transaction-type.enum";
+import { isPayout } from "../pipes/reconcile-contributions.pipe";
+import { groupTxnsByPayout } from "../utils/model/group-txns-by-payout.utils";
+import { runRec } from "./utils/run-rec.util";
+import { activateStripe } from "./utils/activate-stripe.util";
 
 const stripeAccount = genTxnId();
 
@@ -29,8 +29,9 @@ export const genDemoCommittee =
   (comTable: string) =>
   (txnTable: string) =>
   (ddb: DynamoDB) =>
-  (stratoConf: IStratoSDKConfig) => {
-    let committee = genCommittee({
+  (finConf: FinicityConfig) =>
+  async (stratoConf: IStratoSDKConfig): Promise<ICommittee> => {
+    let committee: ICommittee = genCommittee({
       stripeAccount,
       finicityCustomerId: "5007489410",
       finicityAccountId: "5016000964",
@@ -71,7 +72,7 @@ export const genDemoCommittee =
     await sleep(1000);
 
     // Sync finicity data
-    const lazyRes = await syncCommittee()(txnsTableName)(dynamoDB)(committee)();
+    const lazyRes = await syncCommittee(finConf)(txnTable)(ddb)(committee)();
     if (isLeft(lazyRes)) {
       throw new ApplicationError("sync failed", lazyRes.left);
     }
@@ -81,17 +82,42 @@ export const genDemoCommittee =
     await sleep(1000);
 
     // Sync payout data
-    const syncRes = await decodeCSVAndSyncPayouts(txnsTableName)(
-      committeesTableName
-    )(dynamoDB)(stripeAccount)(payoutReconcilationReportData)();
+    const syncRes = await decodeCSVAndSyncPayouts(txnTable)(comTable)(ddb)(
+      stripeAccount
+    )(payoutReconcilationReportData)();
     if (isLeft(syncRes)) {
       throw new ApplicationError("Payout sync failed", syncRes.left);
     }
-    await sleep(2000);
+    await putCommittee(comTable)(ddb)(disableFinicity(committee));
 
-    await putCommittee(committeesTableName)(dynamoDB)(
-      disableFinicity(committee)
+    // Run Reconciliation process
+
+    const txnsRes = await searchTransactions(txnTable)(ddb)({
+      committeeId: committee.id,
+      transactionType: TransactionType.Contribution,
+    })();
+
+    if (isLeft(txnsRes)) {
+      throw new ApplicationError("Txns search failed", txnsRes.left);
+    }
+    const txns = txnsRes.right;
+
+    const matches = txns.filter((txn) => !!txn.stripePayoutId);
+
+    const bankPayouts = txns.filter(
+      (txn) => txn.bankVerified && !txn.ruleVerified && isPayout(txn)
     );
 
-    await sleep(2000);
+    console.log(
+      "Bank payouts",
+      bankPayouts.map(({ amount }) => amount)
+    );
+
+    const payoutGroups = groupTxnsByPayout(matches);
+
+    await runRec(txnTable)(ddb)(payoutGroups)(bankPayouts);
+
+    await putCommittee(comTable)(ddb)(activateStripe(committee));
+
+    return committee;
   };

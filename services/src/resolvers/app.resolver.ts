@@ -20,6 +20,9 @@ import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "../input-types/create-contribution.input-type";
 import {
+  getFinicityAppKey,
+  getFinicityPartnerId,
+  getFinicityPartnerSecret,
   getLNPassword,
   getLNUsername,
   getStratoENodeUrl,
@@ -53,6 +56,9 @@ import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
 import { refreshAggs } from "../pipes/refresh-aggs.pipe";
 import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
 import { initStratoConfig } from "../clients/dapp/dapp.decoders";
+import * as t from "io-ts";
+import { FinicityConfig } from "../clients/finicity/finicity.decoders";
+import { genDemoCommittee } from "../demo/gen-committee.demo";
 
 dotenv.config();
 
@@ -91,6 +97,9 @@ export class AppResolver {
   private oauthClientId: string;
   private oauthClientSecret: string;
   private oauthOpenIdDiscoveryUrl: string;
+  private finPartnerId: string;
+  private finPartnerSecret: string;
+  private finAppKey: string;
   @Query((returns) => Committee)
   async committee(
     @Arg("committeeId") committeeId: string,
@@ -357,7 +366,7 @@ export class AppResolver {
   }
 
   @Mutation((returns) => Committee)
-  async genCommittee(
+  async generateCommittee(
     @Arg("genCommittee") c: GenCommitteeInput,
     @CurrentUser() currentUser: string
   ) {
@@ -368,7 +377,10 @@ export class AppResolver {
       !this.eNodeUrl ||
       !this.oauthClientId ||
       !this.oauthClientSecret ||
-      !this.oauthOpenIdDiscoveryUrl
+      !this.oauthOpenIdDiscoveryUrl ||
+      !this.finPartnerId ||
+      !this.finPartnerSecret ||
+      !this.finAppKey
     ) {
       this.nodeUrl = await getStratoNodeUrl(ps)(runenv);
       this.eNodeUrl = await getStratoENodeUrl(ps)(runenv);
@@ -377,6 +389,9 @@ export class AppResolver {
       this.oauthOpenIdDiscoveryUrl = await getStratoOAuthOpenIdDiscoveryUrl(ps)(
         runenv
       );
+      this.finPartnerId = await getFinicityPartnerId(ps)(runenv);
+      this.finPartnerSecret = await getFinicityPartnerSecret(ps)(runenv);
+      this.finAppKey = await getFinicityAppKey(ps)(runenv);
     }
 
     const stratoConf = initStratoConfig({
@@ -387,15 +402,20 @@ export class AppResolver {
       oauthOpenIdDiscoveryUrl: this.oauthOpenIdDiscoveryUrl,
     });
 
-    const res = await genDemoCommittee(committeesTableName)(dynamoDB)(
-      stratoConf
-    );
+    const finConf: FinicityConfig = {
+      partnerId: this.finPartnerId,
+      partnerSecret: this.finPartnerSecret,
+      appKey: this.finAppKey,
+    };
 
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
-      return res.right;
-    }
+    const committee = await genDemoCommittee(committeesTableName)(
+      txnsTableName
+    )(dynamoDB)(finConf)(stratoConf);
+
+    await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
+
+    console.log("demo committee: ", committee);
+
+    return committee;
   }
 }
