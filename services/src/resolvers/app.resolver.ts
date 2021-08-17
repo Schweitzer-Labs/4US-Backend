@@ -1,4 +1,11 @@
-import { Arg, Args, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Args,
+  Mutation,
+  Query,
+  Resolver,
+  UnauthorizedError,
+} from "type-graphql";
 
 import { Committee } from "../types/committee.type";
 import { Transaction } from "../types/transaction.type";
@@ -12,7 +19,16 @@ import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "../input-types/create-contribution.input-type";
-import { getLNPassword, getLNUsername, getStripeApiKey } from "../utils/config";
+import {
+  getLNPassword,
+  getLNUsername,
+  getStratoENodeUrl,
+  getStratoNodeUrl,
+  getStratoOAuthClientId,
+  getStratoOauthClientSecret,
+  getStratoOAuthOpenIdDiscoveryUrl,
+  getStripeApiKey,
+} from "../utils/config";
 import { Stripe } from "stripe";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
@@ -35,6 +51,8 @@ import { Report } from "../types/report.type";
 import { generateDisclosure } from "../pipes/generate-disclosure.pipe";
 import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
 import { refreshAggs } from "../pipes/refresh-aggs.pipe";
+import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
+import { initStratoConfig } from "../clients/dapp/dapp.decoders";
 
 dotenv.config();
 
@@ -60,7 +78,7 @@ const dynamoDB = new DynamoDB({
   },
 });
 
-const parameterStore = new AWS.SSM();
+const ps = new AWS.SSM();
 
 @Resolver()
 export class AppResolver {
@@ -68,6 +86,11 @@ export class AppResolver {
   private stripe: Stripe;
   private lnUsername: string;
   private lnPassword: string;
+  private nodeUrl: string;
+  private eNodeUrl: string;
+  private oauthClientId: string;
+  private oauthClientSecret: string;
+  private oauthOpenIdDiscoveryUrl: string;
   @Query((returns) => Committee)
   async committee(
     @Arg("committeeId") committeeId: string,
@@ -177,9 +200,9 @@ export class AppResolver {
       !this.lnUsername ||
       !this.lnPassword
     ) {
-      this.stripeApiKey = await getStripeApiKey(parameterStore)(runenv);
-      this.lnUsername = await getLNUsername(parameterStore)(runenv);
-      this.lnPassword = await getLNPassword(parameterStore)(runenv);
+      this.stripeApiKey = await getStripeApiKey(ps)(runenv);
+      this.lnUsername = await getLNUsername(ps)(runenv);
+      this.lnPassword = await getLNPassword(ps)(runenv);
       this.stripe = new Stripe(this.stripeApiKey, {
         apiVersion: "2020-08-27",
       });
@@ -240,8 +263,8 @@ export class AppResolver {
     )(currentUser);
 
     if (!this.lnUsername || !this.lnPassword) {
-      this.lnUsername = await getLNUsername(parameterStore)(runenv);
-      this.lnPassword = await getLNPassword(parameterStore)(runenv);
+      this.lnUsername = await getLNUsername(ps)(runenv);
+      this.lnPassword = await getLNPassword(ps)(runenv);
     }
     const lnConfig: ILexisNexisConfig = {
       username: this.lnUsername,
@@ -324,6 +347,49 @@ export class AppResolver {
     const res = await reconcileTxnWithTxns(txnsTableName)(dynamoDB)(
       rd.committeeId
     )(rd.bankTransaction)(rd.selectedTransactions)();
+
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
+      return res.right;
+    }
+  }
+
+  @Mutation((returns) => Committee)
+  async genCommittee(
+    @Arg("genCommittee") c: GenCommitteeInput,
+    @CurrentUser() currentUser: string
+  ) {
+    if (c.password !== "abc") throw new UnauthorizedError();
+
+    if (
+      !this.nodeUrl ||
+      !this.eNodeUrl ||
+      !this.oauthClientId ||
+      !this.oauthClientSecret ||
+      !this.oauthOpenIdDiscoveryUrl
+    ) {
+      this.nodeUrl = await getStratoNodeUrl(ps)(runenv);
+      this.eNodeUrl = await getStratoENodeUrl(ps)(runenv);
+      this.oauthClientId = await getStratoOAuthClientId(ps)(runenv);
+      this.oauthClientSecret = await getStratoOauthClientSecret(ps)(runenv);
+      this.oauthOpenIdDiscoveryUrl = await getStratoOAuthOpenIdDiscoveryUrl(ps)(
+        runenv
+      );
+    }
+
+    const stratoConf = initStratoConfig({
+      nodeUrl: this.nodeUrl,
+      eNodeUrl: this.eNodeUrl,
+      oauthClientId: this.oauthClientId,
+      oauthClientSecret: this.oauthClientSecret,
+      oauthOpenIdDiscoveryUrl: this.oauthOpenIdDiscoveryUrl,
+    });
+
+    const res = await genDemoCommittee(committeesTableName)(dynamoDB)(
+      stratoConf
+    );
 
     if (isLeft(res)) {
       throw res.left;

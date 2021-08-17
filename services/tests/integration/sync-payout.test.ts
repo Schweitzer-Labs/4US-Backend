@@ -33,6 +33,7 @@ import {
   getStratoOauthClientSecret,
   getStratoOAuthOpenIdDiscoveryUrl,
 } from "../../src/utils/config";
+import { disableFinicity } from "../../src/utils/disable-finicity.utils";
 
 dotenv.config();
 
@@ -51,32 +52,6 @@ const config = {
   partnerSecret: process.env.FINICITY_PARTNER_SECRET,
   appKey: process.env.FINICITY_APP_KEY,
 };
-
-const stripeAccount = genTxnId();
-
-let committee = genCommittee({
-  stripeAccount,
-  finicityCustomerId: "5007489410",
-  finicityAccountId: "5016000964",
-  candidateLastName: "Schweitzer",
-  candidateFirstName: "Will",
-  tzDatabaseName: "America/New_York",
-  state: "ny",
-  scope: "local",
-  party: "republican",
-  race: "general",
-  district: "",
-  county: "saratoga",
-  officeType: "supervisor",
-  ruleVersion: "nyboe-2020",
-  efsFilerId: 161,
-});
-
-const disableFinicity = ({
-  finicityCustomerId,
-  finicityAccountId,
-  ...rest
-}: ICommittee) => rest;
 
 let nodeUrl: string;
 let eNodeUrl: string;
