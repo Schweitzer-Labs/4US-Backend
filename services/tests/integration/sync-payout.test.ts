@@ -6,20 +6,16 @@ import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
-import { genCommittee } from "../utils/gen-committee.util";
 import { dateToTxnId, genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { syncCommittee } from "../../src/pipes/finicity-bank-sync.pipe";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 
 import { deleteTxn } from "../../src/utils/model/delete-txn.utils";
 import * as dotenv from "dotenv";
-import { unverifiedContributionsData } from "../seed/unverified-contributions.data";
 import { decodeCSVAndSyncPayouts } from "../../src/webhook/run-report-succeeded/report-run-succeeded.handler";
-import { payoutReconcilationReportData } from "../seed/payout-reconcilation-report.data";
 import { searchTransactions } from "../../src/queries/search-transactions.query";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { groupTxnsByPayout } from "../../src/utils/model/group-txns-by-payout.utils";
-import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { isPayout } from "../../src/pipes/reconcile-contributions.pipe";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
 import {
@@ -33,8 +29,14 @@ import {
   getStratoOauthClientSecret,
   getStratoOAuthOpenIdDiscoveryUrl,
 } from "../../src/utils/config";
+import { disableFinicity } from "../../src/utils/disable-finicity.utils";
+import { genCommittee } from "../utils/gen-committee.util";
+import { unverifiedContributionsData } from "../seed/unverified-contributions.data";
+import { payoutReconcilationReportData } from "../seed/payout-reconcilation-report.data";
 
 dotenv.config();
+
+const stripeAccount = genTxnId();
 
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
@@ -52,7 +54,14 @@ const config = {
   appKey: process.env.FINICITY_APP_KEY,
 };
 
-const stripeAccount = genTxnId();
+let nodeUrl: string;
+let eNodeUrl: string;
+let oauthClientId: string;
+let oauthClientSecret: string;
+let oauthOpenIdDiscoveryUrl: string;
+let stratoConf: IStratoSDKConfig;
+
+const ps = new AWS.SSM();
 
 let committee = genCommittee({
   stripeAccount,
@@ -71,21 +80,6 @@ let committee = genCommittee({
   ruleVersion: "nyboe-2020",
   efsFilerId: 161,
 });
-
-const disableFinicity = ({
-  finicityCustomerId,
-  finicityAccountId,
-  ...rest
-}: ICommittee) => rest;
-
-let nodeUrl: string;
-let eNodeUrl: string;
-let oauthClientId: string;
-let oauthClientSecret: string;
-let oauthOpenIdDiscoveryUrl: string;
-let stratoConf: IStratoSDKConfig;
-
-const ps = new AWS.SSM();
 
 describe("Model Utils", function () {
   before(async () => {

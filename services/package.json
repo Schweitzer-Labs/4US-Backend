@@ -26,7 +26,8 @@
     "reflect-metadata": "^0.1.13",
     "stripe": "^8.151.0",
     "type-graphql": "^1.1.1",
-    "ua-parser-js": "^0.7.28"
+    "ua-parser-js": "^0.7.28",
+    "faker": "^5.5.3"
   },
   "scripts": {
     "test": "ts-mocha tests/**/*.test.ts --timeout 60000",
@@ -74,7 +75,6 @@
     "@types/stripe": "^8.0.417",
     "aws-sdk": "^2.921.0",
     "chai": "^4.2.0",
-    "faker": "^5.5.3",
     "mocha": "^8.2.1",
     "prettier": "^2.3.0",
     "sinon": "^11.1.1",
