@@ -38,7 +38,6 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
-import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 import { TransactionArg } from "../args/transaction.arg";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 import { ReconcileTxnInput } from "../input-types/reconcile-txn.input-type";
@@ -56,10 +55,10 @@ import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
 import { refreshAggs } from "../pipes/refresh-aggs.pipe";
 import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
 import { initStratoConfig } from "../clients/dapp/dapp.decoders";
-import * as t from "io-ts";
 import { FinicityConfig } from "../clients/finicity/finicity.decoders";
 import { genDemoCommittee } from "../demo/gen-committee.demo";
 
+const demoPasscode = "f4jp1i";
 dotenv.config();
 
 const billableEventsTableName: any = process.env.BILLABLE_EVENTS_DDB_TABLE_NAME;
@@ -370,7 +369,8 @@ export class AppResolver {
     @Arg("genCommittee") c: GenCommitteeInput,
     @CurrentUser() currentUser: string
   ) {
-    if (c.password !== "abc") throw new UnauthorizedError();
+    if (c.password !== demoPasscode || runenv === "prod")
+      throw new UnauthorizedError();
 
     if (
       !this.nodeUrl ||
