@@ -1,4 +1,4 @@
-FirewallAssociation:
+DonorFirewallAssociation:
   Type: AWS::WAFv2::WebACLAssociation
   DependsOn: DonorGateway
   Condition: Production
