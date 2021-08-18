@@ -65,10 +65,9 @@ export const genDemoCommittee =
       txn.committeeId = committee.id;
       txn.id = dateToTxnId(txn.initiatedTimestamp);
       txn.paymentDate = txn.initiatedTimestamp;
+      txn.donorVerificationScore = 20;
       await putTransaction(txnTable)(ddb)(txn);
     }
-
-    await sleep(1000);
 
     // Sync finicity data
     const lazyRes = await syncCommittee(finConf)(txnTable)(ddb)(committee)();
@@ -77,8 +76,6 @@ export const genDemoCommittee =
     }
     const m = lazyRes.right;
     await Promise.all(m.map((f) => f()).map(async (f) => await f));
-
-    await sleep(1000);
 
     // Sync payout data
     const syncRes = await decodeCSVAndSyncPayouts(txnTable)(comTable)(ddb)(

@@ -35,6 +35,7 @@ export const processContribution =
       "Contribution processing pipe called.",
       JSON.stringify(complianceResult)
     );
+
     const baseTxn = {
       id: genTxnId(),
       createdByUser: currentUser,
