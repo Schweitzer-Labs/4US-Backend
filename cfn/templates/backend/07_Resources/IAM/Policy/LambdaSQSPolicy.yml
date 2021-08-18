@@ -7,5 +7,6 @@ LambdaSQSPolicy:
         - Sid: SendSQSNotifications
           Effect: Allow
           Action:
-            - sqs:*
+            - sqs:SendMessage
+            - sqs:ReceiveMessage
           Resource: '*'
