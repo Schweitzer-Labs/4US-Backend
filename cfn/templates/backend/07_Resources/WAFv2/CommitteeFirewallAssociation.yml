@@ -1,0 +1,8 @@
+CommitteeFirewallAssociation:
+  Type: AWS::WAFv2::WebACLAssociation
+  DependsOn: CommitteeGateway
+  Condition: Production
+  Properties:
+    ResourceArn: !Sub
+        arn:aws:apigateway:${AWS::Region}::/restapis/${CommitteeGateway}/stages/${LambdaRunEnvironment}
+    WebACLArn: !GetAtt GatewayFirewall.Arn
