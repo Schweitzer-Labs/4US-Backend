@@ -1,5 +1,4 @@
 BillableEventsTableName:
-{% if PRODUCT == '4us' %}
   Description: Billable Events table name
   Value: !Ref BillableEvents
 BillableEventsTableArn:
@@ -44,4 +43,3 @@ TransactionsTableArn:
 TransactionsStream:
   Description: Transactions table stream for use by both products in this region
   Value: !GetAtt Transactions.StreamArn
-{% endif %}
