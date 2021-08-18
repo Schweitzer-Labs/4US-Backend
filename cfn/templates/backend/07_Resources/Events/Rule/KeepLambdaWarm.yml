@@ -7,3 +7,5 @@ KeepLambdaWarm:
     Targets:
       - Id: !Ref PlatformContributeFunction
         Arn: !GetAtt PlatformContributeFunction.Arn
+      - Id: !Ref CommitteeGraphQLFunction
+        Arn: !GetAtt CommitteeGraphQLFunction.Arn
