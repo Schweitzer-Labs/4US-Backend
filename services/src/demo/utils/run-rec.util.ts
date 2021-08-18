@@ -33,6 +33,7 @@ export const runRec =
             finicityTransactionDate: txn.finicityTransactionDate,
             finicityNormalizedPayeeName: txn.finicityNormalizedPayeeName,
             finicityDescription: txn.finicityDescription,
+            finicityPaymentMethod: txn.finicityPaymentMethod,
             bankVerified: true,
           });
           reconCount++;

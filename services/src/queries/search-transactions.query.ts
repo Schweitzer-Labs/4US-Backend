@@ -43,7 +43,6 @@ export const getTransactionsRes =
     take,
     fromId,
   }: TransactionsArg): Promise<ITransaction[]> => {
-    console.log("search txn arg committeeId", committeeId);
     const byDonorIndex = donorId
       ? { IndexName: "TransactionsByCommitteeDonorIndex" }
       : {};
@@ -83,9 +82,9 @@ export const getTransactionsRes =
 
     const res = await dynamoDB.query(query).promise();
 
-    const marshalledRes: any = res.Items.map((item) =>
-      DynamoDB.Converter.unmarshall(item)
-    );
+    const marshalledRes: any = res.Items.map((item) => {
+      return DynamoDB.Converter.unmarshall(item);
+    });
 
     return marshalledRes;
   };

@@ -48,6 +48,9 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @Min(50)
   amount: number;
 
+  @Field()
+  processPayment: boolean;
+
   @Field((type) => PaymentMethod)
   paymentMethod: PaymentMethod;
 

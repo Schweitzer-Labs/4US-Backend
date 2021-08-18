@@ -34,6 +34,7 @@ export const genCreateContribInput = (
     cardExpirationYear: 2026,
     cardExpirationMonth: 12,
     cardCVC: "123",
+    processPayment: true,
     employmentStatus: EmploymentStatus.Unemployed,
     paymentDate: paymentDate || now(),
     ...(![EntityType.Ind, EntityType.Fam].includes(entityType)

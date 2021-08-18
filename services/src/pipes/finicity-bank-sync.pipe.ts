@@ -112,7 +112,6 @@ const finicityTxnToPlatformTxn =
   (committee: ICommittee) =>
   (fTxn: IFinicityTransaction): ITransaction => {
     const amount = Math.round(Math.abs(fTxn.amount) * 100);
-    console.log(`converted finicity amount ${fTxn.amount} to ${amount}`);
 
     const checkNumber = fTxn.checkNum
       ? { checkNumber: fTxn.checkNum + "" }
@@ -139,8 +138,9 @@ const finicityTxnToPlatformTxn =
       finicityDescription: fTxn.description,
       finicityBestRepresentation: fTxn.categorization.bestRepresentation,
       finicityCategory: fTxn.categorization.category,
-      finicityPostedDate: epochToMilli(fTxn.postedDate),
+      finicityPostedDate: paymentDate,
       finicityTransactionDate: epochToMilli(fTxn.transactionDate),
+      finicityPaymentMethod: finicityTxnToPaymentMethod(fTxn),
     };
   };
 
@@ -157,7 +157,6 @@ const getAllFinicityTxns =
 
     const epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6;
     const epochTo = milliToEpoch(now());
-    console.log(epochTo);
     return getTransactions(config)({
       customerId: finicityCustomerId,
       accountId: finicityAccountId,

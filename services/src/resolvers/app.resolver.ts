@@ -232,9 +232,13 @@ export class AppResolver {
       cardNumber,
       cardExpirationMonth,
       cardExpirationYear,
+      processPayment,
     } = createContributionInput;
 
-    if ([PaymentMethod.Credit, PaymentMethod.Debit].includes(paymentMethod)) {
+    if (
+      [PaymentMethod.Credit, PaymentMethod.Debit].includes(paymentMethod) &&
+      processPayment
+    ) {
       if (
         !cardCVC ||
         !cardNumber ||

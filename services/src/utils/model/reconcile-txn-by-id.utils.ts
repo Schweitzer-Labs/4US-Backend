@@ -10,6 +10,7 @@ const updateExpressionList = [
   "#finicityBestRepresentation = :finicityBestRepresentation",
   "#finicityDescription = :finicityDescription",
   "#finicityPostedDate = :finicityPostedDate",
+  "#finicityPaymentMethod = :finicityPaymentMethod",
   "#finicityTransactionDate = :finicityTransactionDate",
   "#finicityTransactionData = :finicityTransactionData",
 ];
@@ -39,6 +40,7 @@ export const reconcileTxnById =
         "#finicityBestRepresentation": "finicityBestRepresentation",
         "#finicityDescription": "finicityDescription",
         "#finicityPostedDate": "finicityPostedDate",
+        "#finicityPaymentMethod": "finicityPaymentMethod",
         "#finicityTransactionDate": "finicityTransactionDate",
         "#finicityTransactionData": "finicityTransactionData",
       },
@@ -60,6 +62,9 @@ export const reconcileTxnById =
         },
         ":finicityDescription": {
           S: txn.finicityDescription,
+        },
+        ":finicityPaymentMethod": {
+          S: txn.finicityPaymentMethod,
         },
         ":finicityPostedDate": {
           N: "" + txn.finicityPostedDate,

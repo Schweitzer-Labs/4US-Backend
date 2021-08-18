@@ -100,7 +100,6 @@ describe("Model Utils", function () {
     let testTxn: ITransaction;
     before(async () => {
       testTxn = genContributionRecord(committee.id);
-      console.log("test txn", testTxn);
       await putTransaction(txnsTableName)(dynamoDB)(testTxn);
       await sleep(1000);
 
@@ -110,7 +109,6 @@ describe("Model Utils", function () {
       await sleep(1000);
     });
     it("Updates an existing transaction with a stripe payout id", async () => {
-      console.log("test txn: ", testTxn);
       const res = await getTxnById(txnsTableName)(dynamoDB)(committee.id)(
         testTxn.id
       )();

@@ -60,5 +60,7 @@ export const txnsToAgg =
 
     aggs.totalDonors = Object.keys(aggs.donorMap).length;
 
-    return aggs;
+    return removeDonorMap(aggs);
   };
+
+const removeDonorMap = ({ donorMap, ...rest }: any) => rest;

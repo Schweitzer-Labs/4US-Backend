@@ -127,8 +127,6 @@ const commitTransactionToChain =
     };
     const res = await rest.call(user, callArgs, options);
 
-    console.log("blockchain res", res);
-
     return res;
   };
 
@@ -153,7 +151,6 @@ const addBlockchainMetadataToTransaction =
       ...txn,
       blockchainMetadata: commitTransactionsRes,
     };
-    console.log("new txn", newTxn);
 
     return newTxn;
   };

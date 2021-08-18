@@ -225,6 +225,7 @@ mutation(
       $occupation: String
       $middleName: String
       $refCode: String
+      $processPayment: Boolean!
     ) {
       createContribution(createContributionData: {
         committeeId: $committeeId
@@ -249,8 +250,10 @@ mutation(
         occupation: $occupation
         middleName: $middleName
         refCode: $refCode
+        processPayment: $processPayment
       }) {
         id
+        amount
       }
     }
 `;
@@ -310,62 +313,6 @@ const amendContribMut = `
           employmentStatus: $employmentStatus
         }
       ) {
-        id
-      }
-    }
-`;
-
-const createContributionQuery = `
-mutation(
-      $committeeId: String!
-      $amount: Float!
-      $paymentMethod: PaymentMethod!
-      $firstName: String!
-      $lastName: String!
-      $addressLine1: String!
-      $city: String!
-      $state: State!
-      $postalCode: String!
-      $entityType: EntityType!
-      $employmentStatus: EmploymentStatus
-      $emailAddress: String
-      $paymentDate: Float!
-      $cardNumber: String
-      $cardExpirationMonth: Float
-      $cardExpirationYear: Float
-      $cardCVC: String
-      $checkNumber: String
-      $entityName: String
-      $employer: String
-      $occupation: String
-      $middleName: String
-      $refCode: String
-    ) {
-      createContribution(createContributionData: {
-        committeeId: $committeeId
-        amount: $amount
-        paymentMethod: $paymentMethod
-        firstName: $firstName
-        lastName: $lastName
-        addressLine1: $addressLine1
-        city: $city
-        state: $state
-        postalCode: $postalCode
-        entityType: $entityType
-        employmentStatus: $employmentStatus
-        emailAddress: $emailAddress
-        paymentDate: $paymentDate
-        cardNumber: $cardNumber
-        cardExpirationMonth: $cardExpirationMonth
-        cardExpirationYear: $cardExpirationYear
-        cardCVC: $cardCVC
-        checkNumber: $checkNumber
-        entityName: $entityName
-        employer: $employer
-        occupation: $occupation
-        middleName: $middleName
-        refCode: $refCode
-      }) {
         id
         amount
       }
@@ -435,7 +382,6 @@ describe("Committee GraphQL Lambda", function () {
         {}
       );
       const body = JSON.parse(res.body);
-      console.log(res.body);
       expect(body.data.transactions.length > 0).to.equal(true);
     });
     it("Get by Committee ID and Donor ID", async () => {
@@ -469,7 +415,6 @@ describe("Committee GraphQL Lambda", function () {
   describe("Aggregations", function () {
     it("Get by Committee ID", async () => {
       const query = genGraphQLProxy(aggregationsQuery, validUsername);
-      console.log(query);
       const res: any = await lambdaPromise(graphql, query, {});
 
       const body = JSON.parse(res.body);
@@ -482,12 +427,11 @@ describe("Committee GraphQL Lambda", function () {
       const vars = genCreateContribInput(committeeId);
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(createContributionQuery, validUsername, vars),
+        genGraphQLProxy(createContribMut, validUsername, vars),
         {}
       );
 
       const body = JSON.parse(res.body);
-      console.log(res.body);
       expect(body.data.createContribution.amount).to.equal(vars.amount);
     });
     it("Rejects a faulty State value", async () => {
@@ -498,7 +442,6 @@ describe("Committee GraphQL Lambda", function () {
         genGraphQLProxy(createContribMut, validUsername, inputVar),
         {}
       );
-      console.log(createRes);
 
       const body = JSON.parse(createRes.body);
 
@@ -747,7 +690,7 @@ describe("Committee GraphQL Lambda", function () {
       const createRes: any = await lambdaPromise(
         graphql,
         genGraphQLProxy(
-          createContributionQuery,
+          createContribMut,
           validUsername,
           genCreateContribInput(committeeId)
         ),

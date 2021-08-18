@@ -138,6 +138,7 @@ export const platformContribute =
     return pipe(
       eventToObject(event),
       te.chain(eventToCreateContribInput),
+      te.map((c) => ({ ...c, processPayment: true })),
       te.chain(validateInd),
       te.chain(validateNonInd),
       te.chain((contrib) =>

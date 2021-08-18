@@ -10,7 +10,6 @@ import { decodeCSVAndSyncPayouts } from "../webhook/run-report-succeeded/report-
 import { payoutReconcilationReportData } from "../../tests/seed/payout-reconcilation-report.data";
 import { putCommittee } from "../utils/model/put-committee.utils";
 import { DynamoDB } from "aws-sdk";
-
 import { disableFinicity } from "../utils/disable-finicity.utils";
 import { FinicityConfig } from "../clients/finicity/finicity.decoders";
 import { ICommittee } from "../queries/get-committee-by-id.query";

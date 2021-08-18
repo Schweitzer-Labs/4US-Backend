@@ -5,6 +5,6 @@ export class TransactionArg {
   @Field((type) => String)
   committeeId: string;
 
-  @Field((type) => String, { nullable: true })
-  id?: string;
+  @Field((type) => String)
+  id: string;
 }

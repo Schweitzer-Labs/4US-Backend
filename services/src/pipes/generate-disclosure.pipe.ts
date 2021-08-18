@@ -206,6 +206,7 @@ const txnToPayNumber = (txn: ITransaction): string => {
 const txnToMemo = (txn: ITransaction): string => {
   switch (txn.paymentMethod) {
     case PaymentMethod.InKind:
+      return txn.inKindDescription;
     default:
       return "NULL";
   }
@@ -280,9 +281,9 @@ export const NYSInKindTypeId = new Map<InKindType, number>([
 export const NYSPaymentTypeId = new Map<PaymentMethod, number>([
   [PaymentMethod.Check, 1],
   [PaymentMethod.Ach, 1],
+  [PaymentMethod.OnlineProcessor, 4],
   [PaymentMethod.Credit, 2],
   [PaymentMethod.Debit, 3],
-  [PaymentMethod.OnlineProcessor, 4],
   [PaymentMethod.Wire, 5],
   [PaymentMethod.Cash, 6],
   [PaymentMethod.Other, 7],

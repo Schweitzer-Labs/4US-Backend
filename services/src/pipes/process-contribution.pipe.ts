@@ -50,44 +50,57 @@ export const processContribution =
       ...c,
     };
 
+    const processWithStripe = () =>
+      pipe(
+        committeeContributionToPayment(stripe)({
+          committee,
+          contribution: {
+            ...baseTxn,
+          },
+        }),
+        taskEither.chain(paymentToDDB(txnsTableName)(dynamoDB))
+      );
+
+    const processWithoutStripe = () =>
+      pipe(
+        taskEither.tryCatch(
+          () => putTransaction(txnsTableName)(dynamoDB)(baseTxn),
+          (e) =>
+            new ApplicationError(
+              "Failed to write rules compliant transaction to DDB.",
+              e
+            )
+        )
+      );
+
+    const processInKind = () =>
+      pipe(
+        taskEither.tryCatch(
+          () =>
+            putTransaction(txnsTableName)(dynamoDB)({
+              ...baseTxn,
+              bankVerified: true,
+              bankVerifiedTimestamp: now(),
+            }),
+          (e) =>
+            new ApplicationError(
+              "Failed to write rules compliant transaction to DDB.",
+              e
+            )
+        )
+      );
+
     switch (c.paymentMethod) {
       case PaymentMethod.Credit:
       case PaymentMethod.Debit:
-        return pipe(
-          committeeContributionToPayment(stripe)({
-            committee,
-            contribution: {
-              ...baseTxn,
-            },
-          }),
-          taskEither.chain(paymentToDDB(txnsTableName)(dynamoDB))
-        );
+        if (c.processPayment) {
+          return processWithStripe();
+        } else {
+          return processWithoutStripe();
+        }
       case PaymentMethod.InKind:
-        return pipe(
-          taskEither.tryCatch(
-            () =>
-              putTransaction(txnsTableName)(dynamoDB)({
-                ...baseTxn,
-                bankVerified: true,
-                bankVerifiedTimestamp: now(),
-              }),
-            (e) =>
-              new ApplicationError(
-                "Failed to write rules compliant transaction to DDB.",
-                e
-              )
-          )
-        );
+        return processInKind();
       default:
-        return pipe(
-          taskEither.tryCatch(
-            () => putTransaction(txnsTableName)(dynamoDB)(baseTxn),
-            (e) =>
-              new ApplicationError(
-                "Failed to write rules compliant transaction to DDB.",
-                e
-              )
-          )
-        );
+        return processWithoutStripe();
     }
   };

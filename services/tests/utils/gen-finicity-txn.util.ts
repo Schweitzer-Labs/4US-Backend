@@ -35,6 +35,7 @@ export const genFinicityTxn = ({
     transactionDate: paymentDate,
     createdDate: paymentDate,
     customerId: 123,
+    type: "credit",
     categorization: {
       normalizedPayeeName: faker.commerce.product(),
       category: faker.commerce.department(),
@@ -63,6 +64,7 @@ export const genFinicityTxn = ({
     finicityNormalizedPayeeName: fData.categorization.normalizedPayeeName,
     finicityDescription: fData.description,
     finicityTransactionId: fData.id,
+    finicityPaymentMethod: fData.type,
   };
 };
 
