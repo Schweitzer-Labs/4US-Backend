@@ -53,7 +53,11 @@ describe("Rules engine", function () {
   });
 
   it("Disallows a contribution in excess of a committee's limit", async () => {
-    const contrib = genCreateContribInput(committee.id, 750001, EntityType.Ind);
+    const contrib = genCreateContribInput({
+      committeeId: committee.id,
+      amount: 750001,
+      entityType: EntityType.Ind,
+    });
 
     const res = await pipe(
       runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
@@ -73,7 +77,11 @@ describe("Rules engine", function () {
   it("Allows a contribution within committee's limit", async () => {
     await putCommittee(comsTable)(dynamoDB)(committee);
 
-    const contrib = genCreateContribInput(committee.id, 750000, EntityType.Ind);
+    const contrib = genCreateContribInput({
+      committeeId: committee.id,
+      amount: 750000,
+      entityType: EntityType.Ind,
+    });
 
     const res = await pipe(
       runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
@@ -105,12 +113,12 @@ describe("Rules engine", function () {
       const paymentDateOfLastYear =
         millisToYearStart(paymentDateOfToday) - 1000;
 
-      const thisYearContrib = genCreateContribInput(
-        committee.id,
-        500000,
-        EntityType.Corp,
-        paymentDateOfToday
-      );
+      const thisYearContrib = genCreateContribInput({
+        committeeId: committee.id,
+        amount: 500000,
+        entityType: EntityType.Corp,
+        paymentDate: paymentDateOfToday,
+      });
 
       const lastYearContrib = {
         ...thisYearContrib,

@@ -7,12 +7,23 @@ import { EmploymentStatus } from "../../src/utils/enums/employment-status";
 import { enumToKeys } from "../../src/utils/enums/poly.util";
 import { State } from "../../src/utils/enums/state.enum";
 
-export const genCreateContribInput = (
-  committeeId: string,
-  amount?: number,
-  entityType?: EntityType,
-  paymentDate?: number
-): CreateContributionInput => {
+interface GenCreateContribInputConfig {
+  committeeId: string;
+  amount?: number;
+  entityType?: EntityType;
+  paymentDate?: number;
+  paymentMethod?: PaymentMethod;
+  checkNumber?: string;
+}
+
+export const genCreateContribInput = ({
+  committeeId,
+  amount,
+  entityType,
+  paymentDate,
+  paymentMethod,
+  checkNumber,
+}: GenCreateContribInputConfig): CreateContributionInput => {
   const stateStr: any = faker.random.arrayElement(enumToKeys(State));
   return {
     amount:
@@ -22,8 +33,9 @@ export const genCreateContribInput = (
         max: 5000,
       }),
     committeeId,
+    checkNumber,
     entityType: entityType || EntityType.Ind,
-    paymentMethod: PaymentMethod.Credit,
+    paymentMethod: paymentMethod || PaymentMethod.Credit,
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     addressLine1: faker.address.streetAddress(),

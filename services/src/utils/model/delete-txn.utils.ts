@@ -21,7 +21,7 @@ export const deleteTxn =
         },
       })
       .promise();
-    console.log("success deleting");
+    console.log("Transaction deleted. ID: " + txn.id);
     return txn;
   };
 

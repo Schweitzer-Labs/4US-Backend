@@ -57,6 +57,10 @@ import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
 import { initStratoConfig } from "../clients/dapp/dapp.decoders";
 import { FinicityConfig } from "../clients/finicity/finicity.decoders";
 import { genDemoCommittee } from "../demo/gen-committee.demo";
+import { pipe } from "fp-ts/function";
+import { deleteTxn, deleteTxnPipe } from "../utils/model/delete-txn.utils";
+import { taskEither } from "fp-ts";
+import { deleteUnreconciledTxn } from "../pipes/delete-txn.pipe";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();
@@ -194,6 +198,25 @@ export class AppResolver {
 
     const aggs = res.right;
     return aggs;
+  }
+
+  @Mutation((returns) => Transaction)
+  async deleteTransaction(
+    @Args() txnArg: TransactionArg,
+    @CurrentUser() currentUser: string
+  ): Promise<Transaction> {
+    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+      txnArg.committeeId
+    )(currentUser);
+
+    const res = await deleteUnreconciledTxn(txnsTableName)(dynamoDB)(txnArg)();
+
+    if (isLeft(res)) {
+      throw res.left;
+    } else {
+      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
+      return res.right;
+    }
   }
 
   @Mutation((returns) => Transaction)

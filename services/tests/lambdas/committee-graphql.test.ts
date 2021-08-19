@@ -1,5 +1,4 @@
 import { expect } from "chai";
-
 import graphql from "../../src/committee-graphql.lambda";
 import { genGraphQLProxy } from "../utils/gen-allowed-proxy.util";
 import * as AWS from "aws-sdk";
@@ -9,22 +8,22 @@ import { genCommittee } from "../utils/gen-committee.util";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
 import { qaUsers } from "../seed/qa-users.data";
-import { now } from "../../src/utils/time.utils";
-import { genCreateDisbInput } from "../utils/gen-create-disb-input.util";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
-import { genAmendDisbInput } from "../utils/gen-amend-disb-input.util";
-import * as faker from "faker";
+import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
+import { lambdaPromise } from "../../src/utils/lambda-promise.util";
 import { genContributionRecord } from "../utils/gen-contribution.util";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
+import { genCreateDisbInput } from "../utils/gen-create-disb-input.util";
+import { genAmendDisbInput } from "../utils/gen-amend-disb-input.util";
+import * as faker from "faker";
+import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { now, milliToEpoch } from "../../src/utils/time.utils";
 import { genFinicityTxn } from "../utils/gen-finicity-txn.util";
 import { Direction } from "../../src/utils/enums/direction.enum";
 import { ReconcileTxnInput } from "../../src/input-types/reconcile-txn.input-type";
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
-import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
-import { lambdaPromise } from "../../src/utils/lambda-promise.util";
 
 dotenv.config();
 
@@ -337,6 +336,20 @@ const recTxnMutation = `
     }
 `;
 
+const deleteTxnMut = `
+  mutation(
+    $id: String!
+    $committeeId: String!
+  ) {
+    deleteTransaction(
+      id: $id
+      committeeId: $committeeId
+    ) {
+      amount
+    }
+  }
+`;
+
 describe("Committee GraphQL Lambda", function () {
   before(async () => {
     await putCommittee(committeesTableName)(dynamoDB)(committee);
@@ -424,7 +437,7 @@ describe("Committee GraphQL Lambda", function () {
 
   describe("Create Contributions", function () {
     it("Supports the creation of a contribution", async () => {
-      const vars = genCreateContribInput(committeeId);
+      const vars = genCreateContribInput({ committeeId });
       const res: any = await lambdaPromise(
         graphql,
         genGraphQLProxy(createContribMut, validUsername, vars),
@@ -435,7 +448,7 @@ describe("Committee GraphQL Lambda", function () {
       expect(body.data.createContribution.amount).to.equal(vars.amount);
     });
     it("Rejects a faulty State value", async () => {
-      const inputVar = { ...genCreateContribInput(committeeId), state: "" };
+      const inputVar = { ...genCreateContribInput({ committeeId }), state: "" };
 
       const createRes: any = await lambdaPromise(
         graphql,
@@ -641,7 +654,9 @@ describe("Committee GraphQL Lambda", function () {
   describe("Amend Contribution", function () {
     it("Supports amending a contribution", async () => {
       // Create Contrib
-      const createInputVar = genCreateContribInput(committee.id);
+      const createInputVar = genCreateContribInput({
+        committeeId: committee.id,
+      });
 
       const createRes: any = await lambdaPromise(
         graphql,
@@ -692,7 +707,7 @@ describe("Committee GraphQL Lambda", function () {
         genGraphQLProxy(
           createContribMut,
           validUsername,
-          genCreateContribInput(committeeId)
+          genCreateContribInput({ committeeId })
         ),
         {}
       );
@@ -722,6 +737,77 @@ describe("Committee GraphQL Lambda", function () {
 
       const txnResBody = JSON.parse(txnRes.body);
       expect(txnResBody.data.transaction).to.equal(null);
+    });
+  });
+  describe("Supports deleting unreconciled transactions", function () {
+    it("Deletes an unreconciled and unprocessed transaction", async () => {
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          createContribMut,
+          validUsername,
+          genCreateContribInput({
+            committeeId,
+            paymentMethod: PaymentMethod.Check,
+            checkNumber: "123",
+          })
+        ),
+        {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      const id = body.data.createContribution.id;
+
+      await lambdaPromise(
+        graphql,
+        genGraphQLProxy(deleteTxnMut, validUsername, {
+          committeeId,
+          id,
+        }),
+        {}
+      );
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getTxnQuery(committee.id)(id), validUsername, {}),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+      expect(txnResBody.errors[0].message).to.equal(
+        "Get Transaction by ID: Not Found"
+      );
+    });
+    it("stop a processed transaction from deletion", async () => {
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          createContribMut,
+          validUsername,
+          genCreateContribInput({ committeeId })
+        ),
+        {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      const id = body.data.createContribution.id;
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(deleteTxnMut, validUsername, {
+          committeeId,
+          id,
+        }),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+      console.log(txnResBody);
+      expect(txnResBody.errors[0].message).to.equal(
+        "Transaction is not unreconciled or unprocessed."
+      );
     });
   });
   after(async () => {
