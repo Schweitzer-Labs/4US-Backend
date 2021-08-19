@@ -779,7 +779,7 @@ describe("Committee GraphQL Lambda", function () {
         "Get Transaction by ID: Not Found"
       );
     });
-    it("stop a processed transaction from deletion", async () => {
+    it("Stops a processed transaction from deletion", async () => {
       const createRes: any = await lambdaPromise(
         graphql,
         genGraphQLProxy(
