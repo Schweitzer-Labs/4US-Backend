@@ -66,6 +66,7 @@ export const genDemoCommittee =
       txn.id = dateToTxnId(txn.initiatedTimestamp);
       txn.paymentDate = txn.initiatedTimestamp;
       txn.donorVerificationScore = 20;
+      txn.state = txn.state.toUpperCase();
       await putTransaction(txnTable)(ddb)(txn);
     }
 
