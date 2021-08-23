@@ -40,3 +40,5 @@ CommitteeGateway:
       Authorizers:
         PlatformUserCognitoAuthorizer:
           UserPoolArn: !GetAtt PlatformUserPool.Arn
+      ResourcePolicy:
+        IpRangeWhitelist: !Ref CloudFlareIPs
