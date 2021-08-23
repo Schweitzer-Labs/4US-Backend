@@ -9,7 +9,7 @@ dotenv.config();
 const GRAPH_QL_PORT = process.env.PORT || 4000;
 const AUTH_REDIRECT_PORT = process.env.PORT || 4500;
 
-async function bootstrap() {
+export async function bootstrapGql() {
   // ... Building schema here
 
   const schema = await buildSchema({
@@ -32,5 +32,3 @@ async function bootstrap() {
   const { url } = await server.listen(GRAPH_QL_PORT);
   console.log(`Server is running, GraphQL Playground available at ${url}`);
 }
-
-bootstrap();

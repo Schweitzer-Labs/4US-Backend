@@ -56,16 +56,17 @@
     "test-stripe-webhook": "ts-mocha tests/lambdas/stripe-webhook.test.ts --timeout 10000",
     "test-model-utils": "ts-mocha tests/integration/model-utils.test.ts --timeout 10000",
     "test-cors": "ts-mocha tests/integration/cors.test.ts --timeout 10000",
-    "test-server": "ts-node-dev tests/server/graphql.ts --watch",
     "test-sync-payout": "ts-mocha tests/integration/sync-payout.test.ts --timeout 60000",
     "test-in-kind": "ts-mocha tests/integration/in-kind.test.ts --timeout 60000",
     "test-aggs": "ts-mocha tests/integration/aggs.test.ts --timeout 60000",
     "deploy-qa-committees": "ts-node tests/seed/seed-qa-committees.job.ts",
-    "compile": "npm install && tsc"
+    "compile": "npm install && tsc",
+    "test-server": "ts-node-dev tests/server --watch"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.76",
     "@types/chai": "^4.2.17",
+    "@types/express": "^4.17.13",
     "@types/faker": "^5.5.6",
     "@types/graphql": "^14.5.0",
     "@types/http-aws-es": "^6.0.0",
@@ -75,6 +76,8 @@
     "@types/stripe": "^8.0.417",
     "aws-sdk": "^2.921.0",
     "chai": "^4.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
     "mocha": "^8.2.1",
     "prettier": "^2.3.0",
     "sinon": "^11.1.1",
