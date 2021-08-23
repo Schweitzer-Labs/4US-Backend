@@ -27,6 +27,9 @@ DonorGateway:
             Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
         ResponseTemplates:
           "application/json": "{ \"message\": 5xx error }"
+    Auth:
+      ResourcePolicy:
+        IpRangeWhitelist: !Ref CloudFlareIPs
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
