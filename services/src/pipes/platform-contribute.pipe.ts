@@ -77,7 +77,7 @@ const validateNonInd = (
 const validateInd = (
   c: CreateContributionInput
 ): TaskEither<ApplicationError, CreateContributionInput> => {
-  if ([EntityType.Ind, EntityType.Fam].includes(c.entityType)) {
+  if ([EntityType.Ind, EntityType.Fam, EntityType.Can].includes(c.entityType)) {
     if (!c.employmentStatus) {
       return left(
         new ApplicationError(
