@@ -140,6 +140,9 @@ export class Transaction implements ITransaction {
   transactionType?: string;
 
   @Field({ nullable: true })
+  checkNumber?: string;
+
+  @Field({ nullable: true })
   stripePaymentIntentId?: string;
 
   @Field({ nullable: true })

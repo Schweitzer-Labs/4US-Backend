@@ -35,7 +35,7 @@ export const genContributionRecord = (
     city: faker.address.city(),
     state: faker.random.arrayElement(enumToValues(State)),
     postalCode: faker.address.zipCode(),
-    ...(![EntityType.Ind, EntityType.Fam].includes(entityType)
+    ...(![EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType)
       ? { entityName: faker.company.companyName() }
       : {}),
   };

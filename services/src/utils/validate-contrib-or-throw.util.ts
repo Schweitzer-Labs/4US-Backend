@@ -12,7 +12,7 @@ export const validateContribOrThrow = (
 
   if (
     entityType &&
-    ![EntityType.Ind, EntityType.Fam].includes(entityType) &&
+    ![EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType) &&
     !entityName
   ) {
     throw new ValidationError(

@@ -1,5 +1,5 @@
-import { flow, pipe } from "fp-ts/function";
-import { chain, left, right, TaskEither } from "fp-ts/TaskEither";
+import { pipe } from "fp-ts/function";
+import { left, right, TaskEither } from "fp-ts/TaskEither";
 import Joi from "joi";
 import { plainToClass } from "class-transformer";
 import { StatusCodes } from "http-status-codes";
@@ -62,7 +62,10 @@ const validateNonInd = (
 ): TaskEither<ApplicationError, CreateContributionInput> => {
   const { entityType, entityName } = contrib;
 
-  if (![EntityType.Ind, EntityType.Fam].includes(entityType) && !entityName) {
+  if (
+    ![EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType) &&
+    !entityName
+  ) {
     return left(
       new ApplicationError(
         "Entity name must be provided for non-individual and non-family contributions",

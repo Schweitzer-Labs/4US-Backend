@@ -290,7 +290,7 @@ export const NYSPaymentTypeId = new Map<PaymentMethod, number>([
 ]);
 
 const isPerson = (entityType: EntityType) =>
-  [EntityType.Ind, EntityType.Fam].includes(entityType);
+  [EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType);
 
 const getEntityName = (
   entityType: EntityType,
