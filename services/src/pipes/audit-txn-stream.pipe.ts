@@ -66,8 +66,8 @@ const commitTxnToLedgerIfVerified =
       console.log("picked up a verified txn");
       return pipe(
         verifiedTxnToStrato(config)(txnsTableName)(comTable)(ddb)(
-          auditLog.committeeId
-        )(auditLog.newTransaction),
+          auditLog.newTransaction
+        ),
         taskEither.chain(() => taskEither.of(auditLog))
       );
     } else return taskEither.of(auditLog);

@@ -8,7 +8,7 @@ import {
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "./utils/application-error";
 import { Source } from "./utils/enums/source.enum";
-import { DynamoDB, DynamoDBStreams } from "aws-sdk";
+import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import * as dotenv from "dotenv";
@@ -37,6 +37,7 @@ const ps = new AWS.SSM();
 
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 const dynamoDB = new DynamoDB();
+// @ToDo rename SQSQUEUE to EMAILER_QUEUE
 const sqsUrl: any = process.env.SQSQUEUE;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const auditLogsTableName: any = process.env.AUDIT_LOGS_DDB_TABLE_NAME;

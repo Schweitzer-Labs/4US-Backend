@@ -13,10 +13,9 @@ export const verifiedTxnToStrato =
   (txnTable: string) =>
   (comTable: string) =>
   (ddb: DynamoDB) =>
-  (comId: string) =>
   (txn: ITransaction): TaskEither<ApplicationError, ITransaction> =>
     pipe(
-      getCommitteeById(comTable)(ddb)(comId),
+      getCommitteeById(comTable)(ddb)(txn.committeeId),
       taskEither.chain((committee) =>
         commitTransaction(stratoConf)(txnTable)(ddb)(committee)(txn)
       )
