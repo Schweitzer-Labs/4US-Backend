@@ -11,6 +11,7 @@ app.use(express.json());
 app.post("/contribute", async (req, res) => {
   const body = JSON.stringify(req.body);
   const lambdaRes = await lambda({ body });
+  res.statusCode = lambdaRes.statusCode;
   res.json(lambdaRes);
 });
 
