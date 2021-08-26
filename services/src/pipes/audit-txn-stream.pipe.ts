@@ -19,6 +19,7 @@ import {
   ICommittee,
 } from "../queries/get-committee-by-id.query";
 import { commitTransaction } from "../clients/dapp/dapp.client";
+import { verifiedTxnToStrato } from "./verified-txn-to-strato.pipe";
 
 const logPrefix = "Audit Logs";
 
@@ -64,12 +65,9 @@ const commitTxnToLedgerIfVerified =
     ) {
       console.log("picked up a verified txn");
       return pipe(
-        getCommitteeById(comTable)(ddb)(auditLog.committeeId),
-        taskEither.chain((committee) =>
-          commitTransaction(config)(txnsTableName)(ddb)(committee)(
-            auditLog.newTransaction
-          )
-        ),
+        verifiedTxnToStrato(config)(txnsTableName)(comTable)(ddb)(
+          auditLog.committeeId
+        )(auditLog.newTransaction),
         taskEither.chain(() => taskEither.of(auditLog))
       );
     } else return taskEither.of(auditLog);
