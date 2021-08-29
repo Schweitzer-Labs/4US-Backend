@@ -72,6 +72,7 @@ jobs:
       - name: Deploy CloudFlare Worker to redirect committee query strings
         id: deploy-cloudflare-worker-redirect-committee-query-strings
         uses: cloudflare/wrangler-action@1.3.0
+        working-directory: ./committee-redirector
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           environment: ${{ env.RUNENV }}
