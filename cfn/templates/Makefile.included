@@ -11,7 +11,6 @@ IMPORT_PARAMS		+= ParameterKey=Domain,ParameterValue=$(DOMAIN)
 IMPORT_PARAMS		+= ParameterKey=TLD,ParameterValue=$(TLD)
 IMPORT_PARAMS		+= ParameterKey=Nonce,ParameterValue=$(NONCE)
 
-CREPES_PARAMS		:= region=$(REGION)
 CREPES_PARAMS		+= runenv=$(RUNENV) product=$(PRODUCT) domain=$(DOMAIN) tld=$(TLD)
 
 ifneq ($(SUBDOMAIN),)
@@ -34,6 +33,7 @@ check: $(template)
 $(template): $(SRCS)
 	@echo $@
 	@$(CREPES) . \
+		--region $(REGION) \
 		--kwargs $(CREPES_PARAMS) \
 		--output $@
 
@@ -41,7 +41,8 @@ $(template): $(SRCS)
 $(IMPORTED_RESOURCES): ImportedResources.yml $(SRCS)
 	@echo "Importing resources from $(REGION) into $(STACK) via $@"
 	@$(CREPES) . \
-		$(CREPES_PARAMS) \
+		--region $(REGION) \
+		--kwargs $(CREPES_PARAMS) \
 		--import $@ \
 		--output $(IMPORTS)
 
