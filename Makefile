@@ -21,7 +21,6 @@ else ifeq ($(RUNENV), demo)
         export REGION   := us-west-1
 	export DOMAIN   := 4usdemo
 	export TLD      := com
-	export PRODUCT	:= 4us
 endif
 
 export CONTRIB_DIR	:= lambdas
@@ -49,7 +48,7 @@ export ENDPOINT		:= https://cloudformation-fips.$(REGION).amazonaws.com
 export CFN_BUCKET	:= $(PRODUCT)-cfn-templates-$(REGION)
 
 export STACK_PARAMS	:= Nonce=$(NONCE)
-STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV) Product=$(PRODUCT)
+STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
 STACK_PARAMS		+= Domain=$(DOMAIN) TLD=$(TLD)
 
 ifneq ($(SUBDOMAIN),)
