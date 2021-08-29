@@ -11,7 +11,8 @@ IMPORT_PARAMS		+= ParameterKey=Domain,ParameterValue=$(DOMAIN)
 IMPORT_PARAMS		+= ParameterKey=TLD,ParameterValue=$(TLD)
 IMPORT_PARAMS		+= ParameterKey=Nonce,ParameterValue=$(NONCE)
 
-CREPES_PARAMS		:= region=$(REGION) runenv=$(RUNENV) domain=$(DOMAIN) tld=$(TLD)
+CREPES_PARAMS		:= region=$(REGION)
+CREPES_PARAMS		+= runenv=$(RUNENV) product=$(PRODUCT) domain=$(DOMAIN) tld=$(TLD)
 
 ifneq ($(SUBDOMAIN),)
 	CREPES_PARAMS	+= subdomain=$(SUBDOMAIN)
