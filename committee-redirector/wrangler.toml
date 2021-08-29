@@ -6,11 +6,11 @@ zone_id = "40ed36745df172f3d0680d156899e619"
 route = "*.build4.us/*"
 vars = { ENVIRONMENT = "qa" }
 
-[env.production]
+[env.prod]
 name = "committee-redirector"
 zone_id = "eecd123fc5edf71294e1b7b11525d0fc"
 route = "*.4us.net/*"
-vars = { ENVIRONMENT = "production" }
+vars = { ENVIRONMENT = "prod" }
 
 [env.demo]
 name = "committee-redirector-demo"
