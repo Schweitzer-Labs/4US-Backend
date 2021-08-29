@@ -83,7 +83,6 @@ EMAILER_APP		:= $(EMAILER_DIR)/app.js
 JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
 
 EMAIL_TEMPLATES		:= $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
-CFN_TEMPLATES 		:= $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(EMAIL_TEMPLATES) $(CLOUDFLARE_TEMPLATE)
 export SAM_TEMPLATE	:= $(SAM_BUILD_DIR)/template.yaml
 
 # Fetch CloudFlare IP addresses only once, when needed
@@ -92,9 +91,11 @@ CLOUDFLARE_IPS = $(eval CLOUDFLARE_IPS := $$(shell curl -X GET "https://api.clou
 STACK_PARAMS		+= CloudFlareIPs=$(CLOUDFLARE_IPS)
 
 ifeq ($(REGION), us-west-1)
-	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(CLOUDFLARE_TEMPLATE)
+	CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(CLOUDFLARE_TEMPLATE)
 else ifeq ($(REGION), us-east-2)
-	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
+	CFN_TEMPLATES := $(BACKEND_TEMPLATE)
+else
+	CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(EMAIL_TEMPLATES) $(CLOUDFLARE_TEMPLATE)
 endif
 
 .PHONY: dep build build-stacks check local import package deploy clean realclean
@@ -129,8 +130,6 @@ dep:
 
 $(CFN_BUILD_DIR)/%.yml: $(CFN_SRC_DIR)/%
 	$(MAKE) template=$@ -C $^ check
-
-
 
 clean:
 	@rm -f $(CFN_BUILD_DIR)/*.yml
