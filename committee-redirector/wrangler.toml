@@ -1,6 +1,7 @@
 type = "javascript"
 account_id = "0aa021eccda30cdd219955dcafa62b13"
 
+[env.qa]
 name = "committee-redirector-qa"
 zone_id = "40ed36745df172f3d0680d156899e619"
 route = "*.build4.us/*"
