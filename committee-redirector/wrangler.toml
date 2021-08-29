@@ -1,0 +1,19 @@
+type = "javascript"
+account_id = "0aa021eccda30cdd219955dcafa62b13"
+
+name = "committee-redirector-qa"
+zone_id = "40ed36745df172f3d0680d156899e619"
+route = "*.build4.us/*"
+vars = { ENVIRONMENT = "qa" }
+
+[env.production]
+name = "committee-redirector"
+zone_id = "eecd123fc5edf71294e1b7b11525d0fc"
+route = "*.4us.net/*"
+vars = { ENVIRONMENT = "production" }
+
+[env.demo]
+name = "committee-redirector-demo"
+zone_id = "b48424de46a52217d1a97d128f0fff7d"
+route = "*.4usdemo.com/*"
+vars = { ENVIRONMENT = "demo" }
