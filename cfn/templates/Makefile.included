@@ -11,11 +11,10 @@ IMPORT_PARAMS		+= ParameterKey=Domain,ParameterValue=$(DOMAIN)
 IMPORT_PARAMS		+= ParameterKey=TLD,ParameterValue=$(TLD)
 IMPORT_PARAMS		+= ParameterKey=Nonce,ParameterValue=$(NONCE)
 
-CREPES_PARAMS		:= --region $(REGION) --runenv $(RUNENV)
-CREPES_PARAMS		+= --domain $(DOMAIN) --tld $(TLD) --product $(PRODUCT)
+CREPES_PARAMS		:= region=$(REGION) runenv=$(RUNENV) domain=$(DOMAIN) tld=$(TLD)
 
 ifneq ($(SUBDOMAIN),)
-	CREPES_PARAMS	+= --subdomain $(SUBDOMAIN)
+	CREPES_PARAMS	+= subdomain=$(SUBDOMAIN)
 endif
 
 .PHONY: build buildimports check import
@@ -34,7 +33,7 @@ check: $(template)
 $(template): $(SRCS)
 	@echo $@
 	@$(CREPES) . \
-		$(CREPES_PARAMS) \
+		--kwargs $(CREPES_PARAMS) \
 		--output $@
 
 
