@@ -1,4 +1,3 @@
-
 SHELL			:= bash
 export CREPES		:= $(PWD)/cfn/bin/crepes.py
 export PRODUCT		:= 4us
@@ -83,11 +82,6 @@ JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAI
 
 EMAIL_TEMPLATES		:= $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
 export SAM_TEMPLATE	:= $(SAM_BUILD_DIR)/template.yaml
-
-# Fetch CloudFlare IP addresses only once, when needed
-CLOUDFLARE_IPS = $(eval CLOUDFLARE_IPS := $$(shell curl -X GET "https://api.cloudflare.com/client/v4/ips" | cut -d\[ -f 2 | cut -d\] -f1))$(CLOUDFLARE_IPS)
-
-STACK_PARAMS		+= CloudFlareIPs=$(CLOUDFLARE_IPS)
 
 ifeq ($(REGION), us-west-1)
 	CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(CLOUDFLARE_TEMPLATE)
