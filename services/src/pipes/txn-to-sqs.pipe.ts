@@ -1,4 +1,3 @@
-import * as AWS from "aws-sdk";
 import { SQS } from "aws-sdk";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { pipe } from "fp-ts/function";
