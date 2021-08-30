@@ -26,7 +26,7 @@ StratoSQSFunction:
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
 
-EmailerInvokeConfig:
+StratoInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig
   Properties:
     FunctionName: !Ref StratoSQSFunction
