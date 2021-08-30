@@ -25,8 +25,7 @@ PlatformContributeFunction:
       Variables:
         RUNENV:
           !Ref LambdaRunEnvironment
-        CORS_ORIGIN:
-          !Sub https://donate.${Domain}.${TLD}
+        CORS_ORIGIN: '*'
         TRANSACTIONS_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
         COMMITTEES_DDB_TABLE_NAME:
