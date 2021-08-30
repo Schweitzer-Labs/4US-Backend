@@ -152,6 +152,8 @@ const addBlockchainMetadataToTransaction =
       blockchainMetadata: commitTransactionsRes,
     };
 
+    console.log("blockchain metadata added to txn: ", JSON.stringify(newTxn));
+
     return newTxn;
   };
 

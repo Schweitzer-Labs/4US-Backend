@@ -1,4 +1,4 @@
-import { DynamoDB } from "aws-sdk";
+import { DynamoDB, SQS } from "aws-sdk";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { ITxnAuditLog } from "../queries/get-audit-logs.decoders";
@@ -13,12 +13,7 @@ import {
 } from "../queries/search-transactions.decoder";
 import { validateDDBResponse } from "../repositories/ddb.utils";
 import { now } from "../utils/time.utils";
-import { IStratoSDKConfig } from "../clients/dapp/dapp.decoders";
-import {
-  getCommitteeById,
-  ICommittee,
-} from "../queries/get-committee-by-id.query";
-import { commitTransaction } from "../clients/dapp/dapp.client";
+import { txnToSQS } from "./txn-to-sqs.pipe";
 
 const logPrefix = "Audit Logs";
 
@@ -29,9 +24,8 @@ export enum DdbEventName {
 }
 
 export const auditTxnStream =
-  (stratoConf: IStratoSDKConfig) =>
-  (comTable: string) =>
-  (txnsTable: string) =>
+  (sqsUrl: string) =>
+  (sqs: SQS) =>
   (auditLogsTable: string) =>
   (ddb: DynamoDB) =>
   (ddbEvent: DdbEventName) =>
@@ -41,19 +35,15 @@ export const auditTxnStream =
       taskEither.of(imgsToRaw([oldImg, newImg])),
       taskEither.chain(rawToTxns),
       taskEither.map(txnsToAuditLog(ddbEvent)),
-      taskEither.chain(
-        commitTxnToLedgerIfVerified(stratoConf)(comTable)(txnsTable)(ddb)
-      ),
+      taskEither.chain(queueTxnToStratoIfVerified(sqsUrl)(sqs)),
       taskEither.chain(putTxnAuditLogAndDecode(auditLogsTable)(ddb))
     );
 
 const isVerified = (txn: ITransaction) => txn.bankVerified && txn.ruleVerified;
 
-const commitTxnToLedgerIfVerified =
-  (config: IStratoSDKConfig) =>
-  (comTable: string) =>
-  (txnsTableName: string) =>
-  (ddb: DynamoDB) =>
+const queueTxnToStratoIfVerified =
+  (sqsUrl: string) =>
+  (sqs: SQS) =>
   (auditLog: ITxnAuditLog): TaskEither<ApplicationError, ITxnAuditLog> => {
     console.log("checking verification for rules run");
     console.log("new txn is verified", isVerified(auditLog.newTransaction));
@@ -64,12 +54,7 @@ const commitTxnToLedgerIfVerified =
     ) {
       console.log("picked up a verified txn");
       return pipe(
-        getCommitteeById(comTable)(ddb)(auditLog.committeeId),
-        taskEither.chain((committee) =>
-          commitTransaction(config)(txnsTableName)(ddb)(committee)(
-            auditLog.newTransaction
-          )
-        ),
+        txnToSQS(sqsUrl)(sqs)(auditLog.newTransaction),
         taskEither.chain(() => taskEither.of(auditLog))
       );
     } else return taskEither.of(auditLog);

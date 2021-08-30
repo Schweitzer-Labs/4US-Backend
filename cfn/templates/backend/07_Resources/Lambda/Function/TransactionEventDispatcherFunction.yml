@@ -25,6 +25,8 @@ TransactionEventDispatcherFunction:
           !Ref LambdaRunEnvironment
         SQSQUEUE:
           !Ref EmailQueue
+        STRATO_QUEUE:
+          !Ref StratoQueue
         TRANSACTIONS_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
         COMMITTEES_DDB_TABLE_NAME:

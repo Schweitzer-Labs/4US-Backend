@@ -57,9 +57,6 @@ import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
 import { initStratoConfig } from "../clients/dapp/dapp.decoders";
 import { FinicityConfig } from "../clients/finicity/finicity.decoders";
 import { genDemoCommittee } from "../demo/gen-committee.demo";
-import { pipe } from "fp-ts/function";
-import { deleteTxn, deleteTxnPipe } from "../utils/model/delete-txn.utils";
-import { taskEither } from "fp-ts";
 import { deleteUnreconciledTxn } from "../pipes/delete-txn.pipe";
 
 const demoPasscode = "f4jp1i";
