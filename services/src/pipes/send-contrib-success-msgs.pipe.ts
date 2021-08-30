@@ -4,11 +4,10 @@ import {
   ICommittee,
 } from "../queries/get-committee-by-id.query";
 import { SendMessageRequest } from "aws-sdk/clients/sqs";
-import { TaskEither } from "fp-ts/TaskEither";
-import { ApplicationError } from "../utils/application-error";
-import { task, taskEither } from "fp-ts";
+import { taskEither } from "fp-ts";
 import { DynamoDB, SQS } from "aws-sdk";
 import { pipe } from "fp-ts/function";
+import { sendMessage } from "../utils/send-sqs.utils";
 
 export const sendContribSuccessMsgs =
   (committeesTableName: string) =>
@@ -53,13 +52,4 @@ const formatMessage =
       MessageGroupId: txn.committeeId,
       QueueUrl: sqsUrl,
     };
-  };
-const sendMessage =
-  (sqs: SQS) =>
-  (message: SendMessageRequest): TaskEither<ApplicationError, any> => {
-    console.log("message send attempted");
-    return taskEither.tryCatch(
-      () => sqs.sendMessage(message).promise(),
-      (e) => new ApplicationError("SQS send failed", e)
-    );
   };
