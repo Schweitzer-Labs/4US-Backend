@@ -10,7 +10,7 @@ CommitteeGateway:
       EndpointConfiguration: REGIONAL
       SecurityPolicy: TLS_1_2
     Cors:
-      AllowCredentials: true
+#      AllowCredentials: true
       AllowOrigin: "'*'"
       AllowMethods: "'OPTIONS,GET,PUT,POST'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
