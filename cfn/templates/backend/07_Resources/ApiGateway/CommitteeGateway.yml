@@ -19,14 +19,10 @@ CommitteeGateway:
         ResponseParameters:
           Headers:
             Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
-        ResponseTemplates:
-          "application/json": "{ \"message\": 4xx error }"
       DEFAULT_5XX:
         ResponseParameters:
           Headers:
             Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
-        ResponseTemplates:
-          "application/json": "{ \"message\": 5xx error }"
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
