@@ -28,7 +28,7 @@ async function handleRequest(request) {
 
   return new Response(
         ''
-      , { status: redirectCode, headers: { 'Location': url.href } }
+      , { status: redirectCode, headers: { 'Location': url.pathname + url.search } }
     )
   ;
 }
