@@ -14,17 +14,6 @@ CommitteeGateway:
       AllowOrigin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
       AllowMethods: "'OPTIONS,GET,PUT,POST'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-    GatewayResponses:
-      DEFAULT_4XX:
-        ResponseParameters:
-          Headers:
-            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
-            Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      DEFAULT_5XX:
-        ResponseParameters:
-          Headers:
-            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
-            Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
