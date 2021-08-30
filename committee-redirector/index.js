@@ -26,9 +26,5 @@ async function handleRequest(request) {
   url.pathname = `/committee/${committee}`;
   url.search = searchParams.toString();
 
-  return new Response(
-        ''
-      , { status: redirectCode, headers: { 'Location': url.pathname + url.search } }
-    )
-  ;
+  return Response.redirect(url.href, redirectCode);
 }
