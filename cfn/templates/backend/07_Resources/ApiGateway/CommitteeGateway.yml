@@ -10,21 +10,19 @@ CommitteeGateway:
       EndpointConfiguration: REGIONAL
       SecurityPolicy: TLS_1_2
     Cors:
-#      AllowCredentials: true
-      AllowOrigin: "'*'"
+      AllowCredentials: true
+      AllowOrigin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
       AllowMethods: "'OPTIONS,GET,PUT,POST'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     GatewayResponses:
       DEFAULT_4XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'*'"
-            Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
       DEFAULT_5XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'*'"
-            Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
