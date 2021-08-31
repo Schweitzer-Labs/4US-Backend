@@ -45,16 +45,16 @@ export default async (event: DynamoDBStreamEvent): Promise<boolean> => {
       dynamoDB
     );
 
-  const resCol: EffectMetadata[] = [];
+  const effectCol: EffectMetadata[] = [];
   for (const stream of event.Records) {
-    resCol.push(await handlerWithConf(stream));
+    effectCol.push(await handlerWithConf(stream));
   }
 
   const newTxn: any = event.Records[0].dynamodb.NewImage;
   const oldTxn: any = event.Records[0].dynamodb.OldImage;
   const txn = newTxn || oldTxn;
 
-  console.log(JSON.stringify(resCol));
+  console.log("Metadata response: ", JSON.stringify(effectCol));
 
   await txnToAggsUpdate(aggsTable)(txnTable)(dynamoDB)(txn)();
 
@@ -123,9 +123,10 @@ const txnToAggsUpdate =
   (aggsTable: string) =>
   (txnTable: string) =>
   (ddb: DynamoDB) =>
-  (txn: ITransaction): TaskEither<ApplicationError, IAggs> =>
+  (txn: any): TaskEither<ApplicationError, IAggs> =>
     pipe(
-      taskEither.of(txn.committeeId),
+      taskEither.of(AWS.DynamoDB.Converter.unmarshall(txn)),
+      taskEither.map((txn) => txn.committeeId),
       taskEither.chain(refreshAggs(aggsTable)(txnTable)(ddb))
     );
 
