@@ -75,4 +75,6 @@ export default async (event: SQSEvent, context): Promise<any> => {
       console.log("Prefix", "Success", JSON.stringify(res.right));
     }
   }
+
+  return true;
 };
