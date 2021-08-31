@@ -36,7 +36,7 @@ const txnTable: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const aggsTable: any = process.env.AGGREGATES_DDB_TABLE_NAME;
 const stratoSQSUrl: any = process.env.STRATO_SQS_URL;
 
-export default async (event: DynamoDBStreamEvent): Promise<bool> => {
+export default async (event: DynamoDBStreamEvent): Promise<boolean> => {
   console.log(JSON.stringify(event));
   console.log("initiating ddb update loop");
 
