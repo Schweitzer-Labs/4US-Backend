@@ -11,20 +11,20 @@ DonorGateway:
       SecurityPolicy: TLS_1_2
     Cors:
       AllowCredentials: true
-      AllowOrigin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
+      AllowOrigin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
       AllowMethods: "'OPTIONS,GET,PUT,POST'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     GatewayResponses:
       DEFAULT_4XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
+            Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
 #        ResponseTemplates:
 #          "application/json": "{ \"message\": 4xx error }"
       DEFAULT_5XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
+            Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
 #        ResponseTemplates:
 #          "application/json": "{ \"message\": 5xx error }"
     MethodSettings:
