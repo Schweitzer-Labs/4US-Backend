@@ -10,23 +10,23 @@ DonorGateway:
       EndpointConfiguration: REGIONAL
       SecurityPolicy: TLS_1_2
     Cors:
-#      AllowCredentials: true
-      AllowOrigin: "'*'"
+      AllowCredentials: true
+      AllowOrigin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
       AllowMethods: "'OPTIONS,GET,PUT,POST'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     GatewayResponses:
       DEFAULT_4XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'*'"
-        ResponseTemplates:
-          "application/json": "{ \"message\": 4xx error }"
+            Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
+#        ResponseTemplates:
+#          "application/json": "{ \"message\": 4xx error }"
       DEFAULT_5XX:
         ResponseParameters:
           Headers:
-            Access-Control-Allow-Origin: "'*'"
-        ResponseTemplates:
-          "application/json": "{ \"message\": 5xx error }"
+            Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
+#        ResponseTemplates:
+#          "application/json": "{ \"message\": 5xx error }"
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
