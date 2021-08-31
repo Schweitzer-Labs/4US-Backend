@@ -7,7 +7,10 @@ import { taskEither } from "fp-ts";
 export const sendMessage =
   (sqs: SQS) =>
   (message: SendMessageRequest): TaskEither<ApplicationError, any> => {
-    console.log("message send attempted");
+    console.log(
+      "message send attempted with payload: ",
+      JSON.stringify(message)
+    );
     return taskEither.tryCatch(
       () => sqs.sendMessage(message).promise(),
       (e) => new ApplicationError("SQS send failed", e)
