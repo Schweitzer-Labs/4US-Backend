@@ -50,7 +50,13 @@ export default async (event: DynamoDBStreamEvent): Promise<boolean> => {
     resCol.push(await handlerWithConf(stream));
   }
 
+  const newTxn: any = event.Records[0].dynamodb.NewImage;
+  const oldTxn: any = event.Records[0].dynamodb.OldImage;
+  const txn = newTxn || oldTxn;
+
   console.log(JSON.stringify(resCol));
+
+  await txnToAggsUpdate(aggsTable)(txnTable)(dynamoDB)(txn)();
 
   return true;
 };
@@ -110,13 +116,6 @@ const handleStream =
           )
         )();
     }
-
-    const newTxn: any = ddbRecord.dynamodb.NewImage;
-    const oldTxn: any = ddbRecord.dynamodb.OldImage;
-    const txn = newTxn || oldTxn;
-
-    await txnToAggsUpdate(aggsTable)(txnTable)(dynamoDB)(txn)();
-
     return res;
   };
 
