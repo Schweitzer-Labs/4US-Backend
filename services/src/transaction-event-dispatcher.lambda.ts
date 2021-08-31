@@ -19,6 +19,7 @@ import { refreshAggs } from "./pipes/refresh-aggs.pipe";
 import { TaskEither } from "fp-ts/TaskEither";
 import { IAggs } from "./queries/get-aggs.decoders";
 import { DynamoDBRecord } from "aws-lambda/trigger/dynamodb-stream";
+import { decodeRawData } from "./utils/decode-raw-data.util";
 
 dotenv.config();
 
@@ -126,6 +127,7 @@ const txnToAggsUpdate =
   (txn: any): TaskEither<ApplicationError, IAggs> =>
     pipe(
       taskEither.of(AWS.DynamoDB.Converter.unmarshall(txn)),
+      taskEither.chain(decodeRawData("Txn to aggs")(Transaction)),
       taskEither.map((txn) => txn.committeeId),
       taskEither.chain(refreshAggs(aggsTable)(txnTable)(ddb))
     );
