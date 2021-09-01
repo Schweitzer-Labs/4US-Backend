@@ -1,7 +1,7 @@
-GatewayFirewall:
+CommitteeGatewayFirewall:
   Type: AWS::WAFv2::WebACL
   Properties:
-    Name: !Sub GatewayFirewall${LambdaRunEnvironment}${Product}
+    Name: !Sub CommitteeGatewayFirewall${LambdaRunEnvironment}
     Scope: REGIONAL
     DefaultAction:
       Allow: {}

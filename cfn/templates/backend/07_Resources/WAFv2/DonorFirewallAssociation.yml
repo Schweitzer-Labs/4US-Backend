@@ -5,4 +5,4 @@ DonorFirewallAssociation:
   Properties:
     ResourceArn: !Sub
         arn:aws:apigateway:${AWS::Region}::/restapis/${DonorGateway}/stages/${LambdaRunEnvironment}
-    WebACLArn: !GetAtt GatewayFirewall.Arn
+    WebACLArn: !GetAtt DonorGatewayFirewall.Arn
