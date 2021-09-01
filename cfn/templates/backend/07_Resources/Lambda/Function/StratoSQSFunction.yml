@@ -6,9 +6,9 @@ StratoSQSFunction:
     CodeUri: lambdas/
     Layers:
       - !Ref ServicesLayer
-    Handler: app.stratoS
+    Handler: app.stratoSQS
     Runtime: nodejs14.x
-    Role: !GetAtt LambdaSESRole.Arn
+    Role: !GetAtt LambdaGraphQLRole.Arn
     Events:
       TransactionVerified:
         Type: SQS

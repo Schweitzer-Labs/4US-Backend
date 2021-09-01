@@ -19,6 +19,7 @@ import { refreshAggs } from "./pipes/refresh-aggs.pipe";
 import { TaskEither } from "fp-ts/TaskEither";
 import { IAggs } from "./queries/get-aggs.decoders";
 import { DynamoDBRecord } from "aws-lambda/trigger/dynamodb-stream";
+import { decodeRawData } from "./utils/decode-raw-data.util";
 
 dotenv.config();
 
@@ -36,7 +37,7 @@ const txnTable: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const aggsTable: any = process.env.AGGREGATES_DDB_TABLE_NAME;
 const stratoSQSUrl: any = process.env.STRATO_SQS_URL;
 
-export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
+export default async (event: DynamoDBStreamEvent): Promise<boolean> => {
   console.log(JSON.stringify(event));
   console.log("initiating ddb update loop");
 
@@ -45,12 +46,20 @@ export default async (event: DynamoDBStreamEvent): Promise<EffectMetadata> => {
       dynamoDB
     );
 
-  const resCol: EffectMetadata[] = [];
+  const effectCol: EffectMetadata[] = [];
   for (const stream of event.Records) {
-    resCol.push(await handlerWithConf(stream));
+    effectCol.push(await handlerWithConf(stream));
   }
 
-  return resCol[0];
+  const newTxn: any = event.Records[0].dynamodb.NewImage;
+  const oldTxn: any = event.Records[0].dynamodb.OldImage;
+  const txn = newTxn || oldTxn;
+
+  console.log("Metadata response: ", JSON.stringify(effectCol));
+
+  await txnToAggsUpdate(aggsTable)(txnTable)(dynamoDB)(txn)();
+
+  return true;
 };
 
 const handleInsert =
@@ -108,13 +117,6 @@ const handleStream =
           )
         )();
     }
-
-    const newTxn: any = ddbRecord.dynamodb.NewImage;
-    const oldTxn: any = ddbRecord.dynamodb.OldImage;
-    const txn = newTxn || oldTxn;
-
-    await txnToAggsUpdate(aggsTable)(txnTable)(dynamoDB)(txn)();
-
     return res;
   };
 
@@ -122,9 +124,11 @@ const txnToAggsUpdate =
   (aggsTable: string) =>
   (txnTable: string) =>
   (ddb: DynamoDB) =>
-  (txn: ITransaction): TaskEither<ApplicationError, IAggs> =>
+  (txn: any): TaskEither<ApplicationError, IAggs> =>
     pipe(
-      taskEither.of(txn.committeeId),
+      taskEither.of(AWS.DynamoDB.Converter.unmarshall(txn)),
+      taskEither.chain(decodeRawData("Txn to aggs")(Transaction)),
+      taskEither.map((txn) => txn.committeeId),
       taskEither.chain(refreshAggs(aggsTable)(txnTable)(ddb))
     );
 

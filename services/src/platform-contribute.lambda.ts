@@ -45,7 +45,7 @@ export default async (event: any) => {
     stripe = new Stripe(stripeApiKey, {
       apiVersion: "2020-08-27",
     });
-    console.log("Configuration values have been set");
+    console.log("Configuration values have been set.");
   }
   const instantIdConfig: ILexisNexisConfig = {
     username: lnUsername,
