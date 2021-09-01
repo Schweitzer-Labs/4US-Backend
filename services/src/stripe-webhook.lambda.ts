@@ -49,7 +49,7 @@ export default async (
       // }
       return successResponse;
     case "payout.paid":
-      return await handlePayoutPaid(stripe)(payload);
+    // return await handlePayoutPaid(stripe)(payload);
     default:
       console.log(`Unhandled event type ${payload.type}`);
       return successResponse;
