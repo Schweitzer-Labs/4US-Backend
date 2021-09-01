@@ -1,6 +1,12 @@
 import * as t from "io-ts";
 import { FinicityTransaction } from "../clients/finicity/finicity.decoders";
 
+export enum SchemaVersion {
+  V1 = "v1",
+}
+
+export const currentVersion = SchemaVersion.V1;
+
 const TransactionRequired = t.type({
   id: t.string,
   committeeId: t.string,
@@ -10,12 +16,12 @@ const TransactionRequired = t.type({
   bankVerified: t.boolean,
   ruleVerified: t.boolean,
   initiatedTimestamp: t.number,
+  paymentDate: t.number,
   source: t.string,
 });
 
 const TransactionOptional = t.partial({
   donorId: t.string,
-  paymentDate: t.number,
   checkNumber: t.string,
   bankVerifiedTimestamp: t.number,
   ruleVerifiedTimestamp: t.number,
@@ -41,10 +47,15 @@ const TransactionOptional = t.partial({
   stripePaymentIntentId: t.string,
   stripeBalanceTransactionId: t.string,
   stripeChargeId: t.string,
+  stripeTransferId: t.string,
+  stripePaymentId: t.string,
+  stripePayoutId: t.string,
+  stripeAutomaticPayoutEffectiveAtUtc: t.number,
   cardNumberLastFourDigits: t.string,
   entityName: t.string,
   ruleCode: t.string,
   createdByUser: t.string,
+  modifiedByUser: t.string,
   isSubcontracted: t.boolean,
   isPartialPayment: t.boolean,
   isExistingLiability: t.boolean,
@@ -57,7 +68,14 @@ const TransactionOptional = t.partial({
   finicityDescription: t.string,
   finicityTransactionDate: t.number,
   finicityPostedDate: t.number,
+  finicityPaymentMethod: t.string,
   employmentStatus: t.string,
+  donorVerificationScore: t.number,
+  businessIdVerificationScore: t.unknown,
+  businessIdRequestTimestamp: t.number,
+  businessIdRawResponse: t.unknown,
+  inKindType: t.string,
+  inKindDescription: t.string,
 });
 
 export const Transaction = t.intersection([

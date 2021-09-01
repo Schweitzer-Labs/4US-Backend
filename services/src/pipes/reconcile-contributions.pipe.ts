@@ -72,38 +72,6 @@ const processTxns =
       } else if (isUnverifiedContribution(t)) {
         acc.push(t);
       }
-      // if (isPayout(t) && currentPayout) {
-      //   if (sumTxns(acc) === currentPayout?.amount) {
-      //     for (const matchedTxns of acc) {
-      //       const verifiedTxn =
-      //         markTxnAsVerifiedWithFinicity(currentPayout)(matchedTxns);
-      //       const savedTxn = await putTransaction(txnsTableName)(dynamoDB)(
-      //         verifiedTxn
-      //       );
-      //       reconciledTxns.push(savedTxn);
-      //     }
-      //     await deleteTxn(txnsTableName)(dynamoDB)(currentPayout);
-      //     acc = [];
-      //   }
-      //   currentPayout = t;
-      // } else if (isPayout(t)) {
-      //   currentPayout = t;
-      // } else if (isUnverifiedContribution(t) && currentPayout) {
-      //   acc.push(t);
-      //   if (sumTxns(acc) === currentPayout?.amount) {
-      //     for (const matchedTxns of acc) {
-      //       const verifiedTxn =
-      //         markTxnAsVerifiedWithFinicity(currentPayout)(matchedTxns);
-      //       const savedTxn = await putTransaction(txnsTableName)(dynamoDB)(
-      //         verifiedTxn
-      //       );
-      //       reconciledTxns.push(savedTxn);
-      //     }
-      //     await deleteTxn(txnsTableName)(dynamoDB)(currentPayout);
-      //     acc = [];
-      //   }
-      //   currentPayout = undefined;
-      // }
     }
 
     return reconciledTxns;
@@ -112,7 +80,7 @@ const processTxns =
 const isUnverifiedContribution = (txn: ITransaction) =>
   txn.transactionType === TransactionType.Contribution && !txn.bankVerified;
 
-const isPayout = (txn: ITransaction) =>
+export const isPayout = (txn: ITransaction) =>
   txn.direction === Direction.In &&
   payoutDescriptions.includes(txn?.finicityTransactionData?.description);
 

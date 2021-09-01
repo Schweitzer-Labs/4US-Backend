@@ -13,8 +13,21 @@ import {
 import { ITransaction, Transactions } from "./search-transactions.decoder";
 import { TransactionsArg } from "../args/transactions.arg";
 import { Order } from "../utils/enums/order.enum";
+import { QueryInput } from "aws-sdk/clients/dynamodb";
 
 const logPrefix = "Get Transactions";
+
+const toExclusiveStartKey = (committeeId: string) => (id?: string) =>
+  id
+    ? {
+        ExclusiveStartKey: {
+          id: { S: id },
+          committeeId: { S: committeeId },
+        },
+      }
+    : {};
+
+const toLimit = (limit?: number) => (limit ? { Limit: limit } : {});
 
 export const getTransactionsRes =
   (txnsTableName: string) =>
@@ -27,6 +40,8 @@ export const getTransactionsRes =
     order = Order.Desc,
     donorId,
     entityType,
+    take,
+    fromId,
   }: TransactionsArg): Promise<ITransaction[]> => {
     const byDonorIndex = donorId
       ? { IndexName: "TransactionsByCommitteeDonorIndex" }
@@ -47,7 +62,7 @@ export const getTransactionsRes =
     const keyConditionExpress = donorId
       ? "committeeId = :committeeId AND donorId = :donorId"
       : "committeeId = :committeeId";
-    const query = {
+    const query: QueryInput = {
       TableName: txnsTableName,
       ...byDonorIndex,
       KeyConditionExpression: keyConditionExpress,
@@ -61,12 +76,15 @@ export const getTransactionsRes =
         ...toExpressionAttributeValueBool("ruleVerified", ruleVerified),
         ...toExpressionAttributeValueString("entityType", entityType),
       },
+      ...toExclusiveStartKey(committeeId)(fromId),
+      ...toLimit(take),
     };
 
     const res = await dynamoDB.query(query).promise();
-    const marshalledRes: any = res.Items.map((item) =>
-      DynamoDB.Converter.unmarshall(item)
-    );
+
+    const marshalledRes: any = res.Items.map((item) => {
+      return DynamoDB.Converter.unmarshall(item);
+    });
 
     return marshalledRes;
   };

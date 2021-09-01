@@ -7,7 +7,7 @@ TransactionEventDispatcherFunction:
     Layers:
       - !Ref ServicesLayer
     Handler: app.transactionEventDispatcherHandler
-    Runtime: nodejs12.x
+    Runtime: nodejs14.x
     Role: !GetAtt LambdaDonationReceiverRole.Arn
     Events:
       TransactionRecorded:
@@ -15,16 +15,27 @@ TransactionEventDispatcherFunction:
         Properties:
           BatchSize: 1
           StartingPosition: LATEST
-          Stream: !Ref TransactionsStream
+          Stream: !GetAtt DynamoDBsTemplate.Outputs.TransactionsStream
     DeadLetterQueue:
       TargetArn: !Ref LambdaDLQ
       Type: SNS
     Environment:
       Variables:
-        RUNENV: !Ref LambdaRunEnvironment
-        SQSQUEUE: !Ref EmailQueue
-        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
-        COMMITTEES_DDB_TABLE_NAME: !Ref Committees
+        RUNENV:
+          !Ref LambdaRunEnvironment
+        SQSQUEUE:
+          !Ref EmailQueue
+        STRATO_SQS_URL:
+          !Ref StratoQueue
+        TRANSACTIONS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
+        COMMITTEES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+        AGGREGATES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.AggregatesTableName
+        AUDIT_LOGS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableName
+
 
 TxnDispatcherInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig

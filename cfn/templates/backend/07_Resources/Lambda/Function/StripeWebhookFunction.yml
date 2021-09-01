@@ -7,7 +7,7 @@ StripeWebhookFunction:
     Layers:
       - !Ref ServicesLayer
     Handler: app.stripeWebhook
-    Runtime: nodejs12.x
+    Runtime: nodejs14.x
     Role: !GetAtt LambdaGraphQLRole.Arn
     Timeout: 50
     MemorySize: 200
@@ -23,12 +23,18 @@ StripeWebhookFunction:
       Type: SNS
     Environment:
       Variables:
-        RUNENV: !Ref LambdaRunEnvironment
-        TRANSACTIONS_DDB_TABLE_NAME: !Ref Transactions
-        COMMITTEES_DDB_TABLE_NAME: !Ref Committees
-        DONORS_DDB_TABLE_NAME: !Ref Donors
-        RULES_DDB_TABLE_NAME: !Ref Rules
-        BILLABLE_EVENTS_DDB_TABLE_NAME: !Ref BillableEvents
+        RUNENV:
+          !Ref LambdaRunEnvironment
+        TRANSACTIONS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
+        COMMITTEES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+        DONORS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.DonorsTableName
+        RULES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.RulesTableName
+        BILLABLE_EVENTS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableName
 
 StripeWebhookInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig

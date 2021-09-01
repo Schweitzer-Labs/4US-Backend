@@ -9,7 +9,6 @@ export const putTransaction =
   (txnTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (txn: ITransaction) => {
-    console.log("Transaction writing to ddb");
     const marshalledTxn = DynamoDB.Converter.marshall(txn);
     await dynamoDB
       .putItem({
@@ -27,6 +26,6 @@ export const putTransactionAndDecode =
     pipe(
       te.tryCatch(
         () => putTransaction(txnTableName)(dynamoDB)(txn),
-        (e) => new ApplicationError("Put transaction failed", {})
+        (e) => new ApplicationError("Put transaction failed", e)
       )
     );

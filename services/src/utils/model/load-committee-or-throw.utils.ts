@@ -25,7 +25,7 @@ export const loadCommitteeOrThrow =
     }
     const committee = eitherCommittees.right;
     if (!committee.members.includes(currentUser)) {
-      console.log("api use is not authorized");
+      console.log("API use is not authorized");
       throw new UnauthorizedError();
     }
 

@@ -4,8 +4,10 @@ import { pipe } from "fp-ts/function";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { StatusCodes } from "http-status-codes";
-import { taskEither } from "fp-ts";
+import { taskEither as te, taskEither } from "fp-ts";
 import { validateDDBResponse } from "../repositories/ddb.utils";
+import { decodeError } from "../utils/decode-error.util";
+
 import { isEmpty } from "../utils/model/get-res-is-empty.utils";
 
 const logPrefix = "Get Committee";
@@ -37,6 +39,8 @@ const CommitteeOptional = t.partial({
   chainId: t.string,
   emailAddresses: t.string,
   employmentStatus: t.string,
+  efsFilerId: t.number,
+  efsElectionId: t.number,
 });
 
 export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);
@@ -44,6 +48,15 @@ export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);
 export const Committees = t.array(Committee);
 
 export type ICommittee = t.TypeOf<typeof Committee>;
+
+export const decodeCommittees = (
+  res: unknown
+): TaskEither<ApplicationError, ICommittee[]> => {
+  return pipe(
+    te.fromEither(Committees.decode(res)),
+    te.mapLeft(decodeError("Committees"))
+  );
+};
 
 export const committeeIdToDDBRes =
   (committeeTableName: string) =>
@@ -59,7 +72,12 @@ export const committeeIdToDDBRes =
         },
       })
       .promise();
-    return DynamoDB.Converter.unmarshall(res.Item);
+
+    const committee = DynamoDB.Converter.unmarshall(res.Item);
+
+    console.log("Get committee res", committee);
+
+    return committee;
   };
 
 export const getCommitteeById =
@@ -67,6 +85,7 @@ export const getCommitteeById =
   (dynamoDB: DynamoDB) =>
   (committeeId: string): TaskEither<ApplicationError, ICommittee> => {
     console.log("Get committee query called");
+
     return pipe(
       tryCatch<ApplicationError, any>(
         () => committeeIdToDDBRes(committeesTableName)(dynamoDB)(committeeId),

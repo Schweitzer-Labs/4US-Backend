@@ -1,0 +1,19 @@
+DynamoDBAuditLogsPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  DependsOn: DynamoDBsTemplate
+  Properties:
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Effect: Allow
+          Resource:
+            - !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableArn
+          Action:
+            - dynamodb:Scan
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:UpdateItem
+            - dynamodb:PartiQLSelect
+

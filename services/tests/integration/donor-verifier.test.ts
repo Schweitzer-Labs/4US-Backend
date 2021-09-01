@@ -7,8 +7,8 @@ import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { expect } from "chai";
-import { IInstantIdConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
 import { genCommittee } from "../utils/gen-committee.util";
+import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ const dynamoDB = new DynamoDB();
 const lnUsername = process.env.LN_USERNAME;
 const lnPassword = process.env.LN_PASSWORD;
 
-const instantIdConfig: IInstantIdConfig = {
+const instantIdConfig: ILexisNexisConfig = {
   username: lnUsername,
   password: lnPassword,
 };

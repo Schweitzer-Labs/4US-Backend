@@ -21,6 +21,7 @@ AWS.config.apiVersions = {
 // @ToDo Load from parameter store
 
 const dynamoDB = new DynamoDB();
+const parameterStore = new AWS.SSM();
 const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const runenv: any = process.env.RUNENV;
@@ -33,9 +34,9 @@ let finicityConfig: FinicityConfig;
 export default async () => {
   console.log("bank sync lambda is now running");
   if (!partnerId || !partnerSecret || !appKey) {
-    partnerId = await getFinicityPartnerId(runenv);
-    partnerSecret = await getFinicityPartnerSecret(runenv);
-    appKey = await getFinicityAppKey(runenv);
+    partnerId = await getFinicityPartnerId(parameterStore)(runenv);
+    partnerSecret = await getFinicityPartnerSecret(parameterStore)(runenv);
+    appKey = await getFinicityAppKey(parameterStore)(runenv);
 
     finicityConfig = {
       partnerId,

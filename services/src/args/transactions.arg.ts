@@ -35,4 +35,10 @@ export class TransactionsArg {
 
   @Field((type) => EntityType, { nullable: true })
   entityType?: EntityType;
+
+  @Field((type) => Number, { nullable: true })
+  take?: number;
+
+  @Field((type) => String, { nullable: true })
+  fromId?: string;
 }

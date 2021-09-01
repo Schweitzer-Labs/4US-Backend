@@ -1,7 +1,5 @@
 import * as AWS from "aws-sdk";
 
-const ps = new AWS.SSM();
-
 enum ConfigKeys {
   stripeApiKey = "/lambda/stripe/apikey",
   lnUsername = "/lambda/ln/username",
@@ -9,9 +7,15 @@ enum ConfigKeys {
   finicityPartnerId = "/lambda/finicity/partnerId",
   finicityPartnerSecret = "/lambda/finicity/partnerSecret",
   finicityAppKey = "/lambda/finicity/appKey",
+  stripeWebhookEndpointSecret = "/lambda/stripe/webhookEndpointSecret",
+  stratoNodeUrl = "/lambda/strato/nodeUrl",
+  stratoENodeUrl = "/lambda/strato/eNodeUrl",
+  stratoOAuthClientId = "/lambda/strato/oauthClientId",
+  stratoOAuthClientSecret = "/lambda/strato/oauthClientSecret",
+  stratoOAuthOpenIdDiscoveryUrl = "/lambda/strato/oauthOpenIdDiscoveryUrl",
 }
 
-const retrieveConfig = async (env: string, name: string) => {
+const retrieveConfig = (ps: AWS.SSM) => async (env: string, name: string) => {
   const fullKey = `/${env}${name}`;
   console.log("Config look up initiated on key: ", fullKey);
   const res = await ps
@@ -23,37 +27,48 @@ const retrieveConfig = async (env: string, name: string) => {
   return res.Parameter.Value;
 };
 
-const getConfig = async (env: string, name: string): Promise<string> => {
-  console.log(`/${env}${name}`);
-  switch (name) {
-    case ConfigKeys.stripeApiKey:
-    case ConfigKeys.lnUsername:
-    case ConfigKeys.lnPassword:
-    case ConfigKeys.finicityPartnerId:
-    case ConfigKeys.finicityPartnerSecret:
-    case ConfigKeys.finicityAppKey:
-      return retrieveConfig(env, name);
+const getConfig =
+  (ps: AWS.SSM) =>
+  async (env: string, configKey: ConfigKeys): Promise<string> => {
+    console.log(`/${env}${configKey}`);
+    return retrieveConfig(ps)(env, configKey);
+  };
 
-    default:
-      console.error("Config not found");
-      throw new Error("Config not found");
-  }
-};
+export const getStripeApiKey = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.stripeApiKey);
 
-export const getStripeApiKey = async (env: string) =>
-  await getConfig(env, ConfigKeys.stripeApiKey);
+export const getStripeWebhookEndpointSecret =
+  (ps: AWS.SSM) => async (env: string) =>
+    await getConfig(ps)(env, ConfigKeys.stripeWebhookEndpointSecret);
 
-export const getLNUsername = async (env: string) =>
-  await getConfig(env, ConfigKeys.lnUsername);
+export const getLNUsername = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.lnUsername);
 
-export const getLNPassword = async (env: string) =>
-  await getConfig(env, ConfigKeys.lnPassword);
+export const getLNPassword = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.lnPassword);
 
-export const getFinicityPartnerId = async (env: string) =>
-  await getConfig(env, ConfigKeys.finicityPartnerId);
+export const getFinicityPartnerId = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.finicityPartnerId);
 
-export const getFinicityPartnerSecret = async (env: string) =>
-  await getConfig(env, ConfigKeys.finicityPartnerSecret);
+export const getFinicityPartnerSecret = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.finicityPartnerSecret);
 
-export const getFinicityAppKey = async (env: string) =>
-  await getConfig(env, ConfigKeys.finicityAppKey);
+export const getFinicityAppKey = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.finicityAppKey);
+
+export const getStratoNodeUrl = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.stratoNodeUrl);
+
+export const getStratoENodeUrl = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.stratoENodeUrl);
+
+export const getStratoOAuthClientId = (ps: AWS.SSM) => async (env: string) =>
+  await getConfig(ps)(env, ConfigKeys.stratoOAuthClientId);
+
+export const getStratoOauthClientSecret =
+  (ps: AWS.SSM) => async (env: string) =>
+    await getConfig(ps)(env, ConfigKeys.stratoOAuthClientSecret);
+
+export const getStratoOAuthOpenIdDiscoveryUrl =
+  (ps: AWS.SSM) => async (env: string) =>
+    await getConfig(ps)(env, ConfigKeys.stratoOAuthOpenIdDiscoveryUrl);

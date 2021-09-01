@@ -1,0 +1,6 @@
+CloudFlareBuilderGroup:
+  Type: AWS::IAM::Group
+  Properties:
+    GroupName: !Sub CloudFlareBuilder-${AWS::Region}
+    ManagedPolicyArns:
+      - !Ref CloudFlareBuilderPolicy

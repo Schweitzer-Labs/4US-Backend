@@ -1,4 +1,5 @@
 import { now } from "./time.utils";
+const hashLength = 6;
 
 export const randomString = (length) => {
   const chars = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ";
@@ -8,6 +9,10 @@ export const randomString = (length) => {
   return result;
 };
 
+export const dateToTxnId = (date: number): string => {
+  return `${date}-${randomString(hashLength)}`;
+};
+
 export const genTxnId = (): string => {
-  return `${now()}-${randomString(6)}`;
+  return `${now()}-${randomString(hashLength)}`;
 };

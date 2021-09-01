@@ -3,13 +3,13 @@ LambdaBasicPolicy:
   Description: Policy for all Lambdas in {{ DOMAIN }}.{{ TLD }}
   Properties:
     PolicyDocument:
-      Version: '2012-10-17'
+      Version: 2012-10-17
       Statement:
         - Sid: ParameterStoreParameterAccess
           Effect: Allow
           Action:
-            - 'ssm:GetParameter*'
-          Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:*'
+            - ssm:GetParameter*
+          Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:*
         - Sid: VPCNetworkInterfaces
           Effect: Allow
           Resource: '*'

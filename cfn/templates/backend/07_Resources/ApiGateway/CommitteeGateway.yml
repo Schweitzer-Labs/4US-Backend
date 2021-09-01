@@ -8,10 +8,21 @@ CommitteeGateway:
       CertificateArn: !Ref CertificateManagerCertificate
       DomainName: !Sub committee-api.${Domain}.${TLD}
       EndpointConfiguration: REGIONAL
-      DistributionDomainName: !Sub candidate.${Domain}.${TLD}
-      Route53:
-        EvaluateTargetHealth: true
-        HostedZoneId: !Ref HostedZone
+      SecurityPolicy: TLS_1_2
+    Cors:
+      AllowCredentials: true
+      AllowOrigin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
+      AllowMethods: "'OPTIONS,GET,PUT,POST'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    GatewayResponses:
+      DEFAULT_4XX:
+        ResponseParameters:
+          Headers:
+            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
+      DEFAULT_5XX:
+        ResponseParameters:
+          Headers:
+            Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
@@ -21,10 +32,7 @@ CommitteeGateway:
         DataTraceEnabled: true
     Auth:
       DefaultAuthorizer: PlatformUserCognitoAuthorizer
+      AddDefaultAuthorizerToCorsPreflight: false
       Authorizers:
         PlatformUserCognitoAuthorizer:
-        {% if PRODUCT == '4us' %}
           UserPoolArn: !GetAtt PlatformUserPool.Arn
-        {% else %}
-          UserPoolArn: !Ref PlatformUserPoolArn
-        {% endif %}

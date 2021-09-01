@@ -1,20 +1,25 @@
 DynamoDBGraphQLPolicy:
   Type: AWS::IAM::ManagedPolicy
+  DependsOn: DynamoDBsTemplate
   Properties:
     PolicyDocument:
       Version: 2012-10-17
       Statement:
-          Effect: Allow
+        - Effect: Allow
           Resource:
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BillableEvents}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Transactions}/index/TransactionsByCommitteeDonorIndex
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Committees}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Donors}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Rules}
+            - !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.AuditLogsTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.AggregatesTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.DonorsTableArn
+            - !GetAtt DynamoDBsTemplate.Outputs.RulesTableArn
+            - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByCommitteeDonorIndex
           Action:
-            - dynamodb:PartiQLSelect
+            - dynamodb:Scan
             - dynamodb:Query
             - dynamodb:GetItem
             - dynamodb:PutItem
-            - dynamodb:Scan
+            - dynamodb:DeleteItem
+            - dynamodb:UpdateItem
+            - dynamodb:PartiQLSelect

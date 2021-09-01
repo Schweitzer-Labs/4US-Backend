@@ -1,6 +1,6 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { InKindType, PaymentMethod } from "../utils/enums/payment-method.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import {
   MinLength,
@@ -11,6 +11,7 @@ import {
   MaxLength,
 } from "class-validator";
 import { EmploymentStatus } from "../utils/enums/employment-status";
+import { State } from "../utils/enums/state.enum";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -27,6 +28,16 @@ registerEnumType(EmploymentStatus, {
   description: "Employment status of donor",
 });
 
+registerEnumType(State, {
+  name: "State",
+  description: "State location of donor",
+});
+
+registerEnumType(InKindType, {
+  name: "InKindType",
+  description: "Type of In-kind contribution",
+});
+
 @InputType()
 export class CreateContributionInput implements Partial<ITransaction> {
   @Field()
@@ -36,6 +47,9 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @Field()
   @Min(50)
   amount: number;
+
+  @Field()
+  processPayment: boolean;
 
   @Field((type) => PaymentMethod)
   paymentMethod: PaymentMethod;
@@ -56,9 +70,8 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @MinLength(1)
   city: string;
 
-  @Field()
-  @MinLength(2)
-  state: string;
+  @Field((type) => State)
+  state: State;
 
   @Field()
   @MinLength(5)
@@ -71,10 +84,10 @@ export class CreateContributionInput implements Partial<ITransaction> {
   @IsEmail()
   emailAddress?: string;
 
-  @Field({ nullable: true })
+  @Field()
   @IsNumber()
   @Min(1)
-  paymentDate?: number;
+  paymentDate: number;
 
   // Required for PaymentMethod.Credit
   @Field({ nullable: true })
@@ -141,4 +154,11 @@ export class CreateContributionInput implements Partial<ITransaction> {
 
   @Field((type) => EmploymentStatus, { nullable: true })
   employmentStatus?: EmploymentStatus;
+
+  @Field((type) => InKindType, { nullable: true })
+  inKindType?: InKindType;
+
+  @Field({ nullable: true })
+  @MinLength(2)
+  inKindDescription?: string;
 }

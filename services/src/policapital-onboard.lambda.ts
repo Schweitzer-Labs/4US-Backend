@@ -1,7 +1,10 @@
-import headers from "./utils/headers";
-
 import Joi from "joi";
 import { createStripeConnectUser } from "./utils/createStripeConnectUser";
+import { headers } from "./utils/headers";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+const corsOrigin = process.env.CORS_ORIGIN;
 
 const onboardingSchema = Joi.object({
   code: Joi.string().required(),
@@ -32,7 +35,7 @@ export default async (event, context) => {
       body: JSON.stringify({
         message: "success",
       }),
-      headers,
+      headers: headers(corsOrigin),
     };
   } catch (e) {
     return {
@@ -40,7 +43,7 @@ export default async (event, context) => {
       body: JSON.stringify({
         message: "Code is not valid",
       }),
-      headers,
+      headers: headers(corsOrigin),
     };
   }
 };

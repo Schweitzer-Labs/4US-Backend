@@ -1,0 +1,13 @@
+DynamoDBReadTransactionsPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  Properties:
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Effect: Allow
+          Resource:
+            - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
+          Action:
+            - dynamodb:ListShards
+            - dynamodb:GetItem
+            - dynamodb:Query

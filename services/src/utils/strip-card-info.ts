@@ -34,4 +34,5 @@ export interface StrippedContribution {
   donorId?: string;
   ruleCode?: string;
   source?: Source;
+  donorVerificationScore?: number;
 }

@@ -7,7 +7,7 @@ PolicapitalEmailerFunction:
     Layers:
       - !Ref ServicesLayer
     Handler: app.policapitalEmailerHandler
-    Runtime: nodejs12.x
+    Runtime: nodejs14.x
     Role: !GetAtt LambdaSESRole.Arn
     Events:
       ContributionMade:
@@ -22,8 +22,8 @@ PolicapitalEmailerFunction:
       Variables:
         NOTIFICATION_EMAIL_ADDRESS: !Ref NotificationEmailAddress
         RUNENV: !Ref LambdaRunEnvironment
-        SES_CONFIG_SET: !Ref SESConfigSet
 {% if REGION in ['us-east-1', 'us-west-2'] %}
+        SES_CONFIG_SET: !Ref SESConfigSet
         POS_RECEIPT: !Sub ${ContributorReceiptTemplate.Outputs.SES}
         POS_RECORD: !Sub ${CommitteeReceiptTemplate.Outputs.SES}
 {% endif %}

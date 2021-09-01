@@ -8,6 +8,7 @@ SubDomain:
 {% endif %}
 Product:
   Type: String
+  Default: 4us
 HostedZone:
   Type: AWS::SSM::Parameter::Value<String>
   Default: /{{ RUNENV }}/{{ PRODUCT }}/route53/hostedzone

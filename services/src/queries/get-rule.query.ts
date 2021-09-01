@@ -32,7 +32,7 @@ export const queryDDB =
     return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
   };
 
-const RulesToRule = (rules: IRule[]): TaskEither<ApplicationError, IRule> => {
+const rulesToRule = (rules: IRule[]): TaskEither<ApplicationError, IRule> => {
   if (rules.length > 0) {
     return taskEither.right(rules[0]);
   } else {
@@ -58,6 +58,6 @@ export const committeeAndDonorToRule =
           )
       ),
       taskEither.chain(validateDDBResponse(logPrefix)(Rules)),
-      taskEither.chain(RulesToRule)
+      taskEither.chain(rulesToRule)
     );
   };

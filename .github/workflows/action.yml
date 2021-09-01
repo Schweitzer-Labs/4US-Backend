@@ -1,0 +1,85 @@
+name: 4US Backend
+on:
+  push:
+    branches:
+      - qa
+      - prod
+      - demo
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - uses: act10ns/slack@v1
+        with:
+          status: Starting
+          channel: '#dev-updates'
+        if: always()
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: AWS IAM Role
+        id: setup-aws-access
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Setup Python
+        id: setup-python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python libs
+        id: install-python-libs
+        run: |
+          pip3 install -r requirements.txt
+      - name: Set environment to QA
+        id: set-deployment-target-to-qa
+        if: endsWith(github.ref, '/qa')
+        run: |
+          echo "RUNENV=qa" >> $GITHUB_ENV
+      - name: Set environment to Production
+        id: set-deployment-target-to-prod
+        if: endsWith(github.ref, '/prod')
+        run: |
+          echo "RUNENV=prod" >> $GITHUB_ENV
+      - name: Set environment to Demo
+        id: set-deployment-target-to-demo
+        if: endsWith(github.ref, '/demo')
+        run: |
+          echo "RUNENV=demo" >> $GITHUB_ENV
+      - name: Assemble CloudFormation Stacks
+        id: assemble-cloudformation-stacks
+        run: |
+          make RUNENV=${{ env.RUNENV }} build-stacks
+      - name: Transpile TypeScript source code
+        id: transpile-typescript-source-code
+        run: |
+          make RUNENV=${{ env.RUNENV }} compile
+      - name: Compile JavaScript code and assemble SAM template
+        id: compile-javascript-and-assemble-sam-template
+        run: |
+          make RUNENV=${{ env.RUNENV }} build-sam
+      - name: Generate CloudFormation package
+        id: generate-and-upload-cloudformation-package-template
+        run: |
+          make RUNENV=${{ env.RUNENV }} package
+      - name: Deploy Cloudformation template
+        id: deploy-cloudformation-package
+        run: |
+          make RUNENV=${{ env.RUNENV }} deploy
+      - name: Deploy CloudFlare Worker to redirect committee query strings
+        id: deploy-cloudflare-worker-redirect-committee-query-strings
+        uses: cloudflare/wrangler-action@1.3.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          environment: ${{ env.RUNENV }}
+          workingDirectory: committee-redirector
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: '#dev-updates'
+        if: always()
+

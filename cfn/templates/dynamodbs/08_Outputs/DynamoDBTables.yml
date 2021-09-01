@@ -1,0 +1,45 @@
+BillableEventsTableName:
+  Description: Billable Events table name
+  Value: !Ref BillableEvents
+BillableEventsTableArn:
+  Description: Billable Events table ARN
+  Value: !GetAtt BillableEvents.Arn
+AuditLogsTableName:
+  Description: Audit Logs table name
+  Value: !Ref AuditLogs
+AuditLogsTableArn:
+  Description: Audit Logs table ARN
+  Value: !GetAtt AuditLogs.Arn
+CommitteesTableName:
+  Description: Committees table for use by both products in this region
+  Value: !Ref Committees
+CommitteesTableArn:
+  Description: Committees table for use by both products in this region
+  Value: !GetAtt Committees.Arn
+AggregatesTableName:
+  Description: Aggregates table for caching committee aggregates
+  Value: !Ref Aggregates
+AggregatesTableArn:
+  Description: Aggregates table for caching committee aggregates
+  Value: !GetAtt Aggregates.Arn
+DonorsTableName:
+  Description: Donors table for use by both products in this region
+  Value: !Ref Donors
+DonorsTableArn:
+  Description: Donors table for use by both products in this region
+  Value: !GetAtt Donors.Arn
+RulesTableName:
+  Description: Compliance Rules table for use by both products in this region
+  Value: !Ref Rules
+RulesTableArn:
+  Description: Compliance Rules table for use by both products in this region
+  Value: !GetAtt Rules.Arn
+TransactionsTableName:
+  Description: Transactions table for use by both products in this region
+  Value: !Ref Transactions
+TransactionsTableArn:
+  Description: Transactions table for use by both products in this region
+  Value: !GetAtt Transactions.Arn
+TransactionsStream:
+  Description: Transactions table stream for use by both products in this region
+  Value: !GetAtt Transactions.StreamArn

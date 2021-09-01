@@ -27,6 +27,8 @@ export const qaCommitteesData: ICommittee[] = [
     county: "",
     officeType: "assembly",
     ruleVersion: "nyboe-2020",
+    efsFilerId: 146,
+    efsElectionId: 1423,
   },
   {
     // required
@@ -55,6 +57,8 @@ export const qaCommitteesData: ICommittee[] = [
     ruleVersion: "nyboe-2020",
     finicityCustomerId: "5005871881",
     finicityAccountId: "5012575024",
+    efsFilerId: 146,
+    efsElectionId: 1423,
   },
   {
     // required
@@ -83,6 +87,8 @@ export const qaCommitteesData: ICommittee[] = [
     ruleVersion: "nyboe-2020",
     finicityCustomerId: "5007489410",
     finicityAccountId: "5016000964",
+    efsFilerId: 146,
+    efsElectionId: 1423,
   },
   {
     // required
@@ -111,6 +117,8 @@ export const qaCommitteesData: ICommittee[] = [
     ruleVersion: "nyboe-2020",
     finicityCustomerId: "5007489410",
     finicityAccountId: "5016000964",
+    efsFilerId: 146,
+    efsElectionId: 1423,
   },
   {
     // required
@@ -139,6 +147,8 @@ export const qaCommitteesData: ICommittee[] = [
     ruleVersion: "nyboe-2020",
     finicityCustomerId: "5007489410",
     finicityAccountId: "5016000964",
+    efsFilerId: 146,
+    efsElectionId: 1423,
   },
   {
     // required
@@ -192,5 +202,7 @@ export const qaCommitteesData: ICommittee[] = [
     ruleVersion: "nyboe-2020",
     finicityCustomerId: "5007489410",
     finicityAccountId: "5016000964",
+    efsFilerId: 146,
+    efsElectionId: 1423,
   },
 ];

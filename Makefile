@@ -1,4 +1,3 @@
-
 SHELL			:= bash
 export CREPES		:= $(PWD)/cfn/bin/crepes.py
 export PRODUCT		:= 4us
@@ -10,32 +9,17 @@ endif
 
 ifeq ($(RUNENV), qa)
         export REGION   := us-west-2
-	ifeq ($(PRODUCT), 4us)
-		export DOMAIN   := build4
-		export TLD      := us
-		export HOSTID   := Z06902431WSK3XW3K83J3
-	else # PRODUCT = p2
-		export DOMAIN   := purplepay
-		export TLD      := us
-	endif
+	export DOMAIN   := build4
+	export TLD      := us
+	export HOSTID   := Z06902431WSK3XW3K83J3
 else ifeq ($(RUNENV), prod)
         export REGION   := us-east-1
-	ifeq ($(PRODUCT), 4us)
 		export DOMAIN   := 4us
 		export TLD      := net
-	else
-		export DOMAIN   := policapital
-		export TLD      := net
-	endif
 else ifeq ($(RUNENV), demo)
         export REGION   := us-west-1
 	export DOMAIN   := 4usdemo
 	export TLD      := com
-	export PRODUCT	:= 4us
-else # backup
-        export REGION   := us-east-2
-        export DOMAIN   := purplepay
-        export TLD      := us
 endif
 
 export CONTRIB_DIR	:= lambdas
@@ -63,7 +47,7 @@ export ENDPOINT		:= https://cloudformation-fips.$(REGION).amazonaws.com
 export CFN_BUCKET	:= $(PRODUCT)-cfn-templates-$(REGION)
 
 export STACK_PARAMS	:= Nonce=$(NONCE)
-STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV) Product=$(PRODUCT)
+STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
 STACK_PARAMS		+= Domain=$(DOMAIN) TLD=$(TLD)
 
 ifneq ($(SUBDOMAIN),)
@@ -83,6 +67,8 @@ COMMITTEE_RECEIPT	:= committee-receipt
 COMMITTEE_TEMPLATE	:= $(CFN_BUILD_DIR)/$(COMMITTEE_RECEIPT).yml
 DYNAMO_DBS		:= dynamodbs
 DYNAMODB_TEMPLATE	:= $(CFN_BUILD_DIR)/$(DYNAMO_DBS).yml
+CLOUDFLARE_BUILDER	:= cloudflare-builder
+CLOUDFLARE_TEMPLATE	:= $(CFN_BUILD_DIR)/$(CLOUDFLARE_BUILDER).yml
 
 IMPORTS			:= $(CFN_BUILD_DIR)/Imports-$(STACK).yml
 
@@ -94,15 +80,18 @@ EMAILER_APP		:= $(EMAILER_DIR)/app.js
 
 JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
 
-CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE) $(DYNAMODB_TEMPLATE)
+EMAIL_TEMPLATES		:= $(CONTRIBUTOR_TEMPLATE) $(COMMITTEE_TEMPLATE)
+export SAM_TEMPLATE	:= $(SAM_BUILD_DIR)/template.yaml
 
 ifeq ($(REGION), us-west-1)
-	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
+	CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(CLOUDFLARE_TEMPLATE)
 else ifeq ($(REGION), us-east-2)
-	CFN_TEMPLATES	:= $(BACKEND_TEMPLATE)
+	CFN_TEMPLATES := $(BACKEND_TEMPLATE)
+else
+	CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(EMAIL_TEMPLATES) $(CLOUDFLARE_TEMPLATE)
 endif
 
-.PHONY: dep build buildstacks check local import package deploy clean realclean
+.PHONY: dep build build-stacks check local import package deploy clean realclean
 
 # Make targets
 all: build
@@ -111,9 +100,11 @@ all: build
 mkbuilddir:
 	@mkdir -p $(SAM_BUILD_DIR) $(CFN_BUILD_DIR)
 
-build: clean mkbuilddir buildstacks buildsam
+build: mkbuilddir build-stacks build-sam
 
-buildsam: buildstacks compile $(JS_APPS)
+build-sam: build-stacks $(SAM_TEMPLATE)
+
+$(SAM_TEMPLATE): $(JS_APPS)
 	sam build \
 		--cached \
 		--parallel \
@@ -122,7 +113,7 @@ buildsam: buildstacks compile $(JS_APPS)
 		--cache-dir $(SAM_CACHE_DIR) \
 		--template-file $(BACKEND_TEMPLATE)
 
-buildstacks: mkbuilddir $(CFN_TEMPLATES)
+build-stacks: mkbuilddir $(CFN_TEMPLATES)
 
 compile:
 	npm -C services run compile
@@ -132,8 +123,6 @@ dep:
 
 $(CFN_BUILD_DIR)/%.yml: $(CFN_SRC_DIR)/%
 	$(MAKE) template=$@ -C $^ check
-
-
 
 clean:
 	@rm -f $(CFN_BUILD_DIR)/*.yml
@@ -145,7 +134,7 @@ local: build
 	@sam local start-api --warm-containers EAGER --template-file $(SAM_BUILD_DIR)/template.yaml
 
 
-check: buildstacks
+check: build-stacks
 	$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
 
 import: mkbuilddir

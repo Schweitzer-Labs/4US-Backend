@@ -9,7 +9,9 @@ import { PathReporter } from "io-ts/PathReporter";
 import * as t from "io-ts";
 import { SQSEvent } from "aws-lambda";
 import { SendTemplatedEmailResponse } from "aws-sdk/clients/ses";
+import * as dotenv from "dotenv";
 
+dotenv.config();
 const MessageAttributes = t.type({
   committeeEmailAddress: t.type({
     stringValue: t.string,
@@ -24,7 +26,8 @@ const MessageAttributes = t.type({
 
 type IMessageAttributes = t.TypeOf<typeof MessageAttributes>;
 
-const ses = new AWS.SES(), sns = new AWS.SNS();
+const ses = new AWS.SES(),
+  sns = new AWS.SNS();
 const from_address: any = process.env.NOTIFICATION_EMAIL_ADDRESS;
 const posReceiptTemplate: any = process.env.POS_RECEIPT;
 const posRecordTemplate: any = process.env.POS_RECORD;

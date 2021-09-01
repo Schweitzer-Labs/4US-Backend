@@ -16,7 +16,7 @@ import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
 import { searchTransactions } from "../queries/search-transactions.query";
 import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import { Direction } from "../utils/enums/direction.enum";
-import { genTxnId } from "../utils/gen-txn-id.utils";
+import { dateToTxnId, genTxnId } from "../utils/gen-txn-id.utils";
 import { Source } from "../utils/enums/source.enum";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
@@ -77,31 +77,10 @@ const matchAndProcess =
   ): TaskEither<ApplicationError, ITransaction> => {
     const fTxn = finicityTxnToPlatformTxn(committee)(finicityTxn);
     const pTxnRes = matchToPlatformTxn(platformTxns)(fTxn);
-
-    switch (pTxnRes.length) {
-      case 1:
-        const [txn] = pTxnRes;
-        return putTransactionAndDecode(txnsTableName)(dynamoDB)({
-          ...txn,
-          bankVerified: true,
-          finicityTransactionId: fTxn.finicityTransactionId,
-          finicityTransactionData: finicityTxn,
-          finicityNormalizedPayeeName: fTxn.finicityNormalizedPayeeName,
-          finicityCategory: fTxn.finicityCategory,
-          finicityBestRepresentation: fTxn.finicityBestRepresentation,
-          finicityDescription: fTxn.finicityDescription,
-          finicityPostedDate: fTxn.finicityPostedDate,
-          finicityTransactionDate: fTxn.finicityTransactionDate,
-        });
-      case 0:
-        return putTransactionAndDecode(txnsTableName)(dynamoDB)(fTxn);
-      default:
-        return taskEither.left(
-          new ApplicationError(
-            "Unhandled duplicates found",
-            JSON.stringify(pTxnRes)
-          )
-        );
+    if (pTxnRes.length === 0) {
+      return putTransactionAndDecode(txnsTableName)(dynamoDB)(fTxn);
+    } else {
+      return taskEither.right(fTxn);
     }
   };
 
@@ -133,19 +112,20 @@ const finicityTxnToPlatformTxn =
   (committee: ICommittee) =>
   (fTxn: IFinicityTransaction): ITransaction => {
     const amount = Math.round(Math.abs(fTxn.amount) * 100);
-    console.log(`converted finicity amount ${fTxn.amount} to ${amount}`);
 
     const checkNumber = fTxn.checkNum
       ? { checkNumber: fTxn.checkNum + "" }
       : {};
+
+    const paymentDate = epochToMilli(fTxn.postedDate);
     return {
       entityName: fTxn.categorization.normalizedPayeeName,
       committeeId: committee.id,
-      id: genTxnId(),
+      id: dateToTxnId(paymentDate),
       amount,
       paymentMethod: finicityTxnToPaymentMethod(fTxn),
       direction: fTxn.amount > 0 ? Direction.In : Direction.Out,
-      paymentDate: epochToMilli(fTxn.postedDate),
+      paymentDate,
       initiatedTimestamp: epochToMilli(fTxn.transactionDate),
       source: Source.FINICITY,
       bankVerified: true,
@@ -158,8 +138,9 @@ const finicityTxnToPlatformTxn =
       finicityDescription: fTxn.description,
       finicityBestRepresentation: fTxn.categorization.bestRepresentation,
       finicityCategory: fTxn.categorization.category,
-      finicityPostedDate: epochToMilli(fTxn.postedDate),
+      finicityPostedDate: paymentDate,
       finicityTransactionDate: epochToMilli(fTxn.transactionDate),
+      finicityPaymentMethod: finicityTxnToPaymentMethod(fTxn),
     };
   };
 
@@ -176,7 +157,6 @@ const getAllFinicityTxns =
 
     const epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6;
     const epochTo = milliToEpoch(now());
-    console.log(epochTo);
     return getTransactions(config)({
       customerId: finicityCustomerId,
       accountId: finicityAccountId,

@@ -16,7 +16,7 @@ export const validateDisbursement = (
     te.chain(txnHasAnsweredComplianceQuestions)
   );
 
-const isBool = (a: unknown): boolean => typeof a === "boolean";
+export const isBool = (a: unknown): boolean => typeof a === "boolean";
 
 const txnHasAnsweredComplianceQuestions = (
   txn: ITransaction

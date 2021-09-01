@@ -1,5 +1,5 @@
-import { flow, pipe } from "fp-ts/function";
-import { chain, left, right, TaskEither } from "fp-ts/TaskEither";
+import { pipe } from "fp-ts/function";
+import { left, right, TaskEither } from "fp-ts/TaskEither";
 import Joi from "joi";
 import { plainToClass } from "class-transformer";
 import { StatusCodes } from "http-status-codes";
@@ -12,7 +12,6 @@ import { CreateContributionInput } from "../input-types/create-contribution.inpu
 import { ApplicationError } from "../utils/application-error";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
-import { IInstantIdConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { taskEither as te } from "fp-ts";
 import { getCommitteeById } from "../queries/get-committee-by-id.query";
@@ -20,6 +19,9 @@ import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { enumToValues } from "../utils/enums/poly.util";
+import { State } from "../utils/enums/state.enum";
 
 const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
 const stringReq = (min = 1, max = 200) =>
@@ -32,7 +34,9 @@ const schema = Joi.object({
   lastName: stringReq(),
   addressLine1: stringReq(),
   city: stringReq(),
-  state: stringReq(2, 2),
+  state: Joi.string()
+    .valid(...enumToValues(State))
+    .required(),
   postalCode: stringReq(5, 10),
   entityType: Joi.string()
     .valid(...entityTypes)
@@ -58,7 +62,10 @@ const validateNonInd = (
 ): TaskEither<ApplicationError, CreateContributionInput> => {
   const { entityType, entityName } = contrib;
 
-  if (![EntityType.Ind, EntityType.Fam].includes(entityType) && !entityName) {
+  if (
+    ![EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType) &&
+    !entityName
+  ) {
     return left(
       new ApplicationError(
         "Entity name must be provided for non-individual and non-family contributions",
@@ -73,7 +80,7 @@ const validateNonInd = (
 const validateInd = (
   c: CreateContributionInput
 ): TaskEither<ApplicationError, CreateContributionInput> => {
-  if ([EntityType.Ind, EntityType.Fam].includes(c.entityType)) {
+  if ([EntityType.Ind, EntityType.Fam, EntityType.Can].includes(c.entityType)) {
     if (!c.employmentStatus) {
       return left(
         new ApplicationError(
@@ -128,12 +135,13 @@ export const platformContribute =
   (rulesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (stripe: Stripe) =>
-  (instantIdConfig: IInstantIdConfig) =>
+  (lnConfig: ILexisNexisConfig) =>
   (event: any): TaskEither<ApplicationError, ITransaction> => {
     console.log("Platform contribute pipe initiated", JSON.stringify(event));
     return pipe(
       eventToObject(event),
       te.chain(eventToCreateContribInput),
+      te.map((c) => ({ ...c, processPayment: true })),
       te.chain(validateInd),
       te.chain(validateNonInd),
       te.chain((contrib) =>
@@ -143,7 +151,7 @@ export const platformContribute =
             pipe(
               runRulesAndProcess(billableEventsTableName)(donorsTableName)(
                 txnsTableName
-              )(rulesTableName)(dynamoDB)(stripe)(instantIdConfig)(ANONYMOUS)(
+              )(rulesTableName)(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(
                 committee
               )(contrib)
             )

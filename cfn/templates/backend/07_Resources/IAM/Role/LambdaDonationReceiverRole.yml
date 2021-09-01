@@ -2,11 +2,16 @@ LambdaDonationReceiverRole:
   Type: AWS::IAM::Role
   Properties:
     ManagedPolicyArns:
-      - !Ref LambdaBasicPolicy
       - !Ref LambdaKMSPolicy
-      - !Ref LambdaSNSWriterPolicy
       - !Ref LambdaSQSPolicy
+      - !Ref LambdaBasicPolicy
+      - !Ref LambdaSNSWriterPolicy
+      - !Ref DynamoDBAuditLogsPolicy
       - !Ref DynamoDBStreamReaderPolicy
+      - !Ref DynamoDBReadCommitteesPolicy
+      - !Ref DynamoDBReadTransactionsPolicy
+      - !Ref DynamoDBWriteTransactionsPolicy
+      - !Ref DynamoDBWriteAggregatesPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:

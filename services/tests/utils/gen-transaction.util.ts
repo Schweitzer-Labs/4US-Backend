@@ -18,7 +18,7 @@ interface IGenTransactionConfig {
   initiatedTimestamp?: number;
   source?: Source;
   transactionType?: TransactionType;
-  paymentDate: number;
+  paymentDate?: number;
 }
 
 export const genTransaction = ({
@@ -50,5 +50,5 @@ export const genTransaction = ({
   paymentMethod: paymentMethod || PaymentMethod.Ach,
   source: source || Source.DASHBOARD,
   transactionType,
-  paymentDate,
+  paymentDate: paymentDate || now(),
 });

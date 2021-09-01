@@ -11,11 +11,10 @@ IMPORT_PARAMS		+= ParameterKey=Domain,ParameterValue=$(DOMAIN)
 IMPORT_PARAMS		+= ParameterKey=TLD,ParameterValue=$(TLD)
 IMPORT_PARAMS		+= ParameterKey=Nonce,ParameterValue=$(NONCE)
 
-CREPES_PARAMS		:= --region $(REGION) --runenv $(RUNENV)
-CREPES_PARAMS		+= --domain $(DOMAIN) --tld $(TLD) --product $(PRODUCT)
+CREPES_PARAMS		+= runenv=$(RUNENV) product=$(PRODUCT) domain=$(DOMAIN) tld=$(TLD)
 
 ifneq ($(SUBDOMAIN),)
-	CREPES_PARAMS	+= --subdomain $(SUBDOMAIN)
+	CREPES_PARAMS	+= subdomain=$(SUBDOMAIN)
 endif
 
 .PHONY: build buildimports check import
@@ -34,15 +33,16 @@ check: $(template)
 $(template): $(SRCS)
 	@echo $@
 	@$(CREPES) . \
-		$(CREPES_PARAMS) \
-		--runenv $(RUNENV) \
+		--region $(REGION) \
+		--kwargs $(CREPES_PARAMS) \
 		--output $@
 
 
 $(IMPORTED_RESOURCES): ImportedResources.yml $(SRCS)
 	@echo "Importing resources from $(REGION) into $(STACK) via $@"
 	@$(CREPES) . \
-		$(CREPES_PARAMS) \
+		--region $(REGION) \
+		--kwargs $(CREPES_PARAMS) \
 		--import $@ \
 		--output $(IMPORTS)
 
@@ -81,17 +81,19 @@ import: $(IMPORTED_RESOURCES)
 		--stack-name=$(STACK) \
 		--region=$(REGION)
 
-package:
+package: $(PACKAGE)
+
+$(PACKAGE): $(SAM_TEMPLATE)
 	@aws cloudformation package \
 		--endpoint-url $(ENDPOINT) \
-		--template-file $(SAM_BUILD_DIR)/template.yaml \
+		--template-file $(SAM_TEMPLATE) \
 		--region $(REGION) \
 		--s3-bucket $(CFN_BUCKET) \
 		--s3-prefix $(STACK) \
 		--output-template-file $(PACKAGE)
 
 deploy:
-	@aws cloudformation deploy \
+	aws cloudformation deploy \
 		--endpoint-url $(ENDPOINT) \
 		--region $(REGION) \
 		--template-file $(PACKAGE) \

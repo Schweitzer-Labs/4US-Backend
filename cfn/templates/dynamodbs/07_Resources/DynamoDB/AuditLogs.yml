@@ -1,0 +1,28 @@
+AuditLogs:
+  Type: AWS::DynamoDB::GlobalTable
+  DeletionPolicy: Retain
+  Properties:
+    BillingMode: PAY_PER_REQUEST
+    SSESpecification:
+      SSEEnabled: true
+    AttributeDefinitions:
+      - AttributeName: committeeId
+        AttributeType: S
+      - AttributeName: id
+        AttributeType: S
+    KeySchema:
+      - KeyType: HASH
+        AttributeName: committeeId
+      - KeyType: RANGE
+        AttributeName: id
+    StreamSpecification:
+      StreamViewType: NEW_AND_OLD_IMAGES
+    Replicas:
+      - Region: !Ref AWS::Region
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+  {% if RUNENV == 'prod' %}
+    - Region: !Ref BackupRegion
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      {% endif %}

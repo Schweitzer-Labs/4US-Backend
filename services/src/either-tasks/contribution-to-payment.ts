@@ -49,13 +49,15 @@ export const processPaymentFromCommitteeContribution =
         },
       });
 
-      console.log(res);
+      console.log(JSON.stringify(res));
 
       console.log(res.charges.data);
 
+      const stripeMetadata = await getStripeMetadata(stripe)(res);
+
       const payment: Payment = {
         ...stripCardInfo(contribution),
-        ...getStripeMetadata(res),
+        ...stripeMetadata,
         ruleVerified: committee.platformPlan === Plan.FourUs,
       };
 
@@ -76,24 +78,36 @@ interface GetStripeMetadataRes {
   stripeBalanceTransactionId: string;
   stripeChargeId: string;
   stripePaymentIntentId: string;
+  stripeTransferId: string;
+  stripePaymentId: string;
 }
 
-const getStripeMetadata = (
-  res: Stripe.Response<Stripe.PaymentIntent>
-): GetStripeMetadataRes | {} => {
-  const chargeData = res?.charges?.data;
-  if (chargeData?.length > 0) {
-    return {
-      stripeBalanceTransactionId: chargeData[0].balance_transaction,
-      stripeChargeId: chargeData[0].id,
-      stripePaymentIntentId: res.id,
-    };
-  } else {
-    return {
-      stripePaymentIntentId: res.id,
-    };
-  }
-};
+export const getStripeMetadata =
+  (stripe: Stripe) =>
+  async (
+    res: Stripe.Response<Stripe.PaymentIntent>
+  ): Promise<GetStripeMetadataRes | {}> => {
+    const chargeData = res?.charges?.data;
+    if (chargeData?.length > 0) {
+      const transferId: any = chargeData[0].transfer;
+
+      const transferData = await stripe.transfers.retrieve(transferId);
+
+      console.log("transfer data", transferData);
+
+      return {
+        stripeBalanceTransactionId: chargeData[0].balance_transaction,
+        stripeChargeId: chargeData[0].id,
+        stripePaymentIntentId: res.id,
+        stripeTransferId: transferId,
+        stripePaymentId: transferData.destination_payment,
+      };
+    } else {
+      return {
+        stripePaymentIntentId: res.id,
+      };
+    }
+  };
 
 export const committeeContributionToPayment =
   (stripe: Stripe) =>

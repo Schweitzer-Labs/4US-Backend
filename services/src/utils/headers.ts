@@ -1,5 +1,5 @@
-export default {
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
-};
+export const headers = (allowOrigin: string) => ({
+  "access-control-allow-headers": "Content-Type",
+  "access-control-allow-origin": allowOrigin,
+  "access-control-allow-methods": "OPTIONS,POST,GET",
+});

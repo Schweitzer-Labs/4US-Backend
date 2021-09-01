@@ -2,16 +2,14 @@ import { expect } from "chai";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import {
-  donorInputToInstantIdResult,
-  IInstantIdConfig,
-} from "../../src/clients/lexis-nexis/lexis-nexis.client";
 import { IDonorInput } from "../../src/queries/search-donors.decoder";
 import { genCommittee } from "../utils/gen-committee.util";
 import * as dotenv from "dotenv";
 import { genDonorInput } from "../utils/gen-donor-input.util";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
+import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
+import { donorInputToInstantIdResult } from "../../src/clients/lexis-nexis/consumer-id.request";
 
 dotenv.config();
 const committee = genCommittee({});
@@ -22,7 +20,7 @@ const lsUsername = process.env.LN_USERNAME;
 const lsPassword = process.env.LN_PASSWORD;
 const billableEventsTable = process.env.BILLABLE_EVENTS_DDB_TABLE_NAME;
 
-const instantIdConfig: IInstantIdConfig = {
+const instantIdConfig: ILexisNexisConfig = {
   username: lsUsername,
   password: lsPassword,
 };

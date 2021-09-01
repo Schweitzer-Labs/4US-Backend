@@ -40,7 +40,6 @@ export const getClientUserAndDecode = (
   );
 
 export const deployCommitteeChain =
-  (enode: string) =>
   (config: IStratoSDKConfig) =>
   (committee: ICommittee) =>
   async (user: ICreateUserResponse) => {
@@ -55,7 +54,7 @@ export const deployCommitteeChain =
       members: [
         {
           address: dappUser.address,
-          enode,
+          enode: config.eNodeUrl,
         },
       ],
       balances: [
@@ -77,13 +76,12 @@ export const deployCommitteeChain =
   };
 
 const deployCommitteeChainAndDecode =
-  (enode: string) =>
   (config: IStratoSDKConfig) =>
   (committee: ICommittee) =>
   (user: ICreateUserResponse): TaskEither<ApplicationError, string> =>
     pipe(
       te.tryCatch(
-        () => deployCommitteeChain(enode)(config)(committee)(user),
+        () => deployCommitteeChain(config)(committee)(user),
         (e) => new ApplicationError("Strato chain deployment failed", e)
       ),
       te.chain(decodeCreateChainResponse)
@@ -101,10 +99,12 @@ const commitTransactionToChain =
   (committee: ICommittee) =>
   (t: ITransaction) =>
   async (user: ICreateUserResponse): Promise<any> => {
+    console.log("strato config", config);
     const contract = {
       name: "CommitteeContract",
       address: "0000000000000000000000000000000000000100",
     };
+    console.log("committee chain id", committee.chainId);
     const options = {
       config,
       isDetailed: true,
@@ -147,10 +147,14 @@ const commitTransactionToChainAndDecode =
 const addBlockchainMetadataToTransaction =
   (txn: ITransaction) =>
   (commitTransactionsRes: ICommitTransactionResponse): ITransaction => {
-    return {
+    const newTxn = {
       ...txn,
       blockchainMetadata: commitTransactionsRes,
     };
+
+    console.log("blockchain metadata added to txn: ", JSON.stringify(newTxn));
+
+    return newTxn;
   };
 
 export const callMethodOnContract =
@@ -173,24 +177,21 @@ export const callMethodOnContract =
         num: 55555,
       },
     };
+
     const res = await rest.call(user, callArgs, options);
 
     await sleep(1000);
-
-    const state = await rest.getState(user, contract, options);
-
     return res;
   };
 
 export const launchCommittee =
-  (enode: string) =>
   (config: IStratoSDKConfig) =>
   (committeeTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committee: ICommittee): TaskEither<ApplicationError, ICommittee> =>
     pipe(
       getClientUserAndDecode(config),
-      te.chain(deployCommitteeChainAndDecode(enode)(config)(committee)),
+      te.chain(deployCommitteeChainAndDecode(config)(committee)),
       te.map(addChainToCommittee(committee)),
       te.chain(putCommitteeAndDecode(committeeTableName)(dynamoDB))
     );

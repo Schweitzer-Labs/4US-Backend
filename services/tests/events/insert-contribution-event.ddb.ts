@@ -68,6 +68,9 @@ export const insertContributionEvent = (committeeId: string) => ({
           "initiatedTimestamp": {
             "N": 1621795836019
           },
+          "paymentDate": {
+            "N": 1621795836019
+          },
           "cardNumberLastFourDigits": {
             "S": "1232"
           },

@@ -1,9 +1,5 @@
 import * as t from "io-ts";
-import { left, right, TaskEither } from "fp-ts/TaskEither";
-import { ApplicationError } from "../utils/application-error";
-import { pipe } from "fp-ts/function";
-import { taskEither as te } from "fp-ts";
-import { decodeError } from "../utils/decode-error.util";
+import { decodeRawData } from "../utils/decode-raw-data.util";
 
 export const ddbString = t.type({
   S: t.string,
@@ -13,15 +9,7 @@ export const ddbStringList = t.type({
   SS: t.array(t.string),
 });
 
-export const validateDDBResponse =
-  (prefix: string) =>
-  <T>(type: t.Type<T>) =>
-  (res: unknown): TaskEither<ApplicationError, T> => {
-    return pipe(
-      te.fromEither(type.decode(res)),
-      te.mapLeft(decodeError(prefix))
-    );
-  };
+export const validateDDBResponse = decodeRawData;
 
 export const toFilterExpression = (name: string, value?: any): string[] =>
   typeof value === "undefined" ? [] : [`${name} = :${name}`];

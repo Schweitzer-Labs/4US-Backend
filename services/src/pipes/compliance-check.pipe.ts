@@ -7,14 +7,17 @@ import { taskEither as te } from "fp-ts";
 import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
 import { searchTransactions } from "../queries/search-transactions.query";
-import { IRule } from "../queries/get-rule.decoder";
+import { AggregateDuration, IRule } from "../queries/get-rule.decoder";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { StatusCodes } from "http-status-codes";
 import { CreateContributionInput } from "../input-types/create-contribution.input-type";
+import { ITransaction } from "../queries/search-transactions.decoder";
+import { millisToYear } from "../utils/time.utils";
 
 const committeeDonorAndRuleToBalance =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
+  (ccInput: CreateContributionInput) =>
   (committee: ICommittee) =>
   (donor: IDonor) =>
   (rule: IRule): TaskEither<ApplicationError, number> => {
@@ -27,11 +30,21 @@ const committeeDonorAndRuleToBalance =
         committeeId: committee.id,
         ...query,
       }),
-      te.map((txns) =>
-        //@ToDo extract aggregate rule from rule arg and apply
-        txns.reduce((acc, { amount }) => amount + acc, 0)
-      )
+      te.map(aggregateBalance(ccInput)(rule))
     );
+  };
+
+const aggregateBalance =
+  (ccInput: CreateContributionInput) =>
+  (rule: IRule) =>
+  (txns: ITransaction[]): number => {
+    const filter =
+      rule.aggregateDuration === AggregateDuration.CALENDAR_YEAR
+        ? (txn: ITransaction) =>
+            millisToYear(txn.paymentDate) === millisToYear(ccInput.paymentDate)
+        : () => true;
+
+    return txns.filter(filter).reduce((acc, { amount }) => amount + acc, 0);
   };
 
 interface IRuleResult {
@@ -62,15 +75,15 @@ const runRule =
 const committeeDonorAndRuleToDetermination =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (attemptedAmount: number) =>
+  (ccInput: CreateContributionInput) =>
   (committee: ICommittee) =>
   (donor: IDonor) =>
   (rule: IRule): TaskEither<ApplicationError, IRuleResult> =>
     pipe(
-      committeeDonorAndRuleToBalance(txnsTableName)(dynamoDB)(committee)(donor)(
-        rule
-      ),
-      te.chain(runRule(attemptedAmount)(rule))
+      committeeDonorAndRuleToBalance(txnsTableName)(dynamoDB)(ccInput)(
+        committee
+      )(donor)(rule),
+      te.chain(runRule(ccInput.amount)(rule))
     );
 
 export interface IComplianceResult {
@@ -93,7 +106,7 @@ export const runComplianceCheck =
       committeeAndDonorToRule(rulesTableName)(dynamoDB)(committee)(donor),
       te.chain(
         committeeDonorAndRuleToDetermination(txnsTableName)(dynamoDB)(
-          createContributionInput.amount
+          createContributionInput
         )(committee)(donor)
       ),
       te.map(({ rule, balance, remaining }) => ({

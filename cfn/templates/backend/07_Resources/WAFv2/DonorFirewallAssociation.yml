@@ -1,0 +1,8 @@
+DonorFirewallAssociation:
+  Type: AWS::WAFv2::WebACLAssociation
+  DependsOn: DonorGateway
+  Condition: Production
+  Properties:
+    ResourceArn: !Sub
+        arn:aws:apigateway:${AWS::Region}::/restapis/${DonorGateway}/stages/${LambdaRunEnvironment}
+    WebACLArn: !GetAtt GatewayFirewall.Arn
