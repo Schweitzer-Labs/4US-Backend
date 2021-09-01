@@ -24,5 +24,5 @@ AuditLogs:
   {% if RUNENV == 'prod' %}
       - Region: !Ref BackupRegion
         PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true
+          PointInTimeRecoveryEnabled: true
   {% endif %}
