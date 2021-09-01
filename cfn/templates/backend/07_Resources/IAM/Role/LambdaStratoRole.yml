@@ -4,8 +4,8 @@ LambdaStratoRole:
     ManagedPolicyArns:
       - !Ref LambdaBasicPolicy
       - !Ref LambdaSQSPolicy
-      - !Ref DynamoDBReadTransactionPolicy
-      - !Ref DynamoDBWriteTransactionPolicy
+      - !Ref DynamoDBReadTransactionsPolicy
+      - !Ref DynamoDBWriteTransactionsPolicy
       - !Ref DynamoDBReadCommitteesPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
