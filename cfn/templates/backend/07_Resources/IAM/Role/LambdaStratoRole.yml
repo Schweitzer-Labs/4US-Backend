@@ -1,0 +1,18 @@
+LambdaStratoRole:
+  Type: AWS::IAM::Role
+  Properties:
+    ManagedPolicyArns:
+      - !Ref LambdaBasicPolicy
+      - !Ref LambdaSQSPolicy
+      - !Ref DynamoDBReadTransactionPolicy
+      - !Ref DynamoDBWriteTransactionPolicy
+      - !Ref DynamoDBReadCommitteesPolicy
+    AssumeRolePolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
