@@ -3,8 +3,15 @@ import { Stripe } from "stripe";
 import { DynamoDB } from "aws-sdk";
 import { getStripeApiKey } from "./utils/config";
 import * as AWS from "aws-sdk";
+import * as dotenv from "dotenv";
 import { handlePayoutPaid } from "./webhook/payout-paid/payout-paid.handler";
 import { successResponse } from "./utils/success-response";
+import { handleReportRunSucceeded } from "./webhook/run-report-succeeded/report-run-succeeded.handler";
+
+dotenv.config();
+
+const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
+const committeeTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
@@ -36,20 +43,19 @@ export default async (
 
   switch (payload?.type) {
     case "reporting.report_run.succeeded":
-      // console.log("reporting.report_type.succeeded event happened");
-      // if (
-      //   payload?.data?.object?.report_type ===
-      //   "connected_account_payout_reconciliation.itemized.5"
-      // ) {
-      //   return await handleReportRunSucceeded(txnsTableName)(
-      //     committeeTableName
-      //   )(dynamoDB)(stripeApiKey)(payload);
-      // } else {
-      //   return successResponse;
-      // }
-      return successResponse;
+      console.log("reporting.report_type.succeeded event happened");
+      if (
+        payload?.data?.object?.report_type ===
+        "connected_account_payout_reconciliation.itemized.5"
+      ) {
+        return await handleReportRunSucceeded(txnsTableName)(
+          committeeTableName
+        )(dynamoDB)(stripeApiKey)(payload);
+      } else {
+        return successResponse;
+      }
     case "payout.paid":
-    // return await handlePayoutPaid(stripe)(payload);
+      return await handlePayoutPaid(stripe)(payload);
     default:
       console.log(`Unhandled event type ${payload.type}`);
       return successResponse;
