@@ -1,4 +1,4 @@
-import { rest, util, oauthUtil } from "blockapps-rest";
+import { rest, util, oauthUtil, Config } from "blockapps-rest";
 import { ICommittee } from "../../queries/get-committee-by-id.query";
 import { DynamoDB } from "aws-sdk";
 import { ITransaction } from "../../queries/search-transactions.decoder";
@@ -7,19 +7,26 @@ import { taskEither as te } from "fp-ts";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../../utils/application-error";
 
+const baseContract = "CommitteeContract";
+
 import {
   decodeCreateChainResponse,
   decodeCreateUserResponse,
+  getContractName,
   ICommitTransactionResponse,
   ICreateUserResponse,
   IStratoSDKConfig,
 } from "./dapp.decoders";
 import { putCommitteeAndDecode } from "../../utils/model/put-committee.utils";
 import { putTransactionAndDecode } from "../../utils/model/put-transaction.utils";
-import { committeeContract } from "./committee.contract";
+import {
+  committeeContract,
+  committeeContractWithHash,
+} from "./committee.contract";
 import { sleep } from "../../utils/sleep.utils";
+import { Options } from "blockapps-rest/src/types";
 
-export const getClientUser = async (config: IStratoSDKConfig) => {
+export const getClientUser = async ({ config }: IStratoSDKConfig) => {
   const options = { config };
   const oauth = oauthUtil.init(config.nodes[0].oauth);
   const tokenResponse = await oauth.getAccessTokenByClientSecret();
@@ -39,22 +46,35 @@ export const getClientUserAndDecode = (
     te.chain(decodeCreateUserResponse)
   );
 
+export const getCommitteeHistory =
+  (config: IStratoSDKConfig) => async (committee: ICommittee) => {
+    const dappUser = await getClientUser(config);
+    const committeeContractName = getContractName(baseContract)(committee);
+    const res = await rest.search(dappUser, {
+      name: `history@${committeeContractName}`,
+    });
+    return res;
+  };
+
 export const deployCommitteeChain =
-  (config: IStratoSDKConfig) =>
+  (sdkConfig: IStratoSDKConfig) =>
   (committee: ICommittee) =>
   async (user: ICreateUserResponse) => {
-    const dappUser = await getClientUser(config);
-    const options = { config, isDetailed: true };
+    const dappUser = await getClientUser(sdkConfig);
+    const options = { config: sdkConfig.config, isDetailed: true };
+
+    const committeeContractName = getContractName(baseContract)(committee);
+    console.log(committee);
 
     const chainArgs = {
-      label: "CommitteeContract",
-      name: "CommitteeContract",
-      src: committeeContract,
-      args: { _a: 10 },
+      label: committeeContractName,
+      name: committeeContractName,
+      src: committeeContractWithHash(committee.id),
+      args: { _committeeId: committee.id },
       members: [
         {
           address: dappUser.address,
-          enode: config.eNodeUrl,
+          enode: sdkConfig.eNodeUrl,
         },
       ],
       balances: [
@@ -68,9 +88,11 @@ export const deployCommitteeChain =
     const chain = await rest.createChain(
       dappUser,
       chainArgs,
-      { name: "CommitteeContract" },
+      { name: committeeContractName },
       options
     );
+
+    console.log("chain res", chain);
 
     return chain;
   };
@@ -95,18 +117,21 @@ const addChainToCommittee =
   });
 
 const commitTransactionToChain =
-  (config: IStratoSDKConfig) =>
+  (sdkConfig: IStratoSDKConfig) =>
   (committee: ICommittee) =>
   (t: ITransaction) =>
   async (user: ICreateUserResponse): Promise<any> => {
-    console.log("strato config", config);
+    console.log("strato config", sdkConfig);
+
+    const committeeContractName = getContractName(baseContract)(committee);
+
     const contract = {
-      name: "CommitteeContract",
+      name: committeeContractName,
       address: "0000000000000000000000000000000000000100",
     };
-    console.log("committee chain id", committee.chainId);
-    const options = {
-      config,
+    console.log("Committee chain id", committee.chainId);
+    const options: Options = {
+      config: sdkConfig.config,
       isDetailed: true,
       chainIds: [committee.chainId],
     };
@@ -152,36 +177,9 @@ const addBlockchainMetadataToTransaction =
       blockchainMetadata: commitTransactionsRes,
     };
 
-    console.log("blockchain metadata added to txn: ", JSON.stringify(newTxn));
+    console.log("Blockchain metadata added to txn: ", JSON.stringify(newTxn));
 
     return newTxn;
-  };
-
-export const callMethodOnContract =
-  (config: IStratoSDKConfig) =>
-  (committee: ICommittee) =>
-  async (user: ICreateUserResponse) => {
-    const contract = {
-      name: "CommitteeContract",
-      address: "0000000000000000000000000000000000000100",
-    };
-    const options = {
-      config,
-      isDetailed: true,
-      chainIds: [committee.chainId],
-    };
-    const callArgs = {
-      contract,
-      method: "store",
-      args: {
-        num: 55555,
-      },
-    };
-
-    const res = await rest.call(user, callArgs, options);
-
-    await sleep(1000);
-    return res;
   };
 
 export const launchCommittee =

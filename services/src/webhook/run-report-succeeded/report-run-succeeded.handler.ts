@@ -93,7 +93,7 @@ export const saveMatchedTxns =
       "Save Matched Transactions called for the following: ",
       JSON.stringify(txns)
     );
-    if (txns[0]?.committeeId === "will-schweitzer") {
+    if (txns[0]?.committeeId?.includes("will-schweitzer")) {
       console.log("Syncing test transactions");
       return pipe(
         taskEither.tryCatch(

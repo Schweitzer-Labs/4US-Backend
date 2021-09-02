@@ -2,7 +2,8 @@ import { DynamoDB } from "aws-sdk";
 import { deleteTxn } from "../../utils/model/delete-txn.utils";
 import { putTransaction } from "../../utils/model/put-transaction.utils";
 
-const withinADayOf = (d1) => (d2) => Math.abs(d1 - d2) < 1000 * 60 * 60 * 24;
+const withinADayOf = (d1: number) => (d2: number) =>
+  Math.abs(d1 - d2) < 1000 * 60 * 60 * 24;
 export const runRec =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>

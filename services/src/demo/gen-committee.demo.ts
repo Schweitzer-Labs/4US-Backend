@@ -46,6 +46,7 @@ export const genDemoCommittee =
       officeType: "supervisor",
       ruleVersion: "nyboe-2020",
       efsFilerId: 161,
+      id: `will-schweitzer-${genTxnId()}`,
     });
 
     const eitherChainCommittee = await launchCommittee(stratoConf)(comTable)(

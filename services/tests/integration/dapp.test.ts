@@ -11,6 +11,7 @@ import {
 } from "../../src/clients/dapp/dapp.decoders";
 import {
   commitTransaction,
+  getCommitteeHistory,
   launchCommittee,
 } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
@@ -142,6 +143,7 @@ describe("DAPP Tests", async () => {
   // });
   describe("Committee Contract", async () => {
     it("Assigns a committee a private chain", async () => {
+      console.log("strato conf", stratoConf);
       const committee = genNYCommittee();
 
       const eitherChainCommittee = await launchCommittee(stratoConf)(
@@ -153,6 +155,9 @@ describe("DAPP Tests", async () => {
       }
 
       console.log("test res here", eitherChainCommittee);
+
+      // const history = await getCommitteeHistory(stratoConf)(committee);
+      // console.log("com hist", history);
 
       expect(eitherChainCommittee.right.chainId).to.be.a("string");
     });
