@@ -47,12 +47,18 @@ export const getClientUserAndDecode = (
   );
 
 export const getCommitteeHistory =
-  (config: IStratoSDKConfig) => async (committee: ICommittee) => {
-    const dappUser = await getClientUser(config);
+  (sdkConfig: IStratoSDKConfig) => async (committee: ICommittee) => {
+    const dappUser = await getClientUser(sdkConfig);
     const committeeContractName = getContractName(baseContract)(committee);
-    const res = await rest.search(dappUser, {
-      name: `history@${committeeContractName}`,
-    });
+    const res = await rest.search(
+      dappUser,
+      {
+        name: `history@${committeeContractName}`,
+      },
+      {
+        config: sdkConfig.config,
+      }
+    );
     return res;
   };
 
