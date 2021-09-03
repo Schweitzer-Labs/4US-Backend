@@ -5,4 +5,4 @@ CommitteeFirewallAssociation:
   Properties:
     ResourceArn: !Sub
         arn:aws:apigateway:${AWS::Region}::/restapis/${CommitteeGateway}/stages/${LambdaRunEnvironment}
-    WebACLArn: !GetAtt GatewayFirewall.Arn
+    WebACLArn: !GetAtt CommitteeGatewayFirewall.Arn

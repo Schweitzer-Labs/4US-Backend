@@ -8,7 +8,7 @@ StratoSQSFunction:
       - !Ref ServicesLayer
     Handler: app.stratoSQS
     Runtime: nodejs14.x
-    Role: !GetAtt LambdaGraphQLRole.Arn
+    Role: !GetAtt LambdaStratoRole.Arn
     Events:
       TransactionVerified:
         Type: SQS

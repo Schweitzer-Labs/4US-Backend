@@ -14,11 +14,11 @@ Aggregates:
     StreamSpecification:
       StreamViewType: NEW_IMAGE
     Replicas:
-      - Region: !Ref AWS::Region
-        PointInTimeRecoverySpecification:
-          PointInTimeRecoveryEnabled: true
     {% if RUNENV == 'prod' %}
       - Region: !Ref BackupRegion
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
     {% endif %}
+      - Region: !Ref AWS::Region
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
