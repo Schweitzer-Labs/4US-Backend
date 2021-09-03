@@ -9,10 +9,7 @@ contract Transaction {
     string public direction;
     uint256 public amount;
     string public paymentMethod;
-    bool public bankVerified;
-    bool public ruleVerified;
     uint256 public initiatedTimestamp;
-    string public source;
     address public committeeAddress;
     
     constructor  (
@@ -22,8 +19,6 @@ contract Transaction {
         string memory _direction,
         uint256 _amount,
         string memory _paymentMethod,
-        bool _bankVerified,
-        bool _ruleVerified,
         uint256 _initiatedTimestamp,
         string memory _source
     )  public {
@@ -33,12 +28,15 @@ contract Transaction {
         direction = _direction;
         amount = _amount;
         paymentMethod = _paymentMethod;
-        bankVerified = _bankVerified;
-        ruleVerified = _ruleVerified;
         initiatedTimestamp = _initiatedTimestamp;
         source = _source;
         
         committeeAddress = msg.sender;
+    }
+    
+    function amend(string memory _metadata) public returns (uint256) {
+        metadata = _metadata;
+        return index;
     }
     
 }
@@ -78,8 +76,6 @@ contract CommitteeContract {
         string memory _direction,
         uint256 _amount,
         string memory _paymentMethod,
-        bool _bankVerified,
-        bool _ruleVerified,
         uint256 _initiatedTimestamp,
         string memory _source    
     ) public returns (uint256){
@@ -93,8 +89,6 @@ contract CommitteeContract {
              _direction,
              _amount,
              _paymentMethod,
-             _bankVerified,
-             _ruleVerified,
              _initiatedTimestamp,
              _source 
         );
@@ -129,11 +123,9 @@ contract Transaction_${committee_id} {
     string public direction;
     uint256 public amount;
     string public paymentMethod;
-    bool public bankVerified;
-    bool public ruleVerified;
-    uint256 public initiatedTimestamp;
-    string public source;
+    uint256 public paymentDate;
     address public committeeAddress;
+    string public metadata;
     
     constructor  (
         uint256 _index,
@@ -142,10 +134,8 @@ contract Transaction_${committee_id} {
         string memory _direction,
         uint256 _amount,
         string memory _paymentMethod,
-        bool _bankVerified,
-        bool _ruleVerified,
-        uint256 _initiatedTimestamp,
-        string memory _source
+        uint256 _paymentDate,
+        string memory _metadata
     )  public {
         index = _index;
         id = _id;
@@ -153,10 +143,8 @@ contract Transaction_${committee_id} {
         direction = _direction;
         amount = _amount;
         paymentMethod = _paymentMethod;
-        bankVerified = _bankVerified;
-        ruleVerified = _ruleVerified;
-        initiatedTimestamp = _initiatedTimestamp;
-        source = _source;
+        paymentDate = _paymentDate;
+        metadata = _metadata;
         
         committeeAddress = msg.sender;
     }
@@ -175,6 +163,23 @@ contract CommitteeContract_${committee_id} {
     
     Transaction_${committee_id}[] transactions;
     
+    // committee meta data
+    string public committeeName;
+    string public candidateFirstName;
+    string public candidateMiddleName;
+    string public candidateLastName;
+    string public state;
+    string public scope;
+    string public officeType;
+    string public party;
+    string public race;
+    string public district;
+    string public county;
+    string public bankName;
+    string public ruleVersion;
+    string public filerId;
+    string public electionId; 
+    
     constructor(
         string memory _committeeId
     ) public {
@@ -191,6 +196,41 @@ contract CommitteeContract_${committee_id} {
         assert(msg.sender == operator);
         emit MemberRemoved(_member);
     }
+    
+    function initialize(
+        string memory _committeeName,
+        string memory _candidateFirstName,
+        string memory _candidateMiddleName,
+        string memory _candidateLastName,
+        string memory _state,
+        string memory _scope,
+        string memory _officeType,
+        string memory _party,
+        string memory _race,
+        string memory _district,
+        string memory _county,
+        string memory _bankName,
+        string memory _ruleVersion,
+        string memory _filerId,
+        string memory _electionId
+    ) public returns (bool) {
+        committeeName = _committeeName;
+        candidateFirstName = _candidateFirstName;
+        candidateMiddleName = _candidateMiddleName;
+        candidateLastName = _candidateLastName;
+        state = _state;
+        scope = _scope;
+        officeType = _officeType;
+        party = _party;
+        race = _race;
+        district = _district;
+        county = _county;
+        bankName = _bankName;
+        ruleVersion = _ruleVersion;
+        filerId = _filerId;
+        electionId = _electionId;
+        return true;
+    }
 
     function commitTransactionAndGetIndex(
         string memory _id,
@@ -198,10 +238,8 @@ contract CommitteeContract_${committee_id} {
         string memory _direction,
         uint256 _amount,
         string memory _paymentMethod,
-        bool _bankVerified,
-        bool _ruleVerified,
-        uint256 _initiatedTimestamp,
-        string memory _source    
+        uint256 _paymentDate,
+        string memory _metadata    
     ) public returns (uint256){
         
         uint256 index = txnCount;
@@ -213,10 +251,8 @@ contract CommitteeContract_${committee_id} {
              _direction,
              _amount,
              _paymentMethod,
-             _bankVerified,
-             _ruleVerified,
-             _initiatedTimestamp,
-             _source 
+             _paymentDate,
+             _metadata 
         );
         transactions.push(transaction);
         

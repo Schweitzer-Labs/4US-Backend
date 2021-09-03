@@ -45,7 +45,7 @@
     "test-ln-decoders": "ts-mocha tests/unit/lexis-nexis-decoders.test.ts --timeout 10000",
     "test-get-txn": "ts-mocha tests/integration/get-txn-by-id.test.ts --timeout 10000",
     "test-disbver": "ts-mocha tests/integration/verify-disbursment-from-user.test.ts --timeout 10000",
-    "test-dapp": "ts-mocha tests/integration/dapp.test.ts --timeout 30000",
+    "test-dapp": "ts-mocha tests/integration/dapp.test.ts --timeout 60000",
     "test-sync": "ts-mocha tests/lambdas/bank-sync.test.ts --timeout 10000",
     "test-4us-contribute": "ts-mocha tests/lambdas/platform-contribute.test.ts --timeout 40000",
     "test-committee-sync": "ts-mocha tests/integration/committee-sync.test.ts --timeout 10000",

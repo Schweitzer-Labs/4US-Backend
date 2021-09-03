@@ -57,6 +57,12 @@ export type ICommitTransactionResponse = t.TypeOf<
   typeof CommitTransactionResponse
 >;
 
+export const initializeCommitteeResponse = t.unknown;
+
+export type IInitializeCommitteeResponse = t.TypeOf<
+  typeof initializeCommitteeResponse
+>;
+
 export const decodeCreateUserResponse = (
   res: unknown
 ): TaskEither<ApplicationError, ICreateUserResponse> => {

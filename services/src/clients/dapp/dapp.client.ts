@@ -1,5 +1,5 @@
-import { rest, util, oauthUtil, Config } from "blockapps-rest";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
+import { rest, oauthUtil } from "blockapps-rest";
+import { Committee, ICommittee } from "../../queries/get-committee-by-id.query";
 import { DynamoDB } from "aws-sdk";
 import { ITransaction } from "../../queries/search-transactions.decoder";
 import { pipe } from "fp-ts/function";
@@ -8,6 +8,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../../utils/application-error";
 
 const baseContract = "CommitteeContract";
+const txnContract = "Transaction";
 
 import {
   decodeCreateChainResponse,
@@ -19,12 +20,10 @@ import {
 } from "./dapp.decoders";
 import { putCommitteeAndDecode } from "../../utils/model/put-committee.utils";
 import { putTransactionAndDecode } from "../../utils/model/put-transaction.utils";
-import {
-  committeeContract,
-  committeeContractWithHash,
-} from "./committee.contract";
-import { sleep } from "../../utils/sleep.utils";
+import { committeeContractWithHash } from "./committee.contract";
 import { Options } from "blockapps-rest/src/types";
+import { decodeRawData } from "../../utils/decode-raw-data.util";
+import { txnToMetadata } from "../../utils/txn-to-metadata.utils";
 
 export const getClientUser = async ({ config }: IStratoSDKConfig) => {
   const options = { config };
@@ -49,28 +48,55 @@ export const getClientUserAndDecode = (
 export const getCommitteeHistory =
   (sdkConfig: IStratoSDKConfig) => async (committee: ICommittee) => {
     const dappUser = await getClientUser(sdkConfig);
-    const committeeContractName = getContractName(baseContract)(committee);
+    const contractName = getContractName(baseContract)(committee);
     const res = await rest.search(
       dappUser,
       {
-        name: `history@${committeeContractName}`,
+        name: contractName,
       },
       {
         config: sdkConfig.config,
+        chainIds: committee.chainId,
       }
     );
     return res;
   };
 
-export const deployCommitteeChain =
+export const getTransactionHistory =
   (sdkConfig: IStratoSDKConfig) =>
-  (committee: ICommittee) =>
-  async (user: ICreateUserResponse) => {
+  async (committee: ICommittee): Promise<any[]> => {
+    const comHistory = await getCommitteeHistory(sdkConfig)(committee);
+    const dappUser = await getClientUser(sdkConfig);
+    const contractName = getContractName(txnContract)(committee);
+    let records = [];
+    if (comHistory.length > 0) {
+      const txnsAddresses =
+        comHistory[comHistory.length - 1]?.transactions || [];
+      for (const item of txnsAddresses) {
+        let res = await rest.search(
+          dappUser,
+          {
+            name: contractName,
+          },
+          {
+            config: sdkConfig.config,
+            chainIds: committee.chainId,
+          }
+        );
+
+        records.push(res[0]);
+      }
+    }
+
+    return records;
+  };
+
+export const deployCommitteeChain =
+  (sdkConfig: IStratoSDKConfig) => async (committee: ICommittee) => {
     const dappUser = await getClientUser(sdkConfig);
     const options = { config: sdkConfig.config, isDetailed: true };
 
     const committeeContractName = getContractName(baseContract)(committee);
-    console.log(committee);
 
     const chainArgs = {
       label: committeeContractName,
@@ -98,10 +124,68 @@ export const deployCommitteeChain =
       options
     );
 
-    console.log("chain res", chain);
-
     return chain;
   };
+
+export const initializeCommitteeChain =
+  (sdkConfig: IStratoSDKConfig) =>
+  async (c: ICommittee): Promise<any> => {
+    const user = await getClientUser(sdkConfig);
+    const committeeContractName = getContractName(baseContract)(c);
+
+    const contract = {
+      name: committeeContractName,
+      address: "0000000000000000000000000000000000000100",
+    };
+
+    const options: Options = {
+      config: sdkConfig.config,
+      isDetailed: true,
+      chainIds: [c.chainId],
+    };
+    const callArgs = {
+      contract,
+      method: "initialize",
+      args: {
+        _committeeName: c.committeeName,
+        _candidateFirstName: c.candidateFirstName,
+        _candidateMiddleName: c.candidateMiddleName || "",
+        _candidateLastName: c.candidateLastName,
+        _state: c.state || "",
+        _scope: c.scope || "",
+        _officeType: c.officeType || "",
+        _party: c.party || "",
+        _race: c.race || "",
+        _district: c.district || "",
+        _county: c.county || "",
+        _bankName: c.bankName || "",
+        _ruleVersion: c.ruleVersion || "",
+        // @ToDo Convert to string
+        _filerId: c.efsFilerId ? c.efsFilerId + "" : "",
+        _electionId: c.efsElectionId ? c.efsElectionId + "" : "",
+        _metadata: "",
+      },
+    };
+    const blockchainMetadata = await rest.call(user, callArgs, options);
+
+    const newCommittee = {
+      blockchainMetadata,
+      ...c,
+    };
+
+    return newCommittee;
+  };
+
+const initializeCommitteeAndDecode =
+  (config: IStratoSDKConfig) =>
+  (committee: ICommittee): TaskEither<ApplicationError, ICommittee> =>
+    pipe(
+      te.tryCatch(
+        () => initializeCommitteeChain(config)(committee),
+        (e) => new ApplicationError("Strato committee initialize failed", e)
+      ),
+      te.chain(decodeRawData("Strato init committee")(Committee))
+    );
 
 const deployCommitteeChainAndDecode =
   (config: IStratoSDKConfig) =>
@@ -109,7 +193,7 @@ const deployCommitteeChainAndDecode =
   (user: ICreateUserResponse): TaskEither<ApplicationError, string> =>
     pipe(
       te.tryCatch(
-        () => deployCommitteeChain(config)(committee)(user),
+        () => deployCommitteeChain(config)(committee),
         (e) => new ApplicationError("Strato chain deployment failed", e)
       ),
       te.chain(decodeCreateChainResponse)
@@ -125,35 +209,44 @@ const addChainToCommittee =
 const commitTransactionToChain =
   (sdkConfig: IStratoSDKConfig) =>
   (committee: ICommittee) =>
-  (t: ITransaction) =>
+  (txn: ITransaction) =>
   async (user: ICreateUserResponse): Promise<any> => {
-    console.log("strato config", sdkConfig);
-
     const committeeContractName = getContractName(baseContract)(committee);
 
     const contract = {
       name: committeeContractName,
       address: "0000000000000000000000000000000000000100",
     };
-    console.log("Committee chain id", committee.chainId);
+
     const options: Options = {
       config: sdkConfig.config,
       isDetailed: true,
       chainIds: [committee.chainId],
     };
+    const {
+      id,
+      committeeId,
+      direction,
+      amount,
+      paymentMethod,
+      paymentDate,
+      source,
+    } = txn;
+
+    const metadata = txnToMetadata(txn);
+
     const callArgs = {
       contract,
       method: "commitTransactionAndGetIndex",
       args: {
-        _id: t.id,
-        _committeeId: t.committeeId,
-        _direction: t.direction,
-        _amount: t.amount,
-        _paymentMethod: t.paymentMethod,
-        _bankVerified: t.bankVerified,
-        _ruleVerified: t.ruleVerified,
-        _initiatedTimestamp: t.initiatedTimestamp,
-        _source: t.source,
+        _id: id,
+        _committeeId: committeeId,
+        _direction: direction,
+        _amount: amount,
+        _paymentMethod: paymentMethod,
+        _paymentDate: paymentDate,
+        _source: source,
+        _metadata: JSON.stringify(metadata),
       },
     };
     const res = await rest.call(user, callArgs, options);
@@ -197,6 +290,7 @@ export const launchCommittee =
       getClientUserAndDecode(config),
       te.chain(deployCommitteeChainAndDecode(config)(committee)),
       te.map(addChainToCommittee(committee)),
+      te.chain(initializeCommitteeAndDecode(config)),
       te.chain(putCommitteeAndDecode(committeeTableName)(dynamoDB))
     );
 
