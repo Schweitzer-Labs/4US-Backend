@@ -1,3 +1,6 @@
+import { ICommittee } from "../../queries/get-committee-by-id.query";
+import { dashToUnderscore } from "../../utils/dash-to-underscore.utils";
+
 export const committeeContract = `
 pragma solidity ^0.4.25;
 
@@ -111,10 +114,9 @@ contract CommitteeContract {
 `;
 
 export const committeeContractWithHash = (committeeId: string) => {
-  const committee_id = committeeId.replace("-", "_");
+  const committee_id = dashToUnderscore(committeeId);
   return `
 pragma solidity ^0.4.25;
-
 
 contract Transaction_${committee_id} {
     uint256 public index;

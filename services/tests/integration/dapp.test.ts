@@ -138,12 +138,6 @@ describe("DAPP Tests", async () => {
       oauthOpenIdDiscoveryUrl,
     });
   });
-  // describe("Initialize app user", async () => {
-  //   it("Initializes dapp user with client credentials", async () => {
-  //     const res = await getClientUser(config);
-  //     expect(res.token).to.be.a("string");
-  //   });
-  // });
   describe("Committee Contract", async () => {
     it("Assigns a committee a private chain", async () => {
       const committee = genNYCommittee();
@@ -197,33 +191,6 @@ describe("DAPP Tests", async () => {
       expect(txnHis[0]?.index).to.equal(0);
     });
     // it("Supports getting a transaction by index number", async () => {
-    //   expect(false).to.equal(true);
-    // });
-
-    // it("Supports a basic method call", async () => {
-    //   const committee = genNYCommittee();
-    //
-    //   const res = await pipe(
-    //     launchCommittee(eNodeURL)(config)(committeesTableName)(dynamoDB)(
-    //       committee
-    //     ),
-    //     taskEither.chain((committeeWithChainId) =>
-    //       pipe(
-    //         getClientUserAndDecode(config),
-    //         taskEither.chain((user) =>
-    //           taskEither.tryCatch(
-    //             () => callMethodOnContract(config)(committeeWithChainId)(user),
-    //             (e) => new ApplicationError("failed", e)
-    //           )
-    //         )
-    //       )
-    //     )
-    //   )();
-    //
-    //   if (isLeft(res)) {
-    //     throw res.left;
-    //   }
-    //   console.log("evan response", res.right);
     //   expect(false).to.equal(true);
     // });
   });

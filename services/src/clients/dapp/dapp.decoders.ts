@@ -6,6 +6,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { decodeError } from "../../utils/decode-error.util";
 import { ICommittee } from "../../queries/get-committee-by-id.query";
 import { Config } from "blockapps-rest";
+import { dashToUnderscore } from "../../utils/dash-to-underscore.utils";
 
 export interface IStratoSDKConfig {
   config: Config;
@@ -83,4 +84,4 @@ export const decodeCreateChainResponse = (
 
 export const getContractName =
   (contractName: string) => (committee: ICommittee) =>
-    `${contractName}_${committee.id.replace("-", "_")}`;
+    `${contractName}_${dashToUnderscore(committee.id)}`;

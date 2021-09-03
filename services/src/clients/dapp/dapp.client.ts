@@ -160,7 +160,6 @@ export const initializeCommitteeChain =
         _county: c.county || "",
         _bankName: c.bankName || "",
         _ruleVersion: c.ruleVersion || "",
-        // @ToDo Convert to string
         _filerId: c.efsFilerId ? c.efsFilerId + "" : "",
         _electionId: c.efsElectionId ? c.efsElectionId + "" : "",
         _metadata: "",
