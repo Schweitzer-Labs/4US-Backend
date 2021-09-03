@@ -4,27 +4,12 @@ import { ApplicationError } from "../../utils/application-error";
 import * as t from "io-ts";
 import { TaskEither } from "fp-ts/TaskEither";
 import { decodeError } from "../../utils/decode-error.util";
-
-interface IStratoNodeConfig {
-  id: any;
-  url: string;
-  publicKey?: string;
-  oauth: {
-    appTokenCookieName?: string;
-    scope?: string;
-    appTokenCookieMaxAge?: number;
-    clientId: string;
-    clientSecret: string;
-    openIdDiscoveryUrl?: string;
-    redirectUri?: string;
-    logoutRedirectUri?: string;
-  };
-}
+import { ICommittee } from "../../queries/get-committee-by-id.query";
+import { Config } from "blockapps-rest";
+import { dashToUnderscore } from "../../utils/dash-to-underscore.utils";
 
 export interface IStratoSDKConfig {
-  apiDebug: boolean;
-  timeout: number;
-  nodes: IStratoNodeConfig[];
+  config: Config;
   eNodeUrl: string;
 }
 
@@ -36,24 +21,29 @@ export interface IInitStratoConfig {
   oauthOpenIdDiscoveryUrl: string;
 }
 
-export const initStratoConfig = (
-  conf: IInitStratoConfig
-): IStratoSDKConfig => ({
-  apiDebug: false,
-  timeout: 600000,
-  nodes: [
-    {
-      id: 0,
-      url: conf.nodeUrl,
-      oauth: {
-        clientId: conf.oauthClientId,
-        clientSecret: conf.oauthClientSecret,
-        openIdDiscoveryUrl: conf.oauthOpenIdDiscoveryUrl,
+export const initStratoConfig = (conf: IInitStratoConfig): IStratoSDKConfig => {
+  const oauth: any = {
+    clientId: conf.oauthClientId,
+    clientSecret: conf.oauthClientSecret,
+    openIdDiscoveryUrl: conf.oauthOpenIdDiscoveryUrl,
+  };
+
+  const config = {
+    apiDebug: false,
+    timeout: 600000,
+    nodes: [
+      {
+        url: conf.nodeUrl,
+        oauth,
       },
-    },
-  ],
-  eNodeUrl: conf.eNodeUrl,
-});
+    ],
+  };
+
+  return {
+    config,
+    eNodeUrl: conf.eNodeUrl,
+  };
+};
 
 export const CreateUserResponse = t.type({
   token: t.string,
@@ -66,6 +56,12 @@ export const CommitTransactionResponse = t.unknown;
 
 export type ICommitTransactionResponse = t.TypeOf<
   typeof CommitTransactionResponse
+>;
+
+export const initializeCommitteeResponse = t.unknown;
+
+export type IInitializeCommitteeResponse = t.TypeOf<
+  typeof initializeCommitteeResponse
 >;
 
 export const decodeCreateUserResponse = (
@@ -85,3 +81,7 @@ export const decodeCreateChainResponse = (
     te.mapLeft(decodeError("CreateChainResponse"))
   );
 };
+
+export const getContractName =
+  (contractName: string) => (committee: ICommittee) =>
+    `${contractName}_${dashToUnderscore(committee.id)}`;

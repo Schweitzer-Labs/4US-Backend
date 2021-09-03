@@ -54,6 +54,11 @@ export const findOne = (
     case 1:
       return taskEither.right(list[0]);
     default:
-      return taskEither.left(new ApplicationError("Duplicates found", {}));
+      return taskEither.left(
+        new ApplicationError(
+          "Duplicate committees with same Stripe account ID found",
+          {}
+        )
+      );
   }
 };

@@ -39,6 +39,7 @@ const TransactionOptional = t.partial({
   employer: t.string,
   occupation: t.string,
   entityType: t.string,
+  // @Todo remove companyName
   companyName: t.string,
   phoneNumber: t.string,
   emailAddress: t.string,

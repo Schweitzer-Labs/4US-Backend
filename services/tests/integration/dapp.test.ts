@@ -11,6 +11,9 @@ import {
 } from "../../src/clients/dapp/dapp.decoders";
 import {
   commitTransaction,
+  getCommitteeHistory,
+  getTransactionHistory,
+  initializeCommitteeChain,
   launchCommittee,
 } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
@@ -24,6 +27,7 @@ import {
   getStratoOauthClientSecret,
   getStratoOAuthOpenIdDiscoveryUrl,
 } from "../../src/utils/config";
+import { sleep } from "../../src/utils/sleep.utils";
 
 dotenv.config();
 
@@ -134,12 +138,6 @@ describe("DAPP Tests", async () => {
       oauthOpenIdDiscoveryUrl,
     });
   });
-  // describe("Initialize app user", async () => {
-  //   it("Initializes dapp user with client credentials", async () => {
-  //     const res = await getClientUser(config);
-  //     expect(res.token).to.be.a("string");
-  //   });
-  // });
   describe("Committee Contract", async () => {
     it("Assigns a committee a private chain", async () => {
       const committee = genNYCommittee();
@@ -152,9 +150,13 @@ describe("DAPP Tests", async () => {
         throw Error("test failed");
       }
 
-      console.log("test res here", eitherChainCommittee);
+      const history = await getCommitteeHistory(stratoConf)(committee);
+      console.log("com hist", history);
 
       expect(eitherChainCommittee.right.chainId).to.be.a("string");
+      expect(eitherChainCommittee.right.blockchainMetadata["status"]).to.equal(
+        "Success"
+      );
     });
     it("Supports committing a transaction", async () => {
       const committee = genNYCommittee();
@@ -163,9 +165,11 @@ describe("DAPP Tests", async () => {
       const res = await pipe(
         launchCommittee(stratoConf)(committeesTableName)(dynamoDB)(committee),
         taskEither.chain((committeeWithChain) =>
-          commitTransaction(stratoConf)(txnsTableName)(dynamoDB)(
-            committeeWithChain
-          )(txn)
+          pipe(
+            commitTransaction(stratoConf)(txnsTableName)(dynamoDB)(
+              committeeWithChain
+            )(txn)
+          )
         )
       )();
 
@@ -173,36 +177,20 @@ describe("DAPP Tests", async () => {
         throw Error("test failed");
       }
 
-      expect(res.right.blockchainMetadata).to.be.a("object");
+      const history = await getCommitteeHistory(stratoConf)(committee);
+      console.log("com hist", history);
+
+      console.log("metadata", res.right.blockchainMetadata["status"]);
+
+      const txnHis = await getTransactionHistory(stratoConf)(committee);
+      console.log("txnHis", txnHis);
+
+      console.log(res.right.blockchainMetadata);
+
+      expect(res.right.blockchainMetadata["status"]).to.equal("Success");
+      expect(txnHis[0]?.index).to.equal(0);
     });
     // it("Supports getting a transaction by index number", async () => {
-    //   expect(false).to.equal(true);
-    // });
-
-    // it("Supports a basic method call", async () => {
-    //   const committee = genNYCommittee();
-    //
-    //   const res = await pipe(
-    //     launchCommittee(eNodeURL)(config)(committeesTableName)(dynamoDB)(
-    //       committee
-    //     ),
-    //     taskEither.chain((committeeWithChainId) =>
-    //       pipe(
-    //         getClientUserAndDecode(config),
-    //         taskEither.chain((user) =>
-    //           taskEither.tryCatch(
-    //             () => callMethodOnContract(config)(committeeWithChainId)(user),
-    //             (e) => new ApplicationError("failed", e)
-    //           )
-    //         )
-    //       )
-    //     )
-    //   )();
-    //
-    //   if (isLeft(res)) {
-    //     throw res.left;
-    //   }
-    //   console.log("evan response", res.right);
     //   expect(false).to.equal(true);
     // });
   });

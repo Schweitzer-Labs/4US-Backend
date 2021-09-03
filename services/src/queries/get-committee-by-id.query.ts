@@ -41,6 +41,7 @@ const CommitteeOptional = t.partial({
   employmentStatus: t.string,
   efsFilerId: t.number,
   efsElectionId: t.number,
+  blockchainMetadata: t.unknown,
 });
 
 export const Committee = t.intersection([CommitteeRequired, CommitteeOptional]);
