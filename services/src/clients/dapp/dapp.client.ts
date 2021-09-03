@@ -80,7 +80,7 @@ export const getTransactionHistory =
           },
           {
             config: sdkConfig.config,
-            chainIds: committee.chainId,
+            chainIds: [committee.chainId],
           }
         );
 
@@ -147,10 +147,8 @@ export const initializeCommitteeChain =
       contract,
       method: "initialize",
       args: {
+        _committeeId: c.id,
         _committeeName: c.committeeName,
-        _candidateFirstName: c.candidateFirstName,
-        _candidateMiddleName: c.candidateMiddleName || "",
-        _candidateLastName: c.candidateLastName,
         _state: c.state || "",
         _scope: c.scope || "",
         _officeType: c.officeType || "",
@@ -162,7 +160,11 @@ export const initializeCommitteeChain =
         _ruleVersion: c.ruleVersion || "",
         _filerId: c.efsFilerId ? c.efsFilerId + "" : "",
         _electionId: c.efsElectionId ? c.efsElectionId + "" : "",
-        _metadata: "",
+        _metadata: JSON.stringify({
+          candidateFirstName: c.candidateFirstName,
+          candidateMiddleName: c.candidateMiddleName,
+          candidateLastName: c.candidateLastName,
+        }),
       },
     };
     const blockchainMetadata = await rest.call(user, callArgs, options);
@@ -220,7 +222,7 @@ const commitTransactionToChain =
     const options: Options = {
       config: sdkConfig.config,
       isDetailed: true,
-      chainIds: [committee.chainId],
+      chainIds: committee.chainId,
     };
     const {
       id,
@@ -279,6 +281,12 @@ const addBlockchainMetadataToTransaction =
 
     return newTxn;
   };
+
+export const listUsers = async (config: IStratoSDKConfig) => {
+  const user = await getClientUser(config);
+  console.log("my address", user);
+  return user;
+};
 
 export const launchCommittee =
   (config: IStratoSDKConfig) =>

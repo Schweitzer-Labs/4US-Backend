@@ -26,6 +26,7 @@ export const initStratoConfig = (conf: IInitStratoConfig): IStratoSDKConfig => {
     clientId: conf.oauthClientId,
     clientSecret: conf.oauthClientSecret,
     openIdDiscoveryUrl: conf.oauthOpenIdDiscoveryUrl,
+    scope: "https://4us/strato/dummy",
   };
 
   const config = {

@@ -15,6 +15,7 @@ import {
   getTransactionHistory,
   initializeCommitteeChain,
   launchCommittee,
+  listUsers,
 } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
 import { isLeft } from "fp-ts/Either";
@@ -151,6 +152,7 @@ describe("DAPP Tests", async () => {
       }
 
       const history = await getCommitteeHistory(stratoConf)(committee);
+      await listUsers(stratoConf);
       console.log("com hist", history);
 
       expect(eitherChainCommittee.right.chainId).to.be.a("string");
