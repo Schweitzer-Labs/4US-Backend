@@ -155,6 +155,7 @@ services/tests/seed/rules.data.ts
 
 services/src/debit-angel.ts
 services/src/pull-report.ts
+services/src/launch-chain.ts
 services/tests/seed/4us-committee-data
 
 services/src/get-region.ts

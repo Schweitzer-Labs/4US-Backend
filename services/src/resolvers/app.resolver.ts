@@ -434,7 +434,7 @@ export class AppResolver {
 
     const committee = await genDemoCommittee(committeesTableName)(
       txnsTableName
-    )(dynamoDB)(finConf)(stratoConf);
+    )(dynamoDB)(finConf)(stratoConf)(c);
 
     await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
 

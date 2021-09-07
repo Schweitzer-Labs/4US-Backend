@@ -21,6 +21,8 @@ import { isPayout } from "../pipes/reconcile-contributions.pipe";
 import { groupTxnsByPayout } from "../utils/model/group-txns-by-payout.utils";
 import { runRec } from "./utils/run-rec.util";
 import { activateStripe } from "./utils/activate-stripe.util";
+import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
+import { isClean, isReconciled } from "../utils/enums/demo-type.enum";
 
 const stripeAccount = genTxnId();
 
@@ -29,11 +31,18 @@ export const genDemoCommittee =
   (txnTable: string) =>
   (ddb: DynamoDB) =>
   (finConf: FinicityConfig) =>
-  async (stratoConf: IStratoSDKConfig): Promise<ICommittee> => {
+  (stratoConf: IStratoSDKConfig) =>
+  async (g: GenCommitteeInput): Promise<ICommittee> => {
+    const finConfig = isClean(g.demoType)
+      ? {}
+      : {
+          finicityCustomerId: "5007489410",
+          finicityAccountId: "5016000964",
+        };
+
     let committee: ICommittee = genCommittee({
       stripeAccount,
-      finicityCustomerId: "5007489410",
-      finicityAccountId: "5016000964",
+      ...finConfig,
       candidateLastName: "Schweitzer",
       candidateFirstName: "Will",
       tzDatabaseName: "America/New_York",
@@ -59,7 +68,8 @@ export const genDemoCommittee =
 
     committee = eitherChainCommittee.right;
 
-    console.log("test res here", eitherChainCommittee);
+    // @ToDo break out fork via composition not conditional
+    if (isClean(g.demoType)) return committee;
 
     // Add contribution data
     for (const txn of unverifiedContributionsData) {

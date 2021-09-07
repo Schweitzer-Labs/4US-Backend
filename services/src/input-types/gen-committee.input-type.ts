@@ -1,10 +1,19 @@
-import { Field, InputType } from "type-graphql";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { Field, InputType, registerEnumType } from "type-graphql";
 import { MinLength } from "class-validator";
+import { DemoType } from "../utils/enums/demo-type.enum";
+import { PaymentMethod } from "../utils/enums/payment-method.enum";
+
+registerEnumType(DemoType, {
+  name: "DemoType",
+  description: "Type of transaction set for demoing",
+});
 
 @InputType()
 export class GenCommitteeInput {
   @Field()
   @MinLength(3)
   password: string;
+
+  @Field((type) => DemoType, { nullable: true })
+  demoType?: DemoType;
 }
