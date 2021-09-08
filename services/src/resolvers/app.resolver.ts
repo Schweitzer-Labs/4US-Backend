@@ -60,6 +60,8 @@ import { genDemoCommittee } from "../demo/gen-committee.demo";
 import { deleteUnreconciledTxn } from "../pipes/delete-txn.pipe";
 import { ManageDemoCommitteeInput } from "../input-types/manage-demo-committee.input-type";
 import { reconcileOneDemoContrib } from "../demo/utils/reconcile-one-demo-contrib.util";
+import { SeedDemoBankRecordsInput } from "../input-types/seed-demo-bank-records.input-type";
+import { seedTxn } from "../demo/utils/seed-bank-records.util";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();
@@ -447,17 +449,21 @@ export class AppResolver {
     return committee;
   }
 
-  @Mutation((returns) => Committee)
+  @Mutation((returns) => Transaction)
   async seedDemoBankRecords(
-    @Arg("manageDemoCommitteeInput") d: ManageDemoCommitteeInput,
+    @Arg("seedDemoBankRecordsInput") s: SeedDemoBankRecordsInput,
     @CurrentUser() currentUser: string
   ) {
-    if (d.password !== demoPasscode || runenv === "prod")
+    if (s.password !== demoPasscode || runenv === "prod")
       throw new UnauthorizedError();
 
-    await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(d.committeeId)();
+    const res = await seedTxn(txnsTableName)(dynamoDB)(s)();
 
-    // return committee;
+    if (isLeft(res)) throw res.left;
+
+    await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(s.committeeId)();
+
+    return res.right;
   }
 
   @Mutation((returns) => Transaction)

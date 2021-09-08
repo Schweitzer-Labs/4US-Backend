@@ -40,6 +40,7 @@ const toReconciled = (txn: ITransaction): ITransaction => ({
   finicityPaymentMethod: "Credit",
   finicityPostedDate: txn.paymentDate,
   finicityTransactionDate: txn.paymentDate,
+  bankVerified: true,
 });
 
 const takeOne = (
