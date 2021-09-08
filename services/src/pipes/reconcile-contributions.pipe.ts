@@ -77,14 +77,14 @@ const processTxns =
     return reconciledTxns;
   };
 
-const isUnverifiedContribution = (txn: ITransaction) =>
+const isUnverifiedContribution = (txn: ITransaction): boolean =>
   txn.transactionType === TransactionType.Contribution && !txn.bankVerified;
 
-export const isPayout = (txn: ITransaction) =>
+export const isPayout = (txn: ITransaction): boolean =>
   txn.direction === Direction.In &&
   payoutDescriptions.includes(txn?.finicityTransactionData?.description);
 
-const sumTxns = (txns: ITransaction[]) =>
+const sumTxns = (txns: ITransaction[]): number =>
   txns.reduce((acc, { amount }) => acc + amount, 0);
 
 const markTxnAsVerifiedWithFinicity =
