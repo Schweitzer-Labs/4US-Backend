@@ -59,9 +59,6 @@ import { FinicityConfig } from "../clients/finicity/finicity.decoders";
 import { genDemoCommittee } from "../demo/gen-committee.demo";
 import { deleteUnreconciledTxn } from "../pipes/delete-txn.pipe";
 import { ManageDemoCommitteeInput } from "../input-types/manage-demo-committee.input-type";
-import { Order } from "../utils/enums/order.enum";
-import { pipe } from "fp-ts/es6/function";
-import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { reconcileOneDemoContrib } from "../demo/utils/reconcile-one-demo-contrib.util";
 
 const demoPasscode = "f4jp1i";

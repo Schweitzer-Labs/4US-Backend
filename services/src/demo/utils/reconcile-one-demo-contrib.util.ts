@@ -8,6 +8,7 @@ import { ITransaction } from "../../queries/search-transactions.decoder";
 import { taskEither } from "fp-ts";
 import { validateDemoCommittee } from "./validate-demo-committee.utils";
 import { pipe } from "fp-ts/function";
+import { putTransactionAndDecode } from "../../utils/model/put-transaction.utils";
 
 export const reconcileOneDemoContrib =
   (txnTable: string) =>
@@ -24,8 +25,22 @@ export const reconcileOneDemoContrib =
           ruleVerified: true,
         })
       ),
-      taskEither.chain(takeOne)
+      taskEither.chain(takeOne),
+      taskEither.map(toReconciled),
+      taskEither.chain(putTransactionAndDecode(txnTable)(ddb))
     );
+
+const toReconciled = (txn: ITransaction): ITransaction => ({
+  ...txn,
+  finicityBestRepresentation:
+    "ORIG CO NAME US ORIG ID DESC DATE CO ENTRY DESCR US SEC CCD TRACE EED IND ID ST IND NAME SCHWEITZER LABORATORIE TRN TC",
+  finicityCategory: "Income",
+  finicityDescription: "ORIG CO NAME:4US",
+  finicityNormalizedPayeeName: "Co Desc",
+  finicityPaymentMethod: "Credit",
+  finicityPostedDate: txn.paymentDate,
+  finicityTransactionDate: txn.paymentDate,
+});
 
 const takeOne = (
   txns: ITransaction[]
