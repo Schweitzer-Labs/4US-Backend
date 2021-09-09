@@ -138,8 +138,9 @@ realclean: clean
 	@rm -rf $(BUILD_DIR)
 
 local: build
-	@sam local start-api --warm-containers EAGER --template-file $(SAM_BUILD_DIR)/template.yaml
-
+	@sam local start-api \
+		--warm-containers EAGER \
+		--template-file $(SAM_BUILD_DIR)/template.yaml
 
 check: build-stacks
 	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
