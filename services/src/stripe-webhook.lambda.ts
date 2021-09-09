@@ -39,7 +39,7 @@ export default async (
 
   const payload = JSON.parse(event.body);
 
-  if (!payload.livemode) return successResponse;
+  if (!payload?.livemode) return successResponse;
 
   switch (payload?.type) {
     case "reporting.report_run.succeeded":
