@@ -1,6 +1,7 @@
-SHELL			:= bash
-export CREPES		:= $(PWD)/cfn/bin/crepes.py
-export PRODUCT		:= 4us
+SHELL				:= bash
+export CREPES			:= $(PWD)/cfn/bin/crepes.py
+export PRODUCT			:= 4us
+export SAM_CLI_TELEMETRY	:=0
 
 # Allowed values are: prod, qa, demo
 ifeq ($(RUNENV),)
@@ -11,7 +12,6 @@ ifeq ($(RUNENV), qa)
         export REGION   := us-west-2
 	export DOMAIN   := build4
 	export TLD      := us
-	export HOSTID   := Z06902431WSK3XW3K83J3
 else ifeq ($(RUNENV), prod)
         export REGION   := us-east-1
 		export DOMAIN   := 4us
@@ -22,14 +22,6 @@ else ifeq ($(RUNENV), demo)
 	export TLD      := com
 endif
 
-export CONTRIB_DIR	:= lambdas
-export ONBOARD_DIR	:= lambdas
-export ANALYTICS_DIR	:= lambdas
-export RECORDER_DIR	:= lambdas
-export PLATFORM_DIR	:= lambdas
-export EMAILER_DIR	:= lambdas
-
-
 export STACK		:= $(RUNENV)-$(PRODUCT)-backend
 
 export BUILD_DIR	:= $(PWD)/.build
@@ -37,8 +29,6 @@ export SAM_DIR		:= $(BUILD_DIR)/sam
 export CFN_BUILD_DIR	:= $(BUILD_DIR)/cloudformation
 export SAM_BUILD_DIR	:= $(SAM_DIR)/build
 export SAM_CACHE_DIR	:= $(SAM_DIR)/cache
-
-export SAM_CLI_TELEMETRY	:=0
 
 export DATE		:= $(shell date)
 export NONCE		:= $(shell uuidgen | cut -d\- -f1)
@@ -58,25 +48,42 @@ export PACKAGE		:= $(CFN_BUILD_DIR)/CloudFormation-template.yml
 
 CFN_SRC_DIR		:= cfn/templates
 
-# stacks and templates
+# Nested stacks and templates
 BACKEND_STACK		:= backend
 BACKEND_TEMPLATE	:= $(CFN_BUILD_DIR)/$(BACKEND_STACK).yml
+
 CONTRIBUTOR_RECEIPT	:= contributor-receipt
 CONTRIBUTOR_TEMPLATE	:= $(CFN_BUILD_DIR)/$(CONTRIBUTOR_RECEIPT).yml
+
 COMMITTEE_RECEIPT	:= committee-receipt
 COMMITTEE_TEMPLATE	:= $(CFN_BUILD_DIR)/$(COMMITTEE_RECEIPT).yml
+
 DYNAMO_DBS		:= dynamodbs
 DYNAMODB_TEMPLATE	:= $(CFN_BUILD_DIR)/$(DYNAMO_DBS).yml
+
 CLOUDFLARE_BUILDER	:= cloudflare-builder
 CLOUDFLARE_TEMPLATE	:= $(CFN_BUILD_DIR)/$(CLOUDFLARE_BUILDER).yml
 
+
 IMPORTS			:= $(CFN_BUILD_DIR)/Imports-$(STACK).yml
 
+export CONTRIB_DIR	:= lambdas
 CONTRIB_APP		:= $(CONTRIB_DIR)/app.js
+
+export ONBOARD_DIR	:= lambdas
 ONBOARD_APP		:= $(ONBOARD_DIR)/app.js
+
+export ANALYTICS_DIR	:= lambdas
 ANALYTICS_APP		:= $(ANALYTICS_DIR)/app.js
+
+export RECORDER_DIR	:= lambdas
 RECORDER_APP		:= $(RECORDER_DIR)/app.js
+
+export EMAILER_DIR	:= lambdas
 EMAILER_APP		:= $(EMAILER_DIR)/app.js
+
+export PLATFORM_DIR	:= lambdas
+
 
 JS_APPS	:= $(CONTRIB_APP) $(ONBOARD_APP) $(ANALYTICS_APP) $(RECORDER_APP) $(EMAILER_APP)
 
@@ -95,17 +102,17 @@ endif
 
 # Make targets
 all: build
-	$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK)
+	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK)
+
+build: mkbuilddir build-stacks build-sam
 
 mkbuilddir:
 	@mkdir -p $(SAM_BUILD_DIR) $(CFN_BUILD_DIR)
 
-build: mkbuilddir build-stacks build-sam
-
 build-sam: build-stacks $(SAM_TEMPLATE)
 
 $(SAM_TEMPLATE): $(JS_APPS)
-	sam build \
+	@sam build \
 		--cached \
 		--parallel \
 		--base-dir $(PWD) \
@@ -116,7 +123,7 @@ $(SAM_TEMPLATE): $(JS_APPS)
 build-stacks: mkbuilddir $(CFN_TEMPLATES)
 
 compile:
-	npm -C services run compile
+	@npm -C services run compile
 
 dep:
 	@pip3 install jinja2 cfn_flip boto3
@@ -135,7 +142,7 @@ local: build
 
 
 check: build-stacks
-	$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
+	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
 
 import: mkbuilddir
 	@$(MAKE) -C $(CFN_SRC_DIR)/$(BACKEND_STACK) $@
