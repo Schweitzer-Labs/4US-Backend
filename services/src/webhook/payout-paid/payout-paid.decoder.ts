@@ -29,19 +29,7 @@ export const reportEventToStripeAccount = (event: IReportRunEvent): string =>
 export type IReportRunEvent = t.TypeOf<typeof ReportRunEvent>;
 
 export const PayoutPaidEvent = t.type({
-  type: t.string,
   account: t.string,
-  data: t.type({
-    object: t.type({
-      parameter: t.type({
-        connected_account: t.string,
-      }),
-      report_type: t.string,
-      result: t.type({
-        url: t.string,
-      }),
-    }),
-  }),
 });
 
 export type IPayoutPaidEvent = t.TypeOf<typeof PayoutPaidEvent>;
