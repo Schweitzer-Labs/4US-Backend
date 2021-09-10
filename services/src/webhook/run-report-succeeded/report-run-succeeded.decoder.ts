@@ -34,7 +34,7 @@ export const reportEventToUrl = (event: IReportRunEvent): string =>
   event.data.object.result.url;
 
 export const reportEventToStripeAccount = (event: IReportRunEvent): string =>
-  event.data.object.parameter.connected_account;
+  event.data.object.parameters.connected_account;
 
 export type IReportRunEvent = t.TypeOf<typeof ReportRunEvent>;
 
