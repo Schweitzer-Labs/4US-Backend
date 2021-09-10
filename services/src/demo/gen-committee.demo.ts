@@ -24,8 +24,6 @@ import { activateStripe } from "./utils/activate-stripe.util";
 import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
 import { isClean, isReconciled } from "../utils/enums/demo-type.enum";
 
-const stripeAccount = genTxnId();
-
 export const genDemoCommittee =
   (comTable: string) =>
   (txnTable: string) =>
@@ -33,6 +31,9 @@ export const genDemoCommittee =
   (finConf: FinicityConfig) =>
   (stratoConf: IStratoSDKConfig) =>
   async (g: GenCommitteeInput): Promise<ICommittee> => {
+    const stripeAccount = isClean(g.demoType)
+      ? "acct_1IjTcsRC8iiQex3V"
+      : genTxnId();
     const finConfig = isClean(g.demoType)
       ? {}
       : {
