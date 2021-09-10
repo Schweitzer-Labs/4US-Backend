@@ -10,7 +10,7 @@ export const ReportRunEvent = t.type({
   type: t.string,
   data: t.type({
     object: t.type({
-      parameter: t.type({
+      parameters: t.type({
         connected_account: t.string,
       }),
       report_type: t.string,
