@@ -16,7 +16,7 @@ import { SeedDemoBankRecordsInput } from "../../input-types/seed-demo-bank-recor
 
 const toMockDisb = (committeeId: string): ITransaction => {
   const timestamp = 1629975600000;
-  return {
+  const finData = {
     finicityBestRepresentation:
       "ORIG CO NAME INTUIT INC ORIG ID DESC DATE CO ENTRY DESCR SOFTWARE SEC CCD TRACE EED IND ID IND NAME SCHWEITZER LABORATORIE",
     finicityCategory: "Income",
@@ -25,23 +25,46 @@ const toMockDisb = (committeeId: string): ITransaction => {
     finicityPaymentMethod: "Debit",
     finicityPostedDate: timestamp,
     finicityTransactionDate: timestamp,
+    finicityTransactionId: 1,
+  };
+  const amount = 50000;
+  return {
+    ...finData,
     committeeId,
     id: genTxnId(),
     direction: Direction.Out,
-    amount: 50000,
+    amount,
     paymentMethod: PaymentMethod.Credit,
     bankVerified: true,
     ruleVerified: false,
-    initiatedTimestamp: now(),
-    paymentDate: now(),
+    initiatedTimestamp: timestamp,
+    paymentDate: timestamp,
     source: Source.FINICITY,
     transactionType: TransactionType.Disbursement,
+    finicityTransactionData: {
+      id: 1,
+      amount,
+      accountId: 1,
+      status: "complete",
+      description: finData.finicityDescription,
+      postedDate: timestamp,
+      transactionDate: timestamp,
+      customerId: 1,
+      createdDate: timestamp,
+      categorization: {
+        normalizedPayeeName: finData.finicityNormalizedPayeeName,
+        category: finData.finicityCategory,
+        bestRepresentation: finData.finicityBestRepresentation,
+        country: "US",
+      },
+    },
   };
 };
 
 const toMockContrib = (committeeId: string): ITransaction => {
-  const timestamp = 1629975600000;
-  return {
+  const timestamp = now();
+  const amount = 120000;
+  const finData = {
     finicityBestRepresentation:
       "ORIG CO NAME INTUIT INC ORIG ID DESC DATE CO ENTRY DESCR SOFTWARE SEC CCD TRACE EED IND ID IND NAME SCHWEITZER LABORATORIE",
     finicityCategory: "Income",
@@ -50,17 +73,38 @@ const toMockContrib = (committeeId: string): ITransaction => {
     finicityPaymentMethod: "Credit",
     finicityPostedDate: timestamp,
     finicityTransactionDate: timestamp,
+    finicityTransactionId: 1,
+  };
+  return {
+    ...finData,
     committeeId,
     id: genTxnId(),
     direction: Direction.In,
-    amount: 50000,
+    amount,
     paymentMethod: PaymentMethod.Credit,
     bankVerified: true,
     ruleVerified: false,
-    initiatedTimestamp: now(),
-    paymentDate: now(),
+    initiatedTimestamp: timestamp,
+    paymentDate: timestamp,
     source: Source.FINICITY,
     transactionType: TransactionType.Contribution,
+    finicityTransactionData: {
+      id: 1,
+      amount,
+      accountId: 1,
+      status: "complete",
+      description: finData.finicityDescription,
+      postedDate: timestamp,
+      transactionDate: timestamp,
+      customerId: 1,
+      createdDate: timestamp,
+      categorization: {
+        normalizedPayeeName: finData.finicityNormalizedPayeeName,
+        category: finData.finicityCategory,
+        bestRepresentation: finData.finicityBestRepresentation,
+        country: "US",
+      },
+    },
   };
 };
 
