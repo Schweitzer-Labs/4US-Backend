@@ -20,7 +20,7 @@ AWS.config.apiVersions = {
 const runenv: any = process.env.RUNENV;
 let stripe: Stripe;
 let stripeApiKey: string;
-let dynamoDB: DynamoDB;
+const dynamoDB = new DynamoDB();
 
 const ps = new AWS.SSM();
 
