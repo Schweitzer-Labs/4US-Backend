@@ -6,6 +6,38 @@ import { taskEither, taskEither as te } from "fp-ts";
 import { decodeError } from "../../utils/decode-error.util";
 import csvToJson from "csvtojson";
 
+export const ReportRunEvent = t.type({
+  type: t.string,
+  data: t.type({
+    object: t.type({
+      parameter: t.type({
+        connected_account: t.string,
+      }),
+      report_type: t.string,
+      result: t.type({
+        url: t.string,
+      }),
+    }),
+  }),
+});
+
+export const decodeReportRunEvent = (
+  res: unknown
+): TaskEither<ApplicationError, IReportRunEvent> => {
+  return pipe(
+    te.fromEither(ReportRunEvent.decode(res)),
+    te.mapLeft(decodeError("ReportRunEvent"))
+  );
+};
+
+export const reportEventToUrl = (event: IReportRunEvent): string =>
+  event.data.object.result.url;
+
+export const reportEventToStripeAccount = (event: IReportRunEvent): string =>
+  event.data.object.parameter.connected_account;
+
+export type IReportRunEvent = t.TypeOf<typeof ReportRunEvent>;
+
 export const PayoutReportRow = t.type({
   automatic_payout_id: t.string,
   automatic_payout_effective_at_utc: t.string,

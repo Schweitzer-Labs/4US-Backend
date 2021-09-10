@@ -14,7 +14,8 @@ import {
 
 export const runReport =
   (stripe: Stripe) => async (connectAccountId: string) => {
-    return await stripe.reporting.reportRuns.create({
+    console.log("report run called with connect account id", connectAccountId);
+    const res = await stripe.reporting.reportRuns.create({
       report_type: "connected_account_payout_reconciliation.itemized.5",
       parameters: {
         connected_account: connectAccountId,
@@ -33,6 +34,10 @@ export const runReport =
         ],
       },
     });
+
+    console.log("reportRuns res", JSON.stringify(res));
+
+    return res;
   };
 
 export const runReportAndDecode =

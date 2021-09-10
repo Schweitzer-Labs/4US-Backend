@@ -43,11 +43,18 @@ export default async (
 
   switch (payload?.type) {
     case "reporting.report_run.succeeded":
-      console.log("reporting.report_type.succeeded event happened");
+      console.log(
+        "reporting.report_type.succeeded event happened",
+        JSON.stringify(payload)
+      );
       if (
         payload?.data?.object?.report_type ===
         "connected_account_payout_reconciliation.itemized.5"
       ) {
+        console.log(
+          "report type matched connected_account_payout_reconciliation.itemized.5",
+          JSON.stringify(payload)
+        );
         return await handleReportRunSucceeded(txnsTableName)(
           committeeTableName
         )(dynamoDB)(stripeApiKey)(payload);
@@ -55,6 +62,7 @@ export default async (
         return successResponse;
       }
     case "payout.paid":
+      console.log("payout paid branch hit", JSON.stringify(payload));
       return await handlePayoutPaid(stripe)(payload);
     default:
       console.log(`Unhandled event type ${payload.type}`);

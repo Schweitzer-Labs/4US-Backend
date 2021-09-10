@@ -32,6 +32,7 @@ export const getCommitteesByStripeAccount =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async (stripeAccount: string): Promise<any> => {
+    console.log("Get committees by stripe account called", stripeAccount);
     const res = await dynamoDB
       .scan({
         TableName: committeesTableName,
@@ -41,7 +42,16 @@ export const getCommitteesByStripeAccount =
         },
       })
       .promise();
-    return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
+    const committees = res.Items.map((item) =>
+      DynamoDB.Converter.unmarshall(item)
+    );
+
+    console.log(
+      "Get committees by stripe account res",
+      JSON.stringify(committees)
+    );
+
+    return committees;
   };
 
 export const findOne = (

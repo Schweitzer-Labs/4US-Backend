@@ -11,25 +11,24 @@ import { successResponse } from "../../utils/success-response";
 import { update_txns_with_stripe_payout_id } from "../../utils/model/update-txns.utils";
 import {
   decodePayoutReportRows,
+  decodeReportRunEvent,
   IPayoutReportRows,
   parseCSVAndDecode,
-} from "./report-run-succeeded.decoder";
-import {
-  decodeReportRunEvent,
-  IReportRunEvent,
   reportEventToStripeAccount,
   reportEventToUrl,
-} from "../payout-paid/payout-paid.decoder";
+} from "./report-run-succeeded.decoder";
 
 export const getReport =
   (stripeApiKey: string) =>
   async (url: string): Promise<string> => {
+    console.log("get report called with url", url);
     const params = {
       headers: {
         Authorization: `Bearer ${stripeApiKey}`,
       },
     };
     const { data } = await axios.get(url, params);
+    console.log("report gotten", JSON.stringify(data));
     return data;
   };
 
