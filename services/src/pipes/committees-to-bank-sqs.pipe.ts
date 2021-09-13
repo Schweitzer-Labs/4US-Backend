@@ -49,7 +49,8 @@ const publishToSQS =
     const successCommittees = [];
     for (const c of committees) {
       console.log("Pushing committee to queue", c.id);
-      sqs.sendMessage(toMsg(sqsUrl)(c));
+      const res = await sqs.sendMessage(toMsg(sqsUrl)(c)).promise();
+      console.log("SQS Res", JSON.stringify(res));
       successCommittees.push(c);
     }
     return successCommittees;
