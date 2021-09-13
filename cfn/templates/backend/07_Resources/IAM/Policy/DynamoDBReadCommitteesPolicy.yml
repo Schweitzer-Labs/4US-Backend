@@ -10,3 +10,4 @@ DynamoDBReadCommitteesPolicy:
           Action:
             - dynamodb:ListShards
             - dynamodb:GetItem
+            - dynamodb:Scan

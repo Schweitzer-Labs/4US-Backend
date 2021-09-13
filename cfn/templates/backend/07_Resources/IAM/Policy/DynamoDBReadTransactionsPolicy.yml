@@ -11,3 +11,4 @@ DynamoDBReadTransactionsPolicy:
             - dynamodb:ListShards
             - dynamodb:GetItem
             - dynamodb:Query
+            - dynamodb:Scan
