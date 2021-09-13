@@ -1,0 +1,37 @@
+BankSQSFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-BankSQSFunction
+    Description: Sync Transactions with Bank Account
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.bankSQS
+    Runtime: nodejs14.x
+    Role: !GetAtt LambdaBankSQSRole.Arn
+    Events:
+      SyncInitiated:
+        Type: SQS
+        Properties:
+          BatchSize: 1
+          Queue: !GetAtt BankQueue.Arn
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        TRANSACTIONS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
+        COMMITTEES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+
+BankSQSInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref BankSQSFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue

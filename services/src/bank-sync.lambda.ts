@@ -2,15 +2,8 @@ import * as AWS from "aws-sdk";
 
 import * as dotenv from "dotenv";
 import { DynamoDB } from "aws-sdk";
-import { finicityBankSync } from "./pipes/finicity-bank-sync.pipe";
-import { FinicityConfig } from "./clients/finicity/finicity.decoders";
-import {
-  getFinicityAppKey,
-  getFinicityPartnerId,
-  getFinicityPartnerSecret,
-} from "./utils/config";
 import { isLeft } from "fp-ts/Either";
-import { ApplicationError } from "./utils/application-error";
+import { committeesToBankSQS } from "./pipes/committees-to-bank-sqs.pipe";
 
 dotenv.config();
 
@@ -18,61 +11,15 @@ AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
 
-// @ToDo Load from parameter store
-
-const dynamoDB = new DynamoDB();
-const parameterStore = new AWS.SSM();
-const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
-const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
-const runenv: any = process.env.RUNENV;
-
-let partnerId: string;
-let partnerSecret: string;
-let appKey: string;
-let finicityConfig: FinicityConfig;
+const ddb = new DynamoDB();
+const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
+const comsTable: any = process.env.COMMITTEES_DDB_TABLE_NAME;
+const bankSQSUrl: any = process.env.BANK_SQS_URL;
 
 export default async () => {
-  console.log("bank sync lambda is now running");
-  if (!partnerId || !partnerSecret || !appKey) {
-    partnerId = await getFinicityPartnerId(parameterStore)(runenv);
-    partnerSecret = await getFinicityPartnerSecret(parameterStore)(runenv);
-    appKey = await getFinicityAppKey(parameterStore)(runenv);
+  const res = await committeesToBankSQS(bankSQSUrl)(sqs)(comsTable)(ddb)();
+  if (isLeft(res)) throw res.left;
 
-    finicityConfig = {
-      partnerId,
-      partnerSecret,
-      appKey,
-    };
-  }
-
-  const res = await finicityBankSync(finicityConfig)(txnsTableName)(
-    committeesTableName
-  )(dynamoDB)();
-
-  if (isLeft(res)) {
-    throw new ApplicationError("Bank Sync Failed", res.left);
-  }
-
-  const m = res.right;
-
-  // prettier-ignore
-  const unwind = Promise.all(
-    m.map((f) => f())
-      .map(async (f) => await f)
-  );
-
-  const either1 = await unwind;
-
-  const either2 = await either1.map(async (eitherF) => {
-    if (isLeft(eitherF)) {
-      throw new ApplicationError("Bank Sync Failed", eitherF);
-    }
-    return eitherF.right.map(async (f) => await f());
-  });
-
-  const res2 = await Promise.all(either2);
-
-  console.log("Bank Sync Succeeded");
-
+  console.log("bank sync succeeded", res.right);
   return "success";
 };
