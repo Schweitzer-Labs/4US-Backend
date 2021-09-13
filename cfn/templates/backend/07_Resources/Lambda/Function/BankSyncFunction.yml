@@ -7,7 +7,7 @@ BankSyncFunction:
     Layers:
       - !Ref ServicesLayer
     Handler: app.bankSyncHandler
-    Role: !GetAtt LambdaGraphQLRole.Arn
+    Role: !GetAtt LambdaBankSyncRole.Arn
     Timeout: 40
     MemorySize: 300
     Events:
@@ -22,18 +22,10 @@ BankSyncFunction:
       Variables:
         RUNENV:
           !Ref LambdaRunEnvironment
-        TRANSACTIONS_DDB_TABLE_NAME:
-          !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
-        AGGREGATES_DDB_TABLE_NAME:
-          !GetAtt DynamoDBsTemplate.Outputs.AggregatesTableName
-        DONORS_DDB_TABLE_NAME:
-          !GetAtt DynamoDBsTemplate.Outputs.DonorsTableName
-        RULES_DDB_TABLE_NAME:
-          !GetAtt DynamoDBsTemplate.Outputs.RulesTableName
-        BILLABLE_EVENTS_DDB_TABLE_NAME:
-          !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableName
+        BANK_SQS_URL:
+          !Ref BankQueue
 
 BankSyncInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig

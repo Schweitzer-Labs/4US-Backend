@@ -11,3 +11,4 @@ exports.platformContribute =
   require("./dist/src/platform-contribute.lambda").default;
 exports.stripeWebhook = require("./dist/src/stripe-webhook.lambda").default;
 exports.stratoSQS = require("./dist/src/strato-sqs.lambda").default;
+exports.bankSQS = require("./dist/src/bank-sqs.lambda").default;

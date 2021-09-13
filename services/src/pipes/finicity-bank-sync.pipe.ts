@@ -1,5 +1,5 @@
 import { pipe } from "fp-ts/function";
-import { DynamoDB } from "aws-sdk";
+import { DynamoDB, SQS } from "aws-sdk";
 import { taskEither } from "fp-ts";
 import { right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
@@ -14,24 +14,13 @@ import { ITransaction } from "../queries/search-transactions.decoder";
 import { getTransactions } from "../clients/finicity/finicity.client";
 import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
 import { searchTransactions } from "../queries/search-transactions.query";
-import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import { Direction } from "../utils/enums/direction.enum";
-import { dateToTxnId, genTxnId } from "../utils/gen-txn-id.utils";
+import { dateToTxnId } from "../utils/gen-txn-id.utils";
 import { Source } from "../utils/enums/source.enum";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { FinicityTransactionType } from "../utils/enums/finicity-transaction-type.enum";
 import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
-
-export const finicityBankSync =
-  (config: FinicityConfig) =>
-  (txnsTable: string) =>
-  (committeesTable: string) =>
-  (dynamoDB: DynamoDB) =>
-    pipe(
-      getAll4USCommitteesAndDecode(committeesTable)(dynamoDB),
-      taskEither.map(FPArray.map(syncCommittee(config)(txnsTable)(dynamoDB)))
-    );
 
 export const syncCommittee =
   (config: FinicityConfig) =>

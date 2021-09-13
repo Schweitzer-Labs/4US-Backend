@@ -7,8 +7,8 @@ import { now, milliToEpoch } from "../../src/utils/time.utils";
 
 dotenv.config();
 
-let customerId = "5003896371";
-let accountId = "5015365202";
+let customerId = "5007489410";
+let accountId = "5016000964";
 let epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6; // 6 months ago
 let epochTo = milliToEpoch(now());
 
