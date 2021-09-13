@@ -26,7 +26,7 @@ BankSQSFunction:
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
 
-BankInvokeConfig:
+BankSQSInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig
   Properties:
     FunctionName: !Ref BankSQSFunction
