@@ -1,7 +1,7 @@
 BankSQSFunction:
   Type: AWS::Serverless::Function
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-BankQueueFunction
+    FunctionName: !Sub ${AWS::StackName}-BankSQSFunction
     Description: Sync Transactions with Bank Account
     CodeUri: lambdas/
     Layers:
