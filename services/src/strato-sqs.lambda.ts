@@ -38,6 +38,7 @@ let oauthClientSecret: string;
 let oauthOpenIdDiscoveryUrl: string;
 
 export default async (event: SQSEvent, context): Promise<any> => {
+  console.log("Strato SQS Payload", JSON.stringify(event));
   if (
     !nodeUrl ||
     !eNodeUrl ||

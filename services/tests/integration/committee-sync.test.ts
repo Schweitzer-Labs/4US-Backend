@@ -71,13 +71,12 @@ describe("Syncs transactions with a platform account", function () {
         (txns) => task.of(txns)
       )
     )();
-    console.log(pTxns);
 
     fTxns = await pipe(
       FC.getTransactions(config)({
         customerId: committee.finicityCustomerId,
         accountId: committee.finicityAccountId,
-        epochFrom: milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6, // 6 months ago
+        epochFrom: milliToEpoch(now()) - 60 * 60 * 24 * 30 * 8, // 6 months ago
         epochTo: milliToEpoch(now()),
       }),
       taskEither.fold(
@@ -97,7 +96,6 @@ describe("Syncs transactions with a platform account", function () {
 
   it("Transaction amounts are converted to integers", async () => {
     const nonIntegers = pTxns.filter(({ amount }) => {
-      console.log(amount);
       return !Number.isInteger(amount);
     });
     expect(nonIntegers.length).to.equal(0);

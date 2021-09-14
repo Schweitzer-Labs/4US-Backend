@@ -8,6 +8,7 @@ import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import bankSqs from "../../src/bank-sqs.lambda";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import { SQSEvent } from "aws-lambda";
+import { genSQSEvent } from "../utils/gen-sqs-event.util";
 
 dotenv.config();
 
@@ -31,26 +32,7 @@ const committee = genCommittee({
   finicityAccountId: "5016000964",
 });
 
-const sqsEvent: SQSEvent = {
-  Records: [
-    {
-      messageId: "abc",
-      receiptHandle: "abc",
-      body: committee.id,
-      attributes: {
-        ApproximateReceiveCount: "abc",
-        SentTimestamp: "abc",
-        SenderId: "abc",
-        ApproximateFirstReceiveTimestamp: "abc",
-      },
-      messageAttributes: {},
-      md5OfBody: "abc",
-      eventSource: "abc",
-      eventSourceARN: "abc",
-      awsRegion: "us-west-1",
-    },
-  ],
-};
+const sqsEvent: SQSEvent = genSQSEvent(committee.id);
 
 describe("Processes a committee's transactions", function () {
   before(async () => {

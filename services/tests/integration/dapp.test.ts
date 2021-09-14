@@ -192,18 +192,9 @@ describe("DAPP Tests", async () => {
           throw Error("test failed");
         }
 
-        const history = await getCommitteeHistory(stratoConf)(committee);
-        console.log("com hist", history);
-
-        console.log("metadata", res.right.blockchainMetadata["status"]);
-
         await sleep(3000);
 
         const txnHis = await getTransactionHistory(stratoConf)(committee);
-        console.log("txnHis", txnHis);
-
-        console.log(res.right.blockchainMetadata);
-
         expect(res.right.blockchainMetadata["status"]).to.equal("Success");
         expect(txnHis[0]?.index).to.equal(0);
       });

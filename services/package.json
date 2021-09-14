@@ -48,7 +48,7 @@
     "test-dapp": "ts-mocha tests/integration/dapp.test.ts --timeout 60000",
     "test-sync": "ts-mocha tests/lambdas/bank-sync.test.ts --timeout 10000",
     "test-4us-contribute": "ts-mocha tests/lambdas/platform-contribute.test.ts --timeout 40000",
-    "test-committee-sync": "ts-mocha tests/integration/committee-sync.test.ts --timeout 10000",
+    "test-committee-sync": "ts-mocha tests/integration/committee-sync.test.ts --timeout 60000",
     "test-reconcile-contrib": "ts-mocha tests/integration/reconcile-contrib.test.ts --timeout 10000",
     "test-rec-one": "ts-mocha tests/integration/reconcile-one.test.ts --timeout 10000",
     "test-stripe-webhook": "ts-mocha tests/lambdas/stripe-webhook.test.ts --timeout 10000",
