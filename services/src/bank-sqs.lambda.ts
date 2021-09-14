@@ -53,20 +53,7 @@ export default async (event: SQSEvent): Promise<any> => {
     )();
 
     if (isLeft(res)) throw res.left;
-
-    const res2 = res.right.map((fn) => fn());
-
-    const res3 = await Promise.all(res2);
-    res3.map((val) => {
-      if (isLeft(val)) {
-        throw new ApplicationError(
-          "Bank Sync Failed",
-          JSON.stringify(val.left)
-        );
-      } else {
-        console.log("txn synced: ", JSON.stringify(val.right));
-      }
-    });
+    console.log("finicity txns synced", JSON.stringify(res.right));
 
     const recRes = await pipe(
       decodeRawData("Committee Id")(t.string)(record.body),

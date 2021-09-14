@@ -83,12 +83,10 @@ export const genDemoCommittee =
     }
 
     // Sync finicity data
-    const lazyRes = await syncCommittee(finConf)(txnTable)(ddb)(committee)();
-    if (isLeft(lazyRes)) {
-      throw new ApplicationError("sync failed", lazyRes.left);
+    const finRes = await syncCommittee(finConf)(txnTable)(ddb)(committee)();
+    if (isLeft(finRes)) {
+      throw new ApplicationError("sync failed", finRes.left);
     }
-    const m = lazyRes.right;
-    await Promise.all(m.map((f) => f()).map(async (f) => await f));
 
     // Sync payout data
     const syncRes = await decodeCSVAndSyncPayouts(txnTable)(comTable)(ddb)(

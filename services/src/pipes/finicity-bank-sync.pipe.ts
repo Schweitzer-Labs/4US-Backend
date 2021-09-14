@@ -10,7 +10,10 @@ import {
   FinicityConfig,
   IFinicityTransaction,
 } from "../clients/finicity/finicity.decoders";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import {
+  ITransaction,
+  Transactions,
+} from "../queries/search-transactions.decoder";
 import { getTransactions } from "../clients/finicity/finicity.client";
 import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
 import { searchTransactions } from "../queries/search-transactions.query";
@@ -20,31 +23,64 @@ import { Source } from "../utils/enums/source.enum";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { FinicityTransactionType } from "../utils/enums/finicity-transaction-type.enum";
-import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
+import {
+  putTransaction,
+  putTransactionAndDecode,
+} from "../utils/model/put-transaction.utils";
+import { decodeRawData } from "../utils/decode-raw-data.util";
 
 export const syncCommittee =
   (config: FinicityConfig) =>
   (txnsTable: string) =>
-  (dynamoDB: DynamoDB) =>
-  (committee: ICommittee) =>
+  (ddb: DynamoDB) =>
+  (committee: ICommittee): TaskEither<ApplicationError, ITransaction[]> =>
     pipe(
       taskEither.of(committee),
       taskEither.chain(getAllFinicityTxns(config)),
       taskEither.chain((finicityTxns: IFinicityTransaction[]) =>
         pipe(
-          getUnverifiedTxns(txnsTable)(dynamoDB)(committee),
-          taskEither.chain((platformTxns) =>
-            pipe(
-              finicityTxns,
-              FPArray.map(
-                matchAndProcess(txnsTable)(dynamoDB)(committee)(platformTxns)
-              ),
-              taskEither.of
-            )
+          getUnverifiedTxns(txnsTable)(ddb)(committee),
+          taskEither.chain(
+            syncFTxnsAndDecode(txnsTable)(ddb)(committee)(finicityTxns)
           )
         )
       )
     );
+
+const syncFTxnsAndDecode =
+  (txnsTable: string) =>
+  (ddb: DynamoDB) =>
+  (committee: ICommittee) =>
+  (finicityTxns: IFinicityTransaction[]) =>
+  (
+    platformTxns: ITransaction[]
+  ): TaskEither<ApplicationError, ITransaction[]> =>
+    pipe(
+      taskEither.tryCatch(
+        () => syncFTxns(txnsTable)(ddb)(committee)(finicityTxns)(platformTxns),
+        (err) => new ApplicationError("Finitiy transactions sync failed", err)
+      ),
+      decodeRawData("New finicity transactions")(Transactions)
+    );
+
+const syncFTxns =
+  (txnsTable: string) =>
+  (ddb: DynamoDB) =>
+  (committee: ICommittee) =>
+  (finicityTxns: IFinicityTransaction[]) =>
+  async (platformTxns: ITransaction[]): Promise<ITransaction[]> => {
+    const newTxns = [];
+    for (const finicityTxn of finicityTxns) {
+      const fTxn = finicityTxnToPlatformTxn(committee)(finicityTxn);
+      const pTxnRes = matchToPlatformTxn(platformTxns)(fTxn);
+      if (pTxnRes.length === 0) {
+        let newTxn = await putTransaction(txnsTable)(ddb)(fTxn);
+        newTxns.push(newTxn);
+      }
+    }
+
+    return newTxns;
+  };
 
 const matchToPlatformTxn =
   (pTxns: ITransaction[]) =>
@@ -52,23 +88,6 @@ const matchToPlatformTxn =
     return pTxns.filter(
       (pTxn) => pTxn.finicityTransactionId === fTxn.finicityTransactionId
     );
-  };
-
-const matchAndProcess =
-  (txnsTableName: string) =>
-  (dynamoDB: DynamoDB) =>
-  (committee: ICommittee) =>
-  (platformTxns: ITransaction[]) =>
-  (
-    finicityTxn: IFinicityTransaction
-  ): TaskEither<ApplicationError, ITransaction> => {
-    const fTxn = finicityTxnToPlatformTxn(committee)(finicityTxn);
-    const pTxnRes = matchToPlatformTxn(platformTxns)(fTxn);
-    if (pTxnRes.length === 0) {
-      return putTransactionAndDecode(txnsTableName)(dynamoDB)(fTxn);
-    } else {
-      return taskEither.right(fTxn);
-    }
   };
 
 const finicityTxnToPaymentMethod = (
