@@ -11,3 +11,4 @@ DynamoDBWriteTransactionsPolicy:
             - !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableArn
           Action:
             - dynamodb:putItem
+            - dynamodb:deleteItem
