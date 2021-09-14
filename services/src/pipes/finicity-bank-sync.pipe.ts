@@ -58,9 +58,11 @@ const syncFTxnsAndDecode =
     pipe(
       taskEither.tryCatch(
         () => syncFTxns(txnsTable)(ddb)(committee)(finicityTxns)(platformTxns),
-        (err) => new ApplicationError("Finitiy transactions sync failed", err)
+        (err) => new ApplicationError("Finicity transactions sync failed", err)
       ),
-      decodeRawData("New finicity transactions")(Transactions)
+      taskEither.chain(
+        decodeRawData("New platform transactions from finicity")(Transactions)
+      )
     );
 
 const syncFTxns =
@@ -69,6 +71,7 @@ const syncFTxns =
   (committee: ICommittee) =>
   (finicityTxns: IFinicityTransaction[]) =>
   async (platformTxns: ITransaction[]): Promise<ITransaction[]> => {
+    console.log("Committee for current run", committee.id);
     const newTxns = [];
     for (const finicityTxn of finicityTxns) {
       const fTxn = finicityTxnToPlatformTxn(committee)(finicityTxn);
@@ -78,7 +81,6 @@ const syncFTxns =
         newTxns.push(newTxn);
       }
     }
-
     return newTxns;
   };
 
