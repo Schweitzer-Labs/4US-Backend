@@ -59,7 +59,10 @@ export default async (event: SQSEvent): Promise<any> => {
     const res3 = await Promise.all(res2);
     res3.map((val) => {
       if (isLeft(val)) {
-        throw new ApplicationError("Bank Sync Failed", val);
+        throw new ApplicationError(
+          "Bank Sync Failed",
+          JSON.stringify(val.left)
+        );
       } else {
         console.log("txn synced: ", JSON.stringify(val.right));
       }

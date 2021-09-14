@@ -30,7 +30,7 @@ export const syncCommittee =
     pipe(
       taskEither.of(committee),
       taskEither.chain(getAllFinicityTxns(config)),
-      taskEither.chain((finicityTxns) =>
+      taskEither.chain((finicityTxns: IFinicityTransaction[]) =>
         pipe(
           getUnverifiedTxns(txnsTable)(dynamoDB)(committee),
           taskEither.chain((platformTxns) =>
@@ -49,11 +49,9 @@ export const syncCommittee =
 const matchToPlatformTxn =
   (pTxns: ITransaction[]) =>
   (fTxn: ITransaction): ITransaction[] => {
-    return pTxns.filter((pTxn) => {
-      const isFinicityTxn =
-        pTxn.finicityTransactionId === fTxn.finicityTransactionId;
-      return isFinicityTxn;
-    });
+    return pTxns.filter(
+      (pTxn) => pTxn.finicityTransactionId === fTxn.finicityTransactionId
+    );
   };
 
 const matchAndProcess =
@@ -144,7 +142,7 @@ const getAllFinicityTxns =
       return right([]);
     }
 
-    const epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 6;
+    const epochFrom = milliToEpoch(now()) - 60 * 60 * 24 * 30 * 8;
     const epochTo = milliToEpoch(now());
     return getTransactions(config)({
       customerId: finicityCustomerId,

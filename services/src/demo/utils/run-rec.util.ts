@@ -31,8 +31,10 @@ export const runReconcileOnCommittee =
       te.chain(recTxnsAndDecode(txnTable)(ddb))
     );
 
-const withinADayOf = (d1: number) => (d2: number) =>
-  Math.abs(d1 - d2) < 1000 * 60 * 60 * 24;
+const withinADayOf =
+  (d1: number) =>
+  (d2: number): boolean =>
+    Math.abs(d1 - d2) < 1000 * 60 * 60 * 24;
 
 export const recTxnsAndDecode =
   (txnsTable: string) =>
