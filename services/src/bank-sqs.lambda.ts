@@ -16,6 +16,7 @@ import { getCommitteeById } from "./queries/get-committee-by-id.query";
 import { syncCommittee } from "./pipes/finicity-bank-sync.pipe";
 import * as t from "io-ts";
 import { ApplicationError } from "./utils/application-error";
+import { runReconcileOnCommittee } from "./demo/utils/run-rec.util";
 dotenv.config();
 
 AWS.config.apiVersions = {
@@ -60,9 +61,17 @@ export default async (event: SQSEvent): Promise<any> => {
       if (isLeft(val)) {
         throw new ApplicationError("Bank Sync Failed", val);
       } else {
-        console.log("txn synced: ", val.right);
+        console.log("txn synced: ", JSON.stringify(val.right));
       }
     });
+
+    const recRes = await pipe(
+      decodeRawData("Committee Id")(t.string)(record.body),
+      taskEither.chain(runReconcileOnCommittee(txnTable)(ddb))
+    )();
+
+    if (isLeft(recRes)) throw recRes.left;
+    console.log("txns reconciled", JSON.stringify(recRes.right));
   }
 
   return true;
