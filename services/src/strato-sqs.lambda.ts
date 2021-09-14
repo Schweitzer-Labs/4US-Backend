@@ -72,7 +72,10 @@ export default async (event: SQSEvent, context): Promise<any> => {
     if (isLeft(res)) {
       throw res.left;
     } else {
-      console.log("Prefix", "Success", JSON.stringify(res.right));
+      console.log(
+        "Txn successfully committed to strato",
+        JSON.stringify(res.right)
+      );
     }
   }
 

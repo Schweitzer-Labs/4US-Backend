@@ -58,17 +58,10 @@ export const findOne = (
   list: ICommittee[]
 ): TaskEither<ApplicationError, ICommittee> => {
   console.log(list);
-  switch (list.length) {
-    case 0:
-      return taskEither.left(new ApplicationError("Does not exist", {}));
-    case 1:
-      return taskEither.right(list[0]);
-    default:
-      return taskEither.left(
-        new ApplicationError(
-          "Duplicate committees with same Stripe account ID found",
-          {}
-        )
-      );
+  if (list.length > 0) {
+    // @ToDo Address case with multiple committees with same stripe account.
+    return taskEither.right(list[0]);
+  } else {
+    return taskEither.left(new ApplicationError("Does not exist", {}));
   }
 };

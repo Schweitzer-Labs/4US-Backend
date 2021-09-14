@@ -92,23 +92,17 @@ export const saveMatchedTxns =
       "Save Matched Transactions called for the following: ",
       JSON.stringify(txns)
     );
-    if (txns[0]?.committeeId?.includes("will-schweitzer")) {
-      console.log("Syncing test transactions");
-      return pipe(
-        taskEither.tryCatch(
-          () =>
-            update_txns_with_stripe_payout_id(txnsTableName)(dynamoDB)(txns),
-          (error) =>
-            new ApplicationError(
-              "update_txns_with_stripe_payout_id failed",
-              error
-            )
-        )
-      );
-    } else {
-      console.log("Blocking non-test transactions");
-      return taskEither.of([]);
-    }
+    console.log("Syncing test transactions");
+    return pipe(
+      taskEither.tryCatch(
+        () => update_txns_with_stripe_payout_id(txnsTableName)(dynamoDB)(txns),
+        (error) =>
+          new ApplicationError(
+            "update_txns_with_stripe_payout_id failed",
+            error
+          )
+      )
+    );
   };
 
 export const decodeCSVAndSyncPayouts =

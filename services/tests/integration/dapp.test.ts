@@ -18,7 +18,7 @@ import {
   listUsers,
 } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
-import { isLeft } from "fp-ts/Either";
+import { Either, isLeft } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import {
@@ -29,6 +29,10 @@ import {
   getStratoOAuthOpenIdDiscoveryUrl,
 } from "../../src/utils/config";
 import { sleep } from "../../src/utils/sleep.utils";
+import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { ApplicationError } from "../../src/utils/application-error";
+import { ICommittee } from "../../src/queries/get-committee-by-id.query";
+import { TaskEither } from "fp-ts/TaskEither";
 
 dotenv.config();
 
@@ -140,60 +144,73 @@ describe("DAPP Tests", async () => {
     });
   });
   describe("Committee Contract", async () => {
-    it("Assigns a committee a private chain", async () => {
-      const committee = genNYCommittee();
+    describe("Launch committee", function () {
+      let committeeRes: Either<ApplicationError, ICommittee>;
+      let committee: ICommittee;
 
-      const eitherChainCommittee = await launchCommittee(stratoConf)(
-        committeesTableName
-      )(dynamoDB)(committee)();
+      before(async () => {
+        committeeRes = await launchCommittee(stratoConf)(committeesTableName)(
+          dynamoDB
+        )(genNYCommittee())();
 
-      if (isLeft(eitherChainCommittee)) {
-        throw Error("test failed");
-      }
+        if (isLeft(committeeRes)) {
+          throw Error("test failed");
+        }
+        committee = committeeRes.right;
+      });
 
-      const history = await getCommitteeHistory(stratoConf)(committee);
-      await listUsers(stratoConf);
-      console.log("com hist", history);
-
-      expect(eitherChainCommittee.right.chainId).to.be.a("string");
-      expect(eitherChainCommittee.right.blockchainMetadata["status"]).to.equal(
-        "Success"
-      );
+      it("Assigns a committee a private chain", async () => {
+        expect(committee.chainId).to.be.a("string");
+        expect(committee.blockchainMetadata["status"]).to.equal("Success");
+      });
+      after(async () => {
+        await deleteCommittee(committeesTableName)(dynamoDB)(committee);
+      });
     });
-    it("Supports committing a transaction", async () => {
-      const committee = genNYCommittee();
-      const txn = genContributionRecord(committee.id);
+    describe("Commit Transactions", function () {
+      let committeeRes: Either<ApplicationError, ICommittee>;
+      let committee: ICommittee;
+      before(async () => {
+        committeeRes = await launchCommittee(stratoConf)(committeesTableName)(
+          dynamoDB
+        )(genNYCommittee())();
 
-      const res = await pipe(
-        launchCommittee(stratoConf)(committeesTableName)(dynamoDB)(committee),
-        taskEither.chain((committeeWithChain) =>
-          pipe(
-            commitTransaction(stratoConf)(txnsTableName)(dynamoDB)(
-              committeeWithChain
-            )(txn)
-          )
-        )
-      )();
+        if (isLeft(committeeRes)) {
+          throw Error("test failed");
+        }
+        committee = committeeRes.right;
+      });
 
-      if (isLeft(res)) {
-        throw Error("test failed");
-      }
+      it("Supports committing a transaction", async () => {
+        const txn = genContributionRecord(committee.id);
 
-      const history = await getCommitteeHistory(stratoConf)(committee);
-      console.log("com hist", history);
+        const res = await commitTransaction(stratoConf)(txnsTableName)(
+          dynamoDB
+        )(committee)(txn)();
 
-      console.log("metadata", res.right.blockchainMetadata["status"]);
+        if (isLeft(res)) {
+          throw Error("test failed");
+        }
 
-      const txnHis = await getTransactionHistory(stratoConf)(committee);
-      console.log("txnHis", txnHis);
+        const history = await getCommitteeHistory(stratoConf)(committee);
+        console.log("com hist", history);
 
-      console.log(res.right.blockchainMetadata);
+        console.log("metadata", res.right.blockchainMetadata["status"]);
 
-      expect(res.right.blockchainMetadata["status"]).to.equal("Success");
-      expect(txnHis[0]?.index).to.equal(0);
+        await sleep(3000);
+
+        const txnHis = await getTransactionHistory(stratoConf)(committee);
+        console.log("txnHis", txnHis);
+
+        console.log(res.right.blockchainMetadata);
+
+        expect(res.right.blockchainMetadata["status"]).to.equal("Success");
+        expect(txnHis[0]?.index).to.equal(0);
+      });
+
+      after(async () => {
+        await deleteCommittee(committeesTableName)(dynamoDB)(committee);
+      });
     });
-    // it("Supports getting a transaction by index number", async () => {
-    //   expect(false).to.equal(true);
-    // });
   });
 });

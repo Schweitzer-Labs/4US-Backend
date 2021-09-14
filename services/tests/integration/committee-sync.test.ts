@@ -59,8 +59,6 @@ describe("Syncs transactions with a platform account", function () {
     if (isLeft(lazyRes)) {
       throw new ApplicationError("sync failed", lazyRes.left);
     }
-    const m = lazyRes.right;
-    await Promise.all(m.map((f) => f()).map(async (f) => await f));
 
     await sleep(1000);
 

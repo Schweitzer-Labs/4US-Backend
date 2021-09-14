@@ -63,8 +63,6 @@ describe("Model Utils", function () {
     if (isLeft(lazyRes)) {
       throw new ApplicationError("sync failed", lazyRes.left);
     }
-    const m = lazyRes.right;
-    await Promise.all(m.map((f) => f()).map(async (f) => await f));
   });
   describe("get_committee_by_stripe_account_and_decode", function () {
     it("Retrieves a committee by stripe account id", async () => {

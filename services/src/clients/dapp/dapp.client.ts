@@ -56,7 +56,7 @@ export const getCommitteeHistory =
       },
       {
         config: sdkConfig.config,
-        chainIds: committee.chainId,
+        chainIds: [committee.chainId],
       }
     );
     return res;
