@@ -15,7 +15,6 @@ import { FinicityConfig } from "./clients/finicity/finicity.decoders";
 import { getCommitteeById } from "./queries/get-committee-by-id.query";
 import { syncCommittee } from "./pipes/finicity-bank-sync.pipe";
 import * as t from "io-ts";
-import { ApplicationError } from "./utils/application-error";
 import { runReconcileOnCommittee } from "./demo/utils/run-rec.util";
 dotenv.config();
 
