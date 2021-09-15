@@ -8,7 +8,11 @@ import { sleep } from "../../src/utils/sleep.utils";
 
 dotenv.config();
 
-const rulesTableName = process.env.RULES_DDB_TABLE_NAME;
+
+AWS.config.update({region: 'us-west-1'});
+
+// const rulesTableName = "demo-4us-backend-DynamoDBsTemplate-11ZRLMEI6R01P-Rules-1MY6W1BDREK7X"
+const rulesTableName = "qa-4us-backend-Rules-1SWN4ADOI7MRK"
 
 let index = 1;
 const run =
