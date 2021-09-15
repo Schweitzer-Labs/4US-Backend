@@ -8,11 +8,11 @@ import { sleep } from "../../src/utils/sleep.utils";
 
 dotenv.config();
 
+AWS.config.update({ region: "us-west-1" });
 
-AWS.config.update({region: 'us-west-1'});
-
-// const rulesTableName = "demo-4us-backend-DynamoDBsTemplate-11ZRLMEI6R01P-Rules-1MY6W1BDREK7X"
-const rulesTableName = "qa-4us-backend-Rules-1SWN4ADOI7MRK"
+const rulesTableName =
+  "demo-4us-backend-DynamoDBsTemplate-11ZRLMEI6R01P-Rules-1MY6W1BDREK7X";
+// const rulesTableName = "qa-4us-backend-Rules-1SWN4ADOI7MRK";
 
 let index = 1;
 const run =
@@ -23,7 +23,24 @@ const run =
 
     for (let i = 1; i <= sequences + 1; i++) {
       const list = data.slice(25 * i - 25, 25 * i);
-      const items = list.map((r) => {
+      const items = list.reduce((acc, r) => {
+        const isInd = r.contributor_type === "ind";
+        const canRule: IRule = {
+          code: "",
+          state: r.state,
+          scope: r.scope,
+          party: r.party,
+          race: r.race,
+          district: r.district + "",
+          county: r.county,
+          officeType: r.officeType,
+          ruleVersion: r.ruleVersion,
+          entityType: "can",
+          limit: 100000000000,
+          aggregateDuration: r.aggregate_duration,
+          fields: r.fields.split(","),
+        };
+
         const rule: IRule = {
           code: "",
           state: r.state,
@@ -45,16 +62,36 @@ const run =
           code,
         });
 
+        const col: any = isInd
+          ? [
+              {
+                PutRequest: {
+                  Item: marshalledRule,
+                },
+              },
+              {
+                PutRequest: {
+                  Item: DynamoDB.Converter.marshall({
+                    ...canRule,
+                    code: ruleToRuleCode(canRule),
+                  }),
+                },
+              },
+            ]
+          : [
+              {
+                PutRequest: {
+                  Item: marshalledRule,
+                },
+              },
+            ];
+
         console.log(index);
 
         index++;
 
-        return {
-          PutRequest: {
-            Item: marshalledRule,
-          },
-        };
-      });
+        return [...acc, ...col];
+      }, []);
 
       await dynamoDB
         .batchWriteItem({
