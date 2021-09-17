@@ -12,7 +12,7 @@ app.post("/contribute", async (req, res) => {
   const body = JSON.stringify(req.body);
   const lambdaRes = await lambda({ body });
   res.statusCode = lambdaRes.statusCode;
-  res.json(lambdaRes);
+  res.json(JSON.parse(lambdaRes.body));
 });
 
 export const bootstrapContribute = () => app.listen(4001);
