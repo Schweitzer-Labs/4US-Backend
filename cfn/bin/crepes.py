@@ -89,7 +89,7 @@ def parse_command_line_arguments():
             setattr(namespace, self.dest, dict())
             for value in values:
                 key, value = value.split('=')
-                getattr(namespace, self.dest)[key.upper()] = value
+                getattr(namespace, self.dest)[key] = value
 
 
     # Available command line arguments and their defaults
@@ -110,6 +110,9 @@ def main():
     global imports
 
     args = parse_command_line_arguments()
+
+    # Create the destination dir, if it doesn't exist
+    os.makedirs(os.path.dirname(args.outfile), exist_ok=True)
 
     # Find AWS metadata for this stack deployment
     ec2   = boto3.setup_default_session(region_name=args.region)

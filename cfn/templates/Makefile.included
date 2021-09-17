@@ -11,18 +11,16 @@ IMPORT_PARAMS		+= ParameterKey=Domain,ParameterValue=$(DOMAIN)
 IMPORT_PARAMS		+= ParameterKey=TLD,ParameterValue=$(TLD)
 IMPORT_PARAMS		+= ParameterKey=Nonce,ParameterValue=$(NONCE)
 
-CREPES_PARAMS		+= runenv=$(RUNENV) product=$(PRODUCT) domain=$(DOMAIN) tld=$(TLD)
+CREPES_PARAMS		+= RUNENV=$(RUNENV) PRODUCT=$(PRODUCT) DOMAIN=$(DOMAIN) TLD=$(TLD)
 
 ifneq ($(SUBDOMAIN),)
 	CREPES_PARAMS	+= subdomain=$(SUBDOMAIN)
 endif
 
-.PHONY: build buildimports check import
+.PHONY: build buildimports check import deploy
 
 # Make targets
 build: $(template)
-
-buildimports: $(IMPORTED_RESOURCES)
 
 check: $(template)
 	@echo "Validating template"
@@ -37,6 +35,7 @@ $(template): $(SRCS)
 		--kwargs $(CREPES_PARAMS) \
 		--output $@
 
+buildimports: $(IMPORTED_RESOURCES)
 
 $(IMPORTED_RESOURCES): ImportedResources.yml $(SRCS)
 	@echo "Importing resources from $(REGION) into $(STACK) via $@"
@@ -85,21 +84,21 @@ package: $(PACKAGE)
 
 $(PACKAGE): $(SAM_TEMPLATE)
 	@aws cloudformation package \
-		--endpoint-url $(ENDPOINT) \
-		--template-file $(SAM_TEMPLATE) \
 		--region $(REGION) \
+		--endpoint-url $(ENDPOINT) \
 		--s3-bucket $(CFN_BUCKET) \
 		--s3-prefix $(STACK) \
-		--output-template-file $(PACKAGE)
+		--template-file $^ \
+		--output-template-file $@
 
-deploy:
+deploy: $(PACKAGE)
 	aws cloudformation deploy \
-		--endpoint-url $(ENDPOINT) \
 		--region $(REGION) \
-		--template-file $(PACKAGE) \
-		--stack-name $(STACK) \
+		--endpoint-url $(ENDPOINT) \
 		--s3-bucket $(CFN_BUCKET) \
 		--s3-prefix $(STACK) \
+		--stack-name $(STACK) \
+		--template-file $^ \
 		--capabilities \
 		       CAPABILITY_NAMED_IAM \
 		       CAPABILITY_AUTO_EXPAND \
