@@ -3,6 +3,7 @@ import { DynamoDB } from "aws-sdk";
 export enum BillableEventName {
   LexisNexisInstantIdLookUp = "lexis-nexis-instant-id-look-up",
   LexisNexisBusinessIdLookUp = "lexis-nexis-business-id-look-up",
+  LexisNexisCitizenshipLookUp = "lexis-nexis-business-id-look-up",
 }
 
 // Instant ID look up  : $0.75

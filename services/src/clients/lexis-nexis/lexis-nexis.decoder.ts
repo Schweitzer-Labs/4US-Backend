@@ -30,3 +30,15 @@ export const BusinessIDResponse = t.type({
 });
 
 export type IBusinessIDResponse = t.TypeOf<typeof BusinessIDResponse>;
+
+export const DueDiligenceAttributesResponse = t.type({
+  DueDiligenceAttributesResponseEx: t.type({
+    response: t.type({
+      Result: t.type({
+        CitizenshipResults: t.type({
+          CitizenshipScore: t.string,
+        }),
+      }),
+    }),
+  }),
+});
