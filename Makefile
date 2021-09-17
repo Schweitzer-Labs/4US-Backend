@@ -14,8 +14,8 @@ ifeq ($(RUNENV), qa)
 	export TLD      := us
 else ifeq ($(RUNENV), prod)
         export REGION   := us-east-1
-		export DOMAIN   := 4us
-		export TLD      := net
+	export DOMAIN   := 4us
+	export TLD      := net
 else ifeq ($(RUNENV), demo)
         export REGION   := us-west-1
 	export DOMAIN   := 4usdemo
@@ -24,11 +24,14 @@ endif
 
 export STACK		:= $(RUNENV)-$(PRODUCT)-backend
 
+CFN_SRC_DIR		:= cfn/templates
+
 export BUILD_DIR	:= $(PWD)/.build
 export SAM_DIR		:= $(BUILD_DIR)/sam
-export CFN_BUILD_DIR	:= $(BUILD_DIR)/cloudformation
 export SAM_BUILD_DIR	:= $(SAM_DIR)/build
 export SAM_CACHE_DIR	:= $(SAM_DIR)/cache
+export CFN_BUILD_DIR	:= $(BUILD_DIR)/cloudformation
+export BUILD_DIRS	:= $(SAM_BUILD_DIR) $(CFN_BUILD_DIR)
 
 export DATE		:= $(shell date)
 export NONCE		:= $(shell uuidgen | cut -d\- -f1)
@@ -46,8 +49,6 @@ endif
 
 export PACKAGE		:= $(CFN_BUILD_DIR)/CloudFormation-template.yml
 
-CFN_SRC_DIR		:= cfn/templates
-
 # Nested stacks and templates
 BACKEND_STACK		:= backend
 BACKEND_TEMPLATE	:= $(CFN_BUILD_DIR)/$(BACKEND_STACK).yml
@@ -63,7 +64,6 @@ DYNAMODB_TEMPLATE	:= $(CFN_BUILD_DIR)/$(DYNAMO_DBS).yml
 
 CLOUDFLARE_BUILDER	:= cloudflare-builder
 CLOUDFLARE_TEMPLATE	:= $(CFN_BUILD_DIR)/$(CLOUDFLARE_BUILDER).yml
-
 
 IMPORTS			:= $(CFN_BUILD_DIR)/Imports-$(STACK).yml
 
@@ -98,7 +98,7 @@ else
 	CFN_TEMPLATES := $(BACKEND_TEMPLATE) $(DYNAMODB_TEMPLATE) $(EMAIL_TEMPLATES) $(CLOUDFLARE_TEMPLATE)
 endif
 
-.PHONY: dep build build-stacks check local import package deploy clean realclean
+.PHONY: dep build build-stacks mkbuilddir check local import package deploy clean realclean
 
 # Make targets
 all: build
@@ -106,8 +106,10 @@ all: build
 
 build: mkbuilddir build-stacks build-sam
 
-mkbuilddir:
-	@mkdir -p $(SAM_BUILD_DIR) $(CFN_BUILD_DIR)
+mkbuilddir: $(BUILD_DIRS)
+
+$(BUILD_DIRS):
+	@mkdir -p $@
 
 build-sam: build-stacks $(SAM_TEMPLATE)
 
