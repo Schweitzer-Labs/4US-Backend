@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 
 import { registerEnumType } from "type-graphql";
 import { ITransaction } from "../queries/search-transactions.decoder";
@@ -9,6 +9,7 @@ import { EntityType } from "../utils/enums/entity-type.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { EmploymentStatus } from "../utils/enums/employment-status";
 import { State } from "../utils/enums/state.enum";
+import { MinLength } from "class-validator";
 
 registerEnumType(Direction, {
   name: "Direction",
@@ -47,6 +48,33 @@ registerEnumType(InKindType, {
 });
 
 @ObjectType()
+export class OwnerSchema {
+  @Field()
+  firstName: string;
+
+  @Field()
+  lastName: string;
+
+  @Field()
+  addressLine1: string;
+
+  @Field({ nullable: true })
+  addressLine2: string;
+
+  @Field()
+  city: string;
+
+  @Field((type) => State)
+  state: State;
+
+  @Field()
+  postalCode: string;
+
+  @Field()
+  percentOwnership: number;
+}
+
+@ObjectType()
 export class Transaction implements ITransaction {
   @Field((type) => ID)
   id;
@@ -83,6 +111,9 @@ export class Transaction implements ITransaction {
 
   @Field((type) => PurposeCode, { nullable: true })
   purposeCode?: string;
+
+  @Field((type) => [OwnerSchema], { nullable: true })
+  owners?: OwnerSchema[];
 
   @Field({ nullable: true })
   refCode?: string;
