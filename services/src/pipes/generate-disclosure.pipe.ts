@@ -9,7 +9,7 @@ import { ICommittee } from "../queries/get-committee-by-id.query";
 import { now } from "../utils/time.utils";
 import { ApplicationError } from "../utils/application-error";
 
-// Timezone of offset for nyc
+// Timezone of offset for eastern time
 const offset = 60 * 60 * 4;
 
 export const generateDisclosure =
