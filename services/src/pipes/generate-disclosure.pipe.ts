@@ -9,13 +9,19 @@ import { ICommittee } from "../queries/get-committee-by-id.query";
 import { now } from "../utils/time.utils";
 import { ApplicationError } from "../utils/application-error";
 
+// Timezone of offset for nyc
+const offset = 60 * 60 * 4;
+
 export const generateDisclosure =
   (committee: ICommittee) =>
   async (transactions: ITransaction[]): Promise<string> => {
     const disclosures: DisclosureRecord[] = transactions
       .filter((txn) => {
         // @ToDo convert hardcode into data
-        return txn.paymentDate >= new Date("July 16, 2021").getTime();
+        return (
+          txn.paymentDate - offset >=
+          new Date("July 16, 2021").getTime() - offset
+        );
       })
       .map((txn) => {
         const {
