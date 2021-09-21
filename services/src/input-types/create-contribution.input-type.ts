@@ -39,6 +39,40 @@ registerEnumType(InKindType, {
 });
 
 @InputType()
+class Owner {
+  @Field()
+  @MinLength(1)
+  firstName: string;
+
+  @Field()
+  @MinLength(1)
+  lastName: string;
+
+  @Field()
+  @MinLength(1)
+  addressLine1: string;
+
+  @Field({ nullable: true })
+  @MinLength(1)
+  addressLine2: string;
+
+  @Field()
+  @MinLength(1)
+  city: string;
+
+  @Field((type) => State)
+  state: State;
+
+  @Field()
+  @MinLength(5)
+  postalCode: string;
+
+  @Field()
+  @MinLength(5)
+  percentOwnership: number;
+}
+
+@InputType()
 export class CreateContributionInput implements Partial<ITransaction> {
   @Field()
   @MinLength(3)
@@ -53,6 +87,9 @@ export class CreateContributionInput implements Partial<ITransaction> {
 
   @Field((type) => PaymentMethod)
   paymentMethod: PaymentMethod;
+
+  @Field((type) => [Owner])
+  owners: Owner[];
 
   @Field()
   @MinLength(1)
