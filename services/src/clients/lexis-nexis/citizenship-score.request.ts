@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { now } from "../../utils/time.utils";
-import { IDonorInput } from "../../queries/search-donors.decoder";
+import { IDonor, IDonorInput } from "../../queries/search-donors.decoder";
 import { DueDiligenceAttributesResponse } from "./lexis-nexis.decoder";
 import { ICommittee } from "../../queries/get-committee-by-id.query";
 import {
@@ -23,7 +23,7 @@ import {
 
 const prefix = "Lexis-nexis citizenship score";
 
-const formatRequest = (d: IDonorInput) => {
+const formatRequest = (d: IDonor) => {
   const streetAddress2 = d.addressLine2
     ? { StreetAddress2: d.addressLine2 }
     : {};
@@ -32,8 +32,18 @@ const formatRequest = (d: IDonorInput) => {
 
   return {
     DueDiligenceAttributesRequest: {
+      Options: {
+        DDAttributesVersionRequest: "DDAPERV3",
+      },
       ReportBy: {
         ProductRequestType: "CitizenshipOnly",
+        AttributeModules: {
+          Entry: [
+            {
+              Name: null,
+            },
+          ],
+        },
         Person: {
           ...phone,
           Address: {
@@ -49,7 +59,7 @@ const formatRequest = (d: IDonorInput) => {
             Last: d.lastName,
           },
           Citizenship: {
-            CitizenshipModelName: null,
+            CitizenshipModelName: "CIT1808_0_0",
           },
         },
       },
@@ -57,14 +67,14 @@ const formatRequest = (d: IDonorInput) => {
   };
 };
 
-const runInstantId =
+const run =
   (billableEventTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committee: ICommittee) =>
   (config: ILexisNexisConfig) =>
-  async (donorInput: IDonorInput): Promise<any> => {
+  async (donor: IDonor): Promise<any> => {
     console.log("Instance ID running");
-    const payload = formatRequest(donorInput);
+    const payload = formatRequest(donor);
     const { data } = await axios.post(dueDiligenceAttributesEndpoint, payload, {
       auth: {
         username: config.username,
@@ -102,6 +112,8 @@ const resToCitizenshipScoreResult = (
     return taskEither.of({
       citizenshipScoreRawResponse: data,
       citizenshipScoreRequestTimestamp,
+      // Scores range from 300 to 999.
+      // 0 should indicate the context is dev.
       citizenshipScore: "0",
     });
   } else {
@@ -115,21 +127,24 @@ const resToCitizenshipScoreResult = (
   }
 };
 
-export const donorInputToCitizenshipScore =
+const resToDonor =
+  (donor: IDonor) =>
+  (scoreRes: ICitizenshipScoreResult): IDonor => ({
+    ...donor,
+    ...scoreRes,
+  });
+
+export const donorToCitizenshipScore =
   (billableEventsTable: string) =>
   (dynamoDB: DynamoDB) =>
   (config: ILexisNexisConfig) =>
   (committee: ICommittee) =>
-  (
-    donorInput: IDonorInput
-  ): TaskEither<ApplicationError, ICitizenshipScoreResult> =>
+  (donor: IDonor): TaskEither<ApplicationError, IDonor> =>
     pipe(
       tryCatch(
-        () =>
-          runInstantId(billableEventsTable)(dynamoDB)(committee)(config)(
-            donorInput
-          ),
-        (e) => new ApplicationError("ID verification look up failed", e)
+        () => run(billableEventsTable)(dynamoDB)(committee)(config)(donor),
+        (e) => new ApplicationError("Citizenship look up failed", e)
       ),
-      taskEither.chain(resToCitizenshipScoreResult)
+      taskEither.chain(resToCitizenshipScoreResult),
+      taskEither.map(resToDonor(donor))
     );

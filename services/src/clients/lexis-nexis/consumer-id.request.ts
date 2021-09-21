@@ -6,7 +6,7 @@ import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { PathReporter } from "io-ts/PathReporter";
 import { now } from "../../utils/time.utils";
-import { IDonorInput } from "../../queries/search-donors.decoder";
+import { IDonor, IDonorInput } from "../../queries/search-donors.decoder";
 import { InstantIdResponse } from "./lexis-nexis.decoder";
 import { ICommittee } from "../../queries/get-committee-by-id.query";
 import {
@@ -18,6 +18,7 @@ import { genTxnId } from "../../utils/gen-txn-id.utils";
 import axios from "axios";
 import { decodeError } from "../../utils/decode-error.util";
 import { ILexisNexisConfig } from "./lexis-nexis.client";
+import { genFlacspee } from "../../utils/model/gen-donor-match.utils";
 
 const prefix = "Lexis-nexis";
 
@@ -77,7 +78,7 @@ const runInstantId =
   (dynamoDB: DynamoDB) =>
   (committee: ICommittee) =>
   (config: ILexisNexisConfig) =>
-  async (donorInput: IDonorInput): Promise<any> => {
+  async (donorInput: IDonorInput): Promise<unknown> => {
     console.log("Instance ID running");
     const payload = formatInstantIdRequest(donorInput);
     const { data } = await axios.post(instantIdEndpoint, payload, {
@@ -132,12 +133,22 @@ const resToInstantIdResult = (
   }
 };
 
+const resToDonor =
+  (donorInput: IDonorInput) =>
+  (instantIdResult: IInstantIdResult): IDonor => ({
+    id: genTxnId(),
+    createdTimestamp: now(),
+    flacspeeMatch: genFlacspee(donorInput),
+    ...donorInput,
+    ...instantIdResult,
+  });
+
 export const donorInputToInstantIdResult =
   (billableEventsTable: string) =>
   (dynamoDB: DynamoDB) =>
   (config: ILexisNexisConfig) =>
   (committee: ICommittee) =>
-  (donorInput: IDonorInput): TaskEither<ApplicationError, IInstantIdResult> =>
+  (donorInput: IDonorInput): TaskEither<ApplicationError, IDonor> =>
     pipe(
       tryCatch(
         () =>
@@ -146,5 +157,6 @@ export const donorInputToInstantIdResult =
           ),
         (e) => new ApplicationError("ID verification look up failed", e)
       ),
-      taskEither.chain(resToInstantIdResult)
+      taskEither.chain(resToInstantIdResult),
+      taskEither.map(resToDonor(donorInput))
     );

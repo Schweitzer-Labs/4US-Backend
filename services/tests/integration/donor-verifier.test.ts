@@ -41,6 +41,7 @@ describe("Donor Verifier", function () {
       })
     )();
 
+    expect(!!res.citizenshipScoreRawResponse).to.equal(true);
     expect(!!res.instantIdRawResponse).to.equal(true);
   });
 

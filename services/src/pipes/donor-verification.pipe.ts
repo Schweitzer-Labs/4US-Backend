@@ -16,6 +16,7 @@ import { IDonor, IDonorInput } from "../queries/search-donors.decoder";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import { Plan } from "../utils/enums/plan.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { donorToCitizenshipScore } from "../clients/lexis-nexis/citizenship-score.request";
 
 const saveDonor =
   (donorsTableName: string) =>
@@ -27,16 +28,6 @@ const saveDonor =
         (e) => new ApplicationError("Put donor failed", e)
       )
     );
-
-const instantIdResultToDonor =
-  (donorInput: IDonorInput) =>
-  (instantIdResult: IInstantIdResult): IDonor => ({
-    id: genTxnId(),
-    createdTimestamp: now(),
-    flacspeeMatch: genFlacspee(donorInput),
-    ...donorInput,
-    ...instantIdResult,
-  });
 
 const donorInputToDonor = (donorInput: IDonorInput): IDonor => ({
   id: genTxnId(),
@@ -58,7 +49,11 @@ const donorInputToVerifiedDonor =
           donorInputToInstantIdResult(billableEventsTableName)(dynamoDB)(
             config
           )(committee)(donorInput),
-          taskEither.map(instantIdResultToDonor(donorInput))
+          taskEither.chain(
+            donorToCitizenshipScore(billableEventsTableName)(dynamoDB)(config)(
+              committee
+            )
+          )
         );
 
 const verifyAndCreateDonorIfEmpty =

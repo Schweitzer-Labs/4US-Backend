@@ -7,7 +7,7 @@ export const businessIdEndpoint =
   "https://wsonline.seisint.com/WsIdentity/BusinessInstantID2?ver_2.60&_product_code=false&ver_=2.8&json_test_";
 
 export const dueDiligenceAttributesEndpoint =
-  "https://wsonline.seisint.com/WsIdentity/DueDiligenceAttributes?ver_=n.nn";
+  "https://wsonline.seisint.com/WsIdentity/DueDiligenceAttributes?_product_code=false&ver_=2.8&json_test_";
 
 export interface ILexisNexisConfig {
   username: string;
