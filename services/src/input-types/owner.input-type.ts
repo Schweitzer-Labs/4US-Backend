@@ -38,5 +38,5 @@ export class Owner {
 
   @Field()
   @MinLength(5)
-  percentOwnership: number;
+  percentOwnership: string;
 }

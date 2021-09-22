@@ -71,7 +71,7 @@ export class OwnerSchema {
   postalCode: string;
 
   @Field()
-  percentOwnership: number;
+  percentOwnership: string;
 }
 
 @ObjectType()
