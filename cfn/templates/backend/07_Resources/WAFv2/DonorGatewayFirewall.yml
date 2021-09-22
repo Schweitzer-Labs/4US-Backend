@@ -1,5 +1,6 @@
 DonorGatewayFirewall:
   Type: AWS::WAFv2::WebACL
+  Condition: NonQA
   Properties:
     Name: !Sub DonorGatewayFirewall${LambdaRunEnvironment}
     Scope: REGIONAL

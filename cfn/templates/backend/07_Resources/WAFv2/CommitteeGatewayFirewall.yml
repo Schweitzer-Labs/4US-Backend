@@ -1,5 +1,6 @@
 CommitteeGatewayFirewall:
   Type: AWS::WAFv2::WebACL
+  Condition: NonQA
   Properties:
     Name: !Sub CommitteeGatewayFirewall${LambdaRunEnvironment}
     Scope: REGIONAL

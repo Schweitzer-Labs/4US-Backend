@@ -1,7 +1,7 @@
 DonorFirewallAssociation:
   Type: AWS::WAFv2::WebACLAssociation
   DependsOn: DonorGateway
-  Condition: Production
+  Condition: NonQA
   Properties:
     ResourceArn: !Sub
         arn:aws:apigateway:${AWS::Region}::/restapis/${DonorGateway}/stages/${LambdaRunEnvironment}
