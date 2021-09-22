@@ -1,6 +1,6 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
 import { MinLength } from "class-validator";
-import { State } from "../utils/enums/state.enum";
+import { State } from "../../utils/enums/state.enum";
 
 registerEnumType(State, {
   name: "State",

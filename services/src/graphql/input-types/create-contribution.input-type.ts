@@ -1,7 +1,4 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
-import { ITransaction } from "../queries/search-transactions.decoder";
-import { InKindType, PaymentMethod } from "../utils/enums/payment-method.enum";
-import { EntityType } from "../utils/enums/entity-type.enum";
 import {
   MinLength,
   Min,
@@ -10,9 +7,15 @@ import {
   Max,
   MaxLength,
 } from "class-validator";
-import { EmploymentStatus } from "../utils/enums/employment-status";
-import { State } from "../utils/enums/state.enum";
 import { Owner } from "./owner.input-type";
+import { EmploymentStatus } from "../../utils/enums/employment-status";
+import { State } from "../../utils/enums/state.enum";
+import { EntityType } from "../../utils/enums/entity-type.enum";
+import {
+  InKindType,
+  PaymentMethod,
+} from "../../utils/enums/payment-method.enum";
+import { ITransaction } from "../../queries/search-transactions.decoder";
 
 registerEnumType(EntityType, {
   name: "EntityType",

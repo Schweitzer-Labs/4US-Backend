@@ -1,7 +1,7 @@
 import { ArgsType, Field, Int } from "type-graphql";
-import { Order } from "../utils/enums/order.enum";
+import { Order } from "../../utils/enums/order.enum";
 import { registerEnumType } from "type-graphql";
-import { EntityType } from "../utils/enums/entity-type.enum";
+import { EntityType } from "../../utils/enums/entity-type.enum";
 
 registerEnumType(Order, {
   name: "Order", // this one is mandatory

@@ -1,8 +1,8 @@
 import { EntityType } from "./enums/entity-type.enum";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "./enums/payment-method.enum";
-import { CreateContributionInput } from "../input-types/create-contribution.input-type";
-import { AmendContributionInput } from "../input-types/amend-contrib.input-type";
+import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
+import { AmendContributionInput } from "../graphql/input-types/amend-contrib.input-type";
 
 export const validateContribOrThrow = (
   input: CreateContributionInput | AmendContributionInput

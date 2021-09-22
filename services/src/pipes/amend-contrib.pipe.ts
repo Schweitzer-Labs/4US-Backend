@@ -5,7 +5,7 @@ import { taskEither as te } from "fp-ts";
 import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { isRuleVerifiedBankUnverifiedContrib } from "../utils/model/is-non-verified-contrib.utils";
-import { AmendContributionInput } from "../input-types/amend-contrib.input-type";
+import { AmendContributionInput } from "../graphql/input-types/amend-contrib.input-type";
 
 export const amendContrib =
   (txnsTableName: string) =>

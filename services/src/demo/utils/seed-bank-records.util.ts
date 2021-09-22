@@ -12,7 +12,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../../utils/application-error";
 import { taskEither } from "fp-ts";
 import { putTransactionAndDecode } from "../../utils/model/put-transaction.utils";
-import { SeedDemoBankRecordsInput } from "../../input-types/seed-demo-bank-records.input-type";
+import { SeedDemoBankRecordsInput } from "../../graphql/input-types/seed-demo-bank-records.input-type";
 
 const toMockDisb = (committeeId: string): ITransaction => {
   const timestamp = 1629975600000;

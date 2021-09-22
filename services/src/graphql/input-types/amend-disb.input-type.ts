@@ -1,8 +1,8 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
-import { ITransaction } from "../queries/search-transactions.decoder";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
-import { PurposeCode } from "../utils/enums/purpose-code.enum";
-import { State } from "../utils/enums/state.enum";
+import { PurposeCode } from "../../utils/enums/purpose-code.enum";
+import { PaymentMethod } from "../../utils/enums/payment-method.enum";
+import { State } from "../../utils/enums/state.enum";
+import { ITransaction } from "../../queries/search-transactions.decoder";
 
 registerEnumType(PurposeCode, {
   name: "PurposeCode",

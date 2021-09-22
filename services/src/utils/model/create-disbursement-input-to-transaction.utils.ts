@@ -1,10 +1,10 @@
-import { CreateDisbursementInput } from "../../input-types/create-disbursement.input-type";
 import { ITransaction } from "../../queries/search-transactions.decoder";
 import { genTxnId } from "../gen-txn-id.utils";
 import { Direction } from "../enums/direction.enum";
 import { now } from "../time.utils";
 import { Source } from "../enums/source.enum";
 import { TransactionType } from "../enums/transaction-type.enum";
+import { CreateDisbursementInput } from "../../graphql/input-types/create-disbursement.input-type";
 
 export const createDisbInputToTxn =
   (createdByUser: string) =>

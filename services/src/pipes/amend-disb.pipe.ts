@@ -5,7 +5,7 @@ import { taskEither as te } from "fp-ts";
 import { validateDisbursement } from "../utils/model/validate-disbursement.utils";
 import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
 import { ITransaction } from "../queries/search-transactions.decoder";
-import { AmendDisbInput } from "../input-types/amend-disb.input-type";
+import { AmendDisbInput } from "../graphql/input-types/amend-disb.input-type";
 import { isNotABankVerifiedRuleUnverifiedDisb } from "../utils/model/is-non-verified-disbursement.utils";
 
 export const amendDisb =

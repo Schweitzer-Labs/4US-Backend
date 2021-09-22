@@ -11,9 +11,9 @@ import {
   validateDDBResponse,
 } from "../repositories/ddb.utils";
 import { ITransaction, Transactions } from "./search-transactions.decoder";
-import { TransactionsArg } from "../args/transactions.arg";
 import { Order } from "../utils/enums/order.enum";
 import { QueryInput } from "aws-sdk/clients/dynamodb";
+import { TransactionsArg } from "../graphql/args/transactions.arg";
 
 const logPrefix = "Get Transactions";
 

@@ -1,4 +1,4 @@
-import {AmendDisbInput} from "../../src/input-types/amend-disb.input-type";
+import { AmendDisbInput } from "../../src/graphql/input-types/amend-disb.input-type";
 interface GenAmendDisbConfig {
   committeeId: string;
   transactionId: string;

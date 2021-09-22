@@ -21,8 +21,8 @@ import { isPayout } from "../pipes/reconcile-contributions.pipe";
 import { groupTxnsByPayout } from "../utils/model/group-txns-by-payout.utils";
 import { runRec } from "./utils/run-rec.util";
 import { activateStripe } from "./utils/activate-stripe.util";
-import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
 import { isClean, isReconciled } from "../utils/enums/demo-type.enum";
+import { GenCommitteeInput } from "../graphql/input-types/gen-committee.input-type";
 
 export const genDemoCommittee =
   (comTable: string) =>

@@ -11,7 +11,7 @@ import { qaUsers } from "../seed/qa-users.data";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
 import { lambdaPromise } from "../../src/utils/lambda-promise.util";
-import { CreateContributionInput } from "../../src/input-types/create-contribution.input-type";
+import { CreateContributionInput } from "../../src/graphql/input-types/create-contribution.input-type";
 import { State } from "../../src/utils/enums/state.enum";
 
 dotenv.config();

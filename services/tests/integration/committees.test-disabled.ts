@@ -13,14 +13,6 @@ describe("Committee Store", function () {
     dynamoDB = new DynamoDB();
   });
   it("Queries committee table", async () => {
-    // const res = await pipe(
-    //   getAllCommittees("dev")(dynamoDB),
-    //   taskEither.fold(
-    //     () => task.of("error"),
-    //     (res) => task.of("success")
-    //   )
-    // )();
-
     const res = await getAllCommittees("dev")(dynamoDB)();
     if (isLeft(res)) {
       throw res.left;

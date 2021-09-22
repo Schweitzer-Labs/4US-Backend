@@ -1,6 +1,6 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
 import { MinLength } from "class-validator";
-import { TransactionType } from "../utils/enums/transaction-type.enum";
+import { TransactionType } from "../../utils/enums/transaction-type.enum";
 
 registerEnumType(TransactionType, {
   name: "TransactionType",

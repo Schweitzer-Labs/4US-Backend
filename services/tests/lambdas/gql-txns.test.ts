@@ -21,7 +21,7 @@ import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { now, milliToEpoch } from "../../src/utils/time.utils";
 import { genFinicityTxn } from "../utils/gen-finicity-txn.util";
 import { Direction } from "../../src/utils/enums/direction.enum";
-import { ReconcileTxnInput } from "../../src/input-types/reconcile-txn.input-type";
+import { ReconcileTxnInput } from "../../src/graphql/input-types/reconcile-txn.input-type";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 

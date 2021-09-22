@@ -1,4 +1,4 @@
-import { AmendContributionInput } from "../../src/input-types/amend-contrib.input-type";
+import { AmendContributionInput } from "../../src/graphql/input-types/amend-contrib.input-type";
 
 interface GenAmendDisbConfig {
   committeeId: string;
