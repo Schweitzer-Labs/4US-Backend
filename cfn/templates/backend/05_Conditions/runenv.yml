@@ -6,3 +6,5 @@ Demo:
   !Equals [!Ref LambdaRunEnvironment, demo]
 NonProduction:
   !Not [Condition: Production]
+NonQA:
+  !Not [Condition: QA]

@@ -1,7 +1,7 @@
 CommitteeFirewallAssociation:
   Type: AWS::WAFv2::WebACLAssociation
   DependsOn: CommitteeGateway
-  Condition: Production
+  Condition: NonQA
   Properties:
     ResourceArn: !Sub
         arn:aws:apigateway:${AWS::Region}::/restapis/${CommitteeGateway}/stages/${LambdaRunEnvironment}
