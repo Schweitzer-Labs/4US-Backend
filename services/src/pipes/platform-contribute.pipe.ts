@@ -8,7 +8,7 @@ import {
   EmploymentStatus,
   employmentStatuses,
 } from "../utils/enums/employment-status";
-import { CreateContributionInput } from "../input-types/create-contribution.input-type";
+import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
 import { ApplicationError } from "../utils/application-error";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";

@@ -1,26 +1,17 @@
 import { expect } from "chai";
 
 import { genCommittee } from "../utils/gen-committee.util";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as AWS from "aws-sdk";
 import * as dotenv from "dotenv";
 import { DynamoDB } from "aws-sdk";
-import {
-  initStratoConfig,
-  IStratoSDKConfig,
-} from "../../src/clients/dapp/dapp.decoders";
+import { initStratoConfig } from "../../src/clients/dapp/dapp.decoders";
 import {
   commitTransaction,
-  getCommitteeHistory,
   getTransactionHistory,
-  initializeCommitteeChain,
   launchCommittee,
-  listUsers,
 } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
 import { Either, isLeft } from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
-import { taskEither } from "fp-ts";
 import {
   getStratoENodeUrl,
   getStratoNodeUrl,
@@ -32,7 +23,6 @@ import { sleep } from "../../src/utils/sleep.utils";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import { ApplicationError } from "../../src/utils/application-error";
 import { ICommittee } from "../../src/queries/get-committee-by-id.query";
-import { TaskEither } from "fp-ts/TaskEither";
 
 dotenv.config();
 

@@ -9,7 +9,7 @@ import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { ITransaction } from "../queries/search-transactions.decoder";
-import { CreateContributionInput } from "../input-types/create-contribution.input-type";
+import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
 
 export const runRulesAndProcess =
   (billableEventsTableName: string) =>

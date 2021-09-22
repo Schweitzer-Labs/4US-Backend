@@ -4,7 +4,7 @@ import { taskEither } from "fp-ts";
 import { deleteTxnPipe } from "../utils/model/delete-txn.utils";
 import { DynamoDB } from "aws-sdk";
 import { ICommittee } from "../queries/get-committee-by-id.query";
-import { TransactionArg } from "../args/transaction.arg";
+import { TransactionArg } from "../graphql/args/transaction.arg";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { ITransaction } from "../queries/search-transactions.decoder";

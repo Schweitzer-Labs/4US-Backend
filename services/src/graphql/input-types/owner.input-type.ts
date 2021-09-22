@@ -1,6 +1,6 @@
 import { Field, InputType, registerEnumType } from "type-graphql";
 import { MinLength } from "class-validator";
-import { State } from "../utils/enums/state.enum";
+import { State } from "../../utils/enums/state.enum";
 
 registerEnumType(State, {
   name: "State",
@@ -38,5 +38,5 @@ export class Owner {
 
   @Field()
   @MinLength(5)
-  percentOwnership: number;
+  percentOwnership: string;
 }

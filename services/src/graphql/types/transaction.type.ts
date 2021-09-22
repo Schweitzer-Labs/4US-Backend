@@ -1,15 +1,17 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
 
 import { registerEnumType } from "type-graphql";
-import { ITransaction } from "../queries/search-transactions.decoder";
-import { Direction } from "../utils/enums/direction.enum";
-import { InKindType, PaymentMethod } from "../utils/enums/payment-method.enum";
-import { PurposeCode } from "../utils/enums/purpose-code.enum";
-import { EntityType } from "../utils/enums/entity-type.enum";
-import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { EmploymentStatus } from "../utils/enums/employment-status";
-import { State } from "../utils/enums/state.enum";
-import { MinLength } from "class-validator";
+import { Direction } from "../../utils/enums/direction.enum";
+import {
+  InKindType,
+  PaymentMethod,
+} from "../../utils/enums/payment-method.enum";
+import { PurposeCode } from "../../utils/enums/purpose-code.enum";
+import { EntityType } from "../../utils/enums/entity-type.enum";
+import { TransactionType } from "../../utils/enums/transaction-type.enum";
+import { EmploymentStatus } from "../../utils/enums/employment-status";
+import { State } from "../../utils/enums/state.enum";
+import { ITransaction } from "../../queries/search-transactions.decoder";
 
 registerEnumType(Direction, {
   name: "Direction",
@@ -71,7 +73,7 @@ export class OwnerSchema {
   postalCode: string;
 
   @Field()
-  percentOwnership: number;
+  percentOwnership: string;
 }
 
 @ObjectType()

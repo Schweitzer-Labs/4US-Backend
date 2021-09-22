@@ -1,4 +1,4 @@
-import { CreateDisbursementInput } from "../../src/input-types/create-disbursement.input-type";
+import { CreateDisbursementInput } from "../../src/graphql/input-types/create-disbursement.input-type";
 import * as faker from "faker";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import {

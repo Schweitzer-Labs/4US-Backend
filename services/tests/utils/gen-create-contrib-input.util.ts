@@ -1,5 +1,5 @@
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
-import { CreateContributionInput } from "../../src/input-types/create-contribution.input-type";
+import { CreateContributionInput } from "../../src/graphql/input-types/create-contribution.input-type";
 import * as faker from "faker";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { now } from "../../src/utils/time.utils";

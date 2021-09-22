@@ -10,7 +10,7 @@ import { searchTransactions } from "../queries/search-transactions.query";
 import { AggregateDuration, IRule } from "../queries/get-rule.decoder";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { StatusCodes } from "http-status-codes";
-import { CreateContributionInput } from "../input-types/create-contribution.input-type";
+import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { millisToYear } from "../utils/time.utils";
 

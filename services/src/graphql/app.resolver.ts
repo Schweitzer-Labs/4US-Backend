@@ -7,18 +7,18 @@ import {
   UnauthorizedError,
 } from "type-graphql";
 
-import { Committee } from "../types/committee.type";
-import { Transaction } from "../types/transaction.type";
-import { Aggregations } from "../types/aggregations.type";
+import { Committee } from "./types/committee.type";
+import { Transaction } from "./types/transaction.type";
+import { Aggregations } from "./types/aggregations.type";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { searchTransactions } from "../queries/search-transactions.query";
-import { TransactionsArg } from "../args/transactions.arg";
+import { TransactionsArg } from "./args/transactions.arg";
 import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
-import { CreateContributionInput } from "../input-types/create-contribution.input-type";
+import { CreateContributionInput } from "./input-types/create-contribution.input-type";
 import {
   getFinicityAppKey,
   getFinicityPartnerId,
@@ -35,32 +35,32 @@ import {
 import { Stripe } from "stripe";
 import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
-import { CreateDisbursementInput } from "../input-types/create-disbursement.input-type";
+import { CreateDisbursementInput } from "./input-types/create-disbursement.input-type";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
-import { TransactionArg } from "../args/transaction.arg";
+import { TransactionArg } from "./args/transaction.arg";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
-import { ReconcileTxnInput } from "../input-types/reconcile-txn.input-type";
-import { AmendDisbInput } from "../input-types/amend-disb.input-type";
+import { ReconcileTxnInput } from "./input-types/reconcile-txn.input-type";
+import { AmendDisbInput } from "./input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
-import { AmendContributionInput } from "../input-types/amend-contrib.input-type";
+import { AmendContributionInput } from "./input-types/amend-contrib.input-type";
 import { amendContrib } from "../pipes/amend-contrib.pipe";
 import { validateContribOrThrow } from "../utils/validate-contrib-or-throw.util";
 import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
-import { Report } from "../types/report.type";
+import { Report } from "./types/report.type";
 import { generateDisclosure } from "../pipes/generate-disclosure.pipe";
 import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
 import { refreshAggs } from "../pipes/refresh-aggs.pipe";
-import { GenCommitteeInput } from "../input-types/gen-committee.input-type";
+import { GenCommitteeInput } from "./input-types/gen-committee.input-type";
 import { initStratoConfig } from "../clients/dapp/dapp.decoders";
 import { FinicityConfig } from "../clients/finicity/finicity.decoders";
 import { genDemoCommittee } from "../demo/gen-committee.demo";
 import { deleteUnreconciledTxn } from "../pipes/delete-txn.pipe";
-import { ManageDemoCommitteeInput } from "../input-types/manage-demo-committee.input-type";
+import { ManageDemoCommitteeInput } from "./input-types/manage-demo-committee.input-type";
 import { reconcileOneDemoContrib } from "../demo/utils/reconcile-one-demo-contrib.util";
-import { SeedDemoBankRecordsInput } from "../input-types/seed-demo-bank-records.input-type";
+import { SeedDemoBankRecordsInput } from "./input-types/seed-demo-bank-records.input-type";
 import { seedTxn } from "../demo/utils/seed-bank-records.util";
 
 const demoPasscode = "f4jp1i";

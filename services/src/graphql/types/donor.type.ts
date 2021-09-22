@@ -1,7 +1,7 @@
 import { Field, ID, ObjectType, registerEnumType } from "type-graphql";
-import { EntityType } from "../utils/enums/entity-type.enum";
-import { EmploymentStatus } from "../utils/enums/employment-status";
-import { State } from "../utils/enums/state.enum";
+import { EntityType } from "../../utils/enums/entity-type.enum";
+import { EmploymentStatus } from "../../utils/enums/employment-status";
+import { State } from "../../utils/enums/state.enum";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -12,8 +12,8 @@ registerEnumType(EmploymentStatus, {
 });
 
 registerEnumType(State, {
-  name: "State"
-})
+  name: "State",
+});
 
 @ObjectType()
 export class Donor {

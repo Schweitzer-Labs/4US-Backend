@@ -92,7 +92,6 @@ export const saveMatchedTxns =
       "Save Matched Transactions called for the following: ",
       JSON.stringify(txns)
     );
-    console.log("Syncing test transactions");
     return pipe(
       taskEither.tryCatch(
         () => update_txns_with_stripe_payout_id(txnsTableName)(dynamoDB)(txns),
