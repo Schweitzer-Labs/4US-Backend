@@ -24,18 +24,3 @@ CommitteeGatewayFirewall:
             Name: AWSManagedRulesCommonRuleSet
             VendorName: AWS
             ExcludedRules: []
-      - Name: BlockXssAttack
-        Priority: 1
-        Action:
-          Block: {}
-        VisibilityConfig:
-          MetricName: BlockXssAttackMetric
-          SampledRequestsEnabled: true
-          CloudWatchMetricsEnabled: true
-        Statement:
-          XssMatchStatement:
-            FieldToMatch:
-              AllQueryArguments: {}
-            TextTransformations:
-              - Priority: 1
-                Type: NONE
