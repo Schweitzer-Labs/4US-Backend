@@ -23,6 +23,9 @@ CommitteeGateway:
         ResponseParameters:
           Headers:
             Access-Control-Allow-Origin: "'https://dashboard.{{ DOMAIN }}.{{ TLD }}'"
+    Auth:
+      ResourcePolicy:
+        IpRangeWhitelist: !Ref CloudFlareIPs
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'
