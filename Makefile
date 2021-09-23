@@ -39,9 +39,14 @@ export NONCE		:= $(shell uuidgen | cut -d\- -f1)
 export ENDPOINT		:= https://cloudformation-fips.$(REGION).amazonaws.com
 export CFN_BUCKET	:= $(PRODUCT)-cfn-templates-$(REGION)
 
+# Fetch CloudFlare IP addresses only once, when needed
+CLOUDFLARE_IPS = $(eval CLOUDFLARE_IPS := $$(shell curl -X GET "https://api.cloudflare.com/client/v4/ips" | cut -d\[ -f 2 | cut -d\] -f1))$(CLOUDFLARE_IPS)
+
+
 export STACK_PARAMS	:= Nonce=$(NONCE)
 STACK_PARAMS		+= LambdaRunEnvironment=$(RUNENV)
 STACK_PARAMS		+= Domain=$(DOMAIN) TLD=$(TLD)
+STACK_PARAMS		+= CloudFlareIPs=$(CLOUDFLARE_IPS)
 
 ifneq ($(SUBDOMAIN),)
 	STACK_PARAMS	+= SubDomain=$(SUBDOMAIN)
