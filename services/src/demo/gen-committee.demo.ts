@@ -44,8 +44,8 @@ export const genDemoCommittee =
     let committee: ICommittee = genCommittee({
       stripeAccount,
       ...finConfig,
-      candidateLastName: "Allen",
-      candidateFirstName: "Josh",
+      candidateLastName: "Harmongoff",
+      candidateFirstName: "Shawna",
       tzDatabaseName: "America/New_York",
       state: "ny",
       scope: "local",
@@ -53,10 +53,10 @@ export const genDemoCommittee =
       race: "general",
       district: "",
       county: "saratoga",
-      officeType: "governor",
+      officeType: "senator",
       ruleVersion: "nyboe-2020",
       efsFilerId: 161,
-      id: `josh-allen-${genTxnId()}`,
+      id: `shawna-harmongoff-${genTxnId()}`,
       bankName: "avanti",
     });
 

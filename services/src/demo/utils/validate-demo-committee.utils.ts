@@ -5,6 +5,6 @@ import { taskEither } from "fp-ts";
 export const validateDemoCommittee = (
   committeeId: string
 ): TaskEither<ApplicationError, string> =>
-  committeeId.includes("josh-allen")
+  committeeId.includes("shawna-harmongoff")
     ? taskEither.right(committeeId)
     : taskEither.left(new ApplicationError("Committee is not in demo", {}));
