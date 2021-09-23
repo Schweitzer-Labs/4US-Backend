@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server";
 import { buildSchema } from "type-graphql";
-import { AppResolver } from "../../src/resolvers/app.resolver";
+import { AppResolver } from "../../src/graphql/app.resolver";
 import * as dotenv from "dotenv";
 
 dotenv.config();
