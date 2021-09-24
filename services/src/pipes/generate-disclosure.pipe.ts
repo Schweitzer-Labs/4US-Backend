@@ -339,8 +339,8 @@ const getFilingScheduleId = (txn: ITransaction): number => {
           return 1;
         case EntityType.Corp:
           return 2;
-        case EntityType.Llc:
-          return 15;
+        // case EntityType.Llc:
+        //   return 15;
         default:
           return 3;
       }
