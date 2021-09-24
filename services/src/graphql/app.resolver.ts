@@ -45,7 +45,7 @@ import { AmendDisbInput } from "./input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
 import { AmendContributionInput } from "./input-types/amend-contrib.input-type";
 import { amendContrib } from "../pipes/amend-contrib.pipe";
-import { validateContribOrThrow } from "../utils/validate-contrib-or-throw.util";
+import { validateContribOrThrow } from "./validators/contrib.validator";
 import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
@@ -62,6 +62,8 @@ import { ManageDemoCommitteeInput } from "./input-types/manage-demo-committee.in
 import { reconcileOneDemoContrib } from "../demo/utils/reconcile-one-demo-contrib.util";
 import { SeedDemoBankRecordsInput } from "./input-types/seed-demo-bank-records.input-type";
 import { seedTxn } from "../demo/utils/seed-bank-records.util";
+import { pipe } from "fp-ts/function";
+import { taskEither as te } from "fp-ts";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();
@@ -248,7 +250,7 @@ export class AppResolver {
       createContributionInput.committeeId
     )(currentUser);
 
-    validateContribOrThrow(createContributionInput);
+    await validateContribOrThrow(committee)(createContributionInput);
 
     const {
       paymentMethod,
@@ -354,7 +356,7 @@ export class AppResolver {
       c.committeeId
     )(currentUser);
 
-    validateContribOrThrow(c);
+    await validateContribOrThrow(committee)(c);
 
     const res = await amendContrib(txnsTableName)(dynamoDB)(currentUser)(
       c.committeeId
