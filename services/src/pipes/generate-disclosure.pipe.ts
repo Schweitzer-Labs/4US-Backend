@@ -20,7 +20,7 @@ export const generateDisclosure =
         // @ToDo convert hardcode into data
         return (
           txn.paymentDate - offset >=
-          new Date("July 11, 2021").getTime() - offset
+          new Date("July 12, 2021").getTime() - offset
         );
       })
       .map((txn) => {
@@ -93,27 +93,26 @@ export const generateDisclosure =
               ? boolToYesNo(isExistingLiability)
               : "NULL",
           ["Is Liability a Partial Forgiven?"]: "NULL",
-          ["FLNG_ENT_NAME"]: getEntityName(
-            entityType,
-            firstName,
-            lastName,
-            entityName
-          ),
-          ["FLNG_ENT_FIRST_NAME"]: isPerson(entityType) ? firstName : "NULL",
+          ["FLNG_ENT_NAME"]: !isUnItemized(txn)
+            ? getEntityName(entityType, firstName, lastName, entityName)
+            : "NULL",
+          ["FLNG_ENT_FIRST_NAME"]:
+            isPerson(entityType) && !isUnItemized(txn) ? firstName : "NULL",
           ["FLNG_ENT_MIDDLE_NAME"]: "NULL",
-          ["FLNG_ENT_LAST_NAME"]: isPerson(entityType) ? lastName : "NULL",
-          ["FLNG_ENT_ADD1"]: addressLine1,
-          ["FLNG_ENT_CITY"]: city,
-          ["FLNG_ENT_STATE"]: state,
-          ["FLNG_ENT_ZIP"]: postalCode,
-          ["FLNG_ENT_COUNTRY"]: "US",
+          ["FLNG_ENT_LAST_NAME"]:
+            isPerson(entityType) && !isUnItemized(txn) ? lastName : "NULL",
+          ["FLNG_ENT_ADD1"]: !isUnItemized(txn) ? addressLine1 : "NULL",
+          ["FLNG_ENT_CITY"]: !isUnItemized(txn) ? city : "NULL",
+          ["FLNG_ENT_STATE"]: !isUnItemized(txn) ? state : "NULL",
+          ["FLNG_ENT_ZIP"]: !isUnItemized(txn) ? postalCode : "NULL",
+          ["FLNG_ENT_COUNTRY"]: !isUnItemized(txn) ? "US" : "NULL",
           ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
           ["PAY_NUMBER"]: txnToPayNumber(txn),
           ["OWED_AMT"]: "NULL",
           ["ORG_AMT"]: centsToDollars(amount),
           ["TRANS_EXPLNTN"]: txnToMemo(txn),
           ["LOAN_OTHER_ID"]: "NULL",
-          ["R_ITEMIZED"]: "y",
+          ["R_ITEMIZED"]: !isUnItemized(txn) ? "y" : "n",
           ["R_LIABILITY"]: "NULL",
           ["ELECTION_DATE"]: "NULL",
           ["ELECTION_TYPE"]: "NULL",
@@ -142,6 +141,9 @@ export const generateDisclosure =
   };
 
 const boolToYesNo = (val: any) => (val ? "y" : "n");
+
+const isUnItemized = (txn: ITransaction) =>
+  txn.entityType === EntityType.Llc && txn.amount < 9901;
 
 interface FilingPeriod {
   id: number;
@@ -301,6 +303,16 @@ export const NYSPaymentTypeId = new Map<PaymentMethod, number>([
 ]);
 
 const isPerson = (entityType: EntityType) =>
+  [
+    EntityType.Ind,
+    EntityType.Fam,
+    EntityType.Can,
+    EntityType.Llc,
+    EntityType.Plc,
+    EntityType.Part,
+  ].includes(entityType);
+
+const isNonEntityPerson = (entityType: EntityType) =>
   [EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType);
 
 const getEntityName = (
@@ -309,7 +321,7 @@ const getEntityName = (
   lastName: string,
   companyName?: string
 ) => {
-  if (isPerson(entityType)) {
+  if (isNonEntityPerson(entityType)) {
     return `${firstName} ${lastName}`;
   } else {
     return companyName;
@@ -327,8 +339,8 @@ const getFilingScheduleId = (txn: ITransaction): number => {
           return 1;
         case EntityType.Corp:
           return 2;
-        case EntityType.Llc:
-          return 15;
+        // case EntityType.Llc:
+        //   return 15;
         default:
           return 3;
       }

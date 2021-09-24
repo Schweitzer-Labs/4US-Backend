@@ -10,8 +10,9 @@ dotenv.config();
 
 AWS.config.update({ region: "us-west-2" });
 
-// const rulesTableName = "demo-4us-backend-DynamoDBsTemplate-11ZRLMEI6R01P-Rules-1MY6W1BDREK7X";
-const rulesTableName = "qa-4us-backend-Rules-1SWN4ADOI7MRK";
+const rulesTableName =
+  "demo-4us-backend-DynamoDBsTemplate-11ZRLMEI6R01P-Rules-1MY6W1BDREK7X";
+// const rulesTableName = "qa-4us-backend-Rules-1SWN4ADOI7MRK";
 
 let index = 1;
 const run =
@@ -32,7 +33,7 @@ const run =
           race: r.race,
           district: r.district + "",
           county: r.county,
-          officeType: "governor",
+          officeType: "senator",
           ruleVersion: r.ruleVersion,
           entityType: "can",
           limit: 100000000000,
@@ -48,10 +49,10 @@ const run =
           race: r.race,
           district: r.district + "",
           county: r.county,
-          officeType: "governor",
+          officeType: "senator",
           ruleVersion: r.ruleVersion,
           entityType: r.contributor_type,
-          limit: r.limit === "NULL" ? null : 2260000,
+          limit: r.limit === "NULL" ? null : 1180000,
           aggregateDuration: r.aggregate_duration,
           fields: r.fields.split(","),
         };
