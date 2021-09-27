@@ -1,11 +1,32 @@
 import * as t from "io-ts";
 import { FinicityTransaction } from "../clients/finicity/finicity.decoders";
+import { OwnerSchema } from "../graphql/types/transaction.type";
 
 export enum SchemaVersion {
   V1 = "v1",
 }
 
 export const currentVersion = SchemaVersion.V1;
+
+export const OwnerRequired = t.type({
+  firstName: t.string,
+  lastName: t.string,
+  addressLine1: t.string,
+  city: t.string,
+  state: t.string,
+  postalCode: t.string,
+  percentOwnership: t.string,
+});
+
+export const OwnerPartial = t.partial({
+  addressLine2: t.string,
+});
+
+export const Owner = t.intersection([OwnerRequired, OwnerPartial]);
+
+export type IOwner = t.TypeOf<typeof Owner>;
+
+export const Owners = t.array(Owner);
 
 const TransactionRequired = t.type({
   id: t.string,
@@ -77,6 +98,7 @@ const TransactionOptional = t.partial({
   businessIdRawResponse: t.unknown,
   inKindType: t.string,
   inKindDescription: t.string,
+  owners: Owners,
 });
 
 export const Transaction = t.intersection([
