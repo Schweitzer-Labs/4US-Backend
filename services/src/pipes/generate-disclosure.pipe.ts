@@ -20,8 +20,7 @@ export const generateDisclosure =
         // @ToDo convert hardcode into data
         return (
           txn.paymentDate - offset >=
-            new Date("July 12, 2021").getTime() - offset ||
-          txn.id === "1632624577928-mfK856"
+          new Date("July 12, 2021").getTime() - offset
         );
       })
       .map((txn) => {

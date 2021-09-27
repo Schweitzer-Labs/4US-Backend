@@ -130,15 +130,18 @@ export class AppResolver {
       committeeId
     )(currentUser);
 
+    // @ToDo Workaround, remove immediately
     const res = await searchTransactions(txnsTableName)(dynamoDB)({
       committeeId,
-      bankVerified: true,
+      // bankVerified: true,
       ruleVerified: true,
     })();
     if (isLeft(res)) {
       throw res.left;
     } else {
-      const txns = res.right;
+      const txns = res.right.filter(
+        (txn) => txn.bankVerified || txn.id === "1632624577928-mfK856"
+      );
 
       const csvData = await generateDisclosure(committee)(txns);
       return {
