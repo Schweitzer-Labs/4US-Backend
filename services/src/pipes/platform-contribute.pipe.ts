@@ -27,6 +27,20 @@ const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
 const stringReq = (min = 1, max = 200) =>
   Joi.string().min(min).max(max).required();
 
+
+const ownerSchema = {
+  firstName: Joi.string(),
+  lastName: Joi.string(),
+  addressLine1: Joi.string(),
+  addressLine2: Joi.any().optional(),
+  city: Joi.string(),
+  state: Joi.string(),
+  postalCode: Joi.string(),
+  percentOwnership: Joi.string()
+}
+
+
+
 const schema = Joi.object({
   committeeId: stringReq(2),
   amount: Joi.number().min(50).max(200000000).required(),
@@ -55,6 +69,7 @@ const schema = Joi.object({
   addressLine2: stringOpt(),
   phoneNumber: stringOpt(5, 15),
   attestsToBeingAnAdultCitizen: Joi.bool(),
+  owners: Joi.array().items(Joi.object(ownerSchema))
 });
 
 const validateNonInd = (
