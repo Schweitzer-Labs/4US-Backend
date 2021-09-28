@@ -44,13 +44,9 @@ const toAttributedContribs =
     const { amount, owners } = txn;
 
     const ownerRows = owners.reduce((acc, owner) => {
-      const percent = parseInt(owner.percentOwnership);
-      if (isNaN(percent))
-        throw new ApplicationError("Percent ownership is not a number", txn);
-      const ownerAmount = percent * amount;
-      const txnRow = toRow(committee)(txn);
+      const row = toAttributedRow(committee)(txn)(owner);
 
-      return [...acc];
+      return [row, ...acc];
     }, []);
 
     return ownerRows;
@@ -58,29 +54,17 @@ const toAttributedContribs =
 
 const toAttributedRow =
   (committee: ICommittee) => (txn: ITransaction) => (owner: IOwner) => {
+    const percent = parseInt(owner.percentOwnership) / 100;
+    if (isNaN(percent))
+      throw new ApplicationError("Percent ownership is not a number", txn);
+    const ownerAmount = percent * txn.amount;
     const {
       entityType: entityTypeStr,
       id: transactionId,
-      firstName,
-      lastName,
-      addressLine1,
-      city,
-      state,
-      postalCode,
       paymentMethod: paymentMethodStr,
-      amount,
-      entityName,
-      transactionType,
-      purposeCode: purposeCodeString,
-      isSubcontracted,
-      isPartialPayment,
-      isExistingLiability,
     } = txn;
-    const entityType: any = entityTypeStr;
     const paymentMethod: any = paymentMethodStr;
-    const purposeCode: any = purposeCodeString;
     const filingPeriod = getFilingPeriod(committee);
-    const inKindType: any = txn.inKindType;
     return {
       // @Todo implement
       ["FILER_ID"]: committee.efsFilerId,
@@ -98,55 +82,33 @@ const toAttributedRow =
       // @Todo implement
       ["SCHED_DATE"]: millisToDateStr(txn.paymentDate),
       ["ORG_DATE"]: "NULL",
-      ["CNTRBR_TYPE_ID"]:
-        txn.transactionType === TransactionType.Contribution
-          ? NYSEntityTypeId.get(entityType)
-          : "NULL",
+      ["CNTRBR_TYPE_ID"]: "11",
       // @ToDo add in-kind field
-      ["CNTRBN_TYPE_ID"]:
-        txn.paymentMethod === PaymentMethod.InKind
-          ? NYSInKindTypeId.get(inKindType)
-          : "NULL",
+      ["CNTRBN_TYPE_ID"]: "NULL",
       ["TRANSFER_TYPE_ID"]: "NULL",
       ["RECEIPT_TYPE_ID"]: "NULL",
       ["RECEIPT_CODE_ID"]: "NULL",
-      ["PURPOSE_CODE_ID"]:
-        transactionType === TransactionType.Disbursement
-          ? NYSPurposeCodeId.get(purposeCode)
-          : "NULL",
-      ["Is Expenditure Subcontracted?"]:
-        transactionType == TransactionType.Disbursement
-          ? boolToYesNo(isSubcontracted)
-          : "NULL",
-      ["Is Expenditure a Partial Payment?"]:
-        transactionType == TransactionType.Disbursement
-          ? boolToYesNo(isPartialPayment)
-          : "NULL",
-      ["Is this existing Liability?"]:
-        transactionType == TransactionType.Disbursement
-          ? boolToYesNo(isExistingLiability)
-          : "NULL",
+      ["PURPOSE_CODE_ID"]: "NULL",
+      ["Is Expenditure Subcontracted?"]: "NULL",
+      ["Is Expenditure a Partial Payment?"]: "NULL",
+      ["Is this existing Liability?"]: "NULL",
       ["Is Liability a Partial Forgiven?"]: "NULL",
-      ["FLNG_ENT_NAME"]: !isUnItemized(txn)
-        ? getEntityName(entityType, firstName, lastName, entityName)
-        : "NULL",
-      ["FLNG_ENT_FIRST_NAME"]:
-        isPerson(entityType) && !isUnItemized(txn) ? firstName : "NULL",
+      ["FLNG_ENT_NAME"]: `${owner.firstName} ${owner.lastName}`,
+      ["FLNG_ENT_FIRST_NAME"]: owner.firstName,
       ["FLNG_ENT_MIDDLE_NAME"]: "NULL",
-      ["FLNG_ENT_LAST_NAME"]:
-        isPerson(entityType) && !isUnItemized(txn) ? lastName : "NULL",
-      ["FLNG_ENT_ADD1"]: !isUnItemized(txn) ? addressLine1 : "NULL",
-      ["FLNG_ENT_CITY"]: !isUnItemized(txn) ? city : "NULL",
-      ["FLNG_ENT_STATE"]: !isUnItemized(txn) ? state : "NULL",
-      ["FLNG_ENT_ZIP"]: !isUnItemized(txn) ? postalCode : "NULL",
-      ["FLNG_ENT_COUNTRY"]: !isUnItemized(txn) ? "US" : "NULL",
+      ["FLNG_ENT_LAST_NAME"]: owner.lastName,
+      ["FLNG_ENT_ADD1"]: owner.addressLine1,
+      ["FLNG_ENT_CITY"]: owner.city,
+      ["FLNG_ENT_STATE"]: owner.state,
+      ["FLNG_ENT_ZIP"]: owner.postalCode,
+      ["FLNG_ENT_COUNTRY"]: "US",
       ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
-      ["PAY_NUMBER"]: txnToPayNumber(txn),
+      ["PAY_NUMBER"]: "NULL",
       ["OWED_AMT"]: "NULL",
-      ["ORG_AMT"]: centsToDollars(amount),
+      ["ORG_AMT"]: centsToDollars(ownerAmount),
       ["TRANS_EXPLNTN"]: txnToMemo(txn),
       ["LOAN_OTHER_ID"]: "NULL",
-      ["R_ITEMIZED"]: !isUnItemized(txn) ? "y" : "n",
+      ["R_ITEMIZED"]: "y",
       ["R_LIABILITY"]: "NULL",
       ["ELECTION_DATE"]: "NULL",
       ["ELECTION_TYPE"]: "NULL",
