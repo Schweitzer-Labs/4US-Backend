@@ -51,12 +51,12 @@ export const generateDisclosure =
           // @Todo implement
           ["FILER_ID"]: committee.efsFilerId,
           // @Todo implement
-          ["FILING_PERIOD_ID"]: filingPeriod.id,
+          ["FILING_PERIOD_ID"]: filingDates[0].id,
           ["FILING_CAT_ID"]: 1,
           ["ELECT_ID"]: committee.efsElectionId,
           ["RESIG_TERM_TYPE_ID"]: "NULL",
           // @Todo implement
-          ["R_FILING_DATE"]: millisToDateStr(filingPeriod.filingDate),
+          ["R_FILING_DATE"]: millisToDateStr(filingDates[0].filingDate),
           ["FILING_SCHED_ID"]: getFilingScheduleId(txn),
           ["LOAN_LIB_NUMBER"]: "NULL",
           ["TRANS_NUMBER"]: transactionId,
