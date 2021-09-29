@@ -21,7 +21,9 @@ export const generateDisclosure =
         // @ToDo convert hardcode into data
         return (
           txn.paymentDate - offset >=
-          new Date("July 12, 2021").getTime() - offset
+            new Date("July 12, 2021").getTime() - offset &&
+          txn.paymentDate - offset <=
+            new Date("September 27, 2021").getTime() - offset
         );
       })
       .reduce((acc, txn) => {
