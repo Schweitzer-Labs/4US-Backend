@@ -105,7 +105,7 @@ export const generateDisclosure =
           ["FLNG_ENT_CITY"]: !isUnItemized(txn) ? city : "NULL",
           ["FLNG_ENT_STATE"]: !isUnItemized(txn) ? state : "NULL",
           ["FLNG_ENT_ZIP"]: !isUnItemized(txn) ? postalCode : "NULL",
-          ["FLNG_ENT_COUNTRY"]: !isUnItemized(txn) ? "US" : "NULL",
+          ["FLNG_ENT_COUNTRY"]: !isUnItemized(txn) ? "United States" : "NULL",
           ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
           ["PAY_NUMBER"]: txnToPayNumber(txn),
           ["OWED_AMT"]: "NULL",
