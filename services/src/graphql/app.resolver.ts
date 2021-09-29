@@ -124,6 +124,7 @@ export class AppResolver {
   @Query((returns) => Report)
   async report(
     @Arg("committeeId") committeeId: string,
+    @Arg("includeHeaders") includeHeaders: boolean = false,
     @CurrentUser() currentUser: string
   ) {
     const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
@@ -143,7 +144,7 @@ export class AppResolver {
         (txn) => txn.bankVerified || txn.id === "1632624577928-mfK856"
       );
 
-      const csvData = await generateDisclosure(committee)(txns);
+      const csvData = await generateDisclosure(committee)(txns)(includeHeaders);
       return {
         csvData,
       };

@@ -14,7 +14,8 @@ const offset = 60 * 60 * 4;
 
 export const generateDisclosure =
   (committee: ICommittee) =>
-  async (transactions: ITransaction[]): Promise<string> => {
+  (transactions: ITransaction[]) =>
+  async (includeHeaders: boolean): Promise<string> => {
     const disclosures: DisclosureRecord[] = transactions
       .filter((txn) => {
         // @ToDo convert hardcode into data
@@ -139,7 +140,7 @@ export const generateDisclosure =
         };
       });
 
-    return await jsonexport.default(disclosures, { includeHeaders: false });
+    return await jsonexport.default(disclosures, { includeHeaders });
   };
 
 const boolToYesNo = (val: any) => (val ? "Y" : "N");
