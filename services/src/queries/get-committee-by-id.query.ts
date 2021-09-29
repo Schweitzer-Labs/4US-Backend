@@ -76,8 +76,6 @@ export const committeeIdToDDBRes =
 
     const committee = DynamoDB.Converter.unmarshall(res.Item);
 
-    console.log("Get committee res", committee);
-
     return committee;
   };
 

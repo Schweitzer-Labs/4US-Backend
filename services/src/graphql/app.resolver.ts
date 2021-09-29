@@ -62,8 +62,6 @@ import { ManageDemoCommitteeInput } from "./input-types/manage-demo-committee.in
 import { reconcileOneDemoContrib } from "../demo/utils/reconcile-one-demo-contrib.util";
 import { SeedDemoBankRecordsInput } from "./input-types/seed-demo-bank-records.input-type";
 import { seedTxn } from "../demo/utils/seed-bank-records.util";
-import { pipe } from "fp-ts/function";
-import { taskEither as te } from "fp-ts";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();
@@ -115,8 +113,6 @@ export class AppResolver {
     const res = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
       committeeId
     )(currentUser);
-
-    console.log("committee response", res);
 
     return res;
   }

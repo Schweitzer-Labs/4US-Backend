@@ -28,8 +28,6 @@ export const committeeIdToDDBRes =
 
     const aggs = DynamoDB.Converter.unmarshall(res.Item);
 
-    console.log("Get aggs res", aggs);
-
     return aggs;
   };
 

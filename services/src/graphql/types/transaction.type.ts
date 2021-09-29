@@ -61,13 +61,13 @@ export class OwnerSchema {
   addressLine1: string;
 
   @Field({ nullable: true })
-  addressLine2: string;
+  addressLine2?: string;
 
   @Field()
   city: string;
 
   @Field((type) => State)
-  state: State;
+  state: string;
 
   @Field()
   postalCode: string;
