@@ -112,7 +112,7 @@ export const generateDisclosure =
           ["ORG_AMT"]: centsToDollars(amount),
           ["TRANS_EXPLNTN"]: txnToMemo(txn),
           ["LOAN_OTHER_ID"]: "NULL",
-          ["R_ITEMIZED"]: !isUnItemized(txn) ? "y" : "n",
+          ["R_ITEMIZED"]: !isUnItemized(txn) ? "Y" : "N",
           ["R_LIABILITY"]: "NULL",
           ["ELECTION_DATE"]: "NULL",
           ["ELECTION_TYPE"]: "NULL",
@@ -137,10 +137,10 @@ export const generateDisclosure =
         };
       });
 
-    return await jsonexport.default(disclosures);
+    return await jsonexport.default(disclosures, { includeHeaders: false });
   };
 
-const boolToYesNo = (val: any) => (val ? "y" : "n");
+const boolToYesNo = (val: any) => (val ? "Y" : "N");
 
 const isUnItemized = (txn: ITransaction) =>
   txn.entityType === EntityType.Llc && txn.amount < 9901;
