@@ -14,7 +14,10 @@ import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { taskEither as te } from "fp-ts";
-import { getCommitteeById } from "../queries/get-committee-by-id.query";
+import {
+  getCommitteeById,
+  ICommittee,
+} from "../queries/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
@@ -22,11 +25,11 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { enumToValues } from "../utils/enums/poly.util";
 import { State } from "../utils/enums/state.enum";
+import { validateMA } from "../graphql/validators/ma.validators";
 
 const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
 const stringReq = (min = 1, max = 200) =>
   Joi.string().min(min).max(max).required();
-
 
 const ownerSchema = {
   firstName: Joi.string(),
@@ -36,10 +39,8 @@ const ownerSchema = {
   city: Joi.string(),
   state: Joi.string(),
   postalCode: Joi.string(),
-  percentOwnership: Joi.string()
-}
-
-
+  percentOwnership: Joi.string(),
+};
 
 const schema = Joi.object({
   committeeId: stringReq(2),
@@ -69,7 +70,7 @@ const schema = Joi.object({
   addressLine2: stringOpt(),
   phoneNumber: stringOpt(5, 15),
   attestsToBeingAnAdultCitizen: Joi.bool(),
-  owners: Joi.array().items(Joi.object(ownerSchema))
+  owners: Joi.array().items(Joi.object(ownerSchema)),
 });
 
 const validateNonInd = (
@@ -90,38 +91,6 @@ const validateNonInd = (
     );
   }
   return right(contrib);
-};
-
-const validateInd = (
-  c: CreateContributionInput
-): TaskEither<ApplicationError, CreateContributionInput> => {
-  if ([EntityType.Ind, EntityType.Fam, EntityType.Can].includes(c.entityType)) {
-    if (!c.employmentStatus) {
-      return left(
-        new ApplicationError(
-          "Employment status of donor must be provided.",
-          {},
-          StatusCodes.BAD_REQUEST
-        )
-      );
-    }
-    if (
-      [EmploymentStatus.Employed, EmploymentStatus.SelfEmployed].includes(
-        c.employmentStatus
-      ) &&
-      !c.employer &&
-      !c.occupation
-    ) {
-      return left(
-        new ApplicationError(
-          "Employer of donor must be provided.",
-          {},
-          StatusCodes.BAD_REQUEST
-        )
-      );
-    }
-  }
-  return right(c);
 };
 
 const eventToCreateContribInput = (
@@ -157,18 +126,20 @@ export const platformContribute =
       eventToObject(event),
       te.chain(eventToCreateContribInput),
       te.map((c) => ({ ...c, processPayment: true })),
-      te.chain(validateInd),
       te.chain(validateNonInd),
-      te.chain((contrib) =>
+      te.chain((contrib: CreateContributionInput) =>
         pipe(
           getCommitteeById(committeesTableName)(dynamoDB)(contrib.committeeId),
-          te.chain((committee) =>
+          te.chain((committee: ICommittee) =>
             pipe(
-              runRulesAndProcess(billableEventsTableName)(donorsTableName)(
-                txnsTableName
-              )(rulesTableName)(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(
-                committee
-              )(contrib)
+              validateMA(committee)(contrib),
+              te.chain(() =>
+                runRulesAndProcess(billableEventsTableName)(donorsTableName)(
+                  txnsTableName
+                )(rulesTableName)(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(
+                  committee
+                )(contrib)
+              )
             )
           )
         )
