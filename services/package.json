@@ -56,6 +56,7 @@
     "test-model-utils": "ts-mocha tests/integration/model-utils.test.ts --timeout 10000",
     "test-cors": "ts-mocha tests/integration/cors.test.ts --timeout 10000",
     "test-sync-payout": "ts-mocha tests/integration/sync-payout.test.ts --timeout 60000",
+    "test-report": "ts-mocha tests/integration/pull-rec-report.test.ts --timeout 60000",
     "test-in-kind": "ts-mocha tests/integration/in-kind.test.ts --timeout 60000",
     "test-aggs": "ts-mocha tests/integration/aggs.test.ts --timeout 60000",
     "test-strato-sqs": "ts-mocha tests/lambdas/strato-sqs.test.ts --timeout 60000",

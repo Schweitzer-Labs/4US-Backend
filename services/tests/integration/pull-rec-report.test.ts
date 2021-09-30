@@ -1,4 +1,5 @@
-import { task, taskEither } from "fp-ts";
+import { expect } from "chai";
+import { task } from "fp-ts";
 import { fold } from "fp-ts/TaskEither";
 import { successResponse } from "../../src/utils/success-response";
 import { runReportAndDecode } from "../../src/webhook/payout-paid/payout-paid.handler";
@@ -10,7 +11,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const runenv: any = process.env.RUNENV;
+const runenv: any = "qa";
 
 describe("Reconciliation Report", function () {
   it("Pulls a report", async () => {
@@ -22,11 +23,15 @@ describe("Reconciliation Report", function () {
     });
 
     const res = await pipe(
-      runReportAndDecode(stripe)(),
+      runReportAndDecode(stripe)("acct_1IjTcsRC8iiQex3V"),
       fold(
         (error) => task.of(error.toResponse()),
         () => task.of(successResponse)
       )
-    );
+    )();
+
+    console.log(res);
+
+    expect(res.statusCode).to.equal(200);
   });
 });
