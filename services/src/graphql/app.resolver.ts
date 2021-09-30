@@ -136,14 +136,12 @@ export class AppResolver {
       committeeId,
       // bankVerified: true,
       ruleVerified: true,
+      bankVerified: true,
     })();
     if (isLeft(res)) {
       throw res.left;
     } else {
-      const txns = res.right.filter(
-        (txn) => txn.bankVerified || txn.id === "1632624577928-mfK856"
-      );
-
+      const txns = res.right;
       const csvData = await generateDisclosure(committee)(txns)(includeHeaders);
       return {
         csvData,
