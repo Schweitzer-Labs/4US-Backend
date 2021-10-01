@@ -40,7 +40,7 @@ const shouldBeAttributed = (txn: ITransaction) =>
   txn.transactionType === TransactionType.Contribution &&
   txn.entityType === EntityType.Llc;
 
-const toAttributedContribs =
+export const toAttributedContribs =
   (committee: ICommittee) =>
   (txn: ITransaction): any[] => {
     if (!shouldBeAttributed(txn)) return [];
@@ -48,7 +48,14 @@ const toAttributedContribs =
     const { amount, owners } = txn;
 
     const ownerRows = owners.reduce((acc, owner) => {
-      const row = toAttributedRow(committee)(txn)(owner);
+      const percent = parseFloat(owner.percentOwnership);
+      // console.log("percent", percent);
+      if (isNaN(percent))
+        throw new ApplicationError("Percent ownership is not a number", txn);
+
+      const txnPortion = Math.round((percent * txn.amount) / 100);
+
+      const row = toAttributedRow(committee)(txn)(owner)(txnPortion);
 
       return [row, ...acc];
     }, []);
@@ -57,11 +64,10 @@ const toAttributedContribs =
   };
 
 const toAttributedRow =
-  (committee: ICommittee) => (txn: ITransaction) => (owner: IOwner) => {
-    const percent = parseInt(owner.percentOwnership) / 100;
-    if (isNaN(percent))
-      throw new ApplicationError("Percent ownership is not a number", txn);
-    const ownerAmount = percent * txn.amount;
+  (committee: ICommittee) =>
+  (txn: ITransaction) =>
+  (owner: IOwner) =>
+  (txnPortion: number) => {
     const {
       entityType: entityTypeStr,
       id: transactionId,
@@ -109,7 +115,7 @@ const toAttributedRow =
       ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
       ["PAY_NUMBER"]: "NULL",
       ["OWED_AMT"]: "NULL",
-      ["ORG_AMT"]: centsToDollars(ownerAmount),
+      ["ORG_AMT"]: centsToDollars(txnPortion),
       ["TRANS_EXPLNTN"]: txnToMemo(txn),
       ["LOAN_OTHER_ID"]: "NULL",
       ["R_ITEMIZED"]: "y",
@@ -460,7 +466,7 @@ const getFilingScheduleId = (txn: ITransaction): number => {
   }
 };
 
-const centsToDollars = (amount: number): string => {
+export const centsToDollars = (amount: number): string => {
   return (amount / 100).toFixed(2);
 };
 
