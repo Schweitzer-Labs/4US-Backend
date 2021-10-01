@@ -48,7 +48,7 @@ export const toAttributedContribs =
     const { amount, owners } = txn;
 
     const ownerRows = owners.reduce((acc, owner) => {
-      const percent = parseFloat(owner.percentOwnership);
+      const percent = parseInt(owner.percentOwnership);
       // console.log("percent", percent);
       if (isNaN(percent))
         throw new ApplicationError("Percent ownership is not a number", txn);
@@ -111,7 +111,7 @@ const toAttributedRow =
       ["FLNG_ENT_CITY"]: owner.city,
       ["FLNG_ENT_STATE"]: owner.state,
       ["FLNG_ENT_ZIP"]: owner.postalCode,
-      ["FLNG_ENT_COUNTRY"]: "US",
+      ["FLNG_ENT_COUNTRY"]: "United States",
       ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
       ["PAY_NUMBER"]: "NULL",
       ["OWED_AMT"]: "NULL",
@@ -418,14 +418,7 @@ export const NYSPaymentTypeId = new Map<PaymentMethod, number>([
 ]);
 
 const isPerson = (entityType: EntityType) =>
-  [
-    EntityType.Ind,
-    EntityType.Fam,
-    EntityType.Can,
-    EntityType.Llc,
-    EntityType.Plc,
-    EntityType.Part,
-  ].includes(entityType);
+  [EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType);
 
 const isNonEntityPerson = (entityType: EntityType) =>
   [EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType);
