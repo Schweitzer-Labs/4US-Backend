@@ -8,6 +8,8 @@ import { AggregateDuration } from "../queries/get-rule.decoder";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import { now } from "../utils/time.utils";
 import { ApplicationError } from "../utils/application-error";
+import { Owner } from "../graphql/input-types/owner.input-type";
+import { prepareOwners } from "../utils/owner-math.utils";
 
 // Timezone of offset for eastern time
 const offset = 60 * 60 * 4;
@@ -45,17 +47,12 @@ export const toAttributedContribs =
   (txn: ITransaction): any[] => {
     if (!shouldBeAttributed(txn)) return [];
 
-    const { amount, owners } = txn;
+    const { owners } = txn;
 
-    const ownerRows = owners.reduce((acc, owner) => {
-      const percent = parseInt(owner.percentOwnership);
-      // console.log("percent", percent);
-      if (isNaN(percent))
-        throw new ApplicationError("Percent ownership is not a number", txn);
+    const preparedOwners = prepareOwners(txn);
 
-      const txnPortion = Math.round((percent * txn.amount) / 100);
-
-      const row = toAttributedRow(committee)(txn)(owner)(txnPortion);
+    const ownerRows = preparedOwners.reduce((acc, owner) => {
+      const row = toAttributedRow(committee)(txn)(owner);
 
       return [row, ...acc];
     }, []);
@@ -64,10 +61,7 @@ export const toAttributedContribs =
   };
 
 const toAttributedRow =
-  (committee: ICommittee) =>
-  (txn: ITransaction) =>
-  (owner: IOwner) =>
-  (txnPortion: number) => {
+  (committee: ICommittee) => (txn: ITransaction) => (owner: IOwner) => {
     const {
       entityType: entityTypeStr,
       id: transactionId,
@@ -115,7 +109,7 @@ const toAttributedRow =
       ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
       ["PAY_NUMBER"]: "NULL",
       ["OWED_AMT"]: "NULL",
-      ["ORG_AMT"]: centsToDollars(txnPortion),
+      ["ORG_AMT"]: centsToDollars(owner.attributedAmount),
       ["TRANS_EXPLNTN"]: txnToMemo(txn),
       ["LOAN_OTHER_ID"]: "NULL",
       ["R_ITEMIZED"]: "y",

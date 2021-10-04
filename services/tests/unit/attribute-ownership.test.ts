@@ -79,10 +79,18 @@ const roundToCents = (num: number) => Math.round(num * 100) / 100;
 describe("Ownership attribution", function () {
   it("Properly attributes ownership", () => {
     for (let i = 0; i < 100; i++) {
+      console.log("\n", "------------------------------", "\n");
       const owners = genOwners();
       const txn = genTxnWithOwners(owners);
 
       const res = toAttributedContribs(committee)(txn);
+
+      console.log(
+        "owner percentages",
+        owners.map((val) => val.percentOwnership)
+      );
+
+      console.log("txn total", txn.amount);
 
       const totalAmount = res.reduce((acc, val) => {
         console.log("before parse", val["ORG_AMT"]);
@@ -92,12 +100,7 @@ describe("Ownership attribution", function () {
         return amount + acc;
       }, 0);
 
-      // console.log(txn.id);
-      //
-      // console.log("original amount", centsToDollars(txn.amount));
-      //
-      // console.log("total attributed", totalAmount);
-
+      console.log("number of owners tested", i);
       expect(totalAmount).to.equal(txn.amount);
     }
   });

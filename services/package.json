@@ -28,7 +28,7 @@
     "faker": "^5.5.3"
   },
   "scripts": {
-    "test": "ts-mocha tests/**/*.test.ts --timeout 90000",
+    "test": "ts-mocha tests/**/*.test.ts --timeout 100000",
     "test-gql": "ts-mocha tests/lambdas/gql-txns.test.ts --timeout 10000",
     "test-owners": "ts-mocha tests/lambdas/gql-owners.test.ts --timeout 60000",
     "integ-test": "mocha tests/integration",

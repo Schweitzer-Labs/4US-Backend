@@ -15,6 +15,7 @@ dotenv.config();
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
+
 const dynamoDB = new DynamoDB();
 
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;

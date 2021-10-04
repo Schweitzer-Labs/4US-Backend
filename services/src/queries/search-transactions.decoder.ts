@@ -20,6 +20,7 @@ export const OwnerRequired = t.type({
 
 export const OwnerPartial = t.partial({
   addressLine2: t.string,
+  attributedAmount: t.number,
 });
 
 export const Owner = t.intersection([OwnerRequired, OwnerPartial]);
