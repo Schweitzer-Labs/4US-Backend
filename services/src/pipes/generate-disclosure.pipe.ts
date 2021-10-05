@@ -80,12 +80,12 @@ const toAttributedRow =
       // @Todo implement
       ["FILER_ID"]: committee.efsFilerId,
       // @Todo implement
-      ["FILING_PERIOD_ID"]: filingDates[0].id,
+      ["FILING_PERIOD_ID"]: filingDates[1].id,
       ["FILING_CAT_ID"]: 1,
       ["ELECT_ID"]: committee.efsElectionId,
       ["RESIG_TERM_TYPE_ID"]: "NULL",
       // @Todo implement
-      ["R_FILING_DATE"]: millisToDateStr(filingDates[0].filingDate),
+      ["R_FILING_DATE"]: millisToDateStr(filingDates[1].filingDate),
       ["FILING_SCHED_ID"]: 15,
       ["LOAN_LIB_NUMBER"]: "NULL",
       ["TRANS_NUMBER"]: transactionId,
@@ -177,7 +177,7 @@ const toRow = (committee: ICommittee) => (txn: ITransaction) => {
     ["ELECT_ID"]: committee.efsElectionId,
     ["RESIG_TERM_TYPE_ID"]: "NULL",
     // @Todo implement
-    ["R_FILING_DATE"]: millisToDateStr(filingDates[0].filingDate),
+    ["R_FILING_DATE"]: millisToDateStr(filingDates[1].filingDate),
     ["FILING_SCHED_ID"]: getFilingScheduleId(txn),
     ["LOAN_LIB_NUMBER"]: "NULL",
     ["TRANS_NUMBER"]: transactionId,
