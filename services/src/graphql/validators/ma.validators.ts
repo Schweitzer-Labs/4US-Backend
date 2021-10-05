@@ -7,22 +7,21 @@ import { StatusCodes } from "http-status-codes";
 import { EmploymentStatus } from "../../utils/enums/employment-status";
 import { State } from "../../utils/enums/state.enum";
 import { taskEither } from "fp-ts";
+import { ContribInput } from "../input-types/contrib-input.input-type";
 
-export const validateMA =
+export const validateMAContrib =
   (committee: ICommittee) =>
-  (
-    c: CreateContributionInput
-  ): TaskEither<ApplicationError, CreateContributionInput> => {
+  (c: ContribInput): TaskEither<ApplicationError, boolean> => {
     if (committee.state === State.MA) {
       return validateInd(c);
     } else {
-      return taskEither.right(c);
+      return taskEither.right(true);
     }
   };
 
 const validateInd = (
-  c: CreateContributionInput
-): TaskEither<ApplicationError, CreateContributionInput> => {
+  c: ContribInput
+): TaskEither<ApplicationError, boolean> => {
   if ([EntityType.Ind, EntityType.Fam, EntityType.Can].includes(c.entityType)) {
     if (!c.employmentStatus) {
       return left(
@@ -49,5 +48,5 @@ const validateInd = (
       );
     }
   }
-  return right(c);
+  return right(true);
 };

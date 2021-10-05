@@ -32,7 +32,7 @@ registerEnumType(InKindType, {
 });
 
 @InputType()
-export class AmendContributionInput implements Partial<ITransaction> {
+export class AmendContributionInput {
   @Field()
   transactionId?: string;
 

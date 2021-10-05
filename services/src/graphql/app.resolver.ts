@@ -46,7 +46,7 @@ import { AmendDisbInput } from "./input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
 import { AmendContributionInput } from "./input-types/amend-contrib.input-type";
 import { amendContrib } from "../pipes/amend-contrib.pipe";
-import { validateContribOrThrow } from "./validators/contrib.validator";
+import { validateContribOrThrowGQLError } from "./validators/contrib.validator";
 import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
@@ -254,7 +254,7 @@ export class AppResolver {
       createContributionInput.committeeId
     )(currentUser);
 
-    await validateContribOrThrow(committee)(createContributionInput);
+    await validateContribOrThrowGQLError(committee)(createContributionInput);
 
     const {
       paymentMethod,
@@ -360,7 +360,7 @@ export class AppResolver {
       c.committeeId
     )(currentUser);
 
-    await validateContribOrThrow(committee)(c);
+    await validateContribOrThrowGQLError(committee)(c);
 
     const res = await amendContrib(txnsTableName)(dynamoDB)(currentUser)(
       c.committeeId

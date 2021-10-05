@@ -25,7 +25,8 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { enumToValues } from "../utils/enums/poly.util";
 import { State } from "../utils/enums/state.enum";
-import { validateMA } from "../graphql/validators/ma.validators";
+import { validateMAContrib } from "../graphql/validators/ma.validators";
+import { validateNYContrib } from "../graphql/validators/ny.validators";
 
 const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
 const stringReq = (min = 1, max = 200) =>
@@ -75,7 +76,7 @@ const schema = Joi.object({
 
 const validateNonInd = (
   contrib: CreateContributionInput
-): TaskEither<ApplicationError, CreateContributionInput> => {
+): TaskEither<ApplicationError, boolean> => {
   const { entityType, entityName } = contrib;
 
   if (
@@ -90,7 +91,7 @@ const validateNonInd = (
       )
     );
   }
-  return right(contrib);
+  return right(true);
 };
 
 const eventToCreateContribInput = (
@@ -126,13 +127,16 @@ export const platformContribute =
       eventToObject(event),
       te.chain(eventToCreateContribInput),
       te.map((c) => ({ ...c, processPayment: true })),
-      te.chain(validateNonInd),
-      te.chain((contrib: CreateContributionInput) =>
+      te.chain((contrib) =>
         pipe(
-          getCommitteeById(committeesTableName)(dynamoDB)(contrib.committeeId),
+          validateNonInd(contrib),
+          te.chain(() =>
+            getCommitteeById(committeesTableName)(dynamoDB)(contrib.committeeId)
+          ),
           te.chain((committee: ICommittee) =>
             pipe(
-              validateMA(committee)(contrib),
+              validateMAContrib(committee)(contrib),
+              te.chain(() => validateNYContrib(contrib)),
               te.chain(() =>
                 runRulesAndProcess(billableEventsTableName)(donorsTableName)(
                   txnsTableName

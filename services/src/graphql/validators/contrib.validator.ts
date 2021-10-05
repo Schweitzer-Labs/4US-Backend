@@ -1,27 +1,32 @@
 import { ICommittee } from "../../queries/get-committee-by-id.query";
-import { CreateContributionInput } from "../input-types/create-contribution.input-type";
-import { AmendContributionInput } from "../input-types/amend-contrib.input-type";
 import { EntityType } from "../../utils/enums/entity-type.enum";
-import { ValidationError } from "apollo-server-lambda";
 import { PaymentMethod } from "../../utils/enums/payment-method.enum";
 import { validateNYContrib } from "./ny.validators";
 import { TaskEither } from "fp-ts/TaskEither";
 import { taskEither as te } from "fp-ts";
 import { teToRightOrThrow } from "../../utils/te-to-right-or-throw.util";
+import { ApplicationError } from "../../utils/application-error";
+import { ValidationError } from "apollo-server-lambda";
+import { ContribInput } from "../input-types/contrib-input.input-type";
+import { pipe } from "fp-ts/function";
 
-export const validateContribOrThrow =
+export const validateContribOrThrowGQLError =
   (com: ICommittee) =>
-  (
-    input: CreateContributionInput | AmendContributionInput
-  ): Promise<boolean> => {
-    return teToRightOrThrow(validateContrib(com)(input));
+  (input: ContribInput): Promise<boolean> => {
+    return teToRightOrThrow(validateContribOrGQLError(com)(input));
   };
+
+const validateContribOrGQLError =
+  (com: ICommittee) =>
+  (input: ContribInput): TaskEither<ValidationError, boolean> =>
+    pipe(
+      validateContrib(com)(input),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
 
 const validateContrib =
   (com: ICommittee) =>
-  (
-    input: CreateContributionInput | AmendContributionInput
-  ): TaskEither<ValidationError, boolean> => {
+  (input: ContribInput): TaskEither<ApplicationError, boolean> => {
     const { paymentMethod, entityType, entityName, paymentDate, checkNumber } =
       input;
 
@@ -31,8 +36,9 @@ const validateContrib =
       !entityName
     ) {
       te.left(
-        new ValidationError(
-          "Entity name must be provided for non-individual and non-family contributions"
+        new ApplicationError(
+          "Entity name must be provided for non-individual and non-family contributions",
+          input
         )
       );
     }
@@ -40,8 +46,9 @@ const validateContrib =
     if (paymentMethod === PaymentMethod.Check) {
       if (!checkNumber)
         te.left(
-          new ValidationError(
-            "Check number must be provided for contributions by check"
+          new ApplicationError(
+            "Check number must be provided for contributions by check",
+            input
           )
         );
     }
@@ -49,8 +56,9 @@ const validateContrib =
     if ([PaymentMethod.Check, PaymentMethod.Ach].includes(paymentMethod)) {
       if (!paymentDate)
         te.left(
-          new ValidationError(
-            "Payment date must be provided for contributions by check or ACH"
+          new ApplicationError(
+            "Payment date must be provided for contributions by check or ACH",
+            input
           )
         );
     }
@@ -61,6 +69,6 @@ const validateContrib =
       case "ny":
         return validateNYContrib(input);
       default:
-        return te.of(true);
+        return te.right(true);
     }
   };

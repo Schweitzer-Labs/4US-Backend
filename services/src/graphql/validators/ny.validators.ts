@@ -1,21 +1,21 @@
-import { CreateContributionInput } from "../input-types/create-contribution.input-type";
 import { EntityType } from "../../utils/enums/entity-type.enum";
-import { ValidationError } from "apollo-server-lambda";
-import { AmendContributionInput } from "../input-types/amend-contrib.input-type";
 import { TaskEither } from "fp-ts/TaskEither";
 import { taskEither as te } from "fp-ts";
 import { Owner } from "../input-types/owner.input-type";
+import { ApplicationError } from "../../utils/application-error";
+import { ContribInput } from "../input-types/contrib-input.input-type";
 
 export const validateNYContrib = (
-  cInput: CreateContributionInput | AmendContributionInput
-): TaskEither<ValidationError, boolean> => {
+  cInput: ContribInput
+): TaskEither<ApplicationError, boolean> => {
   switch (cInput.entityType) {
     case EntityType.Llc:
       return validateOwners(cInput.owners)
         ? te.right(true)
         : te.left(
-            new ValidationError(
-              "NY LLC validation failed: A list of owners with ownership percentages adding up to 100 is required."
+            new ApplicationError(
+              "NY LLC validation failed: A list of owners with ownership percentages adding up to 100 is required.",
+              cInput
             )
           );
 
