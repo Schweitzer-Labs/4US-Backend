@@ -19,6 +19,7 @@ import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
 import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "./input-types/create-contribution.input-type";
+import { taskEither as te } from "fp-ts";
 import {
   getFinicityAppKey,
   getFinicityPartnerId,
@@ -50,7 +51,10 @@ import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
 import { Report } from "./types/report.type";
-import { generateDisclosure } from "../pipes/generate-disclosure.pipe";
+import {
+  generateDisclosure,
+  generateDisclosureOrError,
+} from "../pipes/generate-disclosure.pipe";
 import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
 import { refreshAggs } from "../pipes/refresh-aggs.pipe";
 import { GenCommitteeInput } from "./input-types/gen-committee.input-type";
@@ -62,6 +66,7 @@ import { ManageDemoCommitteeInput } from "./input-types/manage-demo-committee.in
 import { reconcileOneDemoContrib } from "../demo/utils/reconcile-one-demo-contrib.util";
 import { SeedDemoBankRecordsInput } from "./input-types/seed-demo-bank-records.input-type";
 import { seedTxn } from "../demo/utils/seed-bank-records.util";
+import { pipe } from "fp-ts/function";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();
@@ -128,21 +133,22 @@ export class AppResolver {
     )(currentUser);
 
     // @ToDo Workaround, remove immediately
-    const res = await searchTransactions(txnsTableName)(dynamoDB)({
-      committeeId,
-      // bankVerified: true,
-      ruleVerified: true,
-      bankVerified: true,
-    })();
+    const res = await pipe(
+      searchTransactions(txnsTableName)(dynamoDB)({
+        committeeId,
+        // bankVerified: true,
+        ruleVerified: true,
+        bankVerified: true,
+      }),
+      te.chain(generateDisclosureOrError(committee)(includeHeaders))
+    )();
     if (isLeft(res)) {
+      console.log(res.left);
       throw res.left;
-    } else {
-      const txns = res.right;
-      const csvData = await generateDisclosure(committee)(txns)(includeHeaders);
-      return {
-        csvData,
-      };
     }
+    return {
+      csvData: res.right,
+    };
   }
 
   @Query((returns) => [Transaction])

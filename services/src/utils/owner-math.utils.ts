@@ -18,6 +18,9 @@ const calcAmount = (origAmount: number) =>
   );
 
 export const prepareOwners = (txn: ITransaction): IOwner[] => {
+  // @ToDo this is for legacy data that does not have attributed records
+  if (!txn.owners || txn.owners?.length < 1) return [];
+
   const stagedOwners = txn.owners.map((owner) => ({
     ...owner,
     attributedAmount: calcAmount(txn.amount)(owner),

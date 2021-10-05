@@ -8,8 +8,18 @@ import { AggregateDuration } from "../queries/get-rule.decoder";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import { now } from "../utils/time.utils";
 import { ApplicationError } from "../utils/application-error";
-import { Owner } from "../graphql/input-types/owner.input-type";
 import { prepareOwners } from "../utils/owner-math.utils";
+import { TaskEither } from "fp-ts/TaskEither";
+import { taskEither } from "fp-ts";
+
+export const generateDisclosureOrError =
+  (committee: ICommittee) =>
+  (includeHeaders: boolean) =>
+  (transactions: ITransaction[]): TaskEither<ApplicationError, string> =>
+    taskEither.tryCatch(
+      () => generateDisclosure(committee)(transactions)(includeHeaders),
+      (err) => new ApplicationError("Disclosure report generation failed", err)
+    );
 
 // Timezone of offset for eastern time
 const offset = 60 * 60 * 4;
