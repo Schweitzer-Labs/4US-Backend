@@ -20,7 +20,7 @@ registerEnumType(State, {
 });
 
 @InputType()
-export class AmendDisbInput implements Partial<ITransaction> {
+export class AmendDisbInput {
   @Field()
   transactionId?: string;
 

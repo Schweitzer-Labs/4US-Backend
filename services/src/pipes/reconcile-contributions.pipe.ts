@@ -10,7 +10,10 @@ import { ApplicationError } from "../utils/application-error";
 import { putTransaction } from "../utils/model/put-transaction.utils";
 import { deleteTxn } from "../utils/model/delete-txn.utils";
 import { Direction } from "../utils/enums/direction.enum";
-import { payoutDescriptions } from "../clients/finicity/finicity.decoders";
+import {
+  payoutDescriptions,
+  payoutPayeeName,
+} from "../clients/finicity/finicity.decoders";
 import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import * as FPArray from "fp-ts/Array";
 
@@ -81,8 +84,13 @@ const isUnverifiedContribution = (txn: ITransaction): boolean =>
   txn.transactionType === TransactionType.Contribution && !txn.bankVerified;
 
 export const isPayout = (txn: ITransaction): boolean =>
-  txn.direction === Direction.In &&
-  payoutDescriptions.includes(txn?.finicityTransactionData?.description);
+  txn.direction === Direction.In && txnMetadataMatchesPayout(txn);
+
+const txnMetadataMatchesPayout = (txn: ITransaction): boolean =>
+  payoutDescriptions.includes(txn?.finicityTransactionData?.description) ||
+  payoutPayeeName.includes(
+    txn?.finicityTransactionData?.categorization?.normalizedPayeeName
+  );
 
 const sumTxns = (txns: ITransaction[]): number =>
   txns.reduce((acc, { amount }) => acc + amount, 0);

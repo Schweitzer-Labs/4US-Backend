@@ -21,7 +21,7 @@ registerEnumType(State, {
 });
 
 @InputType()
-export class CreateDisbursementInput implements Partial<ITransaction> {
+export class CreateDisbursementInput {
   @Field()
   @MinLength(3)
   committeeId: string;

@@ -28,9 +28,9 @@
     "faker": "^5.5.3"
   },
   "scripts": {
-    "test": "ts-mocha tests/**/*.test.ts --timeout 60000",
+    "test": "ts-mocha tests/**/*.test.ts --timeout 100000",
     "test-gql": "ts-mocha tests/lambdas/gql-txns.test.ts --timeout 10000",
-    "test-owners": "ts-mocha tests/lambdas/gql-owners.test.ts --timeout 10000",
+    "test-owners": "ts-mocha tests/lambdas/gql-owners.test.ts --timeout 60000",
     "integ-test": "mocha tests/integration",
     "seed-contrib": "ts-node tests/seed/seed-contributions.job.ts",
     "test-contrib": "ts-mocha tests/lambdas/policapital-contribute.test.ts --timeout 10000",
@@ -56,11 +56,13 @@
     "test-model-utils": "ts-mocha tests/integration/model-utils.test.ts --timeout 10000",
     "test-cors": "ts-mocha tests/integration/cors.test.ts --timeout 10000",
     "test-sync-payout": "ts-mocha tests/integration/sync-payout.test.ts --timeout 60000",
+    "test-report": "ts-mocha tests/integration/pull-rec-report.test.ts --timeout 60000",
     "test-in-kind": "ts-mocha tests/integration/in-kind.test.ts --timeout 60000",
     "test-aggs": "ts-mocha tests/integration/aggs.test.ts --timeout 60000",
     "test-strato-sqs": "ts-mocha tests/lambdas/strato-sqs.test.ts --timeout 60000",
     "test-bank-sqs": "ts-mocha tests/lambdas/bank-sqs.test.ts --timeout 90000",
     "deploy-qa-committees": "ts-node tests/seed/seed-qa-committees.job.ts",
+    "test-owner-math": "ts-mocha tests/unit/attribute-ownership.test.ts --timeout 10000",
     "compile": "npm install && tsc",
     "test-server": "ts-node-dev tests/server --watch"
   },

@@ -62,3 +62,5 @@ export const payoutDescriptions = [
   "ORIG CO NAME:Policapital",
   "ORIG CO NAME:4US",
 ];
+
+export const payoutPayeeName = ["4us Friends"];

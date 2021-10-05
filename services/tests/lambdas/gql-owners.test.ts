@@ -3,7 +3,6 @@ import graphql from "../../src/committee-graphql.lambda";
 import { genGraphQLProxy } from "../utils/gen-allowed-proxy.util";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
-import { sleep } from "../../src/utils/sleep.utils";
 import { genCommittee } from "../utils/gen-committee.util";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
@@ -13,6 +12,7 @@ import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
 import { lambdaPromise } from "../../src/utils/lambda-promise.util";
 import { CreateContributionInput } from "../../src/graphql/input-types/create-contribution.input-type";
 import { State } from "../../src/utils/enums/state.enum";
+import { EntityType } from "../../src/utils/enums/entity-type.enum";
 
 dotenv.config();
 
@@ -62,6 +62,7 @@ mutation(
       $middleName: String
       $refCode: String
       $processPayment: Boolean!
+      $owners: [Owner!]
     ) {
       createContribution(createContributionData: {
         committeeId: $committeeId
@@ -87,6 +88,7 @@ mutation(
         middleName: $middleName
         refCode: $refCode
         processPayment: $processPayment
+        owners: $owners
       }) {
         id
         amount
@@ -97,12 +99,13 @@ mutation(
 describe("GraphQL Lambda with Owners", function () {
   before(async () => {
     await putCommittee(committeesTableName)(dynamoDB)(committee);
-    await sleep(1000);
   });
   describe("Create Contributions", function () {
     it("Supports the creation of a contribution with owners", async () => {
       const vars: CreateContributionInput = {
         ...genCreateContribInput({ committeeId }),
+        entityType: EntityType.Llc,
+        amount: 500000,
         owners: [
           {
             firstName: "rick",
@@ -112,7 +115,7 @@ describe("GraphQL Lambda with Owners", function () {
             city: "philadelphia",
             state: State.PA,
             postalCode: "11324",
-            percentOwnership: "25",
+            percentOwnership: "100",
           },
         ],
       };
@@ -124,18 +127,35 @@ describe("GraphQL Lambda with Owners", function () {
       );
 
       const body = JSON.parse(res.body);
+
       expect(body.data.createContribution.amount).to.equal(vars.amount);
     });
     it("Rejects a contribution with bad owner breakdown", async () => {
-      const inputVar = { ...genCreateContribInput({ committeeId }), state: "" };
+      const vars: CreateContributionInput = {
+        ...genCreateContribInput({ committeeId }),
+        entityType: EntityType.Llc,
+        amount: 500000,
+        owners: [
+          {
+            firstName: "rick",
+            lastName: "smith",
+            addressLine1: "123 place",
+            addressLine2: "2r",
+            city: "philadelphia",
+            state: State.PA,
+            postalCode: "11324",
+            percentOwnership: "90",
+          },
+        ],
+      };
 
-      const createRes: any = await lambdaPromise(
+      const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(createContribMut, validUsername, inputVar),
+        genGraphQLProxy(createContribMut, validUsername, vars),
         {}
       );
 
-      const body = JSON.parse(createRes.body);
+      const body = JSON.parse(res.body);
 
       expect(body.errors.length > 0).to.equal(true);
     });

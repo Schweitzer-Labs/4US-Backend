@@ -9,6 +9,7 @@ import {
   PaymentMethod,
 } from "../../utils/enums/payment-method.enum";
 import { ITransaction } from "../../queries/search-transactions.decoder";
+import { Owner } from "./owner.input-type";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -31,7 +32,7 @@ registerEnumType(InKindType, {
 });
 
 @InputType()
-export class AmendContributionInput implements Partial<ITransaction> {
+export class AmendContributionInput {
   @Field()
   transactionId?: string;
 
@@ -117,6 +118,9 @@ export class AmendContributionInput implements Partial<ITransaction> {
   @Field({ nullable: true })
   @MinLength(4)
   phoneNumber?: string;
+
+  @Field((type) => [Owner], { nullable: true })
+  owners?: Owner[];
 
   @Field({ nullable: true })
   attestsToBeingAnAdultCitizen?: boolean;

@@ -14,7 +14,10 @@ import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { taskEither as te } from "fp-ts";
-import { getCommitteeById } from "../queries/get-committee-by-id.query";
+import {
+  getCommitteeById,
+  ICommittee,
+} from "../queries/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
@@ -22,10 +25,23 @@ import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { enumToValues } from "../utils/enums/poly.util";
 import { State } from "../utils/enums/state.enum";
+import { validateMAContrib } from "../graphql/validators/ma.validators";
+import { validateNYContrib } from "../graphql/validators/ny.validators";
 
 const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
 const stringReq = (min = 1, max = 200) =>
   Joi.string().min(min).max(max).required();
+
+const ownerSchema = {
+  firstName: Joi.string(),
+  lastName: Joi.string(),
+  addressLine1: Joi.string(),
+  addressLine2: Joi.any().optional(),
+  city: Joi.string(),
+  state: Joi.string(),
+  postalCode: Joi.string(),
+  percentOwnership: Joi.string(),
+};
 
 const schema = Joi.object({
   committeeId: stringReq(2),
@@ -55,11 +71,12 @@ const schema = Joi.object({
   addressLine2: stringOpt(),
   phoneNumber: stringOpt(5, 15),
   attestsToBeingAnAdultCitizen: Joi.bool(),
+  owners: Joi.array().items(Joi.object(ownerSchema)),
 });
 
 const validateNonInd = (
   contrib: CreateContributionInput
-): TaskEither<ApplicationError, CreateContributionInput> => {
+): TaskEither<ApplicationError, boolean> => {
   const { entityType, entityName } = contrib;
 
   if (
@@ -74,39 +91,7 @@ const validateNonInd = (
       )
     );
   }
-  return right(contrib);
-};
-
-const validateInd = (
-  c: CreateContributionInput
-): TaskEither<ApplicationError, CreateContributionInput> => {
-  if ([EntityType.Ind, EntityType.Fam, EntityType.Can].includes(c.entityType)) {
-    if (!c.employmentStatus) {
-      return left(
-        new ApplicationError(
-          "Employment status of donor must be provided.",
-          {},
-          StatusCodes.BAD_REQUEST
-        )
-      );
-    }
-    if (
-      [EmploymentStatus.Employed, EmploymentStatus.SelfEmployed].includes(
-        c.employmentStatus
-      ) &&
-      !c.employer &&
-      !c.occupation
-    ) {
-      return left(
-        new ApplicationError(
-          "Employer of donor must be provided.",
-          {},
-          StatusCodes.BAD_REQUEST
-        )
-      );
-    }
-  }
-  return right(c);
+  return right(true);
 };
 
 const eventToCreateContribInput = (
@@ -142,18 +127,23 @@ export const platformContribute =
       eventToObject(event),
       te.chain(eventToCreateContribInput),
       te.map((c) => ({ ...c, processPayment: true })),
-      te.chain(validateInd),
-      te.chain(validateNonInd),
       te.chain((contrib) =>
         pipe(
-          getCommitteeById(committeesTableName)(dynamoDB)(contrib.committeeId),
-          te.chain((committee) =>
+          validateNonInd(contrib),
+          te.chain(() =>
+            getCommitteeById(committeesTableName)(dynamoDB)(contrib.committeeId)
+          ),
+          te.chain((committee: ICommittee) =>
             pipe(
-              runRulesAndProcess(billableEventsTableName)(donorsTableName)(
-                txnsTableName
-              )(rulesTableName)(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(
-                committee
-              )(contrib)
+              validateMAContrib(committee)(contrib),
+              te.chain(() => validateNYContrib(contrib)),
+              te.chain(() =>
+                runRulesAndProcess(billableEventsTableName)(donorsTableName)(
+                  txnsTableName
+                )(rulesTableName)(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(
+                  committee
+                )(contrib)
+              )
             )
           )
         )

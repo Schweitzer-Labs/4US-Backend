@@ -9,6 +9,9 @@ import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { EntityType } from "../../src/utils/enums/entity-type.enum";
+import { IOwner } from "../../src/queries/search-transactions.decoder";
+import { genOwners } from "../utils/gen-owners.util";
 
 dotenv.config();
 
@@ -40,6 +43,7 @@ interface GenPlatformContribConfig {
   phoneNumber?: string;
   attestsToBeingAnAdultCitizen?: boolean;
   cardNumber?: string;
+  owners?: IOwner[];
 }
 
 const committee = genCommittee({
@@ -144,7 +148,21 @@ describe("Platform Contribute", function () {
 
     const res = await platformContribute(event);
 
-    const body = JSON.stringify(res.body);
+    expect(res.statusCode).to.equal(200);
+  });
+
+  it("Accepts an LLC contribution", async () => {
+    const req = genPlatformContribution({
+      committeeId: "will-schweitzer",
+      amount: 51,
+      entityType: EntityType.Llc,
+      entityName: faker.company.companyName(),
+      owners: genOwners(),
+    });
+
+    const event = genEvent(req);
+
+    const res = await platformContribute(event);
 
     expect(res.statusCode).to.equal(200);
   });

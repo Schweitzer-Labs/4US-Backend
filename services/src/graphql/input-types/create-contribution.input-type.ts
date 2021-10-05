@@ -43,7 +43,7 @@ registerEnumType(InKindType, {
 });
 
 @InputType()
-export class CreateContributionInput implements Partial<ITransaction> {
+export class CreateContributionInput {
   @Field()
   @MinLength(3)
   committeeId: string;

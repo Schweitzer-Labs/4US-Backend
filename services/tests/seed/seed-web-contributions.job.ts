@@ -1,6 +1,5 @@
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
 import { Direction } from "../../src/utils/enums/direction.enum";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { now } from "../../src/utils/time.utils";

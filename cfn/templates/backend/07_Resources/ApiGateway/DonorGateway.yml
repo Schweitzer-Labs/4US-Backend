@@ -19,14 +19,13 @@ DonorGateway:
         ResponseParameters:
           Headers:
             Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
-#        ResponseTemplates:
-#          "application/json": "{ \"message\": 4xx error }"
       DEFAULT_5XX:
         ResponseParameters:
           Headers:
             Access-Control-Allow-Origin: "'https://donate.{{ DOMAIN }}.{{ TLD }}'"
-#        ResponseTemplates:
-#          "application/json": "{ \"message\": 5xx error }"
+    Auth:
+      ResourcePolicy:
+        IpRangeWhitelist: !Ref CloudFlareIPs
     MethodSettings:
       - LoggingLevel: INFO
         ResourcePath: '/*'

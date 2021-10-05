@@ -1,5 +1,5 @@
 import * as jsonexport from "jsonexport";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { IOwner, ITransaction } from "../queries/search-transactions.decoder";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
@@ -8,140 +8,258 @@ import { AggregateDuration } from "../queries/get-rule.decoder";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import { now } from "../utils/time.utils";
 import { ApplicationError } from "../utils/application-error";
+import { prepareOwners } from "../utils/owner-math.utils";
+import { TaskEither } from "fp-ts/TaskEither";
+import { taskEither } from "fp-ts";
+
+export const generateDisclosureOrError =
+  (committee: ICommittee) =>
+  (includeHeaders: boolean) =>
+  (transactions: ITransaction[]): TaskEither<ApplicationError, string> =>
+    taskEither.tryCatch(
+      () => generateDisclosure(committee)(transactions)(includeHeaders),
+      (err) => new ApplicationError("Disclosure report generation failed", err)
+    );
 
 // Timezone of offset for eastern time
 const offset = 60 * 60 * 4;
 
 export const generateDisclosure =
   (committee: ICommittee) =>
-  async (transactions: ITransaction[]): Promise<string> => {
+  (transactions: ITransaction[]) =>
+  async (includeHeaders: boolean): Promise<string> => {
     const disclosures: DisclosureRecord[] = transactions
       .filter((txn) => {
         // @ToDo convert hardcode into data
         return (
           txn.paymentDate - offset >=
-          new Date("July 11, 2021").getTime() - offset
+            new Date("October 01, 2021").getTime() - offset &&
+          txn.paymentDate - offset <=
+            new Date("October 18, 2021").getTime() - offset
         );
       })
-      .map((txn) => {
-        const {
-          entityType: entityTypeStr,
-          id: transactionId,
-          firstName,
-          lastName,
-          addressLine1,
-          city,
-          state,
-          postalCode,
-          paymentMethod: paymentMethodStr,
-          amount,
-          entityName,
-          transactionType,
-          purposeCode: purposeCodeString,
-          isSubcontracted,
-          isPartialPayment,
-          isExistingLiability,
-        } = txn;
-        const entityType: any = entityTypeStr;
-        const paymentMethod: any = paymentMethodStr;
-        const purposeCode: any = purposeCodeString;
-        const filingPeriod = getFilingPeriod(committee);
-        const inKindType: any = txn.inKindType;
-        return {
-          // @Todo implement
-          ["FILER_ID"]: committee.efsFilerId,
-          // @Todo implement
-          ["FILING_PERIOD_ID"]: filingPeriod.id,
-          ["FILING_CAT_ID"]: 1,
-          ["ELECT_ID"]: committee.efsElectionId,
-          ["RESIG_TERM_TYPE_ID"]: "NULL",
-          // @Todo implement
-          ["R_FILING_DATE"]: millisToDateStr(filingPeriod.filingDate),
-          ["FILING_SCHED_ID"]: getFilingScheduleId(txn),
-          ["LOAN_LIB_NUMBER"]: "NULL",
-          ["TRANS_NUMBER"]: transactionId,
-          ["TRANS_MAPPING"]: "NULL",
-          // @Todo implement
-          ["SCHED_DATE"]: millisToDateStr(txn.paymentDate),
-          ["ORG_DATE"]: "NULL",
-          ["CNTRBR_TYPE_ID"]:
-            txn.transactionType === TransactionType.Contribution
-              ? NYSEntityTypeId.get(entityType)
-              : "NULL",
-          // @ToDo add in-kind field
-          ["CNTRBN_TYPE_ID"]:
-            txn.paymentMethod === PaymentMethod.InKind
-              ? NYSInKindTypeId.get(inKindType)
-              : "NULL",
-          ["TRANSFER_TYPE_ID"]: "NULL",
-          ["RECEIPT_TYPE_ID"]: "NULL",
-          ["RECEIPT_CODE_ID"]: "NULL",
-          ["PURPOSE_CODE_ID"]:
-            transactionType === TransactionType.Disbursement
-              ? NYSPurposeCodeId.get(purposeCode)
-              : "NULL",
-          ["Is Expenditure Subcontracted?"]:
-            transactionType == TransactionType.Disbursement
-              ? boolToYesNo(isSubcontracted)
-              : "NULL",
-          ["Is Expenditure a Partial Payment?"]:
-            transactionType == TransactionType.Disbursement
-              ? boolToYesNo(isPartialPayment)
-              : "NULL",
-          ["Is this existing Liability?"]:
-            transactionType == TransactionType.Disbursement
-              ? boolToYesNo(isExistingLiability)
-              : "NULL",
-          ["Is Liability a Partial Forgiven?"]: "NULL",
-          ["FLNG_ENT_NAME"]: getEntityName(
-            entityType,
-            firstName,
-            lastName,
-            entityName
-          ),
-          ["FLNG_ENT_FIRST_NAME"]: isPerson(entityType) ? firstName : "NULL",
-          ["FLNG_ENT_MIDDLE_NAME"]: "NULL",
-          ["FLNG_ENT_LAST_NAME"]: isPerson(entityType) ? lastName : "NULL",
-          ["FLNG_ENT_ADD1"]: addressLine1,
-          ["FLNG_ENT_CITY"]: city,
-          ["FLNG_ENT_STATE"]: state,
-          ["FLNG_ENT_ZIP"]: postalCode,
-          ["FLNG_ENT_COUNTRY"]: "US",
-          ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
-          ["PAY_NUMBER"]: txnToPayNumber(txn),
-          ["OWED_AMT"]: "NULL",
-          ["ORG_AMT"]: centsToDollars(amount),
-          ["TRANS_EXPLNTN"]: txnToMemo(txn),
-          ["LOAN_OTHER_ID"]: "NULL",
-          ["R_ITEMIZED"]: "y",
-          ["R_LIABILITY"]: "NULL",
-          ["ELECTION_DATE"]: "NULL",
-          ["ELECTION_TYPE"]: "NULL",
-          ["ELECTION_YEAR"]: "NULL",
-          ["TREAS_ID"]: "NULL",
-          ["TREAS_OCCUPATION"]: "NULL",
-          ["TREAS_EMPLOYER"]: "NULL",
-          ["TREAS_ADD1"]: "NULL",
-          ["TREAS_CITY"]: "NULL",
-          ["TREAS_STATE"]: "NULL",
-          ["TREAS_ZIP"]: "NULL",
-          ["PART_FLNG_ENT_ID"]: "NULL",
-          ["OFFICE_ID"]: "NULL",
-          ["DISTRICT"]: "NULL",
-          ["DIST_OFF_CAND_BAL_PROP"]: "NULL",
-          ["IE_CNTRBR_OCC"]: "NULL",
-          ["IE_CNTRBR_EMP"]: "NULL",
-          ["IE_DESC"]: "NULL",
-          ["R_IE_SUPPORTED"]: "NULL",
-          ["R_IE_INCLUDED"]: "NULL",
-          ["R_PARENT"]: "NULL",
-        };
-      });
+      .reduce((acc, txn) => {
+        const entry = toRow(committee)(txn);
+        const attributedContribs = toAttributedContribs(committee)(txn);
+        return [entry, ...attributedContribs, ...acc];
+      }, []);
 
-    return await jsonexport.default(disclosures);
+    return await jsonexport.default(disclosures, { includeHeaders });
   };
 
-const boolToYesNo = (val: any) => (val ? "y" : "n");
+const boolToYesNo = (val: any) => (val ? "Y" : "N");
+const shouldBeAttributed = (txn: ITransaction) =>
+  txn.transactionType === TransactionType.Contribution &&
+  txn.entityType === EntityType.Llc;
+
+export const toAttributedContribs =
+  (committee: ICommittee) =>
+  (txn: ITransaction): any[] => {
+    if (!shouldBeAttributed(txn)) return [];
+    const preparedOwners = prepareOwners(txn);
+
+    const ownerRows = preparedOwners.reduce((acc, owner) => {
+      const row = toAttributedRow(committee)(txn)(owner);
+
+      return [row, ...acc];
+    }, []);
+
+    return ownerRows;
+  };
+
+const toAttributedRow =
+  (committee: ICommittee) => (txn: ITransaction) => (owner: IOwner) => {
+    const {
+      entityType: entityTypeStr,
+      id: transactionId,
+      paymentMethod: paymentMethodStr,
+    } = txn;
+    const paymentMethod: any = paymentMethodStr;
+    const filingPeriod = getFilingPeriod(committee);
+    return {
+      // @Todo implement
+      ["FILER_ID"]: committee.efsFilerId,
+      // @Todo implement
+      ["FILING_PERIOD_ID"]: filingDates[1].id,
+      ["FILING_CAT_ID"]: 1,
+      ["ELECT_ID"]: committee.efsElectionId,
+      ["RESIG_TERM_TYPE_ID"]: "NULL",
+      // @Todo implement
+      ["R_FILING_DATE"]: millisToDateStr(filingDates[1].filingDate),
+      ["FILING_SCHED_ID"]: 15,
+      ["LOAN_LIB_NUMBER"]: "NULL",
+      ["TRANS_NUMBER"]: transactionId,
+      ["TRANS_MAPPING"]: "NULL",
+      // @Todo implement
+      ["SCHED_DATE"]: millisToDateStr(txn.paymentDate),
+      ["ORG_DATE"]: "NULL",
+      ["CNTRBR_TYPE_ID"]: "11",
+      // @ToDo add in-kind field
+      ["CNTRBN_TYPE_ID"]: "NULL",
+      ["TRANSFER_TYPE_ID"]: "NULL",
+      ["RECEIPT_TYPE_ID"]: "NULL",
+      ["RECEIPT_CODE_ID"]: "NULL",
+      ["PURPOSE_CODE_ID"]: "NULL",
+      ["Is Expenditure Subcontracted?"]: "NULL",
+      ["Is Expenditure a Partial Payment?"]: "NULL",
+      ["Is this existing Liability?"]: "NULL",
+      ["Is Liability a Partial Forgiven?"]: "NULL",
+      ["FLNG_ENT_NAME"]: `${owner.firstName} ${owner.lastName}`,
+      ["FLNG_ENT_FIRST_NAME"]: owner.firstName,
+      ["FLNG_ENT_MIDDLE_NAME"]: "NULL",
+      ["FLNG_ENT_LAST_NAME"]: owner.lastName,
+      ["FLNG_ENT_ADD1"]: owner.addressLine1,
+      ["FLNG_ENT_CITY"]: owner.city,
+      ["FLNG_ENT_STATE"]: owner.state,
+      ["FLNG_ENT_ZIP"]: owner.postalCode,
+      ["FLNG_ENT_COUNTRY"]: "United States",
+      ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
+      ["PAY_NUMBER"]: "NULL",
+      ["OWED_AMT"]: "NULL",
+      ["ORG_AMT"]: centsToDollars(owner.attributedAmount),
+      ["TRANS_EXPLNTN"]: txnToMemo(txn),
+      ["LOAN_OTHER_ID"]: "NULL",
+      ["R_ITEMIZED"]: "Y",
+      ["R_LIABILITY"]: "NULL",
+      ["ELECTION_DATE"]: "NULL",
+      ["ELECTION_TYPE"]: "NULL",
+      ["ELECTION_YEAR"]: "NULL",
+      ["TREAS_ID"]: "NULL",
+      ["TREAS_OCCUPATION"]: "NULL",
+      ["TREAS_EMPLOYER"]: "NULL",
+      ["TREAS_ADD1"]: "NULL",
+      ["TREAS_CITY"]: "NULL",
+      ["TREAS_STATE"]: "NULL",
+      ["TREAS_ZIP"]: "NULL",
+      ["PART_FLNG_ENT_ID"]: "NULL",
+      ["OFFICE_ID"]: "NULL",
+      ["DISTRICT"]: "NULL",
+      ["DIST_OFF_CAND_BAL_PROP"]: "NULL",
+      ["IE_CNTRBR_OCC"]: "NULL",
+      ["IE_CNTRBR_EMP"]: "NULL",
+      ["IE_DESC"]: "NULL",
+      ["R_IE_SUPPORTED"]: "NULL",
+      ["R_IE_INCLUDED"]: "NULL",
+      ["R_PARENT"]: "NULL",
+    };
+  };
+
+const toRow = (committee: ICommittee) => (txn: ITransaction) => {
+  const {
+    entityType: entityTypeStr,
+    id: transactionId,
+    firstName,
+    lastName,
+    addressLine1,
+    city,
+    state,
+    postalCode,
+    paymentMethod: paymentMethodStr,
+    amount,
+    entityName,
+    transactionType,
+    purposeCode: purposeCodeString,
+    isSubcontracted,
+    isPartialPayment,
+    isExistingLiability,
+  } = txn;
+  const entityType: any = entityTypeStr;
+  const paymentMethod: any = paymentMethodStr;
+  const purposeCode: any = purposeCodeString;
+  const filingPeriod = getFilingPeriod(committee);
+  const inKindType: any = txn.inKindType;
+  return {
+    // @Todo implement
+    ["FILER_ID"]: committee.efsFilerId,
+    // @Todo implement
+    ["FILING_PERIOD_ID"]: filingDates[0].id,
+    ["FILING_CAT_ID"]: 1,
+    ["ELECT_ID"]: committee.efsElectionId,
+    ["RESIG_TERM_TYPE_ID"]: "NULL",
+    // @Todo implement
+    ["R_FILING_DATE"]: millisToDateStr(filingDates[1].filingDate),
+    ["FILING_SCHED_ID"]: getFilingScheduleId(txn),
+    ["LOAN_LIB_NUMBER"]: "NULL",
+    ["TRANS_NUMBER"]: transactionId,
+    ["TRANS_MAPPING"]: "NULL",
+    // @Todo implement
+    ["SCHED_DATE"]: millisToDateStr(txn.paymentDate),
+    ["ORG_DATE"]: "NULL",
+    ["CNTRBR_TYPE_ID"]:
+      txn.transactionType === TransactionType.Contribution
+        ? NYSEntityTypeId.get(entityType)
+        : "NULL",
+    // @ToDo add in-kind field
+    ["CNTRBN_TYPE_ID"]:
+      txn.paymentMethod === PaymentMethod.InKind
+        ? NYSInKindTypeId.get(inKindType)
+        : "NULL",
+    ["TRANSFER_TYPE_ID"]: "NULL",
+    ["RECEIPT_TYPE_ID"]: "NULL",
+    ["RECEIPT_CODE_ID"]: "NULL",
+    ["PURPOSE_CODE_ID"]:
+      transactionType === TransactionType.Disbursement
+        ? NYSPurposeCodeId.get(purposeCode)
+        : "NULL",
+    ["Is Expenditure Subcontracted?"]:
+      transactionType == TransactionType.Disbursement
+        ? boolToYesNo(isSubcontracted)
+        : "NULL",
+    ["Is Expenditure a Partial Payment?"]:
+      transactionType == TransactionType.Disbursement
+        ? boolToYesNo(isPartialPayment)
+        : "NULL",
+    ["Is this existing Liability?"]:
+      transactionType == TransactionType.Disbursement
+        ? boolToYesNo(isExistingLiability)
+        : "NULL",
+    ["Is Liability a Partial Forgiven?"]: "NULL",
+    ["FLNG_ENT_NAME"]: !isUnItemized(txn)
+      ? getEntityName(entityType, firstName, lastName, entityName)
+      : "NULL",
+    ["FLNG_ENT_FIRST_NAME"]:
+      isPerson(entityType) && !isUnItemized(txn) ? firstName : "NULL",
+    ["FLNG_ENT_MIDDLE_NAME"]: "NULL",
+    ["FLNG_ENT_LAST_NAME"]:
+      isPerson(entityType) && !isUnItemized(txn) ? lastName : "NULL",
+    ["FLNG_ENT_ADD1"]: !isUnItemized(txn) ? addressLine1 : "NULL",
+    ["FLNG_ENT_CITY"]: !isUnItemized(txn) ? city : "NULL",
+    ["FLNG_ENT_STATE"]: !isUnItemized(txn) ? state : "NULL",
+    ["FLNG_ENT_ZIP"]: !isUnItemized(txn) ? postalCode : "NULL",
+    ["FLNG_ENT_COUNTRY"]: !isUnItemized(txn) ? "United States" : "NULL",
+    ["PAYMENT_TYPE_ID"]: NYSPaymentTypeId.get(paymentMethod),
+    ["PAY_NUMBER"]: txnToPayNumber(txn),
+    ["OWED_AMT"]: "NULL",
+    ["ORG_AMT"]: centsToDollars(amount),
+    ["TRANS_EXPLNTN"]: txnToMemo(txn),
+    ["LOAN_OTHER_ID"]: "NULL",
+    ["R_ITEMIZED"]: !isUnItemized(txn) ? "Y" : "N",
+    ["R_LIABILITY"]: "NULL",
+    ["ELECTION_DATE"]: "NULL",
+    ["ELECTION_TYPE"]: "NULL",
+    ["ELECTION_YEAR"]: "NULL",
+    ["TREAS_ID"]: "NULL",
+    ["TREAS_OCCUPATION"]: "NULL",
+    ["TREAS_EMPLOYER"]: "NULL",
+    ["TREAS_ADD1"]: "NULL",
+    ["TREAS_CITY"]: "NULL",
+    ["TREAS_STATE"]: "NULL",
+    ["TREAS_ZIP"]: "NULL",
+    ["PART_FLNG_ENT_ID"]: "NULL",
+    ["OFFICE_ID"]: "NULL",
+    ["DISTRICT"]: "NULL",
+    ["DIST_OFF_CAND_BAL_PROP"]: "NULL",
+    ["IE_CNTRBR_OCC"]: "NULL",
+    ["IE_CNTRBR_EMP"]: "NULL",
+    ["IE_DESC"]: "NULL",
+    ["R_IE_SUPPORTED"]: "NULL",
+    ["R_IE_INCLUDED"]: "NULL",
+    ["R_PARENT"]: "NULL",
+  };
+};
+
+const isUnItemized = (txn: ITransaction) =>
+  txn.entityType === EntityType.Llc && txn.amount < 9901;
 
 interface FilingPeriod {
   id: number;
@@ -303,13 +421,16 @@ export const NYSPaymentTypeId = new Map<PaymentMethod, number>([
 const isPerson = (entityType: EntityType) =>
   [EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType);
 
+const isNonEntityPerson = (entityType: EntityType) =>
+  [EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType);
+
 const getEntityName = (
   entityType: EntityType,
   firstName: string,
   lastName: string,
   companyName?: string
 ) => {
-  if (isPerson(entityType)) {
+  if (isNonEntityPerson(entityType)) {
     return `${firstName} ${lastName}`;
   } else {
     return companyName;
@@ -327,8 +448,8 @@ const getFilingScheduleId = (txn: ITransaction): number => {
           return 1;
         case EntityType.Corp:
           return 2;
-        case EntityType.Llc:
-          return 15;
+        // case EntityType.Llc:
+        //   return 15;
         default:
           return 3;
       }
@@ -339,7 +460,7 @@ const getFilingScheduleId = (txn: ITransaction): number => {
   }
 };
 
-const centsToDollars = (amount: number): string => {
+export const centsToDollars = (amount: number): string => {
   return (amount / 100).toFixed(2);
 };
 
