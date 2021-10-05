@@ -9,7 +9,6 @@ import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { now } from "../../src/utils/time.utils";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
-import { genCommittee } from "./gen-committee.util";
 
 const sum = (nums: number[]) => nums.reduce((acc, val) => acc + val, 0);
 const roundToCents = (num: number) => Math.round(num * 100) / 100;
