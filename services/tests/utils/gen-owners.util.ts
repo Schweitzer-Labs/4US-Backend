@@ -19,7 +19,7 @@ export const genOwner = (percentOwnership: string): IOwner => ({
   lastName: faker.name.lastName(),
   addressLine1: faker.address.streetAddress(),
   city: faker.address.city(),
-  state: faker.address.stateAbbr().toLowerCase(),
+  state: faker.address.stateAbbr().toUpperCase(),
   postalCode: faker.address.zipCode(),
   percentOwnership,
 });
