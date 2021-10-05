@@ -9,7 +9,7 @@ const toIntOrThrow = (owner: IOwner): number => {
   return num;
 };
 
-export const calcAmount = (origAmount: number) =>
+const calcAmount = (origAmount: number) =>
   flow(
     toIntOrThrow,
     (n) => n * origAmount,

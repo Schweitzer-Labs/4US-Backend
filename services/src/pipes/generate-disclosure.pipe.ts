@@ -46,9 +46,6 @@ export const toAttributedContribs =
   (committee: ICommittee) =>
   (txn: ITransaction): any[] => {
     if (!shouldBeAttributed(txn)) return [];
-
-    const { owners } = txn;
-
     const preparedOwners = prepareOwners(txn);
 
     const ownerRows = preparedOwners.reduce((acc, owner) => {
@@ -112,7 +109,7 @@ const toAttributedRow =
       ["ORG_AMT"]: centsToDollars(owner.attributedAmount),
       ["TRANS_EXPLNTN"]: txnToMemo(txn),
       ["LOAN_OTHER_ID"]: "NULL",
-      ["R_ITEMIZED"]: "y",
+      ["R_ITEMIZED"]: "Y",
       ["R_LIABILITY"]: "NULL",
       ["ELECTION_DATE"]: "NULL",
       ["ELECTION_TYPE"]: "NULL",
