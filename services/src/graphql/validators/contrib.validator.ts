@@ -24,7 +24,7 @@ const validateContribOrGQLError =
       te.mapLeft((appErr) => new ValidationError(appErr.message))
     );
 
-const validateContrib =
+export const validateContrib =
   (com: ICommittee) =>
   (input: ContribInput): TaskEither<ApplicationError, boolean> => {
     const { paymentMethod, entityType, entityName, paymentDate, checkNumber } =
