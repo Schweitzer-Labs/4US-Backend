@@ -258,8 +258,7 @@ const toRow = (committee: ICommittee) => (txn: ITransaction) => {
   };
 };
 
-const isUnItemized = (txn: ITransaction) =>
-  txn.entityType === EntityType.Llc && txn.amount < 9901;
+const isUnItemized = (txn: ITransaction) => false;
 
 interface FilingPeriod {
   id: number;

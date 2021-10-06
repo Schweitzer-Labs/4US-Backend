@@ -7,6 +7,28 @@ import { isLeft } from "fp-ts/Either";
 import { UnauthorizedError } from "type-graphql";
 import { ApplicationError } from "../application-error";
 import { StatusCodes } from "http-status-codes";
+import { TaskEither } from "fp-ts/TaskEither";
+import { pipe } from "fp-ts/function";
+import { taskEither } from "fp-ts";
+
+export const loadCommitteeOrError =
+  (committeeTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (committeeId: string) =>
+  (currentUser: string): TaskEither<ApplicationError, ICommittee> =>
+    pipe(
+      getCommitteeById(committeeTableName)(dynamoDB)(committeeId),
+      taskEither.chain(validateUser(currentUser))
+    );
+
+const validateUser =
+  (currentUser: string) =>
+  (committee: ICommittee): TaskEither<ApplicationError, ICommittee> => {
+    if (!committee.members.includes(currentUser)) {
+      taskEither.left(new ApplicationError("API use is not authorized", {}));
+    }
+    return taskEither.right(committee);
+  };
 
 export const loadCommitteeOrThrow =
   (committeeTableName: string) =>
