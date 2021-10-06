@@ -222,7 +222,6 @@ export class AppResolver {
       ),
       te.mapLeft((appErr) => new ValidationError(appErr.message))
     );
-    console.log("delete res", res);
     return await teToRightOrThrow(res);
   }
 
@@ -447,8 +446,6 @@ export class AppResolver {
     )(ddb)(finConf)(stratoConf)(c);
 
     await refreshAggs(aggTable)(txnsTableName)(ddb)(committee.id)();
-
-    console.log("demo committee: ", committee);
 
     return committee;
   }
