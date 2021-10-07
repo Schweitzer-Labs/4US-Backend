@@ -20,7 +20,7 @@ export const runReport =
       parameters: {
         connected_account: connectAccountId,
         interval_start: milliToEpoch(now()) - 60 * 60 * 24 * 14,
-        interval_end: milliToEpoch(midnightLastNight()),
+        interval_end: milliToEpoch(midnightLastNight()) - 60 * 60 * 24,
         columns: [
           "automatic_payout_id",
           "automatic_payout_effective_at_utc",
