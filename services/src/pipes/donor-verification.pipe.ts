@@ -1,8 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import {
-  donorInputToInstantIdResult,
-  IInstantIdResult,
-} from "../clients/lexis-nexis/consumer-id.request";
+import { donorInputToInstantIdResult } from "../clients/lexis-nexis/consumer-id.request";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { pipe } from "fp-ts/function";
@@ -11,7 +8,10 @@ import { genTxnId } from "../utils/gen-txn-id.utils";
 import { now } from "../utils/time.utils";
 import { genFlacspee } from "../utils/model/gen-donor-match.utils";
 import { taskEither } from "fp-ts";
-import { donorInputToDonors } from "../queries/search-donors.query";
+import {
+  donorInputToDonors,
+  getDonorByLNId,
+} from "../queries/search-donors.query";
 import { IDonor, IDonorInput } from "../queries/search-donors.decoder";
 import { ICommittee } from "../queries/get-committee-by-id.query";
 import { Plan } from "../utils/enums/plan.enum";
@@ -73,10 +73,27 @@ const verifyAndCreateDonorIfEmpty =
         donorInputToVerifiedDonor(billableEventsTableName)(dynamoDB)(config)(
           committee
         )(donorInput),
-        taskEither.chain(saveDonor(donorsTableName)(dynamoDB))
+        taskEither.chain(
+          matchDonorWithVerifierOrSave(donorsTableName)(dynamoDB)
+        )
       );
     }
   };
+
+const matchDonorWithVerifierOrSave =
+  (donorsTable: string) =>
+  (ddb: DynamoDB) =>
+  (donor: IDonor): TaskEither<ApplicationError, IDonor> =>
+    pipe(
+      donor.instantIdUniqueId
+        ? getDonorByLNId(donorsTable)(ddb)(donor)
+        : taskEither.of([]),
+      taskEither.chain((donors) =>
+        donors.length > 0
+          ? taskEither.of(donors[0])
+          : saveDonor(donorsTable)(ddb)(donor)
+      )
+    );
 
 export const verifyDonor =
   (billableEventsTableName: string) =>

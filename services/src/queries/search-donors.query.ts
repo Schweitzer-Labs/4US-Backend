@@ -11,6 +11,24 @@ import { Donors, IDonor, IDonorInput } from "./search-donors.decoder";
 
 const logPrefix = "Get Donors";
 
+export const queryByLNId =
+  (donorsTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  async (donor: IDonor): Promise<unknown> => {
+    const res = await dynamoDB
+      .query({
+        TableName: donorsTableName,
+        IndexName: "DonorsByInstantIdUniqueId",
+        KeyConditionExpression: "instantIdUniqueId = :instantIdUniqueId",
+        ScanIndexForward: false,
+        ExpressionAttributeValues: {
+          ":instantIdUniqueId": { S: donor.instantIdUniqueId },
+        },
+      })
+      .promise();
+    return res.Items.map((item) => DynamoDB.Converter.unmarshall(item));
+  };
+
 const queryDDB =
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -45,3 +63,20 @@ export const donorInputToDonors =
       taskEither.chain(validateDDBResponse(logPrefix)(Donors))
     );
   };
+
+export const getDonorByLNId =
+  (donorsTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (donor: IDonor): TaskEither<ApplicationError, IDonor[]> =>
+    pipe(
+      tryCatch(
+        () => queryByLNId(donorsTableName)(dynamoDB)(donor),
+        (e) =>
+          new ApplicationError(
+            "Get donor request failed",
+            e,
+            StatusCodes.INTERNAL_SERVER_ERROR
+          )
+      ),
+      taskEither.chain(validateDDBResponse(logPrefix)(Donors))
+    );
