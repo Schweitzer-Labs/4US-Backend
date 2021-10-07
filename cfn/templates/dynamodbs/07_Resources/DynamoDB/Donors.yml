@@ -10,6 +10,8 @@ Donors:
         AttributeType: S
       - AttributeName: id
         AttributeType: S
+      - AttributeName: instantIdUniqueId
+        AttributeType: S
     KeySchema:
       - KeyType: HASH
         AttributeName: flacspeeMatch
@@ -17,6 +19,13 @@ Donors:
         AttributeName: id
     StreamSpecification:
       StreamViewType: NEW_IMAGE
+    GlobalSecondaryIndexes:
+      - IndexName: DonorsByInstantIdUniqueId
+        KeySchema:
+          - KeyType: HASH
+            AttributeName: instantIdUniqueId
+        Projection:
+          ProjectionType: ALL
     Replicas:
       - Region: !Ref AWS::Region
         PointInTimeRecoverySpecification:
