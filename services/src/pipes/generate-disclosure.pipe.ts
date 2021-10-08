@@ -172,7 +172,7 @@ const toRow = (committee: ICommittee) => (txn: ITransaction) => {
     // @Todo implement
     ["FILER_ID"]: committee.efsFilerId,
     // @Todo implement
-    ["FILING_PERIOD_ID"]: filingDates[0].id,
+    ["FILING_PERIOD_ID"]: filingDates[1].id,
     ["FILING_CAT_ID"]: 1,
     ["ELECT_ID"]: committee.efsElectionId,
     ["RESIG_TERM_TYPE_ID"]: "NULL",
