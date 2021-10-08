@@ -1,0 +1,8 @@
+resolver: lts-16.31
+
+packages:
+- .
+
+extra-deps:
+- git: https://github.com/dnikolovv/aws-lambda-haskell-runtime.git
+  commit: 3a9d26dee8a39fdbe7bd26bc0ec058f904cdf828
