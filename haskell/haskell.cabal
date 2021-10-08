@@ -1,0 +1,52 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 0ab63b81a5843bb455277bc2380cb050d6155ca7eac6de40540c8c044a0b0799
+
+name:           haskell
+version:        0.1.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/haskell#readme>
+homepage:       https://github.com/githubuser/haskell#readme
+bug-reports:    https://github.com/githubuser/haskell/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2021 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/haskell
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_haskell
+  hs-source-dirs:
+      src
+  default-extensions: RecordWildCards OverloadedLists OverloadedStrings DeriveGeneric
+  build-depends:
+      aeson
+    , aws-lambda-haskell-runtime >=3.0.0
+    , base >=4.7 && <5
+  default-language: Haskell2010
+
+executable bootstrap
+  main-is: Main.hs
+  other-modules:
+      Paths_haskell
+  hs-source-dirs:
+      app
+  default-extensions: RecordWildCards OverloadedLists OverloadedStrings DeriveGeneric
+  ghc-options: -threaded -rtsopts -O2 -with-rtsopts=-N
+  build-depends:
+      aeson
+    , aws-lambda-haskell-runtime >=3.0.0
+    , base >=4.7 && <5
+    , haskell
+  default-language: Haskell2010

@@ -17,9 +17,9 @@ handler payload context = runHandler payload
 runHandler :: Payload -> IO (Either String Payload)
 runHandler payload =
     if connectAccountId payload == "test_id" then
-        return (Right payload)
+        return $ Right payload
       else
-        return (Left "Left condition has been hit")
+        return $ Left "Left condition has been hit"
 
 stringToPayload :: String -> Payload
 stringToPayload str = Payload str

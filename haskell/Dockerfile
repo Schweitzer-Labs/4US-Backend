@@ -9,8 +9,12 @@ SHELL ["/bin/bash", "--rcfile", "~/.profile", "-c"]
 
 USER root
 
+RUN yum update -y
+RUN yum install wget -y
+
 # Installing Haskell Stack
-RUN curl -sSL https://get.haskellstack.org/ | sh
+RUN wget https://get.haskellstack.org/
+RUN sh index.html
 
 # Build the lambda
 COPY . /root/lambda-function/
