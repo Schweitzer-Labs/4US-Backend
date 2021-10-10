@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0ab63b81a5843bb455277bc2380cb050d6155ca7eac6de40540c8c044a0b0799
+-- hash: c460473ea5109003d12637bea3c8d24b56aa6114337f20ffcf973bab3930d5e4
 
 name:           haskell
 version:        0.1.0
@@ -25,15 +25,25 @@ source-repository head
 library
   exposed-modules:
       Lib
+      RunReport
   other-modules:
       Paths_haskell
   hs-source-dirs:
       src
-  default-extensions: RecordWildCards OverloadedLists OverloadedStrings DeriveGeneric
+  default-extensions:
+      RecordWildCards
+      OverloadedLists
+      OverloadedStrings
+      DeriveGeneric
   build-depends:
       aeson
+    , amazonka
+    , amazonka-dynamodb
+    , amazonka-s3
+    , amazonka-ssm
     , aws-lambda-haskell-runtime >=3.0.0
     , base >=4.7 && <5
+    , lens
   default-language: Haskell2010
 
 executable bootstrap
@@ -42,11 +52,20 @@ executable bootstrap
       Paths_haskell
   hs-source-dirs:
       app
-  default-extensions: RecordWildCards OverloadedLists OverloadedStrings DeriveGeneric
+  default-extensions:
+      RecordWildCards
+      OverloadedLists
+      OverloadedStrings
+      DeriveGeneric
   ghc-options: -threaded -rtsopts -O2 -with-rtsopts=-N
   build-depends:
       aeson
+    , amazonka
+    , amazonka-dynamodb
+    , amazonka-s3
+    , amazonka-ssm
     , aws-lambda-haskell-runtime >=3.0.0
     , base >=4.7 && <5
     , haskell
+    , lens
   default-language: Haskell2010
