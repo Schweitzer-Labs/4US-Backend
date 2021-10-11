@@ -13,10 +13,14 @@ dependencies:
 - aws-lambda-haskell-runtime >= 3.0.0
 - aeson
 - lens
+- text
 - amazonka
 - amazonka-s3
 - amazonka-dynamodb
 - amazonka-ssm
+- stripe-haskell
+- stripe-core
+- bytestring
 
 library:
   source-dirs: src

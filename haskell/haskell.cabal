@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c460473ea5109003d12637bea3c8d24b56aa6114337f20ffcf973bab3930d5e4
+-- hash: a65ec81830924e39c9ac324a3c73acf0e504e8dd6e8ccc43c585d8f89d8000c5
 
 name:           haskell
 version:        0.1.0
@@ -43,7 +43,11 @@ library
     , amazonka-ssm
     , aws-lambda-haskell-runtime >=3.0.0
     , base >=4.7 && <5
+    , bytestring
     , lens
+    , stripe-core
+    , stripe-haskell
+    , text
   default-language: Haskell2010
 
 executable bootstrap
@@ -66,6 +70,10 @@ executable bootstrap
     , amazonka-ssm
     , aws-lambda-haskell-runtime >=3.0.0
     , base >=4.7 && <5
+    , bytestring
     , haskell
     , lens
+    , stripe-core
+    , stripe-haskell
+    , text
   default-language: Haskell2010
