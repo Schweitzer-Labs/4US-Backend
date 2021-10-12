@@ -3,6 +3,7 @@ module Lib where
 import GHC.Generics
 import Data.Aeson
 import Aws.Lambda
+import RunReport (runReport)
 
 data Payload = Payload
   { connectAccountId :: String
@@ -11,18 +12,16 @@ data Payload = Payload
 instance FromJSON Payload
 instance ToJSON Payload
 
-handler :: Payload -> Context () -> IO (Either String Payload)
+handler :: Payload -> Context () -> IO (Either String String)
 handler payload context = runHandler payload
 
-runHandler :: Payload -> IO (Either String Payload)
+runHandler :: Payload -> IO (Either String String)
 runHandler payload = toRes payload
 
-toRes :: Payload -> IO (Either String Payload)
-toRes payload =
-      if connectAccountId payload == "test_id" then
-        return $ Right payload
-      else
-        return $ Left "Left condition has been hit"
+toRes :: Payload -> IO (Either String String)
+toRes payload = do
+    res <- runReport $ connectAccountId payload
+    return $ Right res
 
 stringToPayload :: String -> Payload
 stringToPayload str = Payload str

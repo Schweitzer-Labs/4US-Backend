@@ -4,14 +4,10 @@ module GetStripeAPIKey where
 
 
 import Network.AWS
-import Network.AWS.S3
-import Network.AWS.DynamoDB
 import Network.AWS.SSM
 import System.IO
 import Data.Text as Text
 import qualified System.Environment as Env
-import Web.Stripe
-import Web.Stripe.Customer
 import qualified Data.ByteString.Char8 as ByteString
 import qualified Data.Text.Encoding as Encode
 

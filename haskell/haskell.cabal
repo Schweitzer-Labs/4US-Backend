@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 11079ef0f1e44c7c02b952342230085ded886a98b57dee745799f86c7d9b489c
+-- hash: 892373821d16fb492fbd4b48819d1402bbd1892da7b4f615948bfa040e197444
 
 name:           haskell
 version:        0.1.0
@@ -26,6 +26,7 @@ library
   exposed-modules:
       GetStripeAPIKey
       Lib
+      Now
       RunReport
   other-modules:
       Paths_haskell
@@ -33,14 +34,11 @@ library
       src
   default-extensions:
       RecordWildCards
-      OverloadedLists
       OverloadedStrings
       DeriveGeneric
   build-depends:
       aeson
     , amazonka
-    , amazonka-dynamodb
-    , amazonka-s3
     , amazonka-ssm
     , aws-lambda-haskell-runtime >=3.0.0
     , base >=4.7 && <5
@@ -48,9 +46,8 @@ library
     , containers
     , lens
     , lens-aeson
-    , stripe-core
-    , stripe-haskell
     , text
+    , time
     , wreq
   default-language: Haskell2010
 
@@ -62,15 +59,12 @@ executable bootstrap
       app
   default-extensions:
       RecordWildCards
-      OverloadedLists
       OverloadedStrings
       DeriveGeneric
   ghc-options: -threaded -rtsopts -O2 -with-rtsopts=-N
   build-depends:
       aeson
     , amazonka
-    , amazonka-dynamodb
-    , amazonka-s3
     , amazonka-ssm
     , aws-lambda-haskell-runtime >=3.0.0
     , base >=4.7 && <5
@@ -79,8 +73,7 @@ executable bootstrap
     , haskell
     , lens
     , lens-aeson
-    , stripe-core
-    , stripe-haskell
     , text
+    , time
     , wreq
   default-language: Haskell2010

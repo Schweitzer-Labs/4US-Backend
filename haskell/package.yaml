@@ -16,14 +16,11 @@ dependencies:
 - lens
 - text
 - amazonka
-- amazonka-s3
-- amazonka-dynamodb
 - amazonka-ssm
-- stripe-haskell
-- stripe-core
 - bytestring
 - wreq
 - containers
+- time
 
 library:
   source-dirs: src
@@ -42,6 +39,6 @@ executables:
 
 default-extensions:
   - RecordWildCards
-  - OverloadedLists
+#  - OverloadedLists
   - OverloadedStrings
   - DeriveGeneric
