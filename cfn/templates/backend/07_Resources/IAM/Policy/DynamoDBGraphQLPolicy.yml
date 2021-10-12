@@ -13,6 +13,7 @@ DynamoDBGraphQLPolicy:
             - !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.AggregatesTableArn
             - !GetAtt DynamoDBsTemplate.Outputs.DonorsTableArn
+            - !Sub ${DynamoDBsTemplate.Outputs.DonorsTableArn}/index/DonorsByInstantIdUniqueId
             - !GetAtt DynamoDBsTemplate.Outputs.RulesTableArn
             - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByCommitteeDonorIndex
           Action:
