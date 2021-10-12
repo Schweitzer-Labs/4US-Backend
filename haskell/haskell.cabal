@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a65ec81830924e39c9ac324a3c73acf0e504e8dd6e8ccc43c585d8f89d8000c5
+-- hash: 11079ef0f1e44c7c02b952342230085ded886a98b57dee745799f86c7d9b489c
 
 name:           haskell
 version:        0.1.0
@@ -24,6 +24,7 @@ source-repository head
 
 library
   exposed-modules:
+      GetStripeAPIKey
       Lib
       RunReport
   other-modules:
@@ -44,10 +45,13 @@ library
     , aws-lambda-haskell-runtime >=3.0.0
     , base >=4.7 && <5
     , bytestring
+    , containers
     , lens
+    , lens-aeson
     , stripe-core
     , stripe-haskell
     , text
+    , wreq
   default-language: Haskell2010
 
 executable bootstrap
@@ -71,9 +75,12 @@ executable bootstrap
     , aws-lambda-haskell-runtime >=3.0.0
     , base >=4.7 && <5
     , bytestring
+    , containers
     , haskell
     , lens
+    , lens-aeson
     , stripe-core
     , stripe-haskell
     , text
+    , wreq
   default-language: Haskell2010
