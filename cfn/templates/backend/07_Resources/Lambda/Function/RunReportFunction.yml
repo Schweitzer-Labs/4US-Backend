@@ -1,0 +1,34 @@
+RunReportFunction:
+  Type: "AWS::Serverless::Function"
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-RunReportFunction
+    Runtime: nodejs14.x
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.runReportHandler
+    Role: !GetAtt LambdaBankSyncRole.Arn
+    Timeout: 40
+    MemorySize: 300
+#    Events:
+#      EveryMinuteEvent:
+#        Type: Schedule
+#        Properties:
+#          Schedule: 'rate(5 minutes)'
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
+    Environment:
+      Variables:
+        RUNENV:
+          !Ref LambdaRunEnvironment
+
+RunReportInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref RunReportFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue
