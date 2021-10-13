@@ -7,6 +7,8 @@ import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { AmendDisbInput } from "../graphql/input-types/amend-disb.input-type";
 import { isNotABankVerifiedRuleUnverifiedDisb } from "../utils/model/is-non-verified-disbursement.utils";
+import { TaskEither } from "fp-ts/TaskEither";
+import { ApplicationError } from "../utils/application-error";
 
 export const amendDisb =
   (txnsTableName: string) =>
@@ -14,7 +16,9 @@ export const amendDisb =
   (modifiedByUser: string) =>
   (committeeId: string) =>
   (txnId: string) =>
-  (disbursementInput: AmendDisbInput) =>
+  (
+    disbursementInput: AmendDisbInput
+  ): TaskEither<ApplicationError, ITransaction> =>
     pipe(
       getTxnById(txnsTableName)(dynamoDB)(committeeId)(txnId),
       te.chain(isNotABankVerifiedRuleUnverifiedDisb),

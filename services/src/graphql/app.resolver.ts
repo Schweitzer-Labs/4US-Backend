@@ -17,7 +17,10 @@ import { searchTransactions } from "../queries/search-transactions.query";
 import { TransactionsArg } from "./args/transactions.arg";
 import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";
-import { loadCommitteeOrThrow } from "../utils/model/load-committee-or-throw.utils";
+import {
+  loadCommitteeOrError,
+  loadCommitteeOrThrow,
+} from "../utils/model/load-committee-or-throw.utils";
 import { CreateContributionInput } from "./input-types/create-contribution.input-type";
 import { taskEither as te } from "fp-ts";
 import {
@@ -46,7 +49,10 @@ import { AmendDisbInput } from "./input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
 import { AmendContributionInput } from "./input-types/amend-contrib.input-type";
 import { amendContrib } from "../pipes/amend-contrib.pipe";
-import { validateContribOrThrowGQLError } from "./validators/contrib.validator";
+import {
+  validateContrib,
+  validateContribOrThrowGQLError,
+} from "./validators/contrib.validator";
 import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
@@ -56,7 +62,7 @@ import {
   generateDisclosureOrError,
 } from "../pipes/generate-disclosure.pipe";
 import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
-import { refreshAggs } from "../pipes/refresh-aggs.pipe";
+import { refreshAggs, refreshAggsFromTxn } from "../pipes/refresh-aggs.pipe";
 import { GenCommitteeInput } from "./input-types/gen-committee.input-type";
 import { initStratoConfig } from "../clients/dapp/dapp.decoders";
 import { FinicityConfig } from "../clients/finicity/finicity.decoders";
@@ -67,6 +73,11 @@ import { reconcileOneDemoContrib } from "../demo/utils/reconcile-one-demo-contri
 import { SeedDemoBankRecordsInput } from "./input-types/seed-demo-bank-records.input-type";
 import { seedTxn } from "../demo/utils/seed-bank-records.util";
 import { pipe } from "fp-ts/function";
+import { teToRightOrThrow } from "../utils/te-to-right-or-throw.util";
+import { validateCard } from "./validators/card.validators";
+import { validateCheck } from "./validators/check.validators";
+import { validateReconcileInput } from "./validators/reconcile.validators";
+import { ITransaction } from "../queries/search-transactions.decoder";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();
@@ -87,7 +98,7 @@ const agent = new https.Agent({
   keepAlive: true,
 });
 
-const dynamoDB = new DynamoDB({
+const ddb = new DynamoDB({
   httpOptions: {
     agent,
   },
@@ -114,12 +125,12 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ) {
-    console.log("from committee resolver");
-    const res = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      committeeId
-    )(currentUser);
+    const res = pipe(
+      loadCommitteeOrError(committeesTableName)(ddb)(committeeId)(currentUser),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
 
-    return res;
+    return await teToRightOrThrow(res);
   }
 
   @Query((returns) => Report)
@@ -128,65 +139,56 @@ export class AppResolver {
     @Arg("includeHeaders") includeHeaders: boolean = false,
     @CurrentUser() currentUser: string
   ) {
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      committeeId
-    )(currentUser);
-
-    // @ToDo Workaround, remove immediately
-    const res = await pipe(
-      searchTransactions(txnsTableName)(dynamoDB)({
-        committeeId,
-        // bankVerified: true,
-        ruleVerified: true,
-        bankVerified: true,
-      }),
-      te.chain(generateDisclosureOrError(committee)(includeHeaders))
-    )();
-    if (isLeft(res)) {
-      console.log(res.left);
-      throw res.left;
-    }
-    return {
-      csvData: res.right,
-    };
+    const res = pipe(
+      loadCommitteeOrError(committeesTableName)(ddb)(committeeId)(currentUser),
+      te.chain((committee) =>
+        pipe(
+          searchTransactions(txnsTableName)(ddb)({
+            committeeId,
+            ruleVerified: true,
+            bankVerified: true,
+          }),
+          te.chain(generateDisclosureOrError(committee)(includeHeaders)),
+          te.map((csvData) => ({
+            csvData,
+          }))
+        )
+      ),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
+    return await teToRightOrThrow(res);
   }
 
   @Query((returns) => [Transaction])
   async transactions(
-    @Args() transactionsArg: TransactionsArg,
+    @Args() txnArgs: TransactionsArg,
     @CurrentUser() currentUser: string
   ): Promise<Transaction[]> {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      transactionsArg.committeeId
-    )(currentUser);
-
-    const res = await searchTransactions(txnsTableName)(dynamoDB)(
-      transactionsArg
-    )();
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      return res.right;
-    }
+    const res = pipe(
+      loadCommitteeOrError(committeesTableName)(ddb)(txnArgs.committeeId)(
+        currentUser
+      ),
+      te.chain(() => searchTransactions(txnsTableName)(ddb)(txnArgs)),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
+    return await teToRightOrThrow(res);
   }
 
   @Query((returns) => Transaction, { nullable: true })
   async transaction(
-    @Args() transactionArg: TransactionArg,
+    @Args() txnArg: TransactionArg,
     @CurrentUser() currentUser: string
   ): Promise<Transaction> {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      transactionArg.committeeId
-    )(currentUser);
-
-    const res = await getTxnById(txnsTableName)(dynamoDB)(
-      transactionArg.committeeId
-    )(transactionArg.id)();
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      return res.right;
-    }
+    const res = pipe(
+      loadCommitteeOrError(committeesTableName)(ddb)(txnArg.committeeId)(
+        currentUser
+      ),
+      te.chain(() =>
+        getTxnById(txnsTableName)(ddb)(txnArg.committeeId)(txnArg.id)
+      ),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
+    return await teToRightOrThrow(res);
   }
 
   @Query((returns) => Aggregations)
@@ -194,17 +196,12 @@ export class AppResolver {
     @Arg("committeeId") committeeId: string,
     @CurrentUser() currentUser: string
   ): Promise<Aggregations> {
-    await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(committeeId)(
-      currentUser
+    const res = pipe(
+      loadCommitteeOrError(committeesTableName)(ddb)(committeeId)(currentUser),
+      te.chain(() => getAggsByCommitteeId(aggTable)(ddb)(committeeId)),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
     );
-
-    const res = await getAggsByCommitteeId(aggTable)(dynamoDB)(committeeId)();
-    if (isLeft(res)) {
-      throw res.left;
-    }
-
-    const aggs = res.right;
-    return aggs;
+    return await teToRightOrThrow(res);
   }
 
   @Mutation((returns) => Transaction)
@@ -212,24 +209,26 @@ export class AppResolver {
     @Args() txnArg: TransactionArg,
     @CurrentUser() currentUser: string
   ): Promise<Transaction> {
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      txnArg.committeeId
-    )(currentUser);
-
-    const res = await deleteUnreconciledTxn(txnsTableName)(dynamoDB)(txnArg)();
-
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
-      return res.right;
-    }
+    const res = pipe(
+      loadCommitteeOrError(committeesTableName)(ddb)(txnArg.committeeId)(
+        currentUser
+      ),
+      te.chain(() => deleteUnreconciledTxn(txnsTableName)(ddb)(txnArg)),
+      te.chain((txn: ITransaction) =>
+        pipe(
+          refreshAggsFromTxn(aggTable)(txnsTableName)(ddb)(txn),
+          te.map(() => txn)
+        )
+      ),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
+    return await teToRightOrThrow(res);
   }
 
   @Mutation((returns) => Transaction)
   async createContribution(
     @Arg("createContributionData")
-    createContributionInput: CreateContributionInput,
+    contribInput: CreateContributionInput,
     @CurrentUser() currentUser: string
   ): Promise<Transaction> {
     if (
@@ -250,48 +249,35 @@ export class AppResolver {
       password: this.lnPassword,
     };
 
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      createContributionInput.committeeId
-    )(currentUser);
+    const res = pipe(
+      validateCard(contribInput),
+      te.chain(() =>
+        loadCommitteeOrError(committeesTableName)(ddb)(
+          contribInput.committeeId
+        )(currentUser)
+      ),
+      te.chain((committee) =>
+        pipe(
+          validateContrib(committee)(contribInput),
+          te.chain(() =>
+            runRulesAndProcess(billableEventsTableName)(donorsTableName)(
+              txnsTableName
+            )(rulesTableName)(ddb)(this.stripe)(lnConfig)(currentUser)(
+              committee
+            )(contribInput)
+          )
+        )
+      ),
+      te.chain((txn: ITransaction) =>
+        pipe(
+          refreshAggsFromTxn(aggTable)(txnsTableName)(ddb)(txn),
+          te.map(() => txn)
+        )
+      ),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
 
-    await validateContribOrThrowGQLError(committee)(createContributionInput);
-
-    const {
-      paymentMethod,
-      cardCVC,
-      cardNumber,
-      cardExpirationMonth,
-      cardExpirationYear,
-      processPayment,
-    } = createContributionInput;
-
-    if (
-      [PaymentMethod.Credit, PaymentMethod.Debit].includes(paymentMethod) &&
-      processPayment
-    ) {
-      if (
-        !cardCVC ||
-        !cardNumber ||
-        !cardExpirationMonth ||
-        !cardExpirationYear
-      )
-        throw new ValidationError(
-          "Card info must be provided for contributions in credit and debit"
-        );
-    }
-
-    const res = await runRulesAndProcess(billableEventsTableName)(
-      donorsTableName
-    )(txnsTableName)(rulesTableName)(dynamoDB)(this.stripe)(lnConfig)(
-      currentUser
-    )(committee)(createContributionInput)();
-
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
-      return res.right;
-    }
+    return await teToRightOrThrow(res);
   }
 
   @Mutation((returns) => Transaction)
@@ -300,10 +286,6 @@ export class AppResolver {
     d: CreateDisbursementInput,
     @CurrentUser() currentUser: string
   ): Promise<Transaction> {
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      d.committeeId
-    )(currentUser);
-
     if (!this.lnUsername || !this.lnPassword) {
       this.lnUsername = await getLNUsername(ps)(runenv);
       this.lnPassword = await getLNPassword(ps)(runenv);
@@ -312,22 +294,27 @@ export class AppResolver {
       username: this.lnUsername,
       password: this.lnPassword,
     };
-
-    if (d.paymentMethod === PaymentMethod.Check && !d.checkNumber)
-      throw new ValidationError(
-        "Check number must be provided for check disbursements"
-      );
-
-    const res = await verifyAndCreateDisb(currentUser)(txnsTableName)(
-      billableEventsTableName
-    )(dynamoDB)(lnConfig)(committee)(d)();
-
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
-      return res.right;
-    }
+    const res = pipe(
+      validateCheck(d),
+      te.chain(() =>
+        loadCommitteeOrError(committeesTableName)(ddb)(d.committeeId)(
+          currentUser
+        )
+      ),
+      te.chain((committee) =>
+        verifyAndCreateDisb(currentUser)(txnsTableName)(
+          billableEventsTableName
+        )(ddb)(lnConfig)(committee)(d)
+      ),
+      te.chain((txn) =>
+        pipe(
+          refreshAggsFromTxn(aggTable)(txnsTableName)(ddb)(txn),
+          te.map(() => txn)
+        )
+      ),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
+    return await teToRightOrThrow(res);
   }
 
   @Mutation((returns) => Transaction)
@@ -335,20 +322,18 @@ export class AppResolver {
     @Arg("amendDisbursementData") d: AmendDisbInput,
     @CurrentUser() currentUser: string
   ) {
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      d.committeeId
-    )(currentUser);
-
-    const res = await amendDisb(txnsTableName)(dynamoDB)(currentUser)(
-      d.committeeId
-    )(d.transactionId)(d)();
-
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
-      return res.right;
-    }
+    const res = pipe(
+      loadCommitteeOrError(committeesTableName)(ddb)(d.committeeId)(
+        currentUser
+      ),
+      te.chain(() =>
+        amendDisb(txnsTableName)(ddb)(currentUser)(d.committeeId)(
+          d.transactionId
+        )(d)
+      ),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
+    return await teToRightOrThrow(res);
   }
 
   @Mutation((returns) => Transaction)
@@ -356,46 +341,58 @@ export class AppResolver {
     @Arg("amendContributionData") c: AmendContributionInput,
     @CurrentUser() currentUser: string
   ) {
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
+    const committee = await loadCommitteeOrThrow(committeesTableName)(ddb)(
       c.committeeId
     )(currentUser);
 
     await validateContribOrThrowGQLError(committee)(c);
 
-    const res = await amendContrib(txnsTableName)(dynamoDB)(currentUser)(
-      c.committeeId
-    )(c.transactionId)(c)();
-
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
-      return res.right;
-    }
+    const res = pipe(
+      loadCommitteeOrError(committeesTableName)(ddb)(c.committeeId)(
+        currentUser
+      ),
+      te.chain((committee) =>
+        pipe(
+          validateContrib(committee)(c),
+          te.chain(() =>
+            amendContrib(txnsTableName)(ddb)(currentUser)(c.committeeId)(
+              c.transactionId
+            )(c)
+          )
+        )
+      ),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
+    return await teToRightOrThrow(res);
   }
 
   @Mutation((returns) => Transaction)
   async reconcileTransaction(
-    @Arg("reconcileTransactionData") rd: ReconcileTxnInput,
+    @Arg("reconcileTransactionData") r: ReconcileTxnInput,
     @CurrentUser() currentUser: string
   ) {
-    if (rd.selectedTransactions.length === 0)
-      throw new ValidationError("Selected transactions list cannot be empty");
+    const res = pipe(
+      validateReconcileInput(r),
+      te.chain(() =>
+        loadCommitteeOrError(committeesTableName)(ddb)(r.committeeId)(
+          currentUser
+        )
+      ),
+      te.chain(() =>
+        reconcileTxnWithTxns(txnsTableName)(ddb)(r.committeeId)(
+          r.bankTransaction
+        )(r.selectedTransactions)
+      ),
+      te.chain((txn) =>
+        pipe(
+          refreshAggsFromTxn(aggTable)(txnsTableName)(ddb)(txn),
+          te.map(() => txn)
+        )
+      ),
+      te.mapLeft((appErr) => new ValidationError(appErr.message))
+    );
 
-    const committee = await loadCommitteeOrThrow(committeesTableName)(dynamoDB)(
-      rd.committeeId
-    )(currentUser);
-
-    const res = await reconcileTxnWithTxns(txnsTableName)(dynamoDB)(
-      rd.committeeId
-    )(rd.bankTransaction)(rd.selectedTransactions)();
-
-    if (isLeft(res)) {
-      throw res.left;
-    } else {
-      await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
-      return res.right;
-    }
+    return await teToRightOrThrow(res);
   }
 
   // Demo
@@ -446,11 +443,9 @@ export class AppResolver {
 
     const committee = await genDemoCommittee(committeesTableName)(
       txnsTableName
-    )(dynamoDB)(finConf)(stratoConf)(c);
+    )(ddb)(finConf)(stratoConf)(c);
 
-    await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(committee.id)();
-
-    console.log("demo committee: ", committee);
+    await refreshAggs(aggTable)(txnsTableName)(ddb)(committee.id)();
 
     return committee;
   }
@@ -463,11 +458,11 @@ export class AppResolver {
     if (s.password !== demoPasscode || runenv === "prod")
       throw new UnauthorizedError();
 
-    const res = await seedTxn(txnsTableName)(dynamoDB)(s)();
+    const res = await seedTxn(txnsTableName)(ddb)(s)();
 
     if (isLeft(res)) throw res.left;
 
-    await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(s.committeeId)();
+    await refreshAggs(aggTable)(txnsTableName)(ddb)(s.committeeId)();
 
     return res.right;
   }
@@ -480,13 +475,13 @@ export class AppResolver {
     if (d.password !== demoPasscode || runenv === "prod")
       throw new UnauthorizedError();
 
-    const res = await reconcileOneDemoContrib(txnsTableName)(dynamoDB)(
+    const res = await reconcileOneDemoContrib(txnsTableName)(ddb)(
       d.committeeId
     )();
 
     if (isLeft(res)) throw res.left;
 
-    await refreshAggs(aggTable)(txnsTableName)(dynamoDB)(d.committeeId)();
+    await refreshAggs(aggTable)(txnsTableName)(ddb)(d.committeeId)();
 
     return res.right;
   }

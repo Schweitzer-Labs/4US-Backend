@@ -28,7 +28,7 @@
     "faker": "^5.5.3"
   },
   "scripts": {
-    "test": "ts-mocha tests/**/*.test.ts --timeout 100000",
+    "test": "ts-mocha tests/**/*.test.ts --timeout 600000",
     "test-gql": "ts-mocha tests/lambdas/gql-txns.test.ts --timeout 10000",
     "test-owners": "ts-mocha tests/lambdas/gql-owners.test.ts --timeout 60000",
     "integ-test": "mocha tests/integration",
@@ -41,7 +41,7 @@
     "test-finicity": "ts-mocha tests/integration/finicity.test.ts --timeout 10000",
     "test-donor": "ts-mocha tests/integration/donor-verifier.test.ts --timeout 10000",
     "test-rules": "ts-mocha tests/integration/get-rule.test.ts --timeout 10000",
-    "test-ln": "ts-mocha tests/integration/lexis-nexis.test.ts --timeout 10000",
+    "test-ln": "ts-mocha tests/integration/lexis-nexis.test.ts --timeout 60000",
     "test-engine": "ts-mocha tests/integration/rules-engine.test.ts --timeout 10000",
     "test-ln-decoders": "ts-mocha tests/unit/lexis-nexis-decoders.test.ts --timeout 10000",
     "test-get-txn": "ts-mocha tests/integration/get-txn-by-id.test.ts --timeout 10000",

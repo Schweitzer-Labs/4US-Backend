@@ -7,6 +7,18 @@ import { searchTransactions } from "../queries/search-transactions.query";
 import { taskEither } from "fp-ts";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 import { putAggAndDecode } from "../utils/model/put-aggs.utils";
+import { ITransaction } from "../queries/search-transactions.decoder";
+
+export const refreshAggsFromTxn =
+  (aggTable: string) =>
+  (txnTable: string) =>
+  (ddb: DynamoDB) =>
+  (txn: ITransaction): TaskEither<ApplicationError, IAggs> =>
+    pipe(
+      searchTransactions(txnTable)(ddb)({ committeeId: txn.committeeId }),
+      taskEither.map(txnsToAgg(txn.committeeId)),
+      taskEither.chain(putAggAndDecode(aggTable)(ddb))
+    );
 
 export const refreshAggs =
   (aggTable: string) =>

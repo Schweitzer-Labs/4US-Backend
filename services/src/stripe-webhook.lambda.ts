@@ -20,9 +20,8 @@ AWS.config.apiVersions = {
 const runenv: any = process.env.RUNENV;
 let stripe: Stripe;
 let stripeApiKey: string;
-const dynamoDB = new DynamoDB();
-
 const ps = new AWS.SSM();
+const dynamoDB = new DynamoDB();
 
 export default async (
   event: APIGatewayEvent

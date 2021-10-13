@@ -39,8 +39,10 @@ const validUsername = qaUsers[0];
 
 const invalidUsername = "james-martin";
 
-const expectedForbiddenText =
-  "Access denied! You need to be authorized to perform this action!";
+// const expectedForbiddenText =
+//   "Access denied! You need to be authorized to perform this action!";
+
+const expectedForbiddenText = "API use is not authorized";
 
 const committee = genCommittee({
   district: "53",

@@ -25,7 +25,9 @@ const validateUser =
   (currentUser: string) =>
   (committee: ICommittee): TaskEither<ApplicationError, ICommittee> => {
     if (!committee.members.includes(currentUser)) {
-      taskEither.left(new ApplicationError("API use is not authorized", {}));
+      return taskEither.left(
+        new ApplicationError("API use is not authorized", {})
+      );
     }
     return taskEither.right(committee);
   };

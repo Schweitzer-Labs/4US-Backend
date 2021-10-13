@@ -13,3 +13,4 @@ exports.policapitalEmailerHandler =
 exports.bankSyncHandler = require("./dist/bank-sync.lambda").default;
 exports.stratoSQS = require("./dist/strato-sqs.lambda").default;
 exports.bankSQS = require("./dist/bank-sqs.lambda").default;
+exports.runReportHandler = require("./dist/src/run-report.lambda").default;
