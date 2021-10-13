@@ -15,6 +15,9 @@ instance ToJSON Payload
 handler :: Payload -> Context () -> IO (Either String String)
 handler payload context = runHandler payload
 
+anotherHandler :: Payload -> Context () -> IO (Either String String)
+anotherHandler payload context = return $ Right "ok, another handler worked"
+
 runHandler :: Payload -> IO (Either String String)
 runHandler payload = toRes payload
 

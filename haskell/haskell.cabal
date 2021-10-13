@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 892373821d16fb492fbd4b48819d1402bbd1892da7b4f615948bfa040e197444
+-- hash: 7d5fcb0cb9a44cccd914ef3b484b992be8c2b5812065276ae982ab64e459d129
 
 name:           haskell
 version:        0.1.0
@@ -40,7 +40,7 @@ library
       aeson
     , amazonka
     , amazonka-ssm
-    , aws-lambda-haskell-runtime >=3.0.0
+    , aws-lambda-haskell-runtime >=4.0.0
     , base >=4.7 && <5
     , bytestring
     , containers
@@ -66,7 +66,7 @@ executable bootstrap
       aeson
     , amazonka
     , amazonka-ssm
-    , aws-lambda-haskell-runtime >=3.0.0
+    , aws-lambda-haskell-runtime >=4.0.0
     , base >=4.7 && <5
     , bytestring
     , containers

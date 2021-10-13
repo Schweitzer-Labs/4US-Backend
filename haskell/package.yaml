@@ -10,7 +10,7 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
-- aws-lambda-haskell-runtime >= 3.0.0
+- aws-lambda-haskell-runtime >= 4.0.0
 - aeson
 - lens-aeson
 - lens
