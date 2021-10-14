@@ -55,7 +55,8 @@ export const genDemoCommittee =
       county: "saratoga",
       officeType: "senator",
       ruleVersion: "nyboe-2020",
-      efsFilerId: 161,
+      efsFilerId: 15950,
+      efsElectionId: 139,
       id: `will-schweitzer-${genTxnId()}`,
       bankName: "avanti",
     });

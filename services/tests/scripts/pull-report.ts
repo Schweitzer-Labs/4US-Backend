@@ -1,10 +1,9 @@
 import { Stripe } from "stripe";
-import { midnightLastNight, milliToEpoch } from "./utils/time.utils";
+import { midnightLastNight, milliToEpoch } from "../../src/utils/time.utils";
 import { now } from "fp-ts/Date";
-import { getReport } from "./webhook/run-report-succeeded/report-run-succeeded.handler";
+import { getReport } from "../../src/webhook/run-report-succeeded/report-run-succeeded.handler";
 
-const apiKey =
-  "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";
+const apiKey = "insert live key here";
 const stripe = new Stripe(apiKey, {
   apiVersion: "2020-08-27",
 });

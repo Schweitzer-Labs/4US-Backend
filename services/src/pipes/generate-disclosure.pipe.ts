@@ -33,7 +33,7 @@ export const generateDisclosure =
         // @ToDo convert hardcode into data
         return (
           txn.paymentDate - offset >=
-            new Date("October 01, 2021").getTime() - offset &&
+            new Date("September 28, 2021").getTime() - offset &&
           txn.paymentDate - offset <=
             new Date("October 18, 2021").getTime() - offset
         );
@@ -89,7 +89,7 @@ const toAttributedRow =
       ["FILING_SCHED_ID"]: 15,
       ["LOAN_LIB_NUMBER"]: "NULL",
       ["TRANS_NUMBER"]: transactionId,
-      ["TRANS_MAPPING"]: "NULL",
+      ["TRANS_MAPPING"]: transactionId,
       // @Todo implement
       ["SCHED_DATE"]: millisToDateStr(txn.paymentDate),
       ["ORG_DATE"]: "NULL",
