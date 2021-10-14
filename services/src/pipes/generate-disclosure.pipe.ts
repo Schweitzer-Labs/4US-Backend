@@ -48,9 +48,12 @@ export const generateDisclosure =
   };
 
 const boolToYesNo = (val: any) => (val ? "Y" : "N");
-const shouldBeAttributed = (txn: ITransaction) =>
-  txn.transactionType === TransactionType.Contribution &&
-  txn.entityType === EntityType.Llc;
+const shouldBeAttributed = ({ transactionType, entityType }: ITransaction) =>
+  transactionType === TransactionType.Contribution &&
+  (entityType === EntityType.Llc || entityType === EntityType.Plc);
+
+const toAttributedTxnId = (txn: ITransaction) => (index: number) =>
+  `${txn.id}-attr-${index}`;
 
 export const toAttributedContribs =
   (committee: ICommittee) =>
@@ -59,7 +62,7 @@ export const toAttributedContribs =
     const preparedOwners = prepareOwners(txn);
 
     const ownerRows = preparedOwners.reduce((acc, owner) => {
-      const row = toAttributedRow(committee)(txn)(owner);
+      const row = toAttributedRow(committee)(txn)(owner)(acc.length);
 
       return [row, ...acc];
     }, []);
@@ -68,7 +71,10 @@ export const toAttributedContribs =
   };
 
 const toAttributedRow =
-  (committee: ICommittee) => (txn: ITransaction) => (owner: IOwner) => {
+  (committee: ICommittee) =>
+  (txn: ITransaction) =>
+  (owner: IOwner) =>
+  (index: number) => {
     const {
       entityType: entityTypeStr,
       id: transactionId,
@@ -88,12 +94,12 @@ const toAttributedRow =
       ["R_FILING_DATE"]: millisToDateStr(filingDates[1].filingDate),
       ["FILING_SCHED_ID"]: 15,
       ["LOAN_LIB_NUMBER"]: "NULL",
-      ["TRANS_NUMBER"]: transactionId,
+      ["TRANS_NUMBER"]: toAttributedTxnId(txn)(index),
       ["TRANS_MAPPING"]: transactionId,
       // @Todo implement
       ["SCHED_DATE"]: millisToDateStr(txn.paymentDate),
       ["ORG_DATE"]: "NULL",
-      ["CNTRBR_TYPE_ID"]: "11",
+      ["CNTRBR_TYPE_ID"]: "NULL",
       // @ToDo add in-kind field
       ["CNTRBN_TYPE_ID"]: "NULL",
       ["TRANSFER_TYPE_ID"]: "NULL",
