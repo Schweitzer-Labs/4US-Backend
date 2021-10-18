@@ -60,9 +60,10 @@ const runRule =
     const remaining = rule.limit - balance;
     const exceedsLimit = balance + attemptedAmount > rule.limit;
     if (exceedsLimit) {
+     const formatNum = num => (num/100).toFixed(2)
       return te.left(
         new ApplicationError(
-          "Excess contribution attempted",
+          `Excess contribution attempted. Remaining: $${formatNum(remaining)}`,
           { remaining },
           StatusCodes.UNAUTHORIZED
         )
