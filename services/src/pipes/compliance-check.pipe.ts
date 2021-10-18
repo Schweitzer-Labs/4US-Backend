@@ -63,7 +63,7 @@ const runRule =
      const formatNum = num => (num/100).toFixed(2)
       return te.left(
         new ApplicationError(
-          `Excess contribution attempted. Remaining: $${formatNum(remaining)}`,
+          `Excess contribution attempted. Remaining: $${formatNum(rule.limit)}`,
           { remaining },
           StatusCodes.UNAUTHORIZED
         )
