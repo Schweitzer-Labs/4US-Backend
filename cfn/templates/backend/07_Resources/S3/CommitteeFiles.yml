@@ -2,3 +2,5 @@ CommitteeFiles:
   Type: AWS::S3::Bucket
   Properties:
     BucketName: committee-files
+
+
