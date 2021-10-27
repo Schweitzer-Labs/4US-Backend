@@ -8,3 +8,4 @@ EmailQueue:
     RedrivePolicy:
       deadLetterTargetArn: !Ref SQSDLQ
       maxReceiveCount: 3
+
