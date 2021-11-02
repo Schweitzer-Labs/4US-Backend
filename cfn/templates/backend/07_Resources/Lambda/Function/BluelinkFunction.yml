@@ -6,7 +6,7 @@ BluelinkFunction:
     CodeUri: lambdas/
     Layers:
       - !Ref ServicesLayer
-    Handler: app.bluelink
+    Handler: app.bluelinkHandler
     Runtime: nodejs14.x
     Role: !GetAtt LambdaGraphQLRole.Arn
     Timeout: 90
