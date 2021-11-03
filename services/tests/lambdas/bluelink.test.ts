@@ -57,6 +57,15 @@ describe("Bluelink webhook", function () {
     expect(body.message).to.equal(`"transactions[0].recipientId" is required`);
   });
 
+  it("Returns a 400 on empty object", async () => {
+    const testEvent = genEvent({});
+
+    const res = await bluelink(testEvent);
+    const body = JSON.parse(res.body);
+
+    expect(res.statusCode).to.equal(400);
+  });
+
   it("Returns a 200 on schema success", async () => {
     const testEvent = genEvent({
       transactions: [

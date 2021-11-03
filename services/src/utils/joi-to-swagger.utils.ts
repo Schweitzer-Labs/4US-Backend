@@ -1,11 +1,7 @@
-import j2s from 'joi-to-swagger';
-import {bluelinkSchema} from "./bluelink-schema.utils";
-
+import j2s from "joi-to-swagger";
+import { bluelinkSchema } from "./bluelink-schema.utils";
 
 const { swagger, components } = j2s(bluelinkSchema, {});
 
-console.log('Swagger')
-console.log(swagger)
-
-console.log('Components')
-console.log(swagger)
+console.log("Swagger");
+console.log(JSON.stringify(swagger));
