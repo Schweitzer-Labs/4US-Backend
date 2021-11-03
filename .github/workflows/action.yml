@@ -5,6 +5,8 @@ on:
       - qa
       - prod
       - demo
+    paths-ignore:
+      - '**/README.md'
 jobs:
   deploy:
     runs-on: ubuntu-latest

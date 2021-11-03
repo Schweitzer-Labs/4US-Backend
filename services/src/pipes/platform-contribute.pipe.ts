@@ -27,10 +27,9 @@ import { enumToValues } from "../utils/enums/poly.util";
 import { State } from "../utils/enums/state.enum";
 import { validateMAContrib } from "../graphql/validators/ma.validators";
 import { validateNYContrib } from "../graphql/validators/ny.validators";
+import {stringOpt, stringReq} from "../utils/joi.utils";
 
-const stringOpt = (min = 1, max = 200) => Joi.string().min(min).max(max);
-const stringReq = (min = 1, max = 200) =>
-  Joi.string().min(min).max(max).required();
+
 
 const ownerSchema = {
   firstName: Joi.string(),
@@ -94,6 +93,8 @@ const validateNonInd = (
   return right(true);
 };
 
+
+// @ToDo generalize function
 const eventToCreateContribInput = (
   event: any
 ): TaskEither<ApplicationError, CreateContributionInput> => {

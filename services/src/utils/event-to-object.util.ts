@@ -10,7 +10,7 @@ export const eventToObject = (
   } catch (e) {
     return left(
       new ApplicationError(
-        "Error parsing body",
+        "Error parsing body. Please ensure you're submitting valid JSON",
         event,
         StatusCodes.UNPROCESSABLE_ENTITY
       )

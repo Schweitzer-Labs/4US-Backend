@@ -274,6 +274,7 @@ export class AppResolver {
           te.map(() => txn)
         )
       ),
+      // @ToDo add custom error to show balances and other metadata
       te.mapLeft((appErr) => new ValidationError(appErr.message))
     );
 

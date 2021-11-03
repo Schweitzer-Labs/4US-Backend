@@ -7,5 +7,7 @@ KeepLambdaWarm:
     Targets:
       - Id: !Ref PlatformContributeFunction
         Arn: !GetAtt PlatformContributeFunction.Arn
+      - Id: !Ref BluelinkFunction
+        Arn: !GetAtt BluelinkFunction.Arn
       - Id: !Ref CommitteeGraphQLFunction
         Arn: !GetAtt CommitteeGraphQLFunction.Arn
