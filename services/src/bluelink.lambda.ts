@@ -1,22 +1,23 @@
 import "reflect-metadata";
-import { getLNPassword, getLNUsername, getStripeApiKey } from "./utils/config";
-import { Stripe } from "stripe";
 import * as dotenv from "dotenv";
-import { platformContribute } from "./pipes/platform-contribute.pipe";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import { successResponse } from "./utils/success-response";
-import { errorResponse } from "./utils/error-response.utils";
+import { appErrorToResp, errorResponse } from "./utils/error-response.utils";
 import { StatusCodes } from "http-status-codes";
-import { ILexisNexisConfig } from "./clients/lexis-nexis/lexis-nexis.client";
 import { headers } from "./utils/headers";
+import { TaskEither } from "fp-ts/TaskEither";
+import { ApplicationError } from "./utils/application-error";
+import { eventToObject } from "./utils/event-to-object.util";
+import { validateObject } from "./utils/validate-schema.utils";
+import { bluelinkSchema } from "./utils/bluelink-schema.utils";
 
 dotenv.config();
 
 AWS.config.apiVersions = {
-    dynamodb: "2012-08-10",
+  dynamodb: "2012-08-10",
 };
 
 const dynamoDB = new DynamoDB();
@@ -31,11 +32,48 @@ const corsOrigin = process.env.CORS_ORIGIN;
 
 const ps = new AWS.SSM();
 
+const appKey = "0e6fa92b-0ab1-4d38-a521-67579010abaa";
+
+const getAppKey = (event: any): any =>
+  event?.headers ? event?.headers["4US-App-Key"] : false;
+
+const validateAppKey = (event: any): TaskEither<ApplicationError, object> =>
+  getAppKey(event) === appKey
+    ? taskEither.right(event)
+    : taskEither.left(
+        new ApplicationError(
+          `Invalid auth. Please ensure headers contain property "4US-App-Key"`,
+          {},
+          StatusCodes.UNAUTHORIZED
+        )
+      );
+
+const bluelinkEventToModel = (
+  event: any
+): TaskEither<ApplicationError, object> =>
+  pipe(
+    validateAppKey(event),
+    taskEither.chain(eventToObject),
+    taskEither.chain(validateObject(bluelinkSchema))
+  );
+
 export default async (event: any) => {
-    console.log('bluelink webhook called')
-    console.log(JSON.stringify(event))
-    return {
-        ...successResponse,
-        headers: headers(corsOrigin),
-    }
+  console.log("bluelink webhook called");
+  console.log(JSON.stringify(event));
+
+  return await pipe(
+    bluelinkEventToModel(event),
+    taskEither.fold(
+      (error) =>
+        task.of({
+          ...appErrorToResp(error),
+          headers: headers(corsOrigin),
+        }),
+      () =>
+        task.of({
+          ...successResponse,
+          headers: headers(corsOrigin),
+        })
+    )
+  )();
 };

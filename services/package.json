@@ -14,18 +14,21 @@
     "class-validator": "^0.13.1",
     "csvtojson": "^2.0.10",
     "dotenv": "^8.2.0",
+    "faker": "^5.5.3",
     "fp-ts": "^2.10.5",
     "graphql": "^15.5.0",
     "http-status-codes": "^2.1.4",
+    "i": "^0.3.7",
     "io-ts": "^2.2.16",
     "joi": "^17.4.0",
+    "joi-to-swagger": "^6.0.1",
     "jsonexport": "^3.2.0",
     "node-fetch": "^2.6.1",
+    "npm": "^8.1.2",
     "reflect-metadata": "^0.1.13",
     "stripe": "^8.151.0",
     "type-graphql": "^1.1.1",
-    "ua-parser-js": "^0.7.28",
-    "faker": "^5.5.3"
+    "ua-parser-js": "^0.7.28"
   },
   "scripts": {
     "test": "ts-mocha tests/**/*.test.ts --timeout 600000",
