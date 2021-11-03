@@ -3,9 +3,13 @@ import { stringOpt, stringReq } from "./joi.utils";
 import { enumToValues } from "./enums/poly.util";
 import { State } from "./enums/state.enum";
 import { employmentStatuses } from "./enums/employment-status";
+import { DataSource, dataSources } from "./enums/data-source.enum";
 
 export const bluelinkTxnSchema = Joi.object({
   recipientId: stringReq(),
+  source: Joi.string()
+    .valid(...dataSources)
+    .required(),
   recipientGovId: stringOpt(),
   paymentDate: Joi.number().integer().required(),
   amount: Joi.number().integer().min(0).max(2000000000).required(),

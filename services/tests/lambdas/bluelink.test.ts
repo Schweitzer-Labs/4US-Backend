@@ -46,6 +46,7 @@ describe("Bluelink webhook", function () {
           amount: "123",
           firstName: 100,
           paymentDate: 123,
+          source: "ActBlu",
         },
       ],
     });
@@ -101,6 +102,7 @@ describe("Bluelink webhook", function () {
             dataOne: "asdfasdf",
             dataTwo: "asdfasdf",
           },
+          source: "ActBlue",
         },
       ],
     });
