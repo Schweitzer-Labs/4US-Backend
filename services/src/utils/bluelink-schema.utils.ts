@@ -4,7 +4,7 @@ import { enumToValues } from "./enums/poly.util";
 import { State } from "./enums/state.enum";
 import { employmentStatuses } from "./enums/employment-status";
 
-export const bluelinkSchema = Joi.object({
+export const bluelinkTxnSchema = Joi.object({
   recipientId: stringReq(),
   recipientGovId: stringOpt(),
   paymentDate: Joi.number().integer().required(),
@@ -27,4 +27,8 @@ export const bluelinkSchema = Joi.object({
   addressLine2: stringOpt(),
   phoneNumber: stringOpt(5, 15),
   metadata: Joi.any(),
+});
+
+export const bluelinkSchema = Joi.object({
+  transactions: Joi.array().items(bluelinkTxnSchema),
 });

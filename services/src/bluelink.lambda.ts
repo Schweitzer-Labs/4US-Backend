@@ -35,7 +35,7 @@ const ps = new AWS.SSM();
 const appKey = "0e6fa92b-0ab1-4d38-a521-67579010abaa";
 
 const getAppKey = (event: any): any =>
-  event?.headers ? event?.headers["4US-App-Key"] : false;
+  event?.headers ? event?.headers["4us-app-key"] : false;
 
 const validateAppKey = (event: any): TaskEither<ApplicationError, object> =>
   getAppKey(event) === appKey

@@ -14,7 +14,7 @@ AWS.config.apiVersions = {
 const genEvent = (payload: object) => {
   return {
     headers: {
-      ["4US-App-Key"]: "0e6fa92b-0ab1-4d38-a521-67579010abaa",
+      ["4us-app-key"]: "0e6fa92b-0ab1-4d38-a521-67579010abaa",
     },
     body: JSON.stringify(payload),
   };
@@ -41,42 +41,50 @@ describe("Bluelink webhook", function () {
 
   it("Returns a 400 on schema failure", async () => {
     const testEvent = genEvent({
-      amount: "123",
-      firstName: 100,
-      paymentDate: 123,
+      transactions: [
+        {
+          amount: "123",
+          firstName: 100,
+          paymentDate: 123,
+        },
+      ],
     });
 
     const res = await bluelink(testEvent);
     const body = JSON.parse(res.body);
 
     expect(res.statusCode).to.equal(400);
-    expect(body.message).to.equal(`"recipientId" is required`);
+    expect(body.message).to.equal(`"transactions[0].recipientId" is required`);
   });
 
   it("Returns a 200 on schema success", async () => {
     const testEvent = genEvent({
-      recipientId: "testeststest",
-      paymentDate: 1231232323,
-      amount: 123,
-      firstName: "Test",
-      middleName: "Test",
-      lastName: "Test",
-      addressLine1: "Test",
-      city: "Test",
-      state: "PA",
-      country: "Test",
-      postalCode: "13224",
-      emailAddress: "dev.evanpiro@gmail.com",
-      employer: "Test",
-      employmentStatus: "Employed",
-      occupation: "Test",
-      refCode: "Test",
-      addressLine2: "Test",
-      phoneNumber: "6103161022",
-      metadata: {
-        dataOne: "asdfasdf",
-        dataTwo: "asdfasdf",
-      },
+      transactions: [
+        {
+          recipientId: "testeststest",
+          paymentDate: 1231232323,
+          amount: 123,
+          firstName: "Test",
+          middleName: "Test",
+          lastName: "Test",
+          addressLine1: "Test",
+          city: "Test",
+          state: "PA",
+          country: "Test",
+          postalCode: "13224",
+          emailAddress: "dev.evanpiro@gmail.com",
+          employer: "Test",
+          employmentStatus: "Employed",
+          occupation: "Test",
+          refCode: "Test",
+          addressLine2: "Test",
+          phoneNumber: "6103161022",
+          metadata: {
+            dataOne: "asdfasdf",
+            dataTwo: "asdfasdf",
+          },
+        },
+      ],
     });
 
     const res = await bluelink(testEvent);
