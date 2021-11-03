@@ -11,10 +11,7 @@ export const validateCheck = (
 ): TaskEither<ApplicationError, boolean> => {
   if (d.paymentMethod === PaymentMethod.Check && !d.checkNumber)
     return taskEither.left(
-      new ApplicationError(
-        "Card info must be provided for contributions in credit and debit",
-        d
-      )
+      new ApplicationError("Check number must be provided.", d)
     );
 
   return taskEither.right(true);
