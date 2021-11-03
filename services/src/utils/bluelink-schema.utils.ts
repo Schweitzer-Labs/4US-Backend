@@ -11,6 +11,7 @@ export const bluelinkTxnSchema = Joi.object({
   amount: Joi.number().integer().min(0).max(2000000000).required(),
   firstName: stringReq(),
   middleName: stringOpt(),
+  reportType: stringOpt(),
   lastName: stringReq(),
   addressLine1: stringReq(),
   city: stringReq(),
