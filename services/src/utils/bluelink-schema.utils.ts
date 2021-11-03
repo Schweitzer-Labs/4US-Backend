@@ -31,5 +31,5 @@ export const bluelinkTxnSchema = Joi.object({
 });
 
 export const bluelinkSchema = Joi.object({
-  transactions: Joi.array().items(bluelinkTxnSchema).required(),
+  transactions: Joi.array().items(bluelinkTxnSchema).min(1).required(),
 }).required();

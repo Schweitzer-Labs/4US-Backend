@@ -61,7 +61,16 @@ describe("Bluelink webhook", function () {
     const testEvent = genEvent({});
 
     const res = await bluelink(testEvent);
-    const body = JSON.parse(res.body);
+
+    expect(res.statusCode).to.equal(400);
+  });
+
+  it("Returns a 400 on empty transactions array", async () => {
+    const testEvent = genEvent({
+      transactions: [],
+    });
+
+    const res = await bluelink(testEvent);
 
     expect(res.statusCode).to.equal(400);
   });
