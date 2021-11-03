@@ -35,7 +35,7 @@ export const validateContrib =
       ![EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType) &&
       !entityName
     ) {
-      te.left(
+      return te.left(
         new ApplicationError(
           "Entity name must be provided for non-individual and non-family contributions",
           input
@@ -45,7 +45,7 @@ export const validateContrib =
 
     if (paymentMethod === PaymentMethod.Check) {
       if (!checkNumber)
-        te.left(
+        return te.left(
           new ApplicationError(
             "Check number must be provided for contributions by check",
             input
@@ -55,7 +55,7 @@ export const validateContrib =
 
     if ([PaymentMethod.Check, PaymentMethod.Ach].includes(paymentMethod)) {
       if (!paymentDate)
-        te.left(
+        return te.left(
           new ApplicationError(
             "Payment date must be provided for contributions by check or ACH",
             input
