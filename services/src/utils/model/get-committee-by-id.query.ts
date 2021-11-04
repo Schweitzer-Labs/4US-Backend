@@ -1,14 +1,14 @@
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
-import { ApplicationError } from "../utils/application-error";
+import { ApplicationError } from "../application-error";
 import { StatusCodes } from "http-status-codes";
 import { taskEither as te, taskEither } from "fp-ts";
-import { validateDDBResponse } from "../utils/ddb.utils";
-import { decodeError } from "../utils/decode-error.util";
+import { validateDDBResponse } from "../ddb.utils";
+import { decodeError } from "../decode-error.util";
 
-import { isEmpty } from "../utils/model/get-res-is-empty.utils";
-import { Committee, Committees, ICommittee } from "../types/committee.type";
+import { isEmpty } from "./get-res-is-empty.utils";
+import { Committee, Committees, ICommittee } from "../../types/committee.type";
 
 const logPrefix = "Get Committee";
 

@@ -3,7 +3,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { IAggs } from "../types/aggs.type";
 import { pipe } from "fp-ts/function";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/search-transactions.query";
 import { taskEither } from "fp-ts";
 import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
 import { putAggAndDecode } from "../utils/model/put-aggs.utils";

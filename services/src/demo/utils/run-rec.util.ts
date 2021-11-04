@@ -13,7 +13,7 @@ import {
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../../utils/application-error";
 import { pipe } from "fp-ts/function";
-import { searchTransactions } from "../../queries/search-transactions.query";
+import { searchTransactions } from "../../utils/model/search-transactions.query";
 import { TransactionType } from "../../utils/enums/transaction-type.enum";
 import { taskEither as te } from "fp-ts";
 import { isPayout } from "../../pipes/reconcile-contributions.pipe";

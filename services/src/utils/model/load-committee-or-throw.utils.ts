@@ -1,5 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { getCommitteeById } from "../../queries/get-committee-by-id.query";
+import { getCommitteeById } from "./get-committee-by-id.query";
 import { isLeft } from "fp-ts/Either";
 import { UnauthorizedError } from "type-graphql";
 import { ApplicationError } from "../application-error";

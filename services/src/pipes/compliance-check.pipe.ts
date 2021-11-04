@@ -1,11 +1,11 @@
 import { IDonor } from "../types/donor.type";
 import { pipe } from "fp-ts/function";
-import { committeeAndDonorToRule } from "../queries/get-rule.query";
+import { committeeAndDonorToRule } from "../utils/model/get-rule.query";
 import { DynamoDB } from "aws-sdk";
 import { taskEither as te } from "fp-ts";
 import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/search-transactions.query";
 import { AggregateDuration, IRule } from "../types/rule.type";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { StatusCodes } from "http-status-codes";

@@ -1,4 +1,4 @@
-import { searchTransactions } from "../../queries/search-transactions.query";
+import { searchTransactions } from "../../utils/model/search-transactions.query";
 import { Order } from "../../utils/enums/order.enum";
 import { TransactionType } from "../../utils/enums/transaction-type.enum";
 import { DynamoDB } from "aws-sdk";

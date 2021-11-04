@@ -1,8 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import {
-  genFlacspee,
-  IFlacspeeInput,
-} from "../utils/model/gen-donor-match.utils";
+import { genFlacspee, IFlacspeeInput } from "./gen-donor-match.utils";
 
 const getDonors =
   (txnsTableName: string) =>

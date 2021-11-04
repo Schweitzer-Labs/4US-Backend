@@ -12,7 +12,7 @@ import {
 import { ITransaction, Transactions } from "../types/transaction.type";
 import { getTransactions } from "../clients/finicity/finicity.client";
 import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/search-transactions.query";
 import { Direction } from "../utils/enums/direction.enum";
 import { dateToTxnId } from "../utils/gen-txn-id.utils";
 import { Source } from "../utils/enums/source.enum";

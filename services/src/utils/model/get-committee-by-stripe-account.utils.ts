@@ -3,7 +3,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { ApplicationError } from "../application-error";
-import { decodeCommittees } from "../../queries/get-committee-by-id.query";
+import { decodeCommittees } from "./get-committee-by-id.query";
 import { StatusCodes } from "http-status-codes";
 import { ICommittee } from "../../types/committee.type";
 

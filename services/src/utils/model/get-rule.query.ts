@@ -1,14 +1,14 @@
 import { DynamoDB } from "aws-sdk";
-import { committeeAndDonorToRuleCode } from "../utils/model/gen-rule-code.utils";
+import { committeeAndDonorToRuleCode } from "./gen-rule-code.utils";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
-import { ApplicationError } from "../utils/application-error";
+import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../utils/ddb.utils";
-import { IRule, Rules } from "../types/rule.type";
-import { IDonor } from "../types/donor.type";
-import { ICommittee } from "../types/committee.type";
+import { validateDDBResponse } from "../ddb.utils";
+import { IRule, Rules } from "../../types/rule.type";
+import { IDonor } from "../../types/donor.type";
+import { ICommittee } from "../../types/committee.type";
 
 const logPrefix = "Get Rule";
 

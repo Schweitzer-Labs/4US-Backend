@@ -11,7 +11,7 @@ import { taskEither } from "fp-ts";
 import {
   donorInputToDonors,
   getDonorByLNId,
-} from "../queries/search-donors.query";
+} from "../utils/model/search-donors.query";
 import { IDonor, IDonorInput } from "../types/donor.type";
 import { Plan } from "../utils/enums/plan.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";

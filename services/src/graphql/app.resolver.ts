@@ -13,7 +13,7 @@ import { Aggregations } from "./object-types/aggregations.object-type";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/search-transactions.query";
 import { TransactionsArg } from "./args/transactions.arg";
 import { isLeft } from "fp-ts/Either";
 import CurrentUser from "../decorators/current-user.decorator";

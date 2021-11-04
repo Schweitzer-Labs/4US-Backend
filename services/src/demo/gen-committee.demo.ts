@@ -14,7 +14,7 @@ import { disableFinicity } from "../utils/disable-finicity.utils";
 import { FinicityConfig } from "../clients/finicity/finicity.decoders";
 import { genCommittee } from "./utils/gen-committee.util";
 import { unverifiedContributionsData } from "./data/unverified-contributions.data";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/search-transactions.query";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { isPayout } from "../pipes/reconcile-contributions.pipe";
 import { groupTxnsByPayout } from "../utils/model/group-txns-by-payout.utils";

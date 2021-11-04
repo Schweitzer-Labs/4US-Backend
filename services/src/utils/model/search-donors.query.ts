@@ -2,12 +2,12 @@ import { DynamoDB } from "aws-sdk";
 import * as t from "io-ts";
 import { pipe } from "fp-ts/function";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
-import { ApplicationError } from "../utils/application-error";
+import { ApplicationError } from "../application-error";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../utils/ddb.utils";
-import { genFlacspee } from "../utils/model/gen-donor-match.utils";
-import { Donors, IDonor, IDonorInput } from "../types/donor.type";
+import { validateDDBResponse } from "../ddb.utils";
+import { genFlacspee } from "./gen-donor-match.utils";
+import { Donors, IDonor, IDonorInput } from "../../types/donor.type";
 
 const logPrefix = "Get Donors";
 

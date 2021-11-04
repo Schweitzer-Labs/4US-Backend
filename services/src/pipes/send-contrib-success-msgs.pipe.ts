@@ -1,5 +1,5 @@
 import { ITransaction } from "../types/transaction.type";
-import { getCommitteeById } from "../queries/get-committee-by-id.query";
+import { getCommitteeById } from "../utils/model/get-committee-by-id.query";
 import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { taskEither } from "fp-ts";
 import { DynamoDB, SQS } from "aws-sdk";

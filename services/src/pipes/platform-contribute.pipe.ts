@@ -14,7 +14,7 @@ import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
 import { ITransaction } from "../types/transaction.type";
 import { taskEither as te } from "fp-ts";
-import { getCommitteeById } from "../queries/get-committee-by-id.query";
+import { getCommitteeById } from "../utils/model/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
