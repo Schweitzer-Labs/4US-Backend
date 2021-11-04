@@ -9,7 +9,7 @@ import { sleep } from "../../src/utils/sleep.utils";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { genDisbursement } from "../utils/gen-disbursement.util";
 import { verifyDisbursementFromUserAndPut } from "../../src/pipes/verify-disbursement-from-user.pipe";
-import { VerifyDisbursementInput } from "../../src/input-types/verify-disbursement.input-type";
+import { VerifyDisbursementInput } from "../../src/input-object-types/verify-disbursement.input-type";
 import { isLeft } from "fp-ts/Either";
 import { PurposeCode } from "../../src/utils/enums/purpose-code.enum";
 import { now } from "../../src/utils/time.utils";
