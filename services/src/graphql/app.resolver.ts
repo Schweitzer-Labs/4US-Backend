@@ -16,7 +16,7 @@ import * as dotenv from "dotenv";
 import { searchTransactions } from "../utils/model/search-transactions.query";
 import { TransactionsArg } from "./args/transactions.arg";
 import { isLeft } from "fp-ts/Either";
-import CurrentUser from "../decorators/current-user.decorator";
+import CurrentUser from "./decorators/current-user.decorator";
 import {
   loadCommitteeOrError,
   loadCommitteeOrThrow,
