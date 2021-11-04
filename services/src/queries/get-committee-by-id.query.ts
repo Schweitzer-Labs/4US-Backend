@@ -4,7 +4,7 @@ import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { StatusCodes } from "http-status-codes";
 import { taskEither as te, taskEither } from "fp-ts";
-import { validateDDBResponse } from "../repositories/ddb.utils";
+import { validateDDBResponse } from "../utils/ddb.utils";
 import { decodeError } from "../utils/decode-error.util";
 
 import { isEmpty } from "../utils/model/get-res-is-empty.utils";

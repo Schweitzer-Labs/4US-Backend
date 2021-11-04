@@ -11,7 +11,7 @@ import {
   ITransaction,
   Transaction,
 } from "../types/transaction.type";
-import { validateDDBResponse } from "../repositories/ddb.utils";
+import { validateDDBResponse } from "../utils/ddb.utils";
 import { now } from "../utils/time.utils";
 import { txnToSQS } from "./txn-to-sqs.pipe";
 

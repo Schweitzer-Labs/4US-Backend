@@ -5,7 +5,7 @@ import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
 
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../../repositories/ddb.utils";
+import { validateDDBResponse } from "../ddb.utils";
 import { isEmpty } from "./get-res-is-empty.utils";
 
 const logPrefix = "Get Transaction by ID";

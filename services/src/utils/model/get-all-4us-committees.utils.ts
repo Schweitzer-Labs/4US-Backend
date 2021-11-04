@@ -3,7 +3,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { Plan } from "../enums/plan.enum";
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../../repositories/ddb.utils";
+import { validateDDBResponse } from "../ddb.utils";
 import { pipe } from "fp-ts/function";
 import { Committees, ICommittee } from "../../types/committee.type";
 

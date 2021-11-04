@@ -5,7 +5,7 @@ import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../repositories/ddb.utils";
+import { validateDDBResponse } from "../utils/ddb.utils";
 import { genFlacspee } from "../utils/model/gen-donor-match.utils";
 import { Donors, IDonor, IDonorInput } from "../types/donor.type";
 

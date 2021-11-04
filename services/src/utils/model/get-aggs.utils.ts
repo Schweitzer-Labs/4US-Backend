@@ -6,7 +6,7 @@ import { taskEither } from "fp-ts";
 import { ApplicationError } from "../application-error";
 import { Aggs, IAggs } from "../../types/aggs.type";
 import { isEmpty } from "./get-res-is-empty.utils";
-import { validateDDBResponse } from "../../repositories/ddb.utils";
+import { validateDDBResponse } from "../ddb.utils";
 import * as t from "io-ts";
 
 const logPrefix = "Get Aggs";

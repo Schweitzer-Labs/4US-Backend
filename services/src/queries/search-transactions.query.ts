@@ -9,7 +9,7 @@ import {
   toExpressionAttributeValueString,
   toFilterExpression,
   validateDDBResponse,
-} from "../repositories/ddb.utils";
+} from "../utils/ddb.utils";
 import { ITransaction, Transactions } from "../types/transaction.type";
 import { Order } from "../utils/enums/order.enum";
 import { QueryInput } from "aws-sdk/clients/dynamodb";

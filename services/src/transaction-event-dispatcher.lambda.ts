@@ -10,7 +10,7 @@ import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import * as dotenv from "dotenv";
 import { sendContribSuccessMsgs } from "./pipes/send-contrib-success-msgs.pipe";
-import { validateDDBResponse } from "./repositories/ddb.utils";
+import { validateDDBResponse } from "./utils/ddb.utils";
 import { auditTxnStream, DdbEventName } from "./pipes/audit-txn-stream.pipe";
 import { refreshAggs } from "./pipes/refresh-aggs.pipe";
 import { TaskEither } from "fp-ts/TaskEither";

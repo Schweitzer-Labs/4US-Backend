@@ -5,7 +5,7 @@ import { ApplicationError } from "../utils/application-error";
 import { pipe } from "fp-ts/function";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../repositories/ddb.utils";
+import { validateDDBResponse } from "../utils/ddb.utils";
 import { IRule, Rules } from "../types/rule.type";
 import { IDonor } from "../types/donor.type";
 import { ICommittee } from "../types/committee.type";
