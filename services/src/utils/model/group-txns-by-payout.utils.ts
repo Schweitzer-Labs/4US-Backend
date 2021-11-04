@@ -1,4 +1,4 @@
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ITransaction } from "../../types/transaction.type";
 
 export interface IPayoutGroup {
   payoutId: string;

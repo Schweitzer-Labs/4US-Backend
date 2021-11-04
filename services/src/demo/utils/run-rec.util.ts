@@ -5,7 +5,7 @@ import {
   ITransaction,
   Transaction,
   Transactions,
-} from "../../queries/search-transactions.decoder";
+} from "../../types/transaction.type";
 import {
   groupTxnsByPayout,
   IPayoutGroup,

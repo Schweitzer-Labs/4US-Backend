@@ -21,6 +21,7 @@ const committee: ICommittee = {
   stripeAccount: "123123",
   members: ["sdf"],
   tzDatabaseName: "est",
+  platformPlan: "4US",
   state: "ny",
   scope: "state",
   party: "democrat",

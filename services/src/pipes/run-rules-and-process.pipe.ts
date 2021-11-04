@@ -7,7 +7,7 @@ import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../types/transaction.type";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
 import { ICommittee } from "../types/committee.type";
 

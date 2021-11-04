@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import { IDonorInput } from "../../src/queries/search-donors.decoder";
+import { IDonorInput } from "../../src/types/donor.type";
 import { genCommittee } from "../utils/gen-committee.util";
 import * as dotenv from "dotenv";
 import { genDonorInput } from "../utils/gen-donor-input.util";

@@ -1,4 +1,4 @@
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ITransaction } from "../../types/transaction.type";
 import { ApplicationError } from "../application-error";
 import { TaskEither } from "fp-ts/TaskEither";
 import { taskEither } from "fp-ts";

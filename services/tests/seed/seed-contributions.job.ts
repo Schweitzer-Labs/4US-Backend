@@ -1,7 +1,7 @@
 import { data } from "./contributions.data";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { ITransaction } from "../../src/types/transaction.type";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { Source } from "../../src/utils/enums/source.enum";
 import { Direction } from "../../src/utils/enums/direction.enum";

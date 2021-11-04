@@ -1,8 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import {
-  ITransaction,
-  Transaction,
-} from "../../queries/search-transactions.decoder";
+import { ITransaction, Transaction } from "../../types/transaction.type";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";

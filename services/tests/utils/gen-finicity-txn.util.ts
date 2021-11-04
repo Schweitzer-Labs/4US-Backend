@@ -1,4 +1,4 @@
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { ITransaction } from "../../src/types/transaction.type";
 import { genTransaction } from "./gen-transaction.util";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import * as faker from "faker";

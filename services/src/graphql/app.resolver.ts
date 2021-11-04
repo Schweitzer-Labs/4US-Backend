@@ -77,7 +77,7 @@ import { teToRightOrThrow } from "../utils/te-to-right-or-throw.util";
 import { validateCard } from "./validators/card.validators";
 import { validateCheck } from "./validators/check.validators";
 import { validateReconcileInput } from "./validators/reconcile.validators";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../types/transaction.type";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();

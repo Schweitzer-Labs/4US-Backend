@@ -3,7 +3,7 @@ import { flow, pipe } from "fp-ts/function";
 import { taskEither as te } from "fp-ts";
 import { searchTransactions } from "../queries/search-transactions.query";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../types/transaction.type";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { putTransaction } from "../utils/model/put-transaction.utils";

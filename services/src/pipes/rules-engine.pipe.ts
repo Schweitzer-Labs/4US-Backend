@@ -7,7 +7,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { createContributionInputToDonorInput } from "../utils/model/create-contribution-input-to-donor-input.utils";
 import { Plan } from "../utils/enums/plan.enum";
-import { IDonor } from "../queries/search-donors.decoder";
+import { IDonor } from "../types/donor.type";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
 import { ICommittee } from "../types/committee.type";

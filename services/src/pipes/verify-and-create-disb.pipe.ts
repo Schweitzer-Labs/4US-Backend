@@ -2,7 +2,7 @@ import { DynamoDB } from "aws-sdk";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../types/transaction.type";
 import { pipe } from "fp-ts/function";
 import { createDisbInputToTxn } from "../utils/model/create-disbursement-input-to-transaction.utils";
 import { taskEither as te } from "fp-ts";

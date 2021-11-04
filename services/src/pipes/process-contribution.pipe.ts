@@ -8,7 +8,7 @@ import { paymentToDDB } from "../either-tasks/payment-to-ddb";
 import { DynamoDB } from "aws-sdk";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../types/transaction.type";
 import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Direction } from "../utils/enums/direction.enum";
 import { now } from "../utils/time.utils";

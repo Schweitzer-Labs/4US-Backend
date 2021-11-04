@@ -1,6 +1,6 @@
 import * as faker from "faker";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
-import { IDonorInput } from "../../src/queries/search-donors.decoder";
+import { IDonorInput } from "../../src/types/donor.type";
 
 export const genDonorInput = (entityType: EntityType): IDonorInput => ({
   firstName: faker.name.firstName(),

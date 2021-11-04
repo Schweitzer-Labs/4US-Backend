@@ -19,7 +19,7 @@ import {
   ILexisNexisConfig,
   logPrefix,
 } from "./lexis-nexis.client";
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ITransaction } from "../../types/transaction.type";
 import { ICommittee } from "../../types/committee.type";
 
 const formatRequest = (d: ITransaction) => {

@@ -1,8 +1,5 @@
 import * as AWS from "aws-sdk";
-import {
-  ITransaction,
-  Transaction,
-} from "./queries/search-transactions.decoder";
+import { ITransaction, Transaction } from "./types/transaction.type";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "./utils/application-error";
 import { PathReporter } from "io-ts/PathReporter";

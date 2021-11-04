@@ -1,4 +1,4 @@
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { ITransaction } from "../../src/types/transaction.type";
 import { now } from "../../src/utils/time.utils";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { Source } from "../../src/utils/enums/source.enum";

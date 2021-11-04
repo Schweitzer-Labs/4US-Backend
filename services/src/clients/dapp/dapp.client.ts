@@ -1,6 +1,6 @@
 import { rest, oauthUtil } from "blockapps-rest";
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ITransaction } from "../../types/transaction.type";
 import { pipe } from "fp-ts/function";
 import { taskEither as te } from "fp-ts";
 import { TaskEither } from "fp-ts/TaskEither";

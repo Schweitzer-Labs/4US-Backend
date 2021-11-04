@@ -17,7 +17,7 @@ import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { genCreateDisbInput } from "../utils/gen-create-disb-input.util";
 import { genAmendDisbInput } from "../utils/gen-amend-disb-input.util";
 import * as faker from "faker";
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { ITransaction } from "../../src/types/transaction.type";
 import { now, milliToEpoch } from "../../src/utils/time.utils";
 import { genFinicityTxn } from "../utils/gen-finicity-txn.util";
 import { Direction } from "../../src/utils/enums/direction.enum";

@@ -1,5 +1,5 @@
-import { IRule } from "../../queries/get-rule.decoder";
-import { IDonor } from "../../queries/search-donors.decoder";
+import { IRule } from "../../types/rule.type";
+import { IDonor } from "../../types/donor.type";
 import { ICommittee } from "../../types/committee.type";
 
 export const committeeAndDonorToRuleCode =

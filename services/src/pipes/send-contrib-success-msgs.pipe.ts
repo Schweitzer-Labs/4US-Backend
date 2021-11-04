@@ -1,4 +1,4 @@
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../types/transaction.type";
 import { getCommitteeById } from "../queries/get-committee-by-id.query";
 import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { taskEither } from "fp-ts";

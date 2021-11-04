@@ -1,4 +1,4 @@
-import { IDonorInput } from "../../queries/search-donors.decoder";
+import { IDonorInput } from "../../types/donor.type";
 import { CreateContributionInput } from "../../graphql/input-types/create-contribution.input-type";
 import { ContribInput } from "../../graphql/input-types/contrib-input.input-type";
 

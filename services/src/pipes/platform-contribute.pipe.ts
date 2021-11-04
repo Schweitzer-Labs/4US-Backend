@@ -12,7 +12,7 @@ import { CreateContributionInput } from "../graphql/input-types/create-contribut
 import { ApplicationError } from "../utils/application-error";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../types/transaction.type";
 import { taskEither as te } from "fp-ts";
 import { getCommitteeById } from "../queries/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";

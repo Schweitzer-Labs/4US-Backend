@@ -9,10 +9,7 @@ import {
   FinicityConfig,
   IFinicityTransaction,
 } from "../clients/finicity/finicity.decoders";
-import {
-  ITransaction,
-  Transactions,
-} from "../queries/search-transactions.decoder";
+import { ITransaction, Transactions } from "../types/transaction.type";
 import { getTransactions } from "../clients/finicity/finicity.client";
 import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
 import { searchTransactions } from "../queries/search-transactions.query";

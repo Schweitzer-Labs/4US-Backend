@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { Transaction } from "./search-transactions.decoder";
+import { Transaction } from "./transaction.type";
 
 const TxnAuditLogRequired = t.type({
   committeeId: t.string,

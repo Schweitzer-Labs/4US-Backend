@@ -1,5 +1,5 @@
 import { SQS } from "aws-sdk";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../types/transaction.type";
 import { pipe } from "fp-ts/function";
 import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { taskEither } from "fp-ts";
