@@ -1,5 +1,3 @@
-import { ICommittee } from "../../src/queries/get-committee-by-id.query";
-import * as t from "io-ts";
 import { genDonor } from "../utils/gen-donor.util";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
 import * as AWS from "aws-sdk";
@@ -9,6 +7,7 @@ import { committeeAndDonorToRule } from "../../src/queries/get-rule.query";
 import { getOrElseW } from "fp-ts/TaskEither";
 import { expect } from "chai";
 import * as dotenv from "dotenv";
+import { ICommittee } from "../../src/types/committee.type";
 
 dotenv.config();
 
@@ -20,7 +19,8 @@ const committee: ICommittee = {
   candidateFirstName: "Taylor",
   candidateLastName: "Jacobs",
   stripeAccount: "123123",
-  members: [],
+  members: ["sdf"],
+  tzDatabaseName: "est",
   state: "ny",
   scope: "state",
   party: "democrat",

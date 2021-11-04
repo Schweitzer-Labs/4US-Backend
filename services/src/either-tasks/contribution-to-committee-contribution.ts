@@ -1,13 +1,11 @@
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
-import {
-  getCommitteeById,
-  ICommittee,
-} from "../queries/get-committee-by-id.query";
+import { getCommitteeById } from "../queries/get-committee-by-id.query";
 import { right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { IContribution } from "./event-to-contribution";
 import { taskEither } from "fp-ts";
+import { ICommittee } from "../types/committee.type";
 
 export interface ICommitteeContribution {
   committee: ICommittee;

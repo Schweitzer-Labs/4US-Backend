@@ -1,4 +1,4 @@
-import { ICommittee } from "../../queries/get-committee-by-id.query";
+import { ICommittee } from "../../types/committee.type";
 
 export const activateStripe = (com: ICommittee): ICommittee => ({
   ...com,

@@ -7,7 +7,6 @@ import { isLeft } from "fp-ts/Either";
 import { now } from "../../utils/time.utils";
 import { IDonor, IDonorInput } from "../../queries/search-donors.decoder";
 import { DueDiligenceAttributesResponse } from "./lexis-nexis.decoder";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 import {
   BillableEventName,
   putBillableEvent,
@@ -20,6 +19,7 @@ import {
   dueDiligenceAttributesEndpoint,
   ILexisNexisConfig,
 } from "./lexis-nexis.client";
+import { ICommittee } from "../../types/committee.type";
 
 const prefix = "Lexis-nexis citizenship score";
 

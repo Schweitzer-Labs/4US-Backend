@@ -3,7 +3,6 @@ import { DynamoDB, SQS } from "aws-sdk";
 import { taskEither } from "fp-ts";
 import { right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import * as FPArray from "fp-ts/lib/Array";
 
 import {
@@ -28,6 +27,7 @@ import {
   putTransactionAndDecode,
 } from "../utils/model/put-transaction.utils";
 import { decodeRawData } from "../utils/decode-raw-data.util";
+import { ICommittee } from "../types/committee.type";
 
 export const syncCommittee =
   (config: FinicityConfig) =>

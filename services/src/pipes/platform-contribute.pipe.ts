@@ -14,10 +14,7 @@ import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { taskEither as te } from "fp-ts";
-import {
-  getCommitteeById,
-  ICommittee,
-} from "../queries/get-committee-by-id.query";
+import { getCommitteeById } from "../queries/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
@@ -27,9 +24,8 @@ import { enumToValues } from "../utils/enums/poly.util";
 import { State } from "../utils/enums/state.enum";
 import { validateMAContrib } from "../graphql/validators/ma.validators";
 import { validateNYContrib } from "../graphql/validators/ny.validators";
-import {stringOpt, stringReq} from "../utils/joi.utils";
-
-
+import { stringOpt, stringReq } from "../utils/joi.utils";
+import { ICommittee } from "../types/committee.type";
 
 const ownerSchema = {
   firstName: Joi.string(),
@@ -92,7 +88,6 @@ const validateNonInd = (
   }
   return right(true);
 };
-
 
 // @ToDo generalize function
 const eventToCreateContribInput = (

@@ -7,9 +7,9 @@ import { pipe } from "fp-ts/function";
 import { createDisbInputToTxn } from "../utils/model/create-disbursement-input-to-transaction.utils";
 import { taskEither as te } from "fp-ts";
 import { runBIDonTxn } from "../clients/lexis-nexis/business-id.request";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
 import { CreateDisbursementInput } from "../graphql/input-types/create-disbursement.input-type";
+import { ICommittee } from "../types/committee.type";
 
 export const verifyAndCreateDisb =
   (user: string) =>

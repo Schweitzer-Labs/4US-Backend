@@ -2,11 +2,11 @@ import { DynamoDB, SQS } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import { taskEither } from "fp-ts";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { now } from "../utils/time.utils";
+import { ICommittee } from "../types/committee.type";
 
 export const committeesToBankSQS =
   (sqsUrl: string) =>

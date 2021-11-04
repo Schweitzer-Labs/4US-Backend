@@ -1,4 +1,3 @@
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 import { EntityType } from "../../utils/enums/entity-type.enum";
 import { PaymentMethod } from "../../utils/enums/payment-method.enum";
 import { validateNYContrib } from "./ny.validators";
@@ -9,6 +8,7 @@ import { ApplicationError } from "../../utils/application-error";
 import { ValidationError } from "apollo-server-lambda";
 import { ContribInput } from "../input-types/contrib-input.input-type";
 import { pipe } from "fp-ts/function";
+import { ICommittee } from "../../types/committee.type";
 
 export const validateContribOrThrowGQLError =
   (com: ICommittee) =>

@@ -1,8 +1,8 @@
-import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import * as faker from "faker";
 import { Plan } from "../../src/utils/enums/plan.enum";
 import { qaUsers } from "../seed/qa-users.data";
+import { ICommittee } from "../../src/types/committee.type";
 
 interface IGenCommitteeConfig {
   state?: string;

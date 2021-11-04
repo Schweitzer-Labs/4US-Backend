@@ -6,7 +6,6 @@ import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { now } from "../../utils/time.utils";
 import { BusinessIDResponse } from "./lexis-nexis.decoder";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 import {
   BillableEventName,
   putBillableEvent,
@@ -21,6 +20,7 @@ import {
   logPrefix,
 } from "./lexis-nexis.client";
 import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ICommittee } from "../../types/committee.type";
 
 const formatRequest = (d: ITransaction) => {
   const streetAddress2 = d.addressLine2

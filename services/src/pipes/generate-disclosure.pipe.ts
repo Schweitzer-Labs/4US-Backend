@@ -5,12 +5,12 @@ import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { InKindType, PaymentMethod } from "../utils/enums/payment-method.enum";
 import { AggregateDuration } from "../queries/get-rule.decoder";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { now } from "../utils/time.utils";
 import { ApplicationError } from "../utils/application-error";
 import { prepareOwners } from "../utils/owner-math.utils";
 import { TaskEither } from "fp-ts/TaskEither";
 import { taskEither } from "fp-ts";
+import { ICommittee } from "../types/committee.type";
 
 export const generateDisclosureOrError =
   (committee: ICommittee) =>

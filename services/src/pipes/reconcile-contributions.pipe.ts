@@ -1,5 +1,4 @@
 import { DynamoDB } from "aws-sdk";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { flow, pipe } from "fp-ts/function";
 import { taskEither as te } from "fp-ts";
 import { searchTransactions } from "../queries/search-transactions.query";
@@ -16,6 +15,7 @@ import {
 } from "../clients/finicity/finicity.decoders";
 import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import * as FPArray from "fp-ts/Array";
+import { ICommittee } from "../types/committee.type";
 
 export const reconcileAll =
   (txnsTableName: string) =>

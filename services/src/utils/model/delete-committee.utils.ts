@@ -1,5 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
+import { ICommittee } from "../../types/committee.type";
 
 export const deleteCommittee =
   (committeeTableName: string) =>

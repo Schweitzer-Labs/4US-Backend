@@ -9,7 +9,6 @@ import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 
 const logPrefix = "Get Txns by Id";
 

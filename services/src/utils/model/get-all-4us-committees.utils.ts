@@ -1,14 +1,11 @@
 import { DynamoDB } from "aws-sdk";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
-import {
-  Committees,
-  ICommittee,
-} from "../../queries/get-committee-by-id.query";
 import { Plan } from "../enums/plan.enum";
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../../repositories/ddb.utils";
 import { pipe } from "fp-ts/function";
+import { Committees, ICommittee } from "../../types/committee.type";
 
 const logPrefix = "Get All 4US Committees";
 

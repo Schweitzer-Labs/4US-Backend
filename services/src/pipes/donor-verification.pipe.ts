@@ -13,10 +13,10 @@ import {
   getDonorByLNId,
 } from "../queries/search-donors.query";
 import { IDonor, IDonorInput } from "../queries/search-donors.decoder";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { Plan } from "../utils/enums/plan.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { donorToCitizenshipScore } from "../clients/lexis-nexis/citizenship-score.request";
+import { ICommittee } from "../types/committee.type";
 
 const saveDonor =
   (donorsTableName: string) =>

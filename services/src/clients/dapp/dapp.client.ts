@@ -1,5 +1,4 @@
 import { rest, oauthUtil } from "blockapps-rest";
-import { Committee, ICommittee } from "../../queries/get-committee-by-id.query";
 import { DynamoDB } from "aws-sdk";
 import { ITransaction } from "../../queries/search-transactions.decoder";
 import { pipe } from "fp-ts/function";
@@ -24,6 +23,7 @@ import { committeeContractWithHash } from "./committee.contract";
 import { Options } from "blockapps-rest/src/types";
 import { decodeRawData } from "../../utils/decode-raw-data.util";
 import { txnToMetadata } from "../../utils/txn-to-metadata.utils";
+import { Committee, ICommittee } from "../../types/committee.type";
 
 export const getClientUser = async ({ config }: IStratoSDKConfig) => {
   const options = { config };

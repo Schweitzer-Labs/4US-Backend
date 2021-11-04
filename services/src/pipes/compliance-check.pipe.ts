@@ -1,4 +1,3 @@
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { IDonor } from "../queries/search-donors.decoder";
 import { pipe } from "fp-ts/function";
 import { committeeAndDonorToRule } from "../queries/get-rule.query";
@@ -13,6 +12,7 @@ import { StatusCodes } from "http-status-codes";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
 import { ITransaction } from "../queries/search-transactions.decoder";
 import { millisToYear } from "../utils/time.utils";
+import { ICommittee } from "../types/committee.type";
 
 const committeeDonorAndRuleToBalance =
   (txnsTableName: string) =>
