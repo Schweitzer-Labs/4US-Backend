@@ -22,7 +22,7 @@ import { runRec } from "./utils/run-rec.util";
 import { activateStripe } from "./utils/activate-stripe.util";
 import { isClean, isReconciled } from "../utils/enums/demo-type.enum";
 import { GenCommitteeInput } from "../graphql/input-types/gen-committee.input-type";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 export const genDemoCommittee =
   (comTable: string) =>

@@ -7,7 +7,7 @@ import { committeeAndDonorToRule } from "../../src/utils/model/get-rule.query";
 import { getOrElseW } from "fp-ts/TaskEither";
 import { expect } from "chai";
 import * as dotenv from "dotenv";
-import { ICommittee } from "../../src/types/committee.type";
+import { ICommittee } from "../../src/model/committee.type";
 
 dotenv.config();
 

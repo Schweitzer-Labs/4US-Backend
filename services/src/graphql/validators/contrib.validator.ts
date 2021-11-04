@@ -8,7 +8,7 @@ import { ApplicationError } from "../../utils/application-error";
 import { ValidationError } from "apollo-server-lambda";
 import { ContribInput } from "../input-types/contrib-input.input-type";
 import { pipe } from "fp-ts/function";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 export const validateContribOrThrowGQLError =
   (com: ICommittee) =>

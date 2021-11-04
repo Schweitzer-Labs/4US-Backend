@@ -1,6 +1,6 @@
-import { IRule } from "../../types/rule.type";
-import { IDonor } from "../../types/donor.type";
-import { ICommittee } from "../../types/committee.type";
+import { IRule } from "../../model/rule.type";
+import { IDonor } from "../../model/donor.type";
+import { ICommittee } from "../../model/committee.type";
 
 export const committeeAndDonorToRuleCode =
   (c: ICommittee) =>

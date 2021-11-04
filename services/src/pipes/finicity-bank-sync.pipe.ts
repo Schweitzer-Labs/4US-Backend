@@ -9,7 +9,7 @@ import {
   FinicityConfig,
   IFinicityTransaction,
 } from "../clients/finicity/finicity.decoders";
-import { ITransaction, Transactions } from "../types/transaction.type";
+import { ITransaction, Transactions } from "../model/transaction.type";
 import { getTransactions } from "../clients/finicity/finicity.client";
 import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
 import { searchTransactions } from "../utils/model/search-transactions.query";
@@ -24,7 +24,7 @@ import {
   putTransactionAndDecode,
 } from "../utils/model/put-transaction.utils";
 import { decodeRawData } from "../utils/decode-raw-data.util";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 export const syncCommittee =
   (config: FinicityConfig) =>

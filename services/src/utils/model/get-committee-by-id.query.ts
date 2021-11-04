@@ -8,7 +8,7 @@ import { validateDDBResponse } from "../ddb.utils";
 import { decodeError } from "../decode-error.util";
 
 import { isEmpty } from "./get-res-is-empty.utils";
-import { Committee, Committees, ICommittee } from "../../types/committee.type";
+import { Committee, Committees, ICommittee } from "../../model/committee.type";
 
 const logPrefix = "Get Committee";
 

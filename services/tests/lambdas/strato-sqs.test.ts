@@ -18,7 +18,7 @@ import { DynamoDB } from "aws-sdk";
 import { genCommittee } from "../utils/gen-committee.util";
 import stratoSQS from "../../src/strato-sqs.lambda";
 import { genSQSEvent } from "../utils/gen-sqs-event.util";
-import { ICommittee } from "../../src/types/committee.type";
+import { ICommittee } from "../../src/model/committee.type";
 
 dotenv.config();
 

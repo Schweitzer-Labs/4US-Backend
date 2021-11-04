@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/function";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { taskEither as te } from "fp-ts";
-import { IAggs } from "../../types/aggs.type";
+import { IAggs } from "../../model/aggs.type";
 
 export const putAggs =
   (aggsTable: string) => (dynamoDB: DynamoDB) => async (aggs: IAggs) => {

@@ -1,5 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../../types/transaction.type";
+import { ITransaction } from "../../model/transaction.type";
 import { pipe } from "fp-ts/function";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";

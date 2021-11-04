@@ -4,7 +4,7 @@ import { TransactionType } from "../../utils/enums/transaction-type.enum";
 import { DynamoDB } from "aws-sdk";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../../utils/application-error";
-import { ITransaction } from "../../types/transaction.type";
+import { ITransaction } from "../../model/transaction.type";
 import { taskEither } from "fp-ts";
 import { validateDemoCommittee } from "./validate-demo-committee.utils";
 import { pipe } from "fp-ts/function";

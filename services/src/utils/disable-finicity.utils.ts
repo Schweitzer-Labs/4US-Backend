@@ -1,4 +1,4 @@
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 export const disableFinicity = ({
   finicityCustomerId,

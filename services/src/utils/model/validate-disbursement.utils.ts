@@ -1,4 +1,4 @@
-import { ITransaction } from "../../types/transaction.type";
+import { ITransaction } from "../../model/transaction.type";
 import { PaymentMethod } from "../enums/payment-method.enum";
 import { ApplicationError } from "../application-error";
 import { taskEither as te } from "fp-ts";

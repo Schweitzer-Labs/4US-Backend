@@ -1,9 +1,9 @@
-import { ITransaction } from "../../types/transaction.type";
+import { ITransaction } from "../../model/transaction.type";
 import { TransactionType } from "../enums/transaction-type.enum";
 import { Direction } from "../enums/direction.enum";
 import { Field } from "type-graphql";
 import { PaymentMethod } from "../enums/payment-method.enum";
-import { IAggs } from "../../types/aggs.type";
+import { IAggs } from "../../model/aggs.type";
 
 export const txnsToAgg =
   (committeeId: string) =>

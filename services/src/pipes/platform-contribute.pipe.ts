@@ -12,7 +12,7 @@ import { CreateContributionInput } from "../graphql/input-types/create-contribut
 import { ApplicationError } from "../utils/application-error";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
-import { ITransaction } from "../types/transaction.type";
+import { ITransaction } from "../model/transaction.type";
 import { taskEither as te } from "fp-ts";
 import { getCommitteeById } from "../utils/model/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
@@ -25,7 +25,7 @@ import { State } from "../utils/enums/state.enum";
 import { validateMAContrib } from "../graphql/validators/ma.validators";
 import { validateNYContrib } from "../graphql/validators/ny.validators";
 import { stringOpt, stringReq } from "../utils/joi.utils";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 const ownerSchema = {
   firstName: Joi.string(),

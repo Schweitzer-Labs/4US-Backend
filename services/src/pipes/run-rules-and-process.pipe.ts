@@ -7,9 +7,9 @@ import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ITransaction } from "../types/transaction.type";
+import { ITransaction } from "../model/transaction.type";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 export const runRulesAndProcess =
   (billableEventsTableName: string) =>

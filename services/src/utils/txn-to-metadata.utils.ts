@@ -1,4 +1,4 @@
-import { ITransaction } from "../types/transaction.type";
+import { ITransaction } from "../model/transaction.type";
 
 export const txnToMetadata = ({
   donorId,

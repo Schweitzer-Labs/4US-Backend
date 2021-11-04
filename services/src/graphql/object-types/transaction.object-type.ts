@@ -11,7 +11,7 @@ import { EntityType } from "../../utils/enums/entity-type.enum";
 import { TransactionType } from "../../utils/enums/transaction-type.enum";
 import { EmploymentStatus } from "../../utils/enums/employment-status";
 import { State } from "../../utils/enums/state.enum";
-import { ITransaction } from "../../types/transaction.type";
+import { ITransaction } from "../../model/transaction.type";
 
 registerEnumType(Direction, {
   name: "Direction",

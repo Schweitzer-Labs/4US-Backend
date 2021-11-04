@@ -10,7 +10,7 @@ import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
-import { IOwner } from "../../src/types/transaction.type";
+import { IOwner } from "../../src/model/transaction.type";
 import { genOwners } from "../utils/gen-owners.util";
 
 dotenv.config();

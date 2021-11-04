@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { TaskEither } from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 export const loadCommitteeOrError =
   (committeeTableName: string) =>

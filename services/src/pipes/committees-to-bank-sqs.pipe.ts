@@ -6,7 +6,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { now } from "../utils/time.utils";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 export const committeesToBankSQS =
   (sqsUrl: string) =>

@@ -6,7 +6,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { decodeError } from "../../utils/decode-error.util";
 import { Config } from "blockapps-rest";
 import { dashToUnderscore } from "../../utils/dash-to-underscore.utils";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 export interface IStratoSDKConfig {
   config: Config;

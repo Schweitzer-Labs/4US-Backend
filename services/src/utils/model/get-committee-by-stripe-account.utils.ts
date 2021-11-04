@@ -5,7 +5,7 @@ import { taskEither } from "fp-ts";
 import { ApplicationError } from "../application-error";
 import { decodeCommittees } from "./get-committee-by-id.query";
 import { StatusCodes } from "http-status-codes";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 export const get_committee_by_stripe_account_and_decode =
   (committeeTable: string) =>

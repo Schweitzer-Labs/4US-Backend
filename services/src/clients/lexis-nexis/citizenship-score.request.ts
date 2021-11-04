@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { now } from "../../utils/time.utils";
-import { IDonor, IDonorInput } from "../../types/donor.type";
+import { IDonor, IDonorInput } from "../../model/donor.type";
 import { DueDiligenceAttributesResponse } from "./lexis-nexis.decoder";
 import {
   BillableEventName,
@@ -19,7 +19,7 @@ import {
   dueDiligenceAttributesEndpoint,
   ILexisNexisConfig,
 } from "./lexis-nexis.client";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 const prefix = "Lexis-nexis citizenship score";
 

@@ -5,7 +5,7 @@ import { right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { IContribution } from "./event-to-contribution";
 import { taskEither } from "fp-ts";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 export interface ICommitteeContribution {
   committee: ICommittee;

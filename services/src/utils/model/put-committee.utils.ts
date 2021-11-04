@@ -3,7 +3,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
 import { taskEither as te } from "fp-ts";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 export const putCommittee =
   (committeeTableName: string) =>

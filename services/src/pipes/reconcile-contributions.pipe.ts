@@ -3,7 +3,7 @@ import { flow, pipe } from "fp-ts/function";
 import { taskEither as te } from "fp-ts";
 import { searchTransactions } from "../utils/model/search-transactions.query";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { ITransaction } from "../types/transaction.type";
+import { ITransaction } from "../model/transaction.type";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { putTransaction } from "../utils/model/put-transaction.utils";
@@ -15,7 +15,7 @@ import {
 } from "../clients/finicity/finicity.decoders";
 import { getAll4USCommitteesAndDecode } from "../utils/model/get-all-4us-committees.utils";
 import * as FPArray from "fp-ts/Array";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 export const reconcileAll =
   (txnsTableName: string) =>

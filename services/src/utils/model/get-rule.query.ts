@@ -6,9 +6,9 @@ import { pipe } from "fp-ts/function";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../ddb.utils";
-import { IRule, Rules } from "../../types/rule.type";
-import { IDonor } from "../../types/donor.type";
-import { ICommittee } from "../../types/committee.type";
+import { IRule, Rules } from "../../model/rule.type";
+import { IDonor } from "../../model/donor.type";
+import { ICommittee } from "../../model/committee.type";
 
 const logPrefix = "Get Rule";
 

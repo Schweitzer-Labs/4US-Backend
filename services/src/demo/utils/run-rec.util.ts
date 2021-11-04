@@ -5,7 +5,7 @@ import {
   ITransaction,
   Transaction,
   Transactions,
-} from "../../types/transaction.type";
+} from "../../model/transaction.type";
 import {
   groupTxnsByPayout,
   IPayoutGroup,

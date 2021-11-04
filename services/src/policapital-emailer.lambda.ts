@@ -1,5 +1,5 @@
 import * as AWS from "aws-sdk";
-import { ITransaction, Transaction } from "./types/transaction.type";
+import { ITransaction, Transaction } from "./model/transaction.type";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "./utils/application-error";
 import { PathReporter } from "io-ts/PathReporter";

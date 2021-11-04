@@ -6,7 +6,7 @@ import { DynamoDB } from "aws-sdk";
 import { TransactionArg } from "../graphql/args/transaction.arg";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ITransaction } from "../types/transaction.type";
+import { ITransaction } from "../model/transaction.type";
 
 export const deleteUnreconciledTxn =
   (txnTable: string) =>

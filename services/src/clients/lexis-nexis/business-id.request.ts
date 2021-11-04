@@ -19,8 +19,8 @@ import {
   ILexisNexisConfig,
   logPrefix,
 } from "./lexis-nexis.client";
-import { ITransaction } from "../../types/transaction.type";
-import { ICommittee } from "../../types/committee.type";
+import { ITransaction } from "../../model/transaction.type";
+import { ICommittee } from "../../model/committee.type";
 
 const formatRequest = (d: ITransaction) => {
   const streetAddress2 = d.addressLine2

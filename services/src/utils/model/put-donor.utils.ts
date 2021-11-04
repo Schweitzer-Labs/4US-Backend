@@ -1,5 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { IDonor } from "../../types/donor.type";
+import { IDonor } from "../../model/donor.type";
 
 export const putDonor =
   (donorsTableName: string) =>

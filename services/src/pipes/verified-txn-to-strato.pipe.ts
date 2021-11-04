@@ -1,6 +1,6 @@
 import { IStratoSDKConfig } from "../clients/dapp/dapp.decoders";
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../types/transaction.type";
+import { ITransaction } from "../model/transaction.type";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { pipe } from "fp-ts/function";

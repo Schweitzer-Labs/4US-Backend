@@ -1,7 +1,7 @@
 import * as AWS from "aws-sdk";
 import { DynamoDBStreamEvent } from "aws-lambda";
 
-import { ITransaction, Transaction } from "./types/transaction.type";
+import { ITransaction, Transaction } from "./model/transaction.type";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "./utils/application-error";
 import { Source } from "./utils/enums/source.enum";
@@ -14,7 +14,7 @@ import { validateDDBResponse } from "./utils/ddb.utils";
 import { auditTxnStream, DdbEventName } from "./pipes/audit-txn-stream.pipe";
 import { refreshAggs } from "./pipes/refresh-aggs.pipe";
 import { TaskEither } from "fp-ts/TaskEither";
-import { IAggs } from "./types/aggs.type";
+import { IAggs } from "./model/aggs.type";
 import { DynamoDBRecord } from "aws-lambda/trigger/dynamodb-stream";
 import { decodeRawData } from "./utils/decode-raw-data.util";
 

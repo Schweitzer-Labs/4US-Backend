@@ -1,4 +1,4 @@
-import { IDonor } from "../types/donor.type";
+import { IDonor } from "../model/donor.type";
 import { pipe } from "fp-ts/function";
 import { committeeAndDonorToRule } from "../utils/model/get-rule.query";
 import { DynamoDB } from "aws-sdk";
@@ -6,13 +6,13 @@ import { taskEither as te } from "fp-ts";
 import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
 import { searchTransactions } from "../utils/model/search-transactions.query";
-import { AggregateDuration, IRule } from "../types/rule.type";
+import { AggregateDuration, IRule } from "../model/rule.type";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { StatusCodes } from "http-status-codes";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
-import { ITransaction } from "../types/transaction.type";
+import { ITransaction } from "../model/transaction.type";
 import { millisToYear } from "../utils/time.utils";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 const committeeDonorAndRuleToBalance =
   (txnsTableName: string) =>

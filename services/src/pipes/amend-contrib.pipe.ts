@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/function";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 import { taskEither as te } from "fp-ts";
 import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
-import { ITransaction } from "../types/transaction.type";
+import { ITransaction } from "../model/transaction.type";
 import { isRuleVerifiedBankUnverifiedContrib } from "../utils/model/is-non-verified-contrib.utils";
 import { AmendContributionInput } from "../graphql/input-types/amend-contrib.input-type";
 

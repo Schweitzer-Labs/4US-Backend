@@ -12,11 +12,11 @@ import {
   donorInputToDonors,
   getDonorByLNId,
 } from "../utils/model/search-donors.query";
-import { IDonor, IDonorInput } from "../types/donor.type";
+import { IDonor, IDonorInput } from "../model/donor.type";
 import { Plan } from "../utils/enums/plan.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { donorToCitizenshipScore } from "../clients/lexis-nexis/citizenship-score.request";
-import { ICommittee } from "../types/committee.type";
+import { ICommittee } from "../model/committee.type";
 
 const saveDonor =
   (donorsTableName: string) =>

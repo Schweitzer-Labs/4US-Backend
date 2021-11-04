@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { now } from "../../utils/time.utils";
-import { IDonor, IDonorInput } from "../../types/donor.type";
+import { IDonor, IDonorInput } from "../../model/donor.type";
 import { InstantIdResponse } from "./lexis-nexis.decoder";
 import {
   BillableEventName,
@@ -17,7 +17,7 @@ import axios from "axios";
 import { decodeError } from "../../utils/decode-error.util";
 import { ILexisNexisConfig } from "./lexis-nexis.client";
 import { genFlacspee } from "../../utils/model/gen-donor-match.utils";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 const prefix = "Lexis-nexis";
 

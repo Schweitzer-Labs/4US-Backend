@@ -2,7 +2,7 @@ import * as faker from "faker";
 import { genTxnId } from "../../utils/gen-txn-id.utils";
 import { qaUsers } from "../data/qa-users.data";
 import { Plan } from "../../utils/enums/plan.enum";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 interface IGenCommitteeConfig {
   state?: string;

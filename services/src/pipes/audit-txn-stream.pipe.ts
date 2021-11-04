@@ -1,7 +1,7 @@
 import { DynamoDB, SQS } from "aws-sdk";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ITxnAuditLog } from "../types/audit-log.type";
+import { ITxnAuditLog } from "../model/audit-log.type";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { putTxnAuditLogAndDecode } from "../utils/model/put-txn-audit-log.utils";
@@ -10,7 +10,7 @@ import {
   currentVersion,
   ITransaction,
   Transaction,
-} from "../types/transaction.type";
+} from "../model/transaction.type";
 import { validateDDBResponse } from "../utils/ddb.utils";
 import { now } from "../utils/time.utils";
 import { txnToSQS } from "./txn-to-sqs.pipe";

@@ -1,4 +1,4 @@
-import { ITransaction } from "../../src/types/transaction.type";
+import { ITransaction } from "../../src/model/transaction.type";
 import { genTransaction } from "./gen-transaction.util";
 import { Direction } from "../../src/utils/enums/direction.enum";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";

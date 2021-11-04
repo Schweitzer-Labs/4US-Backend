@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
 import { validateDDBResponse } from "../ddb.utils";
 import { genFlacspee } from "./gen-donor-match.utils";
-import { Donors, IDonor, IDonorInput } from "../../types/donor.type";
+import { Donors, IDonor, IDonorInput } from "../../model/donor.type";
 
 const logPrefix = "Get Donors";
 

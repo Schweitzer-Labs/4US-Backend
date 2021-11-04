@@ -6,7 +6,7 @@ import { EmploymentStatus } from "../../utils/enums/employment-status";
 import { State } from "../../utils/enums/state.enum";
 import { taskEither } from "fp-ts";
 import { ContribInput } from "../input-types/contrib-input.input-type";
-import { ICommittee } from "../../types/committee.type";
+import { ICommittee } from "../../model/committee.type";
 
 export const validateMAContrib =
   (committee: ICommittee) =>

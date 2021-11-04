@@ -4,7 +4,7 @@ import { qaCommitteesData } from "./qa-committees.data";
 import { putCommittee } from "../../src/utils/model/put-committee.utils";
 import * as dotenv from "dotenv";
 import { qaUsers } from "./qa-users.data";
-import { ICommittee } from "../../src/types/committee.type";
+import { ICommittee } from "../../src/model/committee.type";
 
 AWS.config.update({ region: "us-west-2" });
 

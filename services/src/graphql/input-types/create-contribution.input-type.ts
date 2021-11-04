@@ -15,7 +15,7 @@ import {
   InKindType,
   PaymentMethod,
 } from "../../utils/enums/payment-method.enum";
-import { ITransaction } from "../../types/transaction.type";
+import { ITransaction } from "../../model/transaction.type";
 
 registerEnumType(EntityType, {
   name: "EntityType",

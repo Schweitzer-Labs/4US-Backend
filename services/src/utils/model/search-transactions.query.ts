@@ -10,7 +10,7 @@ import {
   toFilterExpression,
   validateDDBResponse,
 } from "../ddb.utils";
-import { ITransaction, Transactions } from "../../types/transaction.type";
+import { ITransaction, Transactions } from "../../model/transaction.type";
 import { Order } from "../enums/order.enum";
 import { QueryInput } from "aws-sdk/clients/dynamodb";
 import { TransactionsArg } from "../../graphql/args/transactions.arg";

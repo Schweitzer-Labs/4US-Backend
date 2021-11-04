@@ -22,7 +22,7 @@ import {
 import { sleep } from "../../src/utils/sleep.utils";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import { ApplicationError } from "../../src/utils/application-error";
-import { ICommittee } from "../../src/types/committee.type";
+import { ICommittee } from "../../src/model/committee.type";
 
 dotenv.config();
 
