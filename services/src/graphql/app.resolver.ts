@@ -7,16 +7,16 @@ import {
   UnauthorizedError,
 } from "type-graphql";
 
-import { Committee } from "./types/committee.type";
-import { Transaction } from "./types/transaction.type";
-import { Aggregations } from "./types/aggregations.type";
+import { Committee } from "./object-types/committee.object-type";
+import { Transaction } from "./object-types/transaction.object-type";
+import { Aggregations } from "./object-types/aggregations.object-type";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/search-transactions.query";
 import { TransactionsArg } from "./args/transactions.arg";
 import { isLeft } from "fp-ts/Either";
-import CurrentUser from "../decorators/current-user.decorator";
+import CurrentUser from "./decorators/current-user.decorator";
 import {
   loadCommitteeOrError,
   loadCommitteeOrThrow,
@@ -56,7 +56,7 @@ import {
 import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
-import { Report } from "./types/report.type";
+import { Report } from "./object-types/report.object-type";
 import {
   generateDisclosure,
   generateDisclosureOrError,
@@ -77,7 +77,7 @@ import { teToRightOrThrow } from "../utils/te-to-right-or-throw.util";
 import { validateCard } from "./validators/card.validators";
 import { validateCheck } from "./validators/check.validators";
 import { validateReconcileInput } from "./validators/reconcile.validators";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../model/transaction.type";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();

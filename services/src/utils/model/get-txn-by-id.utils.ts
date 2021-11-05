@@ -1,14 +1,11 @@
 import { DynamoDB } from "aws-sdk";
-import {
-  ITransaction,
-  Transaction,
-} from "../../queries/search-transactions.decoder";
+import { ITransaction, Transaction } from "../../model/transaction.type";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
 
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../../repositories/ddb.utils";
+import { validateDDBResponse } from "../ddb.utils";
 import { isEmpty } from "./get-res-is-empty.utils";
 
 const logPrefix = "Get Transaction by ID";

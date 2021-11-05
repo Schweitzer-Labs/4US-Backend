@@ -1,5 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../model/transaction.type";
 import { pipe } from "fp-ts/function";
 import { getTxnById } from "../utils/model/get-txn-by-id.utils";
 import { taskEither, taskEither as te } from "fp-ts";

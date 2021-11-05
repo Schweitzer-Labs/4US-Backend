@@ -3,11 +3,9 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { ApplicationError } from "../application-error";
-import {
-  decodeCommittees,
-  ICommittee,
-} from "../../queries/get-committee-by-id.query";
+import { decodeCommittees } from "./get-committee-by-id.query";
 import { StatusCodes } from "http-status-codes";
+import { ICommittee } from "../../model/committee.type";
 
 export const get_committee_by_stripe_account_and_decode =
   (committeeTable: string) =>

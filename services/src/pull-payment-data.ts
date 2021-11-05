@@ -1,5 +1,5 @@
 import { Stripe } from "stripe";
-import { getStripeMetadata } from "./either-tasks/contribution-to-payment";
+import { getStripeMetadata } from "./pipes/contribution-to-payment";
 import { unverifiedContributionsData } from "../tests/seed/unverified-contributions.data";
 import { sleep } from "./utils/sleep.utils";
 

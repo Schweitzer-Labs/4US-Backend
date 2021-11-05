@@ -1,15 +1,11 @@
 import { DynamoDB } from "aws-sdk";
-import {
-  ITransaction,
-  Transactions,
-} from "../../queries/search-transactions.decoder";
+import { ITransaction, Transactions } from "../../model/transaction.type";
 import { requestTxnById } from "./get-txn-by-id.utils";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import { validateDDBResponse } from "../../repositories/ddb.utils";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
+import { validateDDBResponse } from "../ddb.utils";
 
 const logPrefix = "Get Txns by Id";
 

@@ -1,7 +1,4 @@
-import {
-  IOwner,
-  ITransaction,
-} from "../../src/queries/search-transactions.decoder";
+import { IOwner, ITransaction } from "../../src/model/transaction.type";
 import * as faker from "faker";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { Direction } from "../../src/utils/enums/direction.enum";

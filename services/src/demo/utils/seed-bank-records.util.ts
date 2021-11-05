@@ -1,5 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ITransaction } from "../../model/transaction.type";
 import { genTxnId } from "../../utils/gen-txn-id.utils";
 import { Direction } from "../../utils/enums/direction.enum";
 import { PaymentMethod } from "../../utils/enums/payment-method.enum";

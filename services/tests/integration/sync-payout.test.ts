@@ -13,7 +13,7 @@ import { putTransaction } from "../../src/utils/model/put-transaction.utils";
 import { deleteTxn } from "../../src/utils/model/delete-txn.utils";
 import * as dotenv from "dotenv";
 import { decodeCSVAndSyncPayouts } from "../../src/webhook/run-report-succeeded/report-run-succeeded.handler";
-import { searchTransactions } from "../../src/queries/search-transactions.query";
+import { searchTransactions } from "../../src/utils/model/search-transactions.query";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { groupTxnsByPayout } from "../../src/utils/model/group-txns-by-payout.utils";
 import { isPayout } from "../../src/pipes/reconcile-contributions.pipe";

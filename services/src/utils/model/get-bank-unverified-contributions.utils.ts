@@ -1,12 +1,12 @@
 import { DynamoDB } from "aws-sdk";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
-import { ITransaction } from "../../queries/search-transactions.decoder";
-import { searchTransactions } from "../../queries/search-transactions.query";
+import { ITransaction } from "../../model/transaction.type";
+import { searchTransactions } from "./search-transactions.query";
 import { TransactionType } from "../enums/transaction-type.enum";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
+import { ICommittee } from "../../model/committee.type";
 
 export const get_bank_unverified_contributions_not_paid_out =
   (txnsTable: string) =>

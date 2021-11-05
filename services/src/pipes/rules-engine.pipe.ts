@@ -1,6 +1,5 @@
 import { pipe } from "fp-ts/function";
 import { DynamoDB } from "aws-sdk";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { verifyDonor } from "./donor-verification.pipe";
 import { taskEither as te } from "fp-ts";
 import { IComplianceResult, runComplianceCheck } from "./compliance-check.pipe";
@@ -8,9 +7,10 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { createContributionInputToDonorInput } from "../utils/model/create-contribution-input-to-donor-input.utils";
 import { Plan } from "../utils/enums/plan.enum";
-import { IDonor } from "../queries/search-donors.decoder";
+import { IDonor } from "../model/donor.type";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
+import { ICommittee } from "../model/committee.type";
 
 export const runComplianceCheckOrSkip =
   (txnsTableName: string) =>

@@ -10,7 +10,7 @@ import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
-import { searchTransactions } from "../../src/queries/search-transactions.query";
+import { searchTransactions } from "../../src/utils/model/search-transactions.query";
 import { task, taskEither } from "fp-ts";
 import { pipe } from "fp-ts/function";
 import * as FC from "../../src/clients/finicity/finicity.client";

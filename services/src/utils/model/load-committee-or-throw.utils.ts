@@ -1,8 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import {
-  getCommitteeById,
-  ICommittee,
-} from "../../queries/get-committee-by-id.query";
+import { getCommitteeById } from "./get-committee-by-id.query";
 import { isLeft } from "fp-ts/Either";
 import { UnauthorizedError } from "type-graphql";
 import { ApplicationError } from "../application-error";
@@ -10,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { TaskEither } from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
+import { ICommittee } from "../../model/committee.type";
 
 export const loadCommitteeOrError =
   (committeeTableName: string) =>

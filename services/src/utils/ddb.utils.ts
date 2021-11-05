@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { decodeRawData } from "../utils/decode-raw-data.util";
+import { decodeRawData } from "./decode-raw-data.util";
 
 export const ddbString = t.type({
   S: t.string,

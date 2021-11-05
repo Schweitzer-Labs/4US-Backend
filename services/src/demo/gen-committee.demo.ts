@@ -12,10 +12,9 @@ import { putCommittee } from "../utils/model/put-committee.utils";
 import { DynamoDB } from "aws-sdk";
 import { disableFinicity } from "../utils/disable-finicity.utils";
 import { FinicityConfig } from "../clients/finicity/finicity.decoders";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { genCommittee } from "./utils/gen-committee.util";
 import { unverifiedContributionsData } from "./data/unverified-contributions.data";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/search-transactions.query";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { isPayout } from "../pipes/reconcile-contributions.pipe";
 import { groupTxnsByPayout } from "../utils/model/group-txns-by-payout.utils";
@@ -23,6 +22,7 @@ import { runRec } from "./utils/run-rec.util";
 import { activateStripe } from "./utils/activate-stripe.util";
 import { isClean, isReconciled } from "../utils/enums/demo-type.enum";
 import { GenCommitteeInput } from "../graphql/input-types/gen-committee.input-type";
+import { ICommittee } from "../model/committee.type";
 
 export const genDemoCommittee =
   (comTable: string) =>

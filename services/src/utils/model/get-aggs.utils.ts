@@ -4,9 +4,9 @@ import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
 import { ApplicationError } from "../application-error";
-import { Aggs, IAggs } from "../../queries/get-aggs.decoders";
+import { Aggs, IAggs } from "../../model/aggs.type";
 import { isEmpty } from "./get-res-is-empty.utils";
-import { validateDDBResponse } from "../../repositories/ddb.utils";
+import { validateDDBResponse } from "../ddb.utils";
 import * as t from "io-ts";
 
 const logPrefix = "Get Aggs";

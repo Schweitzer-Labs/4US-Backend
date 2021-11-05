@@ -1,4 +1,4 @@
-import { IOwner, ITransaction } from "../queries/search-transactions.decoder";
+import { IOwner, ITransaction } from "../model/transaction.type";
 import { flow } from "fp-ts/function";
 import { ApplicationError } from "./application-error";
 

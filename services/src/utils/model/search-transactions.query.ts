@@ -1,6 +1,6 @@
 import { DynamoDB } from "aws-sdk";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
-import { ApplicationError } from "../utils/application-error";
+import { ApplicationError } from "../application-error";
 import { pipe } from "fp-ts/function";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
@@ -9,11 +9,11 @@ import {
   toExpressionAttributeValueString,
   toFilterExpression,
   validateDDBResponse,
-} from "../repositories/ddb.utils";
-import { ITransaction, Transactions } from "./search-transactions.decoder";
-import { Order } from "../utils/enums/order.enum";
+} from "../ddb.utils";
+import { ITransaction, Transactions } from "../../model/transaction.type";
+import { Order } from "../enums/order.enum";
 import { QueryInput } from "aws-sdk/clients/dynamodb";
-import { TransactionsArg } from "../graphql/args/transactions.arg";
+import { TransactionsArg } from "../../graphql/args/transactions.arg";
 
 const logPrefix = "Get Transactions";
 

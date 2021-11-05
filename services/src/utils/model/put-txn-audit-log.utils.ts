@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/function";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../application-error";
 import { taskEither as te } from "fp-ts";
-import { ITxnAuditLog } from "../../queries/get-audit-logs.decoders";
+import { ITxnAuditLog } from "../../model/audit-log.type";
 
 export const putTxnAuditLog =
   (auditLogsTableName: string) =>

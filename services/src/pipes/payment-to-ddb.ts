@@ -3,7 +3,7 @@ import { ApplicationError } from "../utils/application-error";
 import { StatusCodes } from "http-status-codes";
 import { Payment } from "./contribution-to-payment";
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../model/transaction.type";
 import { now } from "../utils/time.utils";
 import { Source } from "../utils/enums/source.enum";
 import { genTxnId } from "../utils/gen-txn-id.utils";

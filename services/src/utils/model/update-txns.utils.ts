@@ -1,5 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ITransaction } from "../../model/transaction.type";
 import { UpdateItemInput } from "aws-sdk/clients/dynamodb";
 
 export const updateTxnWithStripePayoutId =

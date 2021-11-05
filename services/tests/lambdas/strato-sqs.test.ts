@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import { Either, isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
-import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
 import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
@@ -19,6 +18,7 @@ import { DynamoDB } from "aws-sdk";
 import { genCommittee } from "../utils/gen-committee.util";
 import stratoSQS from "../../src/strato-sqs.lambda";
 import { genSQSEvent } from "../utils/gen-sqs-event.util";
+import { ICommittee } from "../../src/model/committee.type";
 
 dotenv.config();
 

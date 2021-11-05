@@ -15,7 +15,7 @@ import { syncCommittee } from "../../src/pipes/finicity-bank-sync.pipe";
 import { updateTxnWithStripePayoutId } from "../../src/utils/model/update-txns.utils";
 import { genContributionRecord } from "../utils/gen-contribution.util";
 import { putTransaction } from "../../src/utils/model/put-transaction.utils";
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { ITransaction } from "../../src/model/transaction.type";
 import { getTxnById } from "../../src/utils/model/get-txn-by-id.utils";
 import * as dotenv from "dotenv";
 
