@@ -3,7 +3,7 @@ import { EntityType } from "../../src/utils/enums/entity-type.enum";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
-import { committeeAndDonorToRule } from "../../src/utils/model/get-rule.query";
+import { committeeAndDonorToRule } from "../../src/utils/model/rule/get-rule.query";
 import { getOrElseW } from "fp-ts/TaskEither";
 import { expect } from "chai";
 import * as dotenv from "dotenv";

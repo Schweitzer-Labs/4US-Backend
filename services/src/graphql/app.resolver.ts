@@ -13,14 +13,14 @@ import { Aggregations } from "./object-types/aggregations.object-type";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
-import { searchTransactions } from "../utils/model/search-transactions.query";
+import { searchTransactions } from "../utils/model/transaction/search-transactions.query";
 import { TransactionsArg } from "./args/transactions.arg";
 import { isLeft } from "fp-ts/Either";
 import CurrentUser from "./decorators/current-user.decorator";
 import {
   loadCommitteeOrError,
   loadCommitteeOrThrow,
-} from "../utils/model/load-committee-or-throw.utils";
+} from "../utils/model/committee/load-committee-or-throw.utils";
 import { CreateContributionInput } from "./input-types/create-contribution.input-type";
 import { taskEither as te } from "fp-ts";
 import {
@@ -43,7 +43,7 @@ import { CreateDisbursementInput } from "./input-types/create-disbursement.input
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { TransactionArg } from "./args/transaction.arg";
-import { getTxnById } from "../utils/model/get-txn-by-id.utils";
+import { getTxnById } from "../utils/model/transaction/get-txn-by-id.utils";
 import { ReconcileTxnInput } from "./input-types/reconcile-txn.input-type";
 import { AmendDisbInput } from "./input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
@@ -61,7 +61,7 @@ import {
   generateDisclosure,
   generateDisclosureOrError,
 } from "../pipes/generate-disclosure.pipe";
-import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
+import { getAggsByCommitteeId } from "../utils/model/aggs/get-aggs.utils";
 import { refreshAggs, refreshAggsFromTxn } from "../pipes/refresh-aggs.pipe";
 import { GenCommitteeInput } from "./input-types/gen-committee.input-type";
 import { initStratoConfig } from "../clients/dapp/dapp.decoders";
@@ -260,7 +260,7 @@ export class AppResolver {
         pipe(
           validateContrib(committee)(contribInput),
           te.chain(() =>
-            runRulesAndProcess(billableEventsTableName)(donorsTableName)(
+            runRulesAndProcess(false)(billableEventsTableName)(donorsTableName)(
               txnsTableName
             )(rulesTableName)(ddb)(this.stripe)(lnConfig)(currentUser)(
               committee

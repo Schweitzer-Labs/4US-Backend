@@ -3,7 +3,7 @@ import { Either, isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
-import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import {
   getStratoENodeUrl,
   getStratoNodeUrl,

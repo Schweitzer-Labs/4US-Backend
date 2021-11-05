@@ -3,15 +3,15 @@ import { donorInputToInstantIdResult } from "../clients/lexis-nexis/consumer-id.
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { pipe } from "fp-ts/function";
-import { putDonor } from "../utils/model/put-donor.utils";
+import { putDonor } from "../utils/model/donor/put-donor.utils";
 import { genTxnId } from "../utils/gen-txn-id.utils";
 import { now } from "../utils/time.utils";
-import { genFlacspee } from "../utils/model/gen-donor-match.utils";
+import { genFlacspee } from "../utils/model/donor/gen-donor-match.utils";
 import { taskEither } from "fp-ts";
 import {
   donorInputToDonors,
   getDonorByLNId,
-} from "../utils/model/search-donors.query";
+} from "../utils/model/donor/search-donors.query";
 import { IDonor, IDonorInput } from "../model/donor.type";
 import { Plan } from "../utils/enums/plan.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";

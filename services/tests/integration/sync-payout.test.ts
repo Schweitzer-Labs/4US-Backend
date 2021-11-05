@@ -4,18 +4,18 @@ import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
 import { dateToTxnId, genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { syncCommittee } from "../../src/pipes/finicity-bank-sync.pipe";
-import { putTransaction } from "../../src/utils/model/put-transaction.utils";
+import { putTransaction } from "../../src/utils/model/transaction/put-transaction.utils";
 
-import { deleteTxn } from "../../src/utils/model/delete-txn.utils";
+import { deleteTxn } from "../../src/utils/model/transaction/delete-txn.utils";
 import * as dotenv from "dotenv";
 import { decodeCSVAndSyncPayouts } from "../../src/webhook/run-report-succeeded/report-run-succeeded.handler";
-import { searchTransactions } from "../../src/utils/model/search-transactions.query";
+import { searchTransactions } from "../../src/utils/model/transaction/search-transactions.query";
 import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
-import { groupTxnsByPayout } from "../../src/utils/model/group-txns-by-payout.utils";
+import { groupTxnsByPayout } from "../../src/utils/model/transaction/group-txns-by-payout.utils";
 import { isPayout } from "../../src/pipes/reconcile-contributions.pipe";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
 import {

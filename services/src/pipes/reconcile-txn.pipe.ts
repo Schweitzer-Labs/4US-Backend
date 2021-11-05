@@ -1,14 +1,17 @@
 import { DynamoDB } from "aws-sdk";
 import { ITransaction } from "../model/transaction.type";
 import { pipe } from "fp-ts/function";
-import { getTxnById } from "../utils/model/get-txn-by-id.utils";
+import { getTxnById } from "../utils/model/transaction/get-txn-by-id.utils";
 import { taskEither, taskEither as te } from "fp-ts";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { reconcileTxnsByIds } from "../utils/model/reconcile-txn-by-id.utils";
-import { deleteTxn, deleteTxnPipe } from "../utils/model/delete-txn.utils";
+import { reconcileTxnsByIds } from "../utils/model/transaction/reconcile-txn-by-id.utils";
+import {
+  deleteTxn,
+  deleteTxnPipe,
+} from "../utils/model/transaction/delete-txn.utils";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { getTxnsById } from "../utils/model/get-txns-by-id.utils";
+import { getTxnsById } from "../utils/model/transaction/get-txns-by-id.utils";
 
 // @Todo Add validation
 export const reconcileTxnWithTxns =

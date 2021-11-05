@@ -14,7 +14,7 @@ import { Direction } from "../utils/enums/direction.enum";
 import { now } from "../utils/time.utils";
 import { Source } from "../utils/enums/source.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { putTransaction } from "../utils/model/put-transaction.utils";
+import { putTransaction } from "../utils/model/transaction/put-transaction.utils";
 
 export const processContribution =
   (currentUser: string) =>

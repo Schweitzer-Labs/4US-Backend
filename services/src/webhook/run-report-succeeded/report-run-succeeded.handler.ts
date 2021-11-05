@@ -4,11 +4,11 @@ import { task, taskEither } from "fp-ts";
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { ApplicationError } from "../../utils/application-error";
-import { get_committee_by_stripe_account_and_decode } from "../../utils/model/get-committee-by-stripe-account.utils";
-import { get_bank_unverified_contributions_not_paid_out } from "../../utils/model/get-bank-unverified-contributions.utils";
+import { get_committee_by_stripe_account_and_decode } from "../../utils/model/committee/get-committee-by-stripe-account.utils";
+import { get_bank_unverified_contributions_not_paid_out } from "../../utils/model/transaction/get-bank-unverified-contributions.utils";
 import { ITransaction } from "../../model/transaction.type";
 import { successResponse } from "../../utils/success-response";
-import { update_txns_with_stripe_payout_id } from "../../utils/model/update-txns.utils";
+import { update_txns_with_stripe_payout_id } from "../../utils/model/transaction/update-txns.utils";
 import {
   decodePayoutReportRows,
   decodeReportRunEvent,

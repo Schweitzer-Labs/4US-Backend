@@ -4,7 +4,7 @@ import { ApplicationError } from "../utils/application-error";
 import { ITxnAuditLog } from "../model/audit-log.type";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import { putTxnAuditLogAndDecode } from "../utils/model/put-txn-audit-log.utils";
+import { putTxnAuditLogAndDecode } from "../utils/model/audit-log/put-txn-audit-log.utils";
 import * as AWS from "aws-sdk";
 import {
   currentVersion,

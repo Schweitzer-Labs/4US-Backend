@@ -1,6 +1,6 @@
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
-import { getCommitteeById } from "../utils/model/get-committee-by-id.query";
+import { getCommitteeById } from "../utils/model/committee/get-committee-by-id.query";
 import { right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { IContribution } from "./event-to-contribution";

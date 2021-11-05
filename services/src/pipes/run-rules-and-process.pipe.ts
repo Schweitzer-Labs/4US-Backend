@@ -12,6 +12,7 @@ import { CreateContributionInput } from "../graphql/input-types/create-contribut
 import { ICommittee } from "../model/committee.type";
 
 export const runRulesAndProcess =
+  (allowInvalid: boolean) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
@@ -25,9 +26,9 @@ export const runRulesAndProcess =
     createContributionInput: CreateContributionInput
   ): TaskEither<ApplicationError, ITransaction> =>
     pipe(
-      runRulesEngine(billableEventsTableName)(donorsTableName)(txnsTableName)(
-        rulesTableName
-      )(dynamoDB)(lnConfig)(committee)(createContributionInput),
+      runRulesEngine(allowInvalid)(billableEventsTableName)(donorsTableName)(
+        txnsTableName
+      )(rulesTableName)(dynamoDB)(lnConfig)(committee)(createContributionInput),
       te.chain(
         processContribution(currentUser)(txnsTableName)(dynamoDB)(stripe)
       )

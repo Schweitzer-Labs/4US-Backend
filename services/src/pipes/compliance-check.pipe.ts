@@ -1,11 +1,11 @@
 import { IDonor } from "../model/donor.type";
 import { pipe } from "fp-ts/function";
-import { committeeAndDonorToRule } from "../utils/model/get-rule.query";
+import { committeeAndDonorToRule } from "../utils/model/rule/get-rule.query";
 import { DynamoDB } from "aws-sdk";
 import { taskEither as te } from "fp-ts";
 import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
-import { searchTransactions } from "../utils/model/search-transactions.query";
+import { searchTransactions } from "../utils/model/transaction/search-transactions.query";
 import { AggregateDuration, IRule } from "../model/rule.type";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { StatusCodes } from "http-status-codes";
@@ -51,28 +51,32 @@ interface IRuleResult {
   balance: number;
   remaining: number;
   rule: IRule;
+  invalid?: boolean;
 }
 
 const runRule =
+  (allowInvalid: boolean) =>
   (attemptedAmount: number) =>
   (rule: IRule) =>
   (balance: number): TaskEither<ApplicationError, IRuleResult> => {
     const remaining = rule.limit - balance;
     const exceedsLimit = balance + attemptedAmount > rule.limit;
-    if (exceedsLimit) {
-      return te.left(
-        new ApplicationError(
-          "Excess contribution attempted",
-          { remaining },
-          StatusCodes.UNAUTHORIZED
-        )
-      );
-    } else {
-      return te.right({ balance, remaining, rule });
-    }
+    if (exceedsLimit)
+      if (allowInvalid)
+        return te.right({ balance, remaining, rule, invalid: true });
+      else
+        return te.left(
+          new ApplicationError(
+            "Excess contribution attempted",
+            { remaining },
+            StatusCodes.UNAUTHORIZED
+          )
+        );
+    else return te.right({ balance, remaining, rule });
   };
 
 const committeeDonorAndRuleToDetermination =
+  (allowInvalid: boolean) =>
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (ccInput: CreateContributionInput) =>
@@ -83,7 +87,7 @@ const committeeDonorAndRuleToDetermination =
       committeeDonorAndRuleToBalance(txnsTableName)(dynamoDB)(ccInput)(
         committee
       )(donor)(rule),
-      te.chain(runRule(ccInput.amount)(rule))
+      te.chain(runRule(allowInvalid)(ccInput.amount)(rule))
     );
 
 export interface IComplianceResult {
@@ -96,6 +100,7 @@ export interface IComplianceResult {
 }
 
 export const runComplianceCheck =
+  (allowInvalid: boolean) =>
   (txnsTableName: string) =>
   (rulesTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -105,9 +110,9 @@ export const runComplianceCheck =
     return pipe(
       committeeAndDonorToRule(rulesTableName)(dynamoDB)(committee)(donor),
       te.chain(
-        committeeDonorAndRuleToDetermination(txnsTableName)(dynamoDB)(
-          createContributionInput
-        )(committee)(donor)
+        committeeDonorAndRuleToDetermination(allowInvalid)(txnsTableName)(
+          dynamoDB
+        )(createContributionInput)(committee)(donor)
       ),
       te.map(({ rule, balance, remaining }) => ({
         donor,

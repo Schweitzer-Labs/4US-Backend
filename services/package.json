@@ -70,7 +70,7 @@
     "test-owner-math": "ts-mocha tests/unit/attribute-ownership.test.ts --timeout 10000",
     "compile": "npm install && tsc",
     "test-server": "ts-node-dev tests/server --watch",
-    "gen-int-test": ""
+    "gen-int-test": "cp tests/utils/blank-test.util.ts tests/integration/$NAME.test.ts"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.76",

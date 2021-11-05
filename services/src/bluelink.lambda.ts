@@ -12,7 +12,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "./utils/application-error";
 import { eventToObject } from "./utils/event-to-object.util";
 import { validateObject } from "./utils/validate-schema.utils";
-import { bluelinkSchema } from "./utils/bluelink-schema.utils";
+import { externalDataSchema } from "./utils/external-data-schema.utils";
 
 dotenv.config();
 
@@ -54,7 +54,7 @@ const bluelinkEventToModel = (
   pipe(
     validateAppKey(event),
     taskEither.chain(eventToObject),
-    taskEither.chain(validateObject(bluelinkSchema))
+    taskEither.chain(validateObject(externalDataSchema))
   );
 
 export default async (event: any) => {

@@ -5,7 +5,7 @@ import { taskEither as te } from "fp-ts";
 import { IComplianceResult, runComplianceCheck } from "./compliance-check.pipe";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { createContributionInputToDonorInput } from "../utils/model/create-contribution-input-to-donor-input.utils";
+import { createContributionInputToDonorInput } from "../utils/model/donor/create-contribution-input-to-donor-input.utils";
 import { Plan } from "../utils/enums/plan.enum";
 import { IDonor } from "../model/donor.type";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
@@ -13,6 +13,7 @@ import { CreateContributionInput } from "../graphql/input-types/create-contribut
 import { ICommittee } from "../model/committee.type";
 
 export const runComplianceCheckOrSkip =
+  (allowInvalid: boolean) =>
   (txnsTableName: string) =>
   (rulesTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -21,9 +22,9 @@ export const runComplianceCheckOrSkip =
   (donor: IDonor): TaskEither<ApplicationError, IComplianceResult> =>
     committee.platformPlan === Plan.Policapital
       ? skipComplianceCheck(committee)(contribInput)(donor)
-      : runComplianceCheck(txnsTableName)(rulesTableName)(dynamoDB)(
-          contribInput
-        )(committee)(donor);
+      : runComplianceCheck(allowInvalid)(txnsTableName)(rulesTableName)(
+          dynamoDB
+        )(contribInput)(committee)(donor);
 
 const skipComplianceCheck =
   (committee: ICommittee) =>
@@ -36,6 +37,7 @@ const skipComplianceCheck =
     });
 
 export const runRulesEngine =
+  (allowInvalid: boolean) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
@@ -54,8 +56,8 @@ export const runRulesEngine =
         )(committee)
       ),
       te.chain(
-        runComplianceCheckOrSkip(txnsTableName)(rulesTableName)(dynamoDB)(
-          contribInput
-        )(committee)
+        runComplianceCheckOrSkip(allowInvalid)(txnsTableName)(rulesTableName)(
+          dynamoDB
+        )(contribInput)(committee)
       )
     );

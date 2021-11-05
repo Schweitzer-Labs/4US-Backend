@@ -9,7 +9,7 @@ import { BusinessIDResponse } from "./lexis-nexis.decoder";
 import {
   BillableEventName,
   putBillableEvent,
-} from "../../utils/model/put-billable-event.utils";
+} from "../../utils/model/billable-events/put-billable-event.utils";
 import { DynamoDB } from "aws-sdk";
 import { genTxnId } from "../../utils/gen-txn-id.utils";
 import axios from "axios";

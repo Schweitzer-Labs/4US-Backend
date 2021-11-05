@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { genCommittee } from "../utils/gen-committee.util";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
@@ -60,7 +60,7 @@ describe("Rules engine", function () {
     });
 
     const res = await pipe(
-      runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
+      runRulesEngine(false)(billableEventsTableName)(donorsTable)(txnsTable)(
         rulesTable
       )(dynamoDB)(instantIdConfig)(committee)(contrib),
       taskEither.fold(
@@ -84,7 +84,7 @@ describe("Rules engine", function () {
     });
 
     const res = await pipe(
-      runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
+      runRulesEngine(false)(billableEventsTableName)(donorsTable)(txnsTable)(
         rulesTable
       )(dynamoDB)(instantIdConfig)(committee)(contrib),
       taskEither.fold(
@@ -129,11 +129,11 @@ describe("Rules engine", function () {
       // Run
 
       const stagingRes = await pipe(
-        runRulesAndProcess(billableEventsTableName)(donorsTable)(txnsTable)(
-          rulesTable
-        )(dynamoDB)(stripe)(instantIdConfig)(currentUser)(committee)(
-          thisYearContrib
-        ),
+        runRulesAndProcess(false)(billableEventsTableName)(donorsTable)(
+          txnsTable
+        )(rulesTable)(dynamoDB)(stripe)(instantIdConfig)(currentUser)(
+          committee
+        )(thisYearContrib),
         taskEither.fold(
           (e) => task.of("fail"),
           (res) => task.of("success")
@@ -144,7 +144,7 @@ describe("Rules engine", function () {
         throw new ApplicationError("staging failed", {});
 
       const res = await pipe(
-        runRulesEngine(billableEventsTableName)(donorsTable)(txnsTable)(
+        runRulesEngine(false)(billableEventsTableName)(donorsTable)(txnsTable)(
           rulesTable
         )(dynamoDB)(instantIdConfig)(committee)(lastYearContrib),
         taskEither.fold(

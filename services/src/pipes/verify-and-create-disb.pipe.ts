@@ -4,10 +4,10 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { ITransaction } from "../model/transaction.type";
 import { pipe } from "fp-ts/function";
-import { createDisbInputToTxn } from "../utils/model/create-disbursement-input-to-transaction.utils";
+import { createDisbInputToTxn } from "../utils/model/transaction/create-disbursement-input-to-transaction.utils";
 import { taskEither as te } from "fp-ts";
 import { runBIDonTxn } from "../clients/lexis-nexis/business-id.request";
-import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
+import { putTransactionAndDecode } from "../utils/model/transaction/put-transaction.utils";
 import { CreateDisbursementInput } from "../graphql/input-types/create-disbursement.input-type";
 import { ICommittee } from "../model/committee.type";
 

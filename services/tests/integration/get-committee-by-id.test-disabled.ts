@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { committeeIdToDDBRes } from "../../src/utils/model/get-committee-by-id.query";
+import { committeeIdToDDBRes } from "../../src/utils/model/committee/get-committee-by-id.query";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 

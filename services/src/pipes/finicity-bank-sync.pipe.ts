@@ -12,7 +12,7 @@ import {
 import { ITransaction, Transactions } from "../model/transaction.type";
 import { getTransactions } from "../clients/finicity/finicity.client";
 import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
-import { searchTransactions } from "../utils/model/search-transactions.query";
+import { searchTransactions } from "../utils/model/transaction/search-transactions.query";
 import { Direction } from "../utils/enums/direction.enum";
 import { dateToTxnId } from "../utils/gen-txn-id.utils";
 import { Source } from "../utils/enums/source.enum";
@@ -22,7 +22,7 @@ import { FinicityTransactionType } from "../utils/enums/finicity-transaction-typ
 import {
   putTransaction,
   putTransactionAndDecode,
-} from "../utils/model/put-transaction.utils";
+} from "../utils/model/transaction/put-transaction.utils";
 import { decodeRawData } from "../utils/decode-raw-data.util";
 import { ICommittee } from "../model/committee.type";
 

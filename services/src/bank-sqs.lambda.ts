@@ -12,7 +12,7 @@ import { decodeRawData } from "./utils/decode-raw-data.util";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { FinicityConfig } from "./clients/finicity/finicity.decoders";
-import { getCommitteeById } from "./utils/model/get-committee-by-id.query";
+import { getCommitteeById } from "./utils/model/committee/get-committee-by-id.query";
 import { syncCommittee } from "./pipes/finicity-bank-sync.pipe";
 import * as t from "io-ts";
 import { runReconcileOnCommittee } from "./demo/utils/run-rec.util";

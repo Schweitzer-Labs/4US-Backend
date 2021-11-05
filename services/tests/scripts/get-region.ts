@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
-import { requestTxnById } from "../../src/utils/model/get-txn-by-id.utils";
+import { requestTxnById } from "../../src/utils/model/transaction/get-txn-by-id.utils";
 import * as dotenv from "dotenv";
 
 dotenv.config();

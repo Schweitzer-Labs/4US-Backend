@@ -17,8 +17,8 @@ import {
   ICreateUserResponse,
   IStratoSDKConfig,
 } from "./dapp.decoders";
-import { putCommitteeAndDecode } from "../../utils/model/put-committee.utils";
-import { putTransactionAndDecode } from "../../utils/model/put-transaction.utils";
+import { putCommitteeAndDecode } from "../../utils/model/committee/put-committee.utils";
+import { putTransactionAndDecode } from "../../utils/model/transaction/put-transaction.utils";
 import { committeeContractWithHash } from "./committee.contract";
 import { Options } from "blockapps-rest/src/types";
 import { decodeRawData } from "../../utils/decode-raw-data.util";

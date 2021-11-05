@@ -3,10 +3,10 @@ import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { IAggs } from "../model/aggs.type";
 import { pipe } from "fp-ts/function";
-import { searchTransactions } from "../utils/model/search-transactions.query";
+import { searchTransactions } from "../utils/model/transaction/search-transactions.query";
 import { taskEither } from "fp-ts";
-import { txnsToAgg } from "../utils/model/txns-to-agg.utils";
-import { putAggAndDecode } from "../utils/model/put-aggs.utils";
+import { txnsToAgg } from "../utils/model/aggs/txns-to-agg.utils";
+import { putAggAndDecode } from "../utils/model/aggs/put-aggs.utils";
 import { ITransaction } from "../model/transaction.type";
 
 export const refreshAggsFromTxn =

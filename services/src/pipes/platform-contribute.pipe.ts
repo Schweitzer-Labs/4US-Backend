@@ -14,7 +14,7 @@ import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
 import { ITransaction } from "../model/transaction.type";
 import { taskEither as te } from "fp-ts";
-import { getCommitteeById } from "../utils/model/get-committee-by-id.query";
+import { getCommitteeById } from "../utils/model/committee/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
@@ -134,11 +134,11 @@ export const platformContribute =
               validateMAContrib(committee)(contrib),
               te.chain(() => validateNYContrib(contrib)),
               te.chain(() =>
-                runRulesAndProcess(billableEventsTableName)(donorsTableName)(
-                  txnsTableName
-                )(rulesTableName)(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(
-                  committee
-                )(contrib)
+                runRulesAndProcess(false)(billableEventsTableName)(
+                  donorsTableName
+                )(txnsTableName)(rulesTableName)(dynamoDB)(stripe)(lnConfig)(
+                  ANONYMOUS
+                )(committee)(contrib)
               )
             )
           )

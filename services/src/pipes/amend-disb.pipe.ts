@@ -1,12 +1,12 @@
 import { DynamoDB } from "aws-sdk";
 import { pipe } from "fp-ts/function";
-import { getTxnById } from "../utils/model/get-txn-by-id.utils";
+import { getTxnById } from "../utils/model/transaction/get-txn-by-id.utils";
 import { taskEither as te } from "fp-ts";
-import { validateDisbursement } from "../utils/model/validate-disbursement.utils";
-import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
+import { validateDisbursement } from "../utils/model/transaction/validate-disbursement.utils";
+import { putTransactionAndDecode } from "../utils/model/transaction/put-transaction.utils";
 import { ITransaction } from "../model/transaction.type";
 import { AmendDisbInput } from "../graphql/input-types/amend-disb.input-type";
-import { isNotABankVerifiedRuleUnverifiedDisb } from "../utils/model/is-non-verified-disbursement.utils";
+import { isNotABankVerifiedRuleUnverifiedDisb } from "../utils/model/transaction/is-non-verified-disbursement.utils";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 

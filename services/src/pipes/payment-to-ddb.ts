@@ -9,7 +9,7 @@ import { Source } from "../utils/enums/source.enum";
 import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Direction } from "../utils/enums/direction.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { putTransaction } from "../utils/model/put-transaction.utils";
+import { putTransaction } from "../utils/model/transaction/put-transaction.utils";
 
 const savePayment =
   (transactionsTableName: string) =>

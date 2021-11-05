@@ -14,7 +14,7 @@ import {
 } from "../../src/utils/config";
 import { initStratoConfig } from "../../src/clients/dapp/dapp.decoders";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
-import { getCommitteeById } from "../../src/utils/model/get-committee-by-id.query";
+import { getCommitteeById } from "../../src/utils/model/committee/get-committee-by-id.query";
 
 dotenv.config();
 

@@ -20,7 +20,7 @@ import {
   getStratoOAuthOpenIdDiscoveryUrl,
 } from "../../src/utils/config";
 import { sleep } from "../../src/utils/sleep.utils";
-import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import { ApplicationError } from "../../src/utils/application-error";
 import { ICommittee } from "../../src/model/committee.type";
 

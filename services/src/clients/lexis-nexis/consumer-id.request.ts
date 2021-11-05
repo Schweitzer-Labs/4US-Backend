@@ -10,13 +10,13 @@ import { InstantIdResponse } from "./lexis-nexis.decoder";
 import {
   BillableEventName,
   putBillableEvent,
-} from "../../utils/model/put-billable-event.utils";
+} from "../../utils/model/billable-events/put-billable-event.utils";
 import { DynamoDB } from "aws-sdk";
 import { genTxnId } from "../../utils/gen-txn-id.utils";
 import axios from "axios";
 import { decodeError } from "../../utils/decode-error.util";
 import { ILexisNexisConfig } from "./lexis-nexis.client";
-import { genFlacspee } from "../../utils/model/gen-donor-match.utils";
+import { genFlacspee } from "../../utils/model/donor/gen-donor-match.utils";
 import { ICommittee } from "../../model/committee.type";
 
 const prefix = "Lexis-nexis";

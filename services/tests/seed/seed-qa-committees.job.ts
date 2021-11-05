@@ -1,7 +1,7 @@
 import { DynamoDB } from "aws-sdk";
 import * as AWS from "aws-sdk";
 import { qaCommitteesData } from "./qa-committees.data";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import * as dotenv from "dotenv";
 import { qaUsers } from "./qa-users.data";
 import { ICommittee } from "../../src/model/committee.type";

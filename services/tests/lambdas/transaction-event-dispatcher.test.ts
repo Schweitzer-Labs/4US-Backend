@@ -5,7 +5,7 @@ import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { genCommittee } from "../utils/gen-committee.util";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { verifiedDispatch } from "../events/verified-dispatch.ddb";
 import {
   getStratoENodeUrl,

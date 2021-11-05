@@ -4,18 +4,18 @@ import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { genCommittee } from "../utils/gen-committee.util";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { syncCommittee } from "../../src/pipes/finicity-bank-sync.pipe";
 import { isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
-import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
-import { searchTransactions } from "../../src/utils/model/search-transactions.query";
+import { searchTransactions } from "../../src/utils/model/transaction/search-transactions.query";
 import { task, taskEither } from "fp-ts";
 import { pipe } from "fp-ts/function";
 import * as FC from "../../src/clients/finicity/finicity.client";
 import { milliToEpoch, now } from "../../src/utils/time.utils";
-import { txnsToAgg } from "../../src/utils/model/txns-to-agg.utils";
+import { txnsToAgg } from "../../src/utils/model/aggs/txns-to-agg.utils";
 
 dotenv.config();
 
