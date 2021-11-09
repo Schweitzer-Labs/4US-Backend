@@ -33,9 +33,9 @@ Transactions:
       - IndexName: TransactionsByActBlueTransactionId
         KeySchema:
           - KeyType: HASH
-              AttributeName: committeeId
+            AttributeName: committeeId
           - KeyType: RANGE
-              AttributeName: actBlueTransactionId
+            AttributeName: actBlueTransactionId
         Projection:
           ProjectionType: KEYS_ONLY
     Replicas:
