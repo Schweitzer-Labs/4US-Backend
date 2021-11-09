@@ -12,6 +12,8 @@ Transactions:
         AttributeType: S
       - AttributeName: donorId
         AttributeType: S
+      - AttributeName: actBlueTransactionId
+        AttributeType: S
     KeySchema:
       - KeyType: HASH
         AttributeName: committeeId
@@ -28,6 +30,14 @@ Transactions:
             AttributeName: donorId
         Projection:
           ProjectionType: ALL
+      - IndexName: TransactionsByActBlueTransactionId
+          KeySchema:
+              - KeyType: HASH
+                AttributeName: committeeId
+            - KeyType: RANGE
+                AttributeName: actBlueTransactionId
+          Projection:
+            ProjectionType: KEYS_ONLY
     Replicas:
       - Region: !Ref AWS::Region
         PointInTimeRecoverySpecification:
