@@ -41,4 +41,6 @@ export class TransactionsArg {
 
   @Field((type) => String, { nullable: true })
   fromId?: string;
+
+  actBlueTransactionId?: string;
 }

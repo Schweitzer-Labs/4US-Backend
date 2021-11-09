@@ -38,7 +38,6 @@ import {
 } from "../utils/config";
 import { Stripe } from "stripe";
 import { ValidationError } from "apollo-server-lambda";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "./input-types/create-disbursement.input-type";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";

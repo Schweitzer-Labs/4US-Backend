@@ -168,4 +168,6 @@ export class CreateContributionInput {
   @Field({ nullable: true })
   @MinLength(2)
   inKindDescription?: string;
+
+  actBlueTransactionId?: string;
 }

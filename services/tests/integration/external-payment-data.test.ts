@@ -46,9 +46,11 @@ const committee = genCommittee({
   tzDatabaseName: "America/New_York",
   finicityCustomerId: "5007489410",
   finicityAccountId: "5016000964",
+  actBlueId: genTxnId(),
 });
 
 const mockExternalTxn = (): IExternalTxn => ({
+  id: genTxnId(),
   recipientId: genTxnId(),
   source: "ActBlue",
   paymentDate: now(),
@@ -60,7 +62,7 @@ const mockExternalTxn = (): IExternalTxn => ({
   lastName: faker.name.lastName(),
   addressLine1: faker.address.streetAddress(),
   city: faker.address.city(),
-  state: faker.random.arrayElement(enumToValues(State)),
+  state: faker.random.arrayElement(Object.values(State)),
   postalCode: faker.address.zipCode(),
   country: "US",
 });
@@ -78,7 +80,7 @@ describe("Syncs external data with a platform account", function () {
   before(async () => {
     await putCommittee(comTable)(ddb)(committee);
 
-    await externalTxnsToDdb(txnTable)(ddb)(committee)(testingData)();
+    await externalTxnsToDdb(comTable)(txnTable)(ddb)(testingData);
   });
   it("External transactions are saved to ", async () => {
     const txns = await pipe(

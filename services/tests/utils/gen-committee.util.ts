@@ -24,6 +24,7 @@ interface IGenCommitteeConfig {
   efsElectionId?: number;
   efsFilerId?: number;
   members?: string[];
+  actBlueId?: string;
 }
 
 export const genCommittee = ({
@@ -46,6 +47,7 @@ export const genCommittee = ({
   efsElectionId,
   efsFilerId,
   members,
+  actBlueId,
 }: IGenCommitteeConfig): ICommittee => {
   const randomFirstName = faker.name.firstName();
   const randomLastName = faker.name.lastName();

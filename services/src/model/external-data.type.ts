@@ -4,6 +4,7 @@ import { fromEnum } from "../utils/from-enum.utils";
 import { EmploymentStatus } from "../utils/enums/employment-status";
 
 const ExternalTxnReq = t.type({
+  id: t.string,
   recipientId: t.string,
   source: t.string,
   paymentDate: t.number,

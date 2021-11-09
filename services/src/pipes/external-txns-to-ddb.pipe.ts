@@ -6,17 +6,24 @@ import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
 import { taskEither } from "fp-ts";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
-import { getCommitteesByActBlueIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
+import { getCommitteeByActBlueIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
 import { getOneFromList } from "../utils/get-one-from-list.utils";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
+import { isNewActBlueTxn } from "../utils/model/transaction/get-txn-by-actblue-id.utils";
+import { runRulesAndProcess } from "./run-rules-and-process.pipe";
+import { Stripe } from "stripe";
+import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { ANONYMOUS, SYSTEM } from "../utils/tokens/users.token";
+import * as Array from "fp-ts/lib/Array";
 
 const extTxnToCreateContribInput =
   (com: ICommittee) =>
   (extTxn: IExternalTxn): CreateContributionInput => ({
+    processPayment: false,
+    actBlueTransactionId: extTxn.id,
     committeeId: com.id,
     paymentMethod: PaymentMethod.Credit,
-    processPayment: false,
     paymentDate: extTxn.paymentDate,
     amount: extTxn.amount,
     firstName: extTxn.firstName,
@@ -36,19 +43,84 @@ const extTxnToCreateContribInput =
   });
 
 const externalDataToCreateContribInput =
-  (extData: IExternalData) =>
+  (extTxns: IExternalTxn[]) =>
   (com: ICommittee): CreateContributionInput[] =>
-    extData.transactions.map(extTxnToCreateContribInput(com));
+    extTxns.map(extTxnToCreateContribInput(com));
 
 export const externalTxnsToDdb =
   (comTable: string) =>
-  (txnsTable: string) =>
+  (billableEventsTableName: string) =>
+  (donorsTableName: string) =>
+  (txnsTableName: string) =>
+  (rulesTableName: string) =>
   (ddb: DynamoDB) =>
-  ({ transactions }: IExternalData): TaskEither<ApplicationError, boolean> =>
+  (stripe: Stripe) =>
+  (lnConfig: ILexisNexisConfig) =>
+  ({
+    transactions,
+  }: IExternalData): TaskEither<ApplicationError, CreateContributionInput[]> =>
     pipe(
-      // getOneFromList<IExternalTxn>(transactions),
-      // taskEither.map((extTxn) => extTxn.recipientGovId),
-      // taskEither.chain(getCommitteesByActBlueIdAndDecode(comTable)(ddb)),
-      // taskEither.map(externalDataToCreateContribInput(transactions)),
-      taskEither.of(true)
+      getOneFromList<IExternalTxn>(transactions),
+      taskEither.map((extTxn) => extTxn.recipientId),
+      taskEither.chain(getCommitteeByActBlueIdAndDecode(comTable)(ddb)),
+      taskEither.chain((com) =>
+        pipe(
+          taskEither.of(com),
+          taskEither.map(externalDataToCreateContribInput(transactions)),
+          taskEither.chain(
+            syncTxns(billableEventsTableName)(donorsTableName)(txnsTableName)(
+              rulesTableName
+            )(ddb)(stripe)(lnConfig)(com)
+          )
+        )
+      )
+    );
+
+const syncTxns =
+  (billableEventsTableName: string) =>
+  (donorsTableName: string) =>
+  (txnsTableName: string) =>
+  (rulesTableName: string) =>
+  (ddb: DynamoDB) =>
+  (stripe: Stripe) =>
+  (lnConfig: ILexisNexisConfig) =>
+  (committee: ICommittee) =>
+  (
+    inputs: CreateContributionInput[]
+  ): TaskEither<ApplicationError, CreateContributionInput[]> =>
+    Array.traverse(taskEither.ApplicativeSeq)(
+      syncTxn(billableEventsTableName)(donorsTableName)(txnsTableName)(
+        rulesTableName
+      )(ddb)(stripe)(lnConfig)(committee)
+    )(inputs);
+
+const syncTxn =
+  (billableEventsTableName: string) =>
+  (donorsTableName: string) =>
+  (txnsTableName: string) =>
+  (rulesTableName: string) =>
+  (ddb: DynamoDB) =>
+  (stripe: Stripe) =>
+  (lnConfig: ILexisNexisConfig) =>
+  (committee: ICommittee) =>
+  (
+    input: CreateContributionInput
+  ): TaskEither<ApplicationError, CreateContributionInput> =>
+    pipe(
+      isNewActBlueTxn(txnsTableName)(ddb)({
+        committeeId: input.committeeId,
+        actBlueTransactionId: input.actBlueTransactionId,
+      }),
+      taskEither.chain((isNew) =>
+        isNew
+          ? taskEither.of(input)
+          : pipe(
+              runRulesAndProcess(true)(billableEventsTableName)(
+                donorsTableName
+              )(txnsTableName)(rulesTableName)(ddb)(stripe)(lnConfig)(SYSTEM)(
+                committee
+              )(input),
+              taskEither.map(() => input)
+            )
+      )
     );

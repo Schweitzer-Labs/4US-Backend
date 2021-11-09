@@ -8,7 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import { ICommittee } from "../../../model/committee.type";
 import { findOne } from "./find-one-committee.utils";
 
-export const getCommitteesByActBlueIdAndDecode =
+export const getCommitteeByActBlueIdAndDecode =
   (committeeTable: string) =>
   (dynamoDB: DynamoDB) =>
   (actBlueId: string): TaskEither<ApplicationError, ICommittee> =>
