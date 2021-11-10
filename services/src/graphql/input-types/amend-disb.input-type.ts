@@ -2,7 +2,6 @@ import { Field, InputType, registerEnumType } from "type-graphql";
 import { PurposeCode } from "../../utils/enums/purpose-code.enum";
 import { PaymentMethod } from "../../utils/enums/payment-method.enum";
 import { State } from "../../utils/enums/state.enum";
-import { ITransaction } from "../../model/transaction.type";
 
 registerEnumType(PurposeCode, {
   name: "PurposeCode",

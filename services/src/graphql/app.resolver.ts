@@ -56,10 +56,7 @@ import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
 import { Report } from "./object-types/report.object-type";
-import {
-  generateDisclosure,
-  generateDisclosureOrError,
-} from "../pipes/generate-disclosure.pipe";
+import { generateDisclosureOrError } from "../pipes/generate-disclosure.pipe";
 import { getAggsByCommitteeId } from "../utils/model/aggs/get-aggs.utils";
 import { refreshAggs, refreshAggsFromTxn } from "../pipes/refresh-aggs.pipe";
 import { GenCommitteeInput } from "./input-types/gen-committee.input-type";
@@ -395,7 +392,7 @@ export class AppResolver {
     return await teToRightOrThrow(res);
   }
 
-  // Demo
+  // Demo Generation Code
 
   @Mutation((returns) => Committee)
   async generateCommittee(

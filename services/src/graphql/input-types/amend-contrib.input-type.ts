@@ -8,7 +8,6 @@ import {
   InKindType,
   PaymentMethod,
 } from "../../utils/enums/payment-method.enum";
-import { ITransaction } from "../../model/transaction.type";
 import { Owner } from "./owner.input-type";
 
 registerEnumType(EntityType, {
