@@ -24,7 +24,7 @@ interface IGenCommitteeConfig {
   efsElectionId?: number;
   efsFilerId?: number;
   members?: string[];
-  actBlueId?: string;
+  actBlueAccountId?: string;
 }
 
 export const genCommittee = ({
@@ -47,7 +47,7 @@ export const genCommittee = ({
   efsElectionId,
   efsFilerId,
   members,
-  actBlueId,
+  actBlueAccountId,
 }: IGenCommitteeConfig): ICommittee => {
   const randomFirstName = faker.name.firstName();
   const randomLastName = faker.name.lastName();
@@ -74,5 +74,6 @@ export const genCommittee = ({
     bankName: "chase",
     efsElectionId: efsElectionId || faker.datatype.number(5000000),
     efsFilerId: efsFilerId || faker.datatype.number(5000000),
+    actBlueAccountId,
   };
 };

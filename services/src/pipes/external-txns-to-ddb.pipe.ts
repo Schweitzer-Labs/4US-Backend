@@ -6,7 +6,7 @@ import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
 import { taskEither } from "fp-ts";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
-import { getCommitteeByActBlueIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
+import { getCommitteeByActBlueAccountIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
 import { getOneFromList } from "../utils/get-one-from-list.utils";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
@@ -62,7 +62,7 @@ export const externalTxnsToDdb =
     pipe(
       getOneFromList<IExternalTxn>(transactions),
       taskEither.map((extTxn) => extTxn.recipientId),
-      taskEither.chain(getCommitteeByActBlueIdAndDecode(comTable)(ddb)),
+      taskEither.chain(getCommitteeByActBlueAccountIdAndDecode(comTable)(ddb)),
       taskEither.chain((com) =>
         pipe(
           taskEither.of(com),
@@ -113,8 +113,7 @@ const syncTxn =
       }),
       taskEither.chain((isNew) =>
         isNew
-          ? taskEither.of(input)
-          : pipe(
+          ? pipe(
               runRulesAndProcess(true)(billableEventsTableName)(
                 donorsTableName
               )(txnsTableName)(rulesTableName)(ddb)(stripe)(lnConfig)(SYSTEM)(
@@ -122,5 +121,6 @@ const syncTxn =
               )(input),
               taskEither.map(() => input)
             )
+          : taskEither.of(input)
       )
     );

@@ -4,14 +4,11 @@ import { ApplicationError } from "../../application-error";
 import { pipe } from "fp-ts/function";
 import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
-import * as t from "io-ts";
-
-import { validateDDBResponse } from "../../ddb.utils";
 import { QueryInput } from "aws-sdk/clients/dynamodb";
 
 const logPrefix = "Get Transaction by ActBlue Transaction Id";
 
-interface GetTxnByActBlueIdArgs {
+interface GetTxnByActBlueTxnIdArgs {
   committeeId: string;
   actBlueTransactionId: string;
 }
@@ -22,7 +19,7 @@ export const actBlueTxnExistsUnsafe =
   async ({
     committeeId,
     actBlueTransactionId,
-  }: GetTxnByActBlueIdArgs): Promise<boolean> => {
+  }: GetTxnByActBlueTxnIdArgs): Promise<boolean> => {
     const query: QueryInput = {
       TableName: txnsTableName,
       IndexName: "TransactionsByActBlueTransactionId",
@@ -46,7 +43,7 @@ export const actBlueTxnExistsUnsafe =
 export const actBlueTxnExists =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (args: GetTxnByActBlueIdArgs): TaskEither<ApplicationError, boolean> =>
+  (args: GetTxnByActBlueTxnIdArgs): TaskEither<ApplicationError, boolean> =>
     pipe(
       tryCatch<ApplicationError, boolean>(
         () => actBlueTxnExistsUnsafe(txnsTableName)(dynamoDB)(args),
@@ -62,7 +59,7 @@ export const actBlueTxnExists =
 export const isNewActBlueTxn =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  (args: GetTxnByActBlueIdArgs): TaskEither<ApplicationError, boolean> =>
+  (args: GetTxnByActBlueTxnIdArgs): TaskEither<ApplicationError, boolean> =>
     pipe(
       actBlueTxnExists(txnsTableName)(dynamoDB)(args),
       taskEither.map((res) => !res)

@@ -8,13 +8,16 @@ import { StatusCodes } from "http-status-codes";
 import { ICommittee } from "../../../model/committee.type";
 import { findOne } from "./find-one-committee.utils";
 
-export const getCommitteeByActBlueIdAndDecode =
+export const getCommitteeByActBlueAccountIdAndDecode =
   (committeeTable: string) =>
   (dynamoDB: DynamoDB) =>
-  (actBlueId: string): TaskEither<ApplicationError, ICommittee> =>
+  (actBlueAccountId: string): TaskEither<ApplicationError, ICommittee> =>
     pipe(
       taskEither.tryCatch(
-        () => getCommitteesByActBlueId(committeeTable)(dynamoDB)(actBlueId),
+        () =>
+          getCommitteesByActBlueAccountId(committeeTable)(dynamoDB)(
+            actBlueAccountId
+          ),
         (err) =>
           new ApplicationError(
             "Get committee request failed",
@@ -26,17 +29,17 @@ export const getCommitteeByActBlueIdAndDecode =
       taskEither.chain(findOne)
     );
 
-const getCommitteesByActBlueId =
+const getCommitteesByActBlueAccountId =
   (committeesTableName: string) =>
   (dynamoDB: DynamoDB) =>
-  async (actBlueId: string): Promise<any> => {
-    console.log("Get committees by ActBlue Id called", actBlueId);
+  async (actBlueAccountId: string): Promise<any> => {
+    console.log("Get committees by ActBlue Id called", actBlueAccountId);
     const res = await dynamoDB
       .scan({
         TableName: committeesTableName,
-        FilterExpression: "actBlueId = :actBlueId",
+        FilterExpression: "actBlueAccountId = :actBlueAccountId",
         ExpressionAttributeValues: {
-          ":actBlueId": { S: actBlueId },
+          ":actBlueAccountId": { S: actBlueAccountId },
         },
       })
       .promise();
