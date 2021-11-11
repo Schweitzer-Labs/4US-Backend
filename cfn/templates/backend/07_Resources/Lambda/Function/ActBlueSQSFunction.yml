@@ -1,0 +1,37 @@
+ActBlueSQSFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-ActBlueSQSFunction
+    Description: Sync Transactions with ActBlue Account
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.actblueSQS
+    Runtime: nodejs14.x
+    Role: !GetAtt LambdaGraphQLRole.Arn
+    Events:
+      SyncInitiated:
+        Type: SQS
+        Properties:
+          BatchSize: 1
+          Queue: !GetAtt ActBlueQueue.Arn
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
+    Environment:
+      Variables:
+        RUNENV: !Ref LambdaRunEnvironment
+        TRANSACTIONS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
+        COMMITTEES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+
+ActBlueSQSInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref ActBlueSQSFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue
