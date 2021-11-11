@@ -7,7 +7,7 @@ ActBlueSyncFunction:
     Layers:
       - !Ref ServicesLayer
     Handler: app.actblueSync
-    Role: !GetAtt LambdaGraphQLRole.Arn
+    Role: !GetAtt LambdaBankSyncRole.Arn
     Timeout: 40
     MemorySize: 300
     Events:

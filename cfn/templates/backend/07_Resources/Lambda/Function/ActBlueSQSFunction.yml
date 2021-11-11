@@ -8,7 +8,7 @@ ActBlueSQSFunction:
       - !Ref ServicesLayer
     Handler: app.actblueSQS
     Runtime: nodejs14.x
-    Role: !GetAtt LambdaGraphQLRole.Arn
+    Role: !GetAtt LambdaBankSQSRole.Arn
     Events:
       SyncInitiated:
         Type: SQS
