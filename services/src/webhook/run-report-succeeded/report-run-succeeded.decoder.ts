@@ -58,18 +58,3 @@ export const decodePayoutReportRows = (
     te.mapLeft(decodeError("PayoutReportRows"))
   );
 };
-
-export const parseCSV = async (csv: string) => {
-  console.log(csv);
-  const res = await csvToJson().fromString(csv);
-  console.log(res);
-  return res;
-};
-
-export const parseCSVAndDecode = (
-  csv: string
-): TaskEither<ApplicationError, any> =>
-  taskEither.tryCatch(
-    () => parseCSV(csv),
-    (err) => new ApplicationError("Report is an invalid CSV", err)
-  );

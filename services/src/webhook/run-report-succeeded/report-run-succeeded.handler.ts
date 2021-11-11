@@ -13,10 +13,10 @@ import {
   decodePayoutReportRows,
   decodeReportRunEvent,
   IPayoutReportRows,
-  parseCSVAndDecode,
   reportEventToStripeAccount,
   reportEventToUrl,
 } from "./report-run-succeeded.decoder";
+import { parseCSVAndDecode } from "../../utils/parse-csv.utils";
 
 export const getReport =
   (stripeApiKey: string) =>

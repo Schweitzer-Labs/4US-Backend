@@ -9,3 +9,14 @@ const yearToYearMillis = (year: number): number =>
 
 export const millisToYearStart = (date: number): number =>
   yearToYearMillis(millisToYear(date));
+
+export const toISODate = (time: number): string =>
+  new Date(time).toISOString().split("T")[0];
+
+export const nMonthsAgo =
+  (monthsAgo: number) =>
+  (time: number): number => {
+    const date = new Date(time);
+    date.setMonth(date.getMonth() - monthsAgo);
+    return date.getTime();
+  };
