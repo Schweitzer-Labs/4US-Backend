@@ -118,9 +118,6 @@ describe("Syncs external data with a platform account", function () {
       )
     )();
 
-    console.log("transaction list");
-    console.log(txns);
-
     expect(txns.length).to.equal(testSize);
   });
   after(async () => {
