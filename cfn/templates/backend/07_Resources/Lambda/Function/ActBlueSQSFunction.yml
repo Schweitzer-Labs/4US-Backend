@@ -6,7 +6,7 @@ ActBlueSQSFunction:
     CodeUri: lambdas/
     Layers:
       - !Ref ServicesLayer
-    Handler: app.actblueSQS
+    Handler: app.actBlueSQS
     Runtime: nodejs14.x
     Role: !GetAtt LambdaExternalDataRole.Arn
     Events:

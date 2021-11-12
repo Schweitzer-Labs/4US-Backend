@@ -2,19 +2,16 @@ import { expect } from "chai";
 import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
 import {
+  ActBlueCSVType,
   IActBlueAPICredentials,
   IActBluePaidContribution,
 } from "../../src/clients/actblue/actblue.decoders";
 import { pipe } from "fp-ts/function";
-import { either, task, taskEither } from "fp-ts";
-import {
-  actBlueCSVIdToTypedData,
-  getActBlueCSVId,
-} from "../../src/clients/actblue/actblue.client";
-import { nMonthsAgo } from "../../src/utils/time.utils";
-import { now, milliToEpoch } from "../../src/utils/time.utils";
+import { task, taskEither } from "fp-ts";
+import { nMonthsAgo, now } from "../../src/utils/time.utils";
 import { isLeft } from "fp-ts/Either";
 import { sleep } from "../../src/utils/sleep.utils";
+import { getActBlueCSVMetadata } from "../../src/clients/actblue/actblue.client";
 
 dotenv.config();
 
@@ -34,16 +31,18 @@ const creds: IActBlueAPICredentials = {
 
 describe("ActBlue Client", function () {
   describe("CSV generation", function () {
-    it("Request CSV generation and retrieves an ID", async () => {
+    it("Request CSV generation and retrieves an CSV Metadata", async () => {
       const rn = now();
       const sixMAgo = nMonthsAgo(6)(rn);
 
-      const eitherCSVId = await getActBlueCSVId(creds)(sixMAgo)(rn)();
+      const eitherCSVId = await getActBlueCSVMetadata(
+        ActBlueCSVType.PaidContributions
+      )(creds)(sixMAgo)(rn)();
       if (isLeft(eitherCSVId)) {
         throw Error("request failed");
       }
 
-      expect(eitherCSVId.right).to.be.a("string");
+      expect(eitherCSVId.right.csvId).to.be.a("string");
     });
   });
 

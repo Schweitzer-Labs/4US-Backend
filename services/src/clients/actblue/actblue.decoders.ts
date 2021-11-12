@@ -1,5 +1,16 @@
 import * as t from "io-ts";
 
+export enum ActBlueCSVType {
+  PaidContributions = "paid_contributions",
+  RefundedContributions = "refunded_contributions",
+  ManagedFormContributions = "managed_form_contributions",
+}
+
+export interface IActBlueCSVMetadata {
+  csvType: ActBlueCSVType;
+  csvId: string;
+}
+
 export const ActBlueAPICredentials = t.type({
   clientUUID: t.string,
   clientSecret: t.string,

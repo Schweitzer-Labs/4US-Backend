@@ -6,7 +6,7 @@ ActBlueSyncFunction:
     CodeUri: lambdas/
     Layers:
       - !Ref ServicesLayer
-    Handler: app.actblueSync
+    Handler: app.actBlueSync
     Role: !GetAtt LambdaBankSyncRole.Arn
     Timeout: 40
     MemorySize: 300

@@ -1,8 +1,10 @@
 import {
+  ActBlueCSVType,
   ActBlueCSVUrlResponse,
   ActBlueGenCSVResponse,
   ActBluePaidContribution,
   IActBlueAPICredentials,
+  IActBlueCSVMetadata,
   IActBlueCSVUrlResponse,
   IActBluePaidContribution,
 } from "./actblue.decoders";
@@ -75,6 +77,7 @@ export const actBlueCSVIdToTypedData =
     );
 
 const getActBlueCSVIdUnsafe =
+  (csvType: ActBlueCSVType) =>
   (creds: IActBlueAPICredentials) =>
   (fromTime: number) =>
   async (toTime: number): Promise<unknown> => {
@@ -83,7 +86,7 @@ const getActBlueCSVIdUnsafe =
     const { data } = await axios.post<unknown>(
       endpoint,
       {
-        csv_type: "paid_contributions",
+        csv_type: csvType,
         date_range_start: fromTimeISO,
         date_range_end: toTimeISO,
       },
@@ -95,15 +98,19 @@ const getActBlueCSVIdUnsafe =
     return data;
   };
 
-export const getActBlueCSVId =
+export const getActBlueCSVMetadata =
+  (csvType: ActBlueCSVType) =>
   (creds: IActBlueAPICredentials) =>
   (fromTime: number) =>
-  (toTime: number): TaskEither<ApplicationError, string> =>
+  (toTime: number): TaskEither<ApplicationError, IActBlueCSVMetadata> =>
     pipe(
       te.tryCatch(
-        () => getActBlueCSVIdUnsafe(creds)(fromTime)(toTime),
+        () => getActBlueCSVIdUnsafe(csvType)(creds)(fromTime)(toTime),
         (err) => new ApplicationError("Call to generate ActBlue ID failed", err)
       ),
       te.chain(decodeRawData("ActBlue CSV ID response")(ActBlueGenCSVResponse)),
-      te.map((res) => res.id)
+      te.map((res) => ({
+        csvType,
+        csvId: res.id,
+      }))
     );

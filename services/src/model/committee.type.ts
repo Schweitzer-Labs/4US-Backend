@@ -1,4 +1,5 @@
 import * as t from "io-ts";
+import { ActBlueAPICredentials } from "../clients/actblue/actblue.decoders";
 
 const CommitteeRequired = t.type({
   id: t.string,
@@ -28,6 +29,7 @@ const CommitteeOptional = t.partial({
   emailAddresses: t.string,
   employmentStatus: t.string,
   actBlueAccountId: t.string,
+  actBlueAPICredentials: ActBlueAPICredentials,
   efsFilerId: t.number,
   efsElectionId: t.number,
   blockchainMetadata: t.unknown,
