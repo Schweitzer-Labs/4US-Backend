@@ -11,7 +11,10 @@ import { task, taskEither } from "fp-ts";
 import { nMonthsAgo, now } from "../../src/utils/time.utils";
 import { isLeft } from "fp-ts/Either";
 import { sleep } from "../../src/utils/sleep.utils";
-import { getActBlueCSVMetadata } from "../../src/clients/actblue/actblue.client";
+import {
+  actBlueCSVMetadataToTypedData,
+  getActBlueCSVMetadata,
+} from "../../src/clients/actblue/actblue.client";
 
 dotenv.config();
 
@@ -51,19 +54,21 @@ describe("ActBlue Client", function () {
       const rn = now();
       const sixMAgo = nMonthsAgo(6)(rn);
 
-      const eitherCSVId = await getActBlueCSVId(creds)(sixMAgo)(rn)();
+      const eitherCSVId = await getActBlueCSVMetadata(
+        ActBlueCSVType.PaidContributions
+      )(creds)(sixMAgo)(rn)();
       if (isLeft(eitherCSVId)) {
         throw Error("request failed");
       }
 
       await sleep(3000);
 
-      csvId = eitherCSVId.right;
+      csvId = eitherCSVId.right.csvId;
     });
 
     it("Retrieves typed data from a CSV Id", async () => {
       const res: IActBluePaidContribution[] = await pipe(
-        actBlueCSVIdToTypedData(creds)(csvId),
+        actBlueCSVMetadataToTypedData(creds)(csvId),
         taskEither.fold(
           () => task.of([]),
           (res) => task.of(res)

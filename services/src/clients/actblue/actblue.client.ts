@@ -55,7 +55,7 @@ const getActBlueCSVById =
       (err) => new ApplicationError("Get report by url failed", err)
     );
 
-export const actBlueCSVIdToTypedData =
+export const actBlueCSVMetadataToTypedData =
   (creds: IActBlueAPICredentials) =>
   (
     reportId: string
