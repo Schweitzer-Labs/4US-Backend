@@ -8,7 +8,7 @@
     "apollo-server": "^2.25.3",
     "apollo-server-lambda": "^2.25.0",
     "axios": "^0.24.0",
-    "blockapps-rest": "^8.0.2",
+    "blockapps-rest": "^8.0.3",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "csvtojson": "^2.0.10",
@@ -32,7 +32,6 @@
     "test-one": "ts-mocha tests/**/$npm_config_f*.test.ts --timeout 600000",
     "test-actblue": "ts-mocha tests/integration/actblue-client.test.ts --timeout 600000",
     "gen-int-test": "cp tests/utils/blank-test.util.ts tests/integration/$NAME.test.ts",
-
     "compile": "npm install && tsc",
     "test-server": "ts-node-dev tests/server --watch"
   },
