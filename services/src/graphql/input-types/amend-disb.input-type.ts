@@ -3,6 +3,7 @@ import { PurposeCode } from "../../utils/enums/purpose-code.enum";
 import { PaymentMethod } from "../../utils/enums/payment-method.enum";
 import { State } from "../../utils/enums/state.enum";
 import { ITransaction } from "../../model/transaction.type";
+import {Min} from "class-validator";
 
 registerEnumType(PurposeCode, {
   name: "PurposeCode",
@@ -26,6 +27,10 @@ export class AmendDisbInput {
 
   @Field()
   committeeId?: string;
+
+  @Field({ nullable: true })
+  @Min(50)
+  amount?: number;
 
   @Field({ nullable: true })
   entityName?: string;
