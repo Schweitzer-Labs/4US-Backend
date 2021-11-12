@@ -6,6 +6,6 @@ export const mLog =
   <a>(msg: string) =>
   (data: a): TaskEither<ApplicationError, a> => {
     console.log(msg);
-    console.log(data);
+    console.log(JSON.stringify(data));
     return te.right(data);
   };

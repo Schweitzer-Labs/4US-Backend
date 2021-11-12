@@ -86,6 +86,7 @@ export const actBlueToSqs =
   (comsTable: string) =>
   (ddb: DynamoDB): TaskEither<ApplicationError, unknown[]> =>
     pipe(
-      getActBlueCommitteesAndDecode(comsTable)(ddb)
-      // te.chain(actBlueCommitteesToSQS(csvType)(sqsUrl)(sqs))
+      getActBlueCommitteesAndDecode(comsTable)(ddb),
+      te.chain(mLog("ActBlue committees query executed")),
+      te.chain(actBlueCommitteesToSQS(csvType)(sqsUrl)(sqs))
     );
