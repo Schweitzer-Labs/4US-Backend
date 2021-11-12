@@ -27,6 +27,7 @@ const CommitteeOptional = t.partial({
   chainId: t.string,
   emailAddresses: t.string,
   employmentStatus: t.string,
+  actBlueAccountId: t.string,
   efsFilerId: t.number,
   efsElectionId: t.number,
   blockchainMetadata: t.unknown,

@@ -5,6 +5,7 @@ import { State } from "../../utils/enums/state.enum";
 import { ITransaction } from "../../model/transaction.type";
 import {Min} from "class-validator";
 
+
 registerEnumType(PurposeCode, {
   name: "PurposeCode",
   description: "Purpose code for an expenditure",

@@ -38,7 +38,6 @@ import {
 } from "../utils/config";
 import { Stripe } from "stripe";
 import { ValidationError } from "apollo-server-lambda";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "./input-types/create-disbursement.input-type";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
@@ -57,10 +56,7 @@ import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
 import { Report } from "./object-types/report.object-type";
-import {
-  generateDisclosure,
-  generateDisclosureOrError,
-} from "../pipes/generate-disclosure.pipe";
+import { generateDisclosureOrError } from "../pipes/generate-disclosure.pipe";
 import { getAggsByCommitteeId } from "../utils/model/aggs/get-aggs.utils";
 import { refreshAggs, refreshAggsFromTxn } from "../pipes/refresh-aggs.pipe";
 import { GenCommitteeInput } from "./input-types/gen-committee.input-type";
@@ -396,7 +392,7 @@ export class AppResolver {
     return await teToRightOrThrow(res);
   }
 
-  // Demo
+  // Demo Generation Code
 
   @Mutation((returns) => Committee)
   async generateCommittee(

@@ -1,0 +1,19 @@
+LambdaExternalDataRole:
+  Type: AWS::IAM::Role
+  Properties:
+    ManagedPolicyArns:
+      - !Ref LambdaBasicPolicy
+      - !Ref DynamoDBGraphQLPolicy
+      - !Ref DynamoDBExternalDataPolicy
+      - !Ref DynamoDBAuditLogsPolicy
+      - !Ref DynamoDBReadAggregatesPolicy
+      - !Ref DynamoDBWriteAggregatesPolicy
+    AssumeRolePolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole

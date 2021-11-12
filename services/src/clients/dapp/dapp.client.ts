@@ -5,10 +5,6 @@ import { pipe } from "fp-ts/function";
 import { taskEither as te } from "fp-ts";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../../utils/application-error";
-
-const baseContract = "CommitteeContract";
-const txnContract = "Transaction";
-
 import {
   decodeCreateChainResponse,
   decodeCreateUserResponse,
@@ -24,6 +20,9 @@ import { Options } from "blockapps-rest/src/types";
 import { decodeRawData } from "../../utils/decode-raw-data.util";
 import { txnToMetadata } from "../../utils/txn-to-metadata.utils";
 import { Committee, ICommittee } from "../../model/committee.type";
+
+const baseContract = "CommitteeContract";
+const txnContract = "Transaction";
 
 export const getClientUser = async ({ config }: IStratoSDKConfig) => {
   const options = { config };

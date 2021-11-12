@@ -1,0 +1,38 @@
+ActBlueSyncFunction:
+  Type: "AWS::Serverless::Function"
+  Properties:
+    FunctionName: !Sub ${AWS::StackName}-ActBlueSyncFunction
+    Runtime: nodejs14.x
+    CodeUri: lambdas/
+    Layers:
+      - !Ref ServicesLayer
+    Handler: app.actblueSync
+    Role: !GetAtt LambdaBankSyncRole.Arn
+    Timeout: 40
+    MemorySize: 300
+    Events:
+      EveryMinuteEvent:
+        Type: Schedule
+        Properties:
+          Schedule: 'rate(5 minutes)'
+    DeadLetterQueue:
+      TargetArn: !Ref LambdaDLQ
+      Type: SNS
+    Environment:
+      Variables:
+        RUNENV:
+          !Ref LambdaRunEnvironment
+        COMMITTEES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+        BANK_SQS_URL:
+          !Ref ActBlueQueue
+
+ActBlueSyncInvokeConfig:
+  Type: AWS::Lambda::EventInvokeConfig
+  Properties:
+    FunctionName: !Ref ActBlueSyncFunction
+    Qualifier: "$LATEST"
+    MaximumRetryAttempts: 0
+    DestinationConfig:
+      OnSuccess:
+        Destination: !Ref LambdaSuccessQueue
