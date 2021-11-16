@@ -98,7 +98,7 @@ describe("Model Utils", function () {
     let testTxn: ITransaction;
     before(async () => {
       const committeeId = committee.id
-      const testTxn = genContributionRecord({committeeId});
+       testTxn = genContributionRecord({committeeId});
       await putTransaction(txnsTableName)(dynamoDB)(testTxn);
       await sleep(1000);
 
