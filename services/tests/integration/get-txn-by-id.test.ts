@@ -32,7 +32,8 @@ const dynamoDB = new DynamoDB();
 describe("Get transaction by id", function () {
   before(async () => {});
   it("Retrieve a transaction by an valid id", async () => {
-    const txn = genContributionRecord(committee.id);
+    const committeeId = committee.id
+    const txn = genContributionRecord({committeeId});
 
     await putTransaction(txnTableName)(dynamoDB)(txn);
 
