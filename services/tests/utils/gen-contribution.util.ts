@@ -11,11 +11,19 @@ import {enumToValues} from "../../src/utils/enums/poly.util";
 import {State} from "../../src/utils/enums/state.enum";
 import {Source} from "../../src/utils/enums/source.enum";
 
-export const genContributionRecord = (
+
+interface IGenContributionRecordArgs {
   committeeId: string,
   source?: Source,
   donorId?: string,
   entityType?: EntityType,
+}
+
+export const genContributionRecord = ({
+  committeeId,
+  source,
+  donorId,
+  entityType,}: IGenContributionRecordArgs
 ): ITransaction => {
   return {
     ...genTransaction({

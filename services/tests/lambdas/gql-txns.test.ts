@@ -389,7 +389,7 @@ describe("Committee GraphQL Lambda", function () {
   });
   describe("Transactions", function () {
     it("Get by Committee ID", async () => {
-      const txn = genContributionRecord(committeeId);
+      const txn = genContributionRecord({committeeId});
       await putTransaction(txnsTableName)(dynamoDB)(txn);
       await sleep(1000);
       const res: any = await lambdaPromise(
@@ -401,7 +401,7 @@ describe("Committee GraphQL Lambda", function () {
       expect(body.data.transactions.length > 0).to.equal(true);
     });
     it("Get by Committee ID and Donor ID", async () => {
-      const txn = genContributionRecord(committeeId);
+      const txn = genContributionRecord({committeeId});
       await putTransaction(txnsTableName)(dynamoDB)(txn);
       await sleep(1000);
 
@@ -814,7 +814,7 @@ describe("Committee GraphQL Lambda", function () {
     });
     it("Stops a ActBlue transaction from deletion", async () => {
       const source = Source.ACTBLUE
-      const newTxn = genContributionRecord(committeeId,source)
+      const newTxn = genContributionRecord({committeeId, source})
 
       await putTransaction(txnsTableName)(dynamoDB)(newTxn);
       await sleep(1000);
