@@ -17,6 +17,8 @@ import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { sendMessage } from "../utils/send-sqs.utils";
 import { mLog } from "../utils/m-log.utils";
 
+const reportMonthRange = 6;
+
 interface IActBlueSQSMsgBody {
   committeeId: string;
   csvType: ActBlueCSVType;
@@ -32,7 +34,7 @@ const credsToCsvMetadata =
     creds: IActBlueAPICredentials
   ): TaskEither<ApplicationError, IActBlueCSVMetadata> => {
     const rightNow = now();
-    const sixMonthsAgo = nMonthsAgo(6)(rightNow);
+    const sixMonthsAgo = nMonthsAgo(reportMonthRange)(rightNow);
     return getActBlueCSVMetadata(csvType)(creds)(sixMonthsAgo)(rightNow);
   };
 

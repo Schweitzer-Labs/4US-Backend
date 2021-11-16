@@ -36,6 +36,9 @@ export const ActBluePaidContribution = t.type({
   ["Receipt ID"]: t.string,
   ["Date"]: t.string,
   ["Amount"]: t.string,
+  ["Fee"]: t.string,
+  ["Disbursement Date"]: t.string,
+  ["Disbursement ID"]: t.string,
 });
 
 export type IActBluePaidContribution = t.TypeOf<typeof ActBluePaidContribution>;

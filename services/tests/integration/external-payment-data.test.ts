@@ -8,7 +8,7 @@ import { deleteCommittee } from "../../src/utils/model/committee/delete-committe
 import { externalTxnsToDdb } from "../../src/pipes/external-txns-to-ddb.pipe";
 import {
   IExternalData,
-  IExternalTxn,
+  IExternalContrib,
 } from "../../src/model/external-data.type";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { now } from "../../src/utils/time.utils";
@@ -61,7 +61,7 @@ const committee = genCommittee({
   actBlueAccountId,
 });
 
-const mockExternalTxn = (amount?: number): IExternalTxn => ({
+const mockExternalContrib = (amount?: number): IExternalContrib => ({
   id: genTxnId(),
   recipientId: actBlueAccountId,
   source: "ActBlue",
@@ -72,6 +72,10 @@ const mockExternalTxn = (amount?: number): IExternalTxn => ({
       min: 1000,
       max: 5000,
     }),
+  fee: faker.datatype.number({
+    min: 10,
+    max: 100,
+  }),
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
   addressLine1: faker.address.streetAddress(),
@@ -84,7 +88,7 @@ const mockExternalTxn = (amount?: number): IExternalTxn => ({
 const genList = (size: number) => Array.from(Array(size).keys());
 
 const mockExternalData = (txnSize: number): IExternalData => ({
-  transactions: genList(txnSize).map(mockExternalTxn),
+  contributions: genList(txnSize).map(mockExternalContrib),
 });
 
 const testSize = 3;
@@ -103,7 +107,7 @@ describe("Syncs external data with a platform account", function () {
       txnsTable
     )(rulesTable)(ddb)(stripe)(lnConfig)(testingData)();
   });
-  it("External transactions are saved to ", async () => {
+  it("External transactions are saved to database", async () => {
     const txns = await pipe(
       searchTransactions(txnsTable)(ddb)({
         committeeId: committee.id,
@@ -118,7 +122,7 @@ describe("Syncs external data with a platform account", function () {
       )
     )();
 
-    expect(txns.length).to.equal(testSize);
+    expect(txns.length).to.equal(testSize * 2);
   });
   after(async () => {
     await deleteCommittee(comsTable)(ddb)(committee);
