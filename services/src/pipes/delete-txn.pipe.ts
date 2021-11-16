@@ -38,5 +38,5 @@ const isNotActBlue = (
 ): TaskEither<ApplicationError, ITransaction> => (
      enumToValues(ExternalSource).includes(txn.source) ?
          taskEither.left(
-            new ApplicationError("ActBlue transactions cannot be deleted.", txn)
+            new ApplicationError(`${txn.source} transactions cannot be deleted.`, txn)
          ) : taskEither.right(txn))

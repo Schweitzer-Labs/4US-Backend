@@ -119,7 +119,8 @@ describe("DAPP Tests", async () => {
       });
 
       it("Supports committing a transaction", async () => {
-        const txn = genContributionRecord(committee.id);
+        const committeeId = committee.id
+        const txn = genContributionRecord({committeeId});
 
         const res = await commitTransaction(stratoConf)(txnsTableName)(
           dynamoDB

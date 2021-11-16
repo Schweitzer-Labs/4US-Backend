@@ -812,7 +812,7 @@ describe("Committee GraphQL Lambda", function () {
         "Transaction is not unreconciled or unprocessed."
       );
     });
-    it("Stops a ActBlue transaction from deletion", async () => {
+    it("Stops a External Source transaction from deletion", async () => {
       const source = Source.ACTBLUE
       const newTxn = genContributionRecord({committeeId, source})
 
@@ -833,7 +833,7 @@ describe("Committee GraphQL Lambda", function () {
       const txnResBody = JSON.parse(txnRes.body);
       console.log(txnResBody);
       expect(txnResBody.errors[0].message).to.equal(
-          "ActBlue transactions cannot be deleted."
+          `${newTxn.source} transactions cannot be deleted.`
       );
     });
   });
