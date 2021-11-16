@@ -15,6 +15,7 @@ export const deleteUnreconciledTxn =
     pipe(
       getTxnById(txnTable)(ddb)(txnArgs.committeeId)(txnArgs.id),
       taskEither.chain(isReconciled),
+      taskEither.chain(isActBlue),
       taskEither.chain(deleteTxnPipe(txnTable)(ddb))
     );
 
@@ -29,3 +30,11 @@ const isReconciled = (
           txn
         )
       );
+
+const isActBlue = (
+    t: ITransaction
+): TaskEither<ApplicationError, ITransaction> => (
+     t.source === "ActBlue" ?
+         taskEither.left(
+            new ApplicationError("ActBlue transactions cannot be deleted", t)
+         ) : taskEither.right(t))
