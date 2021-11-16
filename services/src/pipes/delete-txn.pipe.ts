@@ -7,6 +7,7 @@ import { TransactionArg } from "../graphql/args/transaction.arg";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { ITransaction } from "../model/transaction.type";
+import {Source} from "../utils/enums/source.enum";
 
 export const deleteUnreconciledTxn =
   (txnTable: string) =>
@@ -34,7 +35,7 @@ const isReconciled = (
 const isActBlue = (
     t: ITransaction
 ): TaskEither<ApplicationError, ITransaction> => (
-     t.source === "ActBlue" ?
+     t.source === Source.ACTBLUE ?
          taskEither.left(
-            new ApplicationError("ActBlue transactions cannot be deleted", t)
+            new ApplicationError("ActBlue transactions cannot be deleted.", t)
          ) : taskEither.right(t))

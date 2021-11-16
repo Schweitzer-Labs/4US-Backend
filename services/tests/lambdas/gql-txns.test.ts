@@ -24,6 +24,7 @@ import { Direction } from "../../src/utils/enums/direction.enum";
 import { ReconcileTxnInput } from "../../src/graphql/input-types/reconcile-txn.input-type";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import {Source} from "../../src/utils/enums/source.enum";
 
 dotenv.config();
 
@@ -809,6 +810,30 @@ describe("Committee GraphQL Lambda", function () {
       console.log(txnResBody);
       expect(txnResBody.errors[0].message).to.equal(
         "Transaction is not unreconciled or unprocessed."
+      );
+    });
+    it("Stops a ActBlue transaction from deletion", async () => {
+      const source = Source.ACTBLUE
+      const newTxn = genContributionRecord(committeeId,source)
+
+      await putTransaction(txnsTableName)(dynamoDB)(newTxn);
+      await sleep(1000);
+
+      const id = newTxn.id
+
+      const txnRes: any = await lambdaPromise(
+          graphql,
+          genGraphQLProxy(deleteTxnMut, validUsername, {
+            committeeId,
+            id,
+          }),
+          {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+      console.log(txnResBody);
+      expect(txnResBody.errors[0].message).to.equal(
+          "ActBlue transactions cannot be deleted."
       );
     });
   });
