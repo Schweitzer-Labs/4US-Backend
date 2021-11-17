@@ -6,6 +6,7 @@
   "author": "4US",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
+    "chai": "^4.2.0",
     "apollo-server": "^2.25.3",
     "apollo-server-lambda": "^2.25.3",
     "axios": "^0.24.0",
