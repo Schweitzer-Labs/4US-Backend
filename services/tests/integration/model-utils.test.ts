@@ -97,7 +97,8 @@ describe("Model Utils", function () {
   describe("update_txn_with_stripe_payout_id", function () {
     let testTxn: ITransaction;
     before(async () => {
-      testTxn = genContributionRecord(committee.id);
+      const committeeId = committee.id
+       testTxn = genContributionRecord({committeeId});
       await putTransaction(txnsTableName)(dynamoDB)(testTxn);
       await sleep(1000);
 
