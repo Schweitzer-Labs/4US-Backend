@@ -1,10 +1,14 @@
 import {
   CommitteeGetter,
   ContributionMapper,
+  IExternalContrib,
+  IExternalTxnsToDDBDeps,
   IsNewValidator,
-  toDeps,
 } from "../model/external-data.type";
-import { IActBluePaidContribution } from "../clients/actblue/actblue.decoders";
+import {
+  formatDate,
+  IActBluePaidContribution,
+} from "../clients/actblue/actblue.decoders";
 import { DynamoDB } from "aws-sdk";
 import {
   IGetTxnByActBlueTxnIdArgs,
@@ -17,9 +21,12 @@ import { Source } from "../utils/enums/source.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { flow } from "fp-ts/function";
 import { getCommitteeByActBlueAccountIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
-import {syncExternalContributions} from "../pipes/external-txns-to-ddb.pipe";
-
-const formatDate = (dateStr: string): number => new Date(dateStr).getTime();
+import { syncExternalContributions } from "../pipes/external-txns-to-ddb.pipe";
+import { Stripe } from "stripe";
+import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { TaskEither } from "fp-ts/TaskEither";
+import { ApplicationError } from "../utils/application-error";
+import { PaymentMethod } from "../utils/enums/payment-method.enum";
 
 const committeeGetter: CommitteeGetter =
   getCommitteeByActBlueAccountIdAndDecode;
@@ -42,18 +49,50 @@ const contributionMapper: ContributionMapper<IActBluePaidContribution> = (
   postalCode: ab["Donor ZIP"],
   payoutId: ab["Disbursement ID"],
   payoutDate: formatDate(ab["Disbursement Date"]),
-  fee: dollarStrToCents(ab["Fee"]),
   occupation: ab["Donor Occupation"],
   employer: ab["Donor Employer"],
   refCode: ab["Reference Code"],
   entityType: EntityType.Ind,
+  paymentMethod: PaymentMethod.Credit,
+  checkNumber: ab["Check Number"],
+  processorFee: dollarStrToCents(ab["Fee"]),
+  processorEntityName: "ActBlue Technical Services",
+  processorAddressLine1: "366 Summer Street",
+  processorCity: "Somerville",
+  processorState: State.MA,
+  processorPostalCode: "02144-3132",
+  processorCountry: "US",
 });
 
 const isNewValidator: IsNewValidator = isNewActBlueTxn;
 
-export const syncActBlue = flow(
-  toDeps<IActBluePaidContribution>(committeeGetter)(contributionMapper)(
-    isNewValidator
-  ),
-  syncExternalContributions<IActBluePaidContribution>
-);
+// @Todo refactor with currying
+// https://samhh.github.io/fp-ts-std/modules/Function.ts.html
+export const syncActBlue =
+  <IActBluePaidContribution>(committeeGetter: CommitteeGetter) =>
+  (contributionMapper: ContributionMapper<IActBluePaidContribution>) =>
+  (isNewValidator: IsNewValidator) =>
+  (committeesTable: string) =>
+  (billableEventsTable: string) =>
+  (donorsTableName: string) =>
+  (transactionsTableName: string) =>
+  (rulesTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (stripe: Stripe) =>
+  (lexisNexisConfig: ILexisNexisConfig) =>
+  (
+    actBlueContribs: IActBluePaidContribution[]
+  ): TaskEither<ApplicationError, IExternalContrib[]> =>
+    syncExternalContributions<IActBluePaidContribution>({
+      committeesTable,
+      billableEventsTable,
+      donorsTableName,
+      transactionsTableName,
+      rulesTableName,
+      dynamoDB,
+      stripe,
+      lexisNexisConfig,
+      committeeGetter,
+      contributionMapper,
+      isNewValidator,
+    })(actBlueContribs);

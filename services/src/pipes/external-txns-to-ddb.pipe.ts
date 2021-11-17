@@ -29,6 +29,8 @@ import { Direction } from "../utils/enums/direction.enum";
 import { now } from "../utils/time.utils";
 import { Source } from "../utils/enums/source.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
+import { formatDate } from "../clients/actblue/actblue.decoders";
+import { PurposeCode } from "../utils/enums/purpose-code.enum";
 
 export const syncExternalContributions =
   <schema>({
@@ -137,17 +139,29 @@ const extContribToCreateContribInput =
     phoneNumber: extContrib.phoneNumber,
   });
 
-// const externalContribAndTxnToFeeTxn =
-//   (extContrib: IExternalContrib) =>
-//   (txn: ITransaction): ITransaction => ({
-//     committeeId: txn.committeeId,
-//     amount: dollarStrToCents(extContrib.fee),
-//     id: genTxnId(),
-//     direction: Direction.Out,
-//     paymentDate:
-//     bankVerified: false,
-//     ruleVerified: true,
-//     initiatedTimestamp: now(),
-//     source: Source.ActBlue,
-//     transactionType: TransactionType.Disbursement,
-//   });
+const externalContribAndTxnToFeeTxn =
+  (c: IExternalContrib) =>
+  (txn: ITransaction): ITransaction => ({
+    id: genTxnId(),
+    source: Source.ActBlue,
+    amount: c.processorFee,
+    entityName: c.processorEntityName,
+    addressLine1: c.processorEntityName,
+    addressLine2: c.processorEntityName,
+    city: c.processorCity,
+    state: c.processorState,
+    postalCode: c.processorPostalCode,
+    committeeId: txn.committeeId,
+    direction: Direction.Out,
+    paymentDate: c.payoutDate,
+    bankVerified: false,
+    ruleVerified: true,
+    initiatedTimestamp: now(),
+    transactionType: TransactionType.Disbursement,
+    paymentMethod: c.paymentMethod,
+    isSubcontracted: false,
+    isPartialPayment: false,
+    isExistingLiability: false,
+    purposeCode: PurposeCode.FUNDR,
+    checkNumber: c.checkNumber,
+  });

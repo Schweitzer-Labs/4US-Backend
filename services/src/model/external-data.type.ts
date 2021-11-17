@@ -9,6 +9,7 @@ import { DynamoDB } from "aws-sdk";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { PaymentMethod } from "../utils/enums/payment-method.enum";
 
 const ExternalContribReq = t.type({
   id: t.string,
@@ -24,12 +25,12 @@ const ExternalContribReq = t.type({
   country: t.string,
   postalCode: t.string,
   entityType: fromEnum<EntityType>("EntityType", EntityType),
+  paymentMethod: fromEnum<PaymentMethod>("PaymentMethod", PaymentMethod),
 });
 
 const ExternalContribOpt = t.partial({
   payoutDate: t.number,
   payoutId: t.string,
-  fee: t.number,
   emailAddress: t.string,
   employer: t.string,
   employmentStatus: fromEnum<EmploymentStatus>(
@@ -44,6 +45,15 @@ const ExternalContribOpt = t.partial({
   middleName: t.string,
   reportType: t.string,
   metadata: t.unknown,
+  checkNumber: t.string,
+  processorFee: t.number,
+  processorEntityName: t.string,
+  processorAddressLine1: t.string,
+  processorAddressLine2: t.string,
+  processorCity: t.string,
+  processorState: fromEnum<State>("State", State),
+  processorPostalCode: t.string,
+  processorCountry: t.string,
 });
 
 export const ExternalContrib = t.intersection([
@@ -89,7 +99,7 @@ export interface IExternalTxnsToDDBDeps<schema> {
   isNewValidator: IsNewValidator;
 }
 
-export const toDeps =
+export const toDepsFromObject =
   <schema>(committeeGetter: CommitteeGetter) =>
   (contributionMapper: ContributionMapper<schema>) =>
   (isNewValidator: IsNewValidator) =>

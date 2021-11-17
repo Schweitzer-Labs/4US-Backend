@@ -131,3 +131,6 @@ export const ActBluePaidContribution = t.intersection([
 ]);
 
 export type IActBluePaidContribution = t.TypeOf<typeof ActBluePaidContribution>;
+
+export const formatDate = (dateStr: string): number =>
+  new Date(dateStr).getTime();
