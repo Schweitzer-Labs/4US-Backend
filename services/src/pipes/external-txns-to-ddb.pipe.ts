@@ -6,6 +6,8 @@ import {
   ContributionMapper,
   IExternalContrib,
   IExternalData,
+  IExternalTxnsToDDBDeps,
+  IsNewValidator,
 } from "../model/external-data.type";
 import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
@@ -28,21 +30,8 @@ import { now } from "../utils/time.utils";
 import { Source } from "../utils/enums/source.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
 
-interface IExternalTxnsToDDBDeps {
-  committeesTable: string;
-  billableEventsTable: string;
-  donorsTableName: string;
-  transactionsTableName: string;
-  rulesTableName: string;
-  dynamoDB: DynamoDB;
-  stripe: Stripe;
-  lexisNexisConfig: ILexisNexisConfig;
-  committeeGetter: CommitteeGetter;
-  contributionMapper: ContributionMapper;
-}
-
 export const syncExternalContributions =
-  ({
+  <schema>({
     committeesTable,
     billableEventsTable,
     donorsTableName,
@@ -52,24 +41,28 @@ export const syncExternalContributions =
     stripe,
     lexisNexisConfig,
     committeeGetter,
+    isNewValidator,
     contributionMapper,
-  }: IExternalTxnsToDDBDeps) =>
-  ({
-    contributions,
-  }: IExternalData): TaskEither<ApplicationError, IExternalContrib[]> =>
+  }: IExternalTxnsToDDBDeps<schema>) =>
+  (data: schema[]): TaskEither<ApplicationError, IExternalContrib[]> =>
     pipe(
-      getOneFromList<IExternalContrib>(contributions),
-      taskEither.map((extContrib) => extContrib.recipientId),
-      taskEither.chain(committeeGetter(committeesTable)(dynamoDB)),
-      taskEither.chain(
-        syncContribs(contributionMapper)(billableEventsTable)(donorsTableName)(
-          transactionsTableName
-        )(rulesTableName)(dynamoDB)(stripe)(lexisNexisConfig)(contributions)
+      taskEither.of(data.map(contributionMapper)),
+      taskEither.chain((contributions) =>
+        pipe(
+          getOneFromList<IExternalContrib>(contributions),
+          taskEither.map((extContrib) => extContrib.recipientId),
+          taskEither.chain(committeeGetter(committeesTable)(dynamoDB)),
+          taskEither.chain(
+            syncContribs(isNewValidator)(billableEventsTable)(donorsTableName)(
+              transactionsTableName
+            )(rulesTableName)(dynamoDB)(stripe)(lexisNexisConfig)(contributions)
+          )
+        )
       )
     );
 
 const syncContribs =
-  (contribMapper: ContributionMapper) =>
+  (isNewValidator: IsNewValidator) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
@@ -80,13 +73,13 @@ const syncContribs =
   (inputs: IExternalContrib[]) =>
   (committee: ICommittee): TaskEither<ApplicationError, IExternalContrib[]> =>
     Array.traverse(taskEither.ApplicativeSeq)(
-      syncContrib(contribMapper)(billableEventsTableName)(donorsTableName)(
+      syncContrib(isNewValidator)(billableEventsTableName)(donorsTableName)(
         txnsTableName
       )(rulesTableName)(ddb)(stripe)(lnConfig)(committee)
     )(inputs);
 
 const syncContrib =
-  (contribMapper: ContributionMapper) =>
+  (isNewValidator: IsNewValidator) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
@@ -99,10 +92,7 @@ const syncContrib =
     extContrib: IExternalContrib
   ): TaskEither<ApplicationError, IExternalContrib> =>
     pipe(
-      isNewActBlueTxn(txnsTableName)(ddb)({
-        committeeId: committee.id,
-        actBlueTransactionId: extContrib.id,
-      }),
+      isNewValidator(txnsTableName)(ddb)(committee.id)(extContrib.id),
       taskEither.chain((isNew) =>
         isNew
           ? pipe(

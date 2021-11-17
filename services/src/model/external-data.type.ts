@@ -5,7 +5,10 @@ import { EmploymentStatus } from "../utils/enums/employment-status";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { ICommittee } from "./committee.type";
-import { ITransaction } from "./transaction.type";
+import { DynamoDB } from "aws-sdk";
+import { EntityType } from "../utils/enums/entity-type.enum";
+import { Stripe } from "stripe";
+import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 
 const ExternalContribReq = t.type({
   id: t.string,
@@ -20,10 +23,11 @@ const ExternalContribReq = t.type({
   state: fromEnum<State>("State", State),
   country: t.string,
   postalCode: t.string,
+  entityType: fromEnum<EntityType>("EntityType", EntityType),
 });
 
 const ExternalContribOpt = t.partial({
-  payoutDate: t.string,
+  payoutDate: t.number,
   payoutId: t.string,
   fee: t.number,
   emailAddress: t.string,
@@ -55,12 +59,57 @@ export const ExternalData = t.type({
 
 export type IExternalData = t.TypeOf<typeof ExternalData>;
 
-export type ContributionMapper = <a>(a) => IExternalContrib;
+export type ContributionMapper<a> = (a: a) => IExternalContrib;
 
-export type ContributionDoesNotExist = <a>(
-  comTable
-) => () => (ddb) => (a) => ITransaction;
+export type IsNewValidator = (
+  transactionTable: string
+) => (
+  dynamoDB: DynamoDB
+) => (
+  committeeId: string
+) => (txnId: string) => TaskEither<ApplicationError, boolean>;
 
-export type CommitteeGetter = <args>(
-  string
-) => (string) => (args) => TaskEither<ApplicationError, ICommittee>;
+export type CommitteeGetter = (
+  committeeTable: string
+) => (
+  dynamoDB: DynamoDB
+) => (recipientId: string) => TaskEither<ApplicationError, ICommittee>;
+
+export interface IExternalTxnsToDDBDeps<schema> {
+  committeesTable: string;
+  billableEventsTable: string;
+  donorsTableName: string;
+  transactionsTableName: string;
+  rulesTableName: string;
+  dynamoDB: DynamoDB;
+  stripe: Stripe;
+  lexisNexisConfig: ILexisNexisConfig;
+  committeeGetter: CommitteeGetter;
+  contributionMapper: ContributionMapper<schema>;
+  isNewValidator: IsNewValidator;
+}
+
+export const toDeps =
+  <schema>(committeeGetter: CommitteeGetter) =>
+  (contributionMapper: ContributionMapper<schema>) =>
+  (isNewValidator: IsNewValidator) =>
+  (committeesTable: string) =>
+  (billableEventsTable: string) =>
+  (donorsTableName: string) =>
+  (transactionsTableName: string) =>
+  (rulesTableName: string) =>
+  (dynamoDB: DynamoDB) =>
+  (stripe: Stripe) =>
+  (lexisNexisConfig: ILexisNexisConfig): IExternalTxnsToDDBDeps<schema> => ({
+    committeesTable,
+    billableEventsTable,
+    donorsTableName,
+    transactionsTableName,
+    rulesTableName,
+    dynamoDB,
+    stripe,
+    lexisNexisConfig,
+    committeeGetter,
+    contributionMapper,
+    isNewValidator,
+  });

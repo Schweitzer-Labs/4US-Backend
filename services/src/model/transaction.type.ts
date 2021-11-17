@@ -1,6 +1,5 @@
 import * as t from "io-ts";
 import { FinicityTransaction } from "../clients/finicity/finicity.decoders";
-import { OwnerSchema } from "../graphql/object-types/transaction.object-type";
 
 export enum SchemaVersion {
   V1 = "v1",
