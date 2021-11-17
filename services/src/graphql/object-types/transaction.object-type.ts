@@ -108,7 +108,7 @@ export class Transaction implements ITransaction {
   initiatedTimestamp: number;
 
   @Field((type) => Source, { nullable: true })
-  source: Source;
+  source: string;
 
   @Field({ nullable: true })
   bankVerifiedTimestamp?: number;

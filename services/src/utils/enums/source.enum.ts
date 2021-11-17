@@ -2,7 +2,12 @@ export enum Source {
   DONATE_FORM = "donate_form",
   DASHBOARD = "dashboard",
   FINICITY = "finicity",
-  ActBlue = "actblue",
+  ActBlue = "ActBlue",
+}
+
+export enum ExternalSource {
+  FINICITY = "finicity",
+  ActBlue = "ActBlue",
 }
 
 export const sources: Source[] = [

@@ -7,6 +7,8 @@ import { TransactionArg } from "../graphql/args/transaction.arg";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { ITransaction } from "../model/transaction.type";
+import {ExternalSource} from "../utils/enums/source.enum";
+import {enumToValues} from "../utils/enums/poly.util";
 
 export const deleteUnreconciledTxn =
   (txnTable: string) =>
@@ -14,11 +16,12 @@ export const deleteUnreconciledTxn =
   (txnArgs: TransactionArg): TaskEither<ApplicationError, ITransaction> =>
     pipe(
       getTxnById(txnTable)(ddb)(txnArgs.committeeId)(txnArgs.id),
-      taskEither.chain(isReconciled),
+      taskEither.chain(isNotReconciled),
+      taskEither.chain(isNotActBlue),
       taskEither.chain(deleteTxnPipe(txnTable)(ddb))
     );
 
-const isReconciled = (
+const isNotReconciled = (
   txn: ITransaction
 ): TaskEither<ApplicationError, ITransaction> =>
   txn.bankVerified === false && !txn.stripePaymentIntentId
@@ -29,3 +32,11 @@ const isReconciled = (
           txn
         )
       );
+
+const isNotActBlue = (
+    txn: ITransaction
+): TaskEither<ApplicationError, ITransaction> => (
+     enumToValues(ExternalSource).includes(txn.source) ?
+         taskEither.left(
+            new ApplicationError(`${txn.source} transactions cannot be deleted.`, txn)
+         ) : taskEither.right(txn))

@@ -94,8 +94,10 @@ describe("Strato SQS", function () {
   });
 
   it("Supports committing a transaction", async () => {
+    const committeeId = committee.id
+
     const txn = {
-      ...genContributionRecord(committee.id),
+      ...genContributionRecord({committeeId}),
       bankVerified: true,
       ruleVerified: true,
     };
