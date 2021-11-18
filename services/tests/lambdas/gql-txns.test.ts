@@ -24,7 +24,7 @@ import { Direction } from "../../src/utils/enums/direction.enum";
 import { ReconcileTxnInput } from "../../src/graphql/input-types/reconcile-txn.input-type";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
-import {Source} from "../../src/utils/enums/source.enum";
+import { Source } from "../../src/utils/enums/source.enum";
 
 dotenv.config();
 
@@ -389,7 +389,7 @@ describe("Committee GraphQL Lambda", function () {
   });
   describe("Transactions", function () {
     it("Get by Committee ID", async () => {
-      const txn = genContributionRecord({committeeId});
+      const txn = genContributionRecord({ committeeId });
       await putTransaction(txnsTableName)(dynamoDB)(txn);
       await sleep(1000);
       const res: any = await lambdaPromise(
@@ -401,7 +401,7 @@ describe("Committee GraphQL Lambda", function () {
       expect(body.data.transactions.length > 0).to.equal(true);
     });
     it("Get by Committee ID and Donor ID", async () => {
-      const txn = genContributionRecord({committeeId});
+      const txn = genContributionRecord({ committeeId });
       await putTransaction(txnsTableName)(dynamoDB)(txn);
       await sleep(1000);
 
@@ -813,27 +813,27 @@ describe("Committee GraphQL Lambda", function () {
       );
     });
     it("Stops a External Source transaction from deletion", async () => {
-      const source = Source.ACTBLUE
-      const newTxn = genContributionRecord({committeeId, source})
+      const source = Source.ActBlue;
+      const newTxn = genContributionRecord({ committeeId, source });
 
       await putTransaction(txnsTableName)(dynamoDB)(newTxn);
       await sleep(1000);
 
-      const id = newTxn.id
+      const id = newTxn.id;
 
       const txnRes: any = await lambdaPromise(
-          graphql,
-          genGraphQLProxy(deleteTxnMut, validUsername, {
-            committeeId,
-            id,
-          }),
-          {}
+        graphql,
+        genGraphQLProxy(deleteTxnMut, validUsername, {
+          committeeId,
+          id,
+        }),
+        {}
       );
 
       const txnResBody = JSON.parse(txnRes.body);
       console.log(txnResBody);
       expect(txnResBody.errors[0].message).to.equal(
-          `${newTxn.source} transactions cannot be deleted.`
+        `${newTxn.source} transactions cannot be deleted.`
       );
     });
   });

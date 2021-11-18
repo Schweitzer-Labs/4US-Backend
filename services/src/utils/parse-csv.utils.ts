@@ -7,10 +7,7 @@ import { decodeRawData } from "./decode-raw-data.util";
 import * as t from "io-ts";
 
 export const parseCSV = async (csv: string) => {
-  console.log(csv);
-  const res = await csvToJson().fromString(csv);
-  console.log(res);
-  return res;
+  return csvToJson().fromString(csv);
 };
 
 export const parseCSVAndDecode = (

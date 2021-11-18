@@ -12,6 +12,7 @@ import { TransactionType } from "../../utils/enums/transaction-type.enum";
 import { EmploymentStatus } from "../../utils/enums/employment-status";
 import { State } from "../../utils/enums/state.enum";
 import { ITransaction } from "../../model/transaction.type";
+import { Source } from "../../utils/enums/source.enum";
 
 registerEnumType(Direction, {
   name: "Direction",
@@ -19,6 +20,10 @@ registerEnumType(Direction, {
 
 registerEnumType(PaymentMethod, {
   name: "PaymentMethod",
+});
+
+registerEnumType(Source, {
+  name: "Source",
 });
 
 registerEnumType(PurposeCode, {
@@ -102,7 +107,7 @@ export class Transaction implements ITransaction {
   @Field()
   initiatedTimestamp: number;
 
-  @Field()
+  @Field((type) => Source, { nullable: true })
   source: string;
 
   @Field({ nullable: true })
