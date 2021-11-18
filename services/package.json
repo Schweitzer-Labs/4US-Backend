@@ -34,6 +34,7 @@
     "test-one": "ts-mocha tests/**/$npm_config_f*.test.ts --timeout 600000",
     "test-actblue": "ts-mocha tests/integration/actblue-client.test.ts --timeout 600000",
     "test-actblue-sync": "ts-mocha tests/lambdas/actblue-sync.test.ts --timeout 600000",
+    "test-mail": "ts-mocha tests/lambdas/policapital-emailer.test.ts --timeout 600000",
     "gen-int-test": "cp tests/utils/blank-test.util.ts tests/integration/$NAME.test.ts",
     "compile": "npm install && tsc",
     "test-server": "ts-node-dev tests/server --watch"
