@@ -8,5 +8,6 @@ AWS.config.apiVersions = {
 };
 
 export default async (event: SQSEvent): Promise<any> => {
+  console.log(event);
   return "ActBlue SQS function invoked";
 };

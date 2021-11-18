@@ -17,7 +17,7 @@ import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { sendMessage } from "../utils/send-sqs.utils";
 import { mLog } from "../utils/m-log.utils";
 
-interface IActBlueSQSMsgBody {
+export interface IActBlueSQSMsgBody {
   committeeId: string;
   csvType: ActBlueCSVType;
   csvId: string;
