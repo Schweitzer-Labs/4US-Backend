@@ -6,11 +6,10 @@
   "author": "4US",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
-    "chai": "^4.2.0",
     "apollo-server": "^2.25.3",
     "apollo-server-lambda": "^2.25.3",
     "axios": "^0.24.0",
-    "blockapps-rest": "^8.0.4",
+    "blockapps-rest": "^8.0.5",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "csvtojson": "^2.0.10",
