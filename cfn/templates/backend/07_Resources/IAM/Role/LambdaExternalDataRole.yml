@@ -5,6 +5,7 @@ LambdaExternalDataRole:
       - !Ref LambdaBasicPolicy
       - !Ref DynamoDBGraphQLPolicy
       - !Ref DynamoDBExternalDataPolicy
+      - !Ref LambdaSQSPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:

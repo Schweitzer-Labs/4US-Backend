@@ -25,7 +25,7 @@ ExternalContribSyncFunction:
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
         BANK_SQS_URL:
-          !Ref ActBlueQueue
+          !Ref ExternalContribQueue
 
 ExternalContribSyncInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig
