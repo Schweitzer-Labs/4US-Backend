@@ -15,3 +15,7 @@ exports.bankSQS = require("./dist/src/bank-sqs.lambda").default;
 exports.runReportHandler = require("./dist/src/run-report.lambda").default;
 exports.actBlueSQS = require("./dist/src/actblue-sqs.lambda").default;
 exports.actBlueSync = require("./dist/src/actblue-sync.lambda").default;
+exports.externalContribSQS =
+  require("./dist/src/external-contrib-sqs.lambda").default;
+exports.externalContribSync =
+  require("./dist/src/external-contrib-sync.lambda").default;

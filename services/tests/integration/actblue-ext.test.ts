@@ -8,9 +8,6 @@ import { genCommittee } from "../utils/gen-committee.util";
 import { getStripeApiKey } from "../../src/utils/config";
 import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
-import { syncExternalContributions } from "../../src/pipes/external-txns-to-ddb.pipe";
-import { getCommitteeByActBlueAccountIdAndDecode } from "../../src/utils/model/committee/get-committee-by-actblue-id.utils";
-import { isNewActBlueTxn } from "../../src/utils/model/transaction/get-txn-by-actblue-id.utils";
 import { syncActBlue } from "../../src/external-data/act-blue.external-data";
 import {
   ActBlueCSVType,
@@ -25,7 +22,6 @@ import { isLeft } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { IExternalContrib } from "../../src/model/external-data.type";
-import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import { mLog } from "../../src/utils/m-log.utils";
 
 dotenv.config();
@@ -35,6 +31,7 @@ const donorsTable = process.env.DONORS_DDB_TABLE_NAME;
 const txnsTable = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const rulesTable = process.env.RULES_DDB_TABLE_NAME;
 const comsTable = process.env.COMMITTEES_DDB_TABLE_NAME;
+
 const lnUsername = process.env.LN_USERNAME;
 const lnPassword = process.env.LN_PASSWORD;
 const actBlueSecret = process.env.ACTBLUE_CLIENT_SECRET;
