@@ -9,10 +9,7 @@ import { getStripeApiKey } from "../../src/utils/config";
 import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
 import { syncActBlue } from "../../src/external-data/act-blue.external-data";
-import {
-  ActBlueCSVType,
-  IActBluePaidContribution,
-} from "../../src/clients/actblue/actblue.decoders";
+import { ActBlueCSVType } from "../../src/clients/actblue/actblue.decoders";
 import { nMonthsAgo, now } from "../../src/utils/time.utils";
 import {
   actBlueCSVMetadataToTypedData,
@@ -107,7 +104,7 @@ describe("ActBlue to External Transaction Synchronization", function () {
       taskEither.chain(
         syncActBlue(comsTable)(billableEventsTableName)(donorsTable)(txnsTable)(
           rulesTable
-        )(ddb)(stripe)(lnConfig)
+        )(ddb)(stripe)(lnConfig)(committee.id)
       )
     )();
 
@@ -127,6 +124,6 @@ describe("ActBlue to External Transaction Synchronization", function () {
   after(async () => {
     console.log("committee ID");
     console.log(committee.id);
-    await deleteCommittee(comsTable)(ddb)(committee);
+    // await deleteCommittee(comsTable)(ddb)(committee);
   });
 });

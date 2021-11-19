@@ -2,6 +2,7 @@ import { DynamoDB } from "aws-sdk";
 import { ICommittee } from "../model/committee.type";
 import { pipe } from "fp-ts/function";
 import {
+  CommitteeValidator,
   IExternalContrib,
   IExternalTxnsToDDBDeps,
   IsNewValidator,
@@ -27,6 +28,7 @@ import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { putTransactionAndDecode } from "../utils/model/transaction/put-transaction.utils";
 import { mLog } from "../utils/m-log.utils";
 import { isNewExternalTxn } from "../utils/model/transaction/get-txn-by-external-txn-id.utils";
+import { getCommitteeById } from "../utils/model/committee/get-committee-by-id.query";
 
 export const syncExternalContributions =
   ({
@@ -38,23 +40,44 @@ export const syncExternalContributions =
     dynamoDB,
     stripe,
     lexisNexisConfig,
-    committeeGetter,
+    committeeValidator,
     contributionMapper,
   }: IExternalTxnsToDDBDeps) =>
+  (committeeId: string) =>
   (data: any): TaskEither<ApplicationError, IExternalContrib[]> =>
     pipe(
       taskEither.of(data.map(contributionMapper)),
       taskEither.chain((contributions) =>
         pipe(
-          getOneFromList<IExternalContrib>(contributions),
-          taskEither.map((extContrib) => extContrib.recipientId),
-          taskEither.chain(committeeGetter(committeesTable)(dynamoDB)),
+          getCommitteeById(committeesTable)(dynamoDB)(committeeId),
+          taskEither.chain(
+            recipientIdMatchesCommittee(committeeValidator)(contributions)
+          ),
           taskEither.chain(
             syncContribs(billableEventsTable)(donorsTableName)(
               transactionsTableName
             )(rulesTableName)(dynamoDB)(stripe)(lexisNexisConfig)(contributions)
           )
         )
+      )
+    );
+
+const recipientIdMatchesCommittee =
+  (committeeValidator: CommitteeValidator) =>
+  (extContribs: IExternalContrib[]) =>
+  (com: ICommittee): TaskEither<ApplicationError, ICommittee> =>
+    pipe(
+      getOneFromList<IExternalContrib>(extContribs),
+      taskEither.map((extContrib) => extContrib.recipientId),
+      taskEither.chain((id) =>
+        committeeValidator(com)(id)
+          ? taskEither.right(com)
+          : taskEither.left(
+              new ApplicationError(
+                "Committee External account id does not match the recipient ID in the data.",
+                id
+              )
+            )
       )
     );
 

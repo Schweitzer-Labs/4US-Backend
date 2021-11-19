@@ -1,9 +1,8 @@
 import {
   CommitteeGetter,
+  CommitteeValidator,
   ContributionMapper,
   IExternalContrib,
-  IExternalTxnsToDDBDeps,
-  IsNewValidator,
 } from "../model/external-data.type";
 import {
   formatDate,
@@ -13,7 +12,6 @@ import { DynamoDB } from "aws-sdk";
 import { State } from "../utils/enums/state.enum";
 import { Source } from "../utils/enums/source.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
-import { getCommitteeByActBlueAccountIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
 import { syncExternalContributions } from "../pipes/external-txns-to-ddb.pipe";
 import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
@@ -22,8 +20,8 @@ import { ApplicationError } from "../utils/application-error";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { dollarStrToCents } from "../utils/cents.util";
 
-const committeeGetter: CommitteeGetter =
-  getCommitteeByActBlueAccountIdAndDecode;
+const committeeValidator: CommitteeValidator = (com) => (id) =>
+  com.actBlueAccountId === id;
 
 const contributionMapper: ContributionMapper = (
   ab: IActBluePaidContribution
@@ -74,6 +72,7 @@ export const syncActBlue =
   (dynamoDB: DynamoDB) =>
   (stripe: Stripe) =>
   (lexisNexisConfig: ILexisNexisConfig) =>
+  (committeeId: string) =>
   (
     actBlueContribs: IActBluePaidContribution[]
   ): TaskEither<ApplicationError, IExternalContrib[]> =>
@@ -86,6 +85,6 @@ export const syncActBlue =
       dynamoDB,
       stripe,
       lexisNexisConfig,
-      committeeGetter,
+      committeeValidator,
       contributionMapper,
-    })(actBlueContribs);
+    })(committeeId)(actBlueContribs);

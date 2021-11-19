@@ -96,6 +96,10 @@ export type CommitteeGetter = (
   dynamoDB: DynamoDB
 ) => (recipientId: string) => TaskEither<ApplicationError, ICommittee>;
 
+export type CommitteeValidator = (
+  committee: ICommittee
+) => (externalAccountId: string) => boolean;
+
 export interface IExternalTxnsToDDBDeps {
   committeesTable: string;
   billableEventsTable: string;
@@ -105,6 +109,6 @@ export interface IExternalTxnsToDDBDeps {
   dynamoDB: DynamoDB;
   stripe: Stripe;
   lexisNexisConfig: ILexisNexisConfig;
-  committeeGetter: CommitteeGetter;
+  committeeValidator: CommitteeValidator;
   contributionMapper: ContributionMapper;
 }

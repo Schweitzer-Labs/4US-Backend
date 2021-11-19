@@ -18,10 +18,10 @@ const comsTable: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const bankSQSUrl: any = process.env.ACTBLUE_SQS_URL;
 
 export default async () => {
-  const res = await actBlueToSqs(ActBlueCSVType.PaidContributions)(bankSQSUrl)(
-    sqs
-  )(comsTable)(ddb)();
-  if (isLeft(res)) throw res.left;
+  // const res = await actBlueToSqs(ActBlueCSVType.PaidContributions)(bankSQSUrl)(
+  //   sqs
+  // )(comsTable)(ddb)();
+  // if (isLeft(res)) throw res.left;
 
   return "success";
 };
