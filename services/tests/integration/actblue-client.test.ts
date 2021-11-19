@@ -61,7 +61,7 @@ describe("ActBlue Client", function () {
         throw Error("request failed");
       }
 
-      await sleep(3000);
+      await sleep(6000);
 
       csvId = eitherCSVId.right.csvId;
     });

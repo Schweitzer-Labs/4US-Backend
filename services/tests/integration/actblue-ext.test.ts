@@ -23,6 +23,7 @@ import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { IExternalContrib } from "../../src/model/external-data.type";
 import { mLog } from "../../src/utils/m-log.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 
 dotenv.config();
 
@@ -126,6 +127,6 @@ describe("ActBlue to External Transaction Synchronization", function () {
   after(async () => {
     console.log("committee ID");
     console.log(committee.id);
-    // await deleteCommittee(comsTable)(ddb)(committee);
+    await deleteCommittee(comsTable)(ddb)(committee);
   });
 });

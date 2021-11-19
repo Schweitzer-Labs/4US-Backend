@@ -169,7 +169,7 @@ export class CreateContributionInput {
   @MinLength(2)
   inKindDescription?: string;
 
-  actBlueTransactionId?: string;
+  externalTransactionId?: string;
 
   source?: Source;
 }

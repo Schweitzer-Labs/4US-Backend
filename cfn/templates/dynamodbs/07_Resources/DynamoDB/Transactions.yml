@@ -38,6 +38,14 @@ Transactions:
             AttributeName: actBlueTransactionId
         Projection:
           ProjectionType: KEYS_ONLY
+      - IndexName: TransactionsByExternalTransactionId
+        KeySchema:
+          - KeyType: HASH
+            AttributeName: committeeId
+          - KeyType: RANGE
+            AttributeName: externalTransactionId
+          Projection:
+            ProjectionType: ALL
     Replicas:
       - Region: !Ref AWS::Region
         PointInTimeRecoverySpecification:

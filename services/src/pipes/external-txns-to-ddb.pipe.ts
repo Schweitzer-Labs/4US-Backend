@@ -26,6 +26,7 @@ import { TransactionType } from "../utils/enums/transaction-type.enum";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
 import { putTransactionAndDecode } from "../utils/model/transaction/put-transaction.utils";
 import { mLog } from "../utils/m-log.utils";
+import { isNewExternalTxn } from "../utils/model/transaction/get-txn-by-external-txn-id.utils";
 
 export const syncExternalContributions =
   ({
@@ -38,7 +39,6 @@ export const syncExternalContributions =
     stripe,
     lexisNexisConfig,
     committeeGetter,
-    isNewValidator,
     contributionMapper,
   }: IExternalTxnsToDDBDeps) =>
   (data: any): TaskEither<ApplicationError, IExternalContrib[]> =>
@@ -50,7 +50,7 @@ export const syncExternalContributions =
           taskEither.map((extContrib) => extContrib.recipientId),
           taskEither.chain(committeeGetter(committeesTable)(dynamoDB)),
           taskEither.chain(
-            syncContribs(isNewValidator)(billableEventsTable)(donorsTableName)(
+            syncContribs(billableEventsTable)(donorsTableName)(
               transactionsTableName
             )(rulesTableName)(dynamoDB)(stripe)(lexisNexisConfig)(contributions)
           )
@@ -59,7 +59,6 @@ export const syncExternalContributions =
     );
 
 const syncContribs =
-  (isNewValidator: IsNewValidator) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
@@ -70,13 +69,12 @@ const syncContribs =
   (inputs: IExternalContrib[]) =>
   (committee: ICommittee): TaskEither<ApplicationError, IExternalContrib[]> =>
     Array.traverse(taskEither.ApplicativeSeq)(
-      syncContrib(isNewValidator)(billableEventsTableName)(donorsTableName)(
-        txnsTableName
-      )(rulesTableName)(ddb)(stripe)(lnConfig)(committee)
+      syncContrib(billableEventsTableName)(donorsTableName)(txnsTableName)(
+        rulesTableName
+      )(ddb)(stripe)(lnConfig)(committee)
     )(inputs);
 
 const syncContrib =
-  (isNewValidator: IsNewValidator) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
@@ -89,7 +87,7 @@ const syncContrib =
     extContrib: IExternalContrib
   ): TaskEither<ApplicationError, IExternalContrib> =>
     pipe(
-      isNewValidator(txnsTableName)(ddb)(committee.id)(extContrib.id),
+      isNewExternalTxn(txnsTableName)(ddb)(committee.id)(extContrib.id),
       taskEither.chain((isNew) =>
         isNew
           ? pipe(
@@ -115,6 +113,7 @@ const syncContrib =
 const extContribToCreateContribInput =
   (com: ICommittee) =>
   (extContrib: IExternalContrib): CreateContributionInput => ({
+    externalTransactionId: extContrib.id,
     processPayment: false,
     committeeId: com.id,
     paymentMethod: PaymentMethod.Credit,
@@ -156,4 +155,5 @@ const externalContribAndTxnToFeeTxn =
     isExistingLiability: false,
     purposeCode: PurposeCode.FUNDR,
     checkNumber: c.checkNumber,
+    externalTransactionId: c.id,
   });
