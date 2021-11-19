@@ -5,23 +5,24 @@ import { putCommittee } from "../../src/utils/model/committee/put-committee.util
 import { DynamoDB } from "aws-sdk";
 import { genCommittee } from "../utils/gen-committee.util";
 import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
-import { externalTxnsToDdb } from "../../src/pipes/external-txns-to-ddb.pipe";
-import {
-  IExternalData,
-  IExternalTxn,
-} from "../../src/model/external-data.type";
+import { syncExternalContributions } from "../../src/pipes/external-txns-to-ddb.pipe";
+import { IExternalContrib } from "../../src/model/external-data.type";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { now } from "../../src/utils/time.utils";
 import * as faker from "faker";
 import { State } from "../../src/utils/enums/state.enum";
 import { searchTransactions } from "../../src/utils/model/transaction/search-transactions.query";
 import { Order } from "../../src/utils/enums/order.enum";
-import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
 import { pipe } from "fp-ts/function";
 import { task, taskEither } from "fp-ts";
 import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
 import { getStripeApiKey } from "../../src/utils/config";
 import { Stripe } from "stripe";
+import { EntityType } from "../../src/utils/enums/entity-type.enum";
+import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
+import { isNewActBlueTxn } from "../../src/utils/model/transaction/get-txn-by-actblue-id.utils";
+import { getCommitteeByActBlueAccountIdAndDecode } from "../../src/utils/model/committee/get-committee-by-actblue-id.utils";
+import { sleep } from "../../src/utils/sleep.utils";
 
 dotenv.config();
 
@@ -56,22 +57,33 @@ const committee = genCommittee({
   scope: "state",
   state: "ny",
   tzDatabaseName: "America/New_York",
-  finicityCustomerId: "5007489410",
-  finicityAccountId: "5016000964",
   actBlueAccountId,
 });
 
-const mockExternalTxn = (amount?: number): IExternalTxn => ({
+const processorData = {
+  entityName: "ActBlue Technical Services",
+  addressLine1: faker.address.streetAddress(),
+  city: faker.address.city(),
+  state: faker.random.arrayElement(Object.values(State)),
+  postalCode: faker.address.zipCode(),
+  country: "US",
+  paymentDate: now(),
+};
+
+const mockExternalContrib = (): IExternalContrib => ({
   id: genTxnId(),
   recipientId: actBlueAccountId,
+  processorFeeData: {
+    amount: 60,
+    ...processorData,
+  },
   source: "ActBlue",
   paymentDate: now(),
-  amount:
-    amount ||
-    faker.datatype.number({
-      min: 1000,
-      max: 5000,
-    }),
+  amount: faker.datatype.number({
+    min: 1000,
+    max: 5000,
+  }),
+  // processorFeeData:
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
   addressLine1: faker.address.streetAddress(),
@@ -79,18 +91,19 @@ const mockExternalTxn = (amount?: number): IExternalTxn => ({
   state: faker.random.arrayElement(Object.values(State)),
   postalCode: faker.address.zipCode(),
   country: "US",
+  entityType: EntityType.Ind,
+  paymentMethod: PaymentMethod.Credit,
 });
 
 const genList = (size: number) => Array.from(Array(size).keys());
 
-const mockExternalData = (txnSize: number): IExternalData => ({
-  transactions: genList(txnSize).map(mockExternalTxn),
-});
+const mockExternalData = (txnSize: number): IExternalContrib[] =>
+  genList(txnSize).map(mockExternalContrib);
 
 const testSize = 3;
 const testingData = mockExternalData(testSize);
 
-describe("Syncs external data with a platform account", function () {
+describe("Syncs external contributions with a platform account", function () {
   before(async () => {
     const stripeApiKey = await getStripeApiKey(ps)("qa");
     stripe = new Stripe(stripeApiKey, {
@@ -99,16 +112,27 @@ describe("Syncs external data with a platform account", function () {
 
     await putCommittee(comsTable)(ddb)(committee);
 
-    await externalTxnsToDdb(comsTable)(billableEventsTableName)(donorsTable)(
-      txnsTable
-    )(rulesTable)(ddb)(stripe)(lnConfig)(testingData)();
+    await sleep(2000);
+
+    await syncExternalContributions({
+      committeesTable: comsTable,
+      billableEventsTable: billableEventsTableName,
+      donorsTableName: donorsTable,
+      transactionsTableName: txnsTable,
+      rulesTableName: rulesTable,
+      dynamoDB: ddb,
+      stripe: stripe,
+      lexisNexisConfig: lnConfig,
+      committeeGetter: getCommitteeByActBlueAccountIdAndDecode,
+      isNewValidator: isNewActBlueTxn,
+      contributionMapper: (val) => val,
+    })(testingData)();
   });
-  it("External transactions are saved to ", async () => {
+  it("External transactions are saved to database", async () => {
     const txns = await pipe(
       searchTransactions(txnsTable)(ddb)({
         committeeId: committee.id,
         order: Order.Asc,
-        transactionType: TransactionType.Contribution,
         bankVerified: false,
         ruleVerified: true,
       }),
@@ -118,9 +142,11 @@ describe("Syncs external data with a platform account", function () {
       )
     )();
 
-    expect(txns.length).to.equal(testSize);
+    expect(txns.length).to.equal(testSize * 2);
   });
   after(async () => {
-    await deleteCommittee(comsTable)(ddb)(committee);
+    console.log("committee Id");
+    console.log(`http://localhost:3000/committee/${committee.id}`);
+    // await deleteCommittee(comsTable)(ddb)(committee);
   });
 });

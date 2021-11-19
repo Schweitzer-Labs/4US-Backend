@@ -68,12 +68,11 @@ export const actBlueCSVMetadataToTypedData =
       ),
       te.chain(mLog("Decoded CSV Status")),
       te.map((resp) => resp.download_url),
-      te.chain(mLog("CSV url")),
+      te.chain(mLog("Got CSV url")),
       te.chain(getActBlueCSVByUrl),
       te.chain(
         csvToTypedData("ActBlue Contrib CSV")(t.array(ActBluePaidContribution))
-      ),
-      te.chain(mLog("Decoded result"))
+      )
     );
 
 const getActBlueCSVIdUnsafe =

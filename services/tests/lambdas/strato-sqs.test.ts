@@ -17,7 +17,7 @@ import * as dotenv from "dotenv";
 import { DynamoDB } from "aws-sdk";
 import { genCommittee } from "../utils/gen-committee.util";
 import stratoSQS from "../../src/strato-sqs.lambda";
-import { genSQSEvent } from "../utils/gen-sqs-event.util";
+import { genSQSEventWithStr } from "../utils/gen-sqs-event.util";
 import { ICommittee } from "../../src/model/committee.type";
 
 dotenv.config();
@@ -94,14 +94,14 @@ describe("Strato SQS", function () {
   });
 
   it("Supports committing a transaction", async () => {
-    const committeeId = committee.id
+    const committeeId = committee.id;
 
     const txn = {
-      ...genContributionRecord({committeeId}),
+      ...genContributionRecord({ committeeId }),
       bankVerified: true,
       ruleVerified: true,
     };
-    const event = genSQSEvent(JSON.stringify(txn));
+    const event = genSQSEventWithStr(JSON.stringify(txn));
 
     const res = await stratoSQS(event, {});
 

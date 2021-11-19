@@ -3,6 +3,7 @@ import * as faker from "faker";
 import { Plan } from "../../src/utils/enums/plan.enum";
 import { qaUsers } from "../seed/qa-users.data";
 import { ICommittee } from "../../src/model/committee.type";
+import { IActBlueAPICredentials } from "../../src/clients/actblue/actblue.decoders";
 
 interface IGenCommitteeConfig {
   state?: string;
@@ -25,6 +26,7 @@ interface IGenCommitteeConfig {
   efsFilerId?: number;
   members?: string[];
   actBlueAccountId?: string;
+  actBlueAPICredentials?: IActBlueAPICredentials;
 }
 
 export const genCommittee = ({
@@ -48,6 +50,7 @@ export const genCommittee = ({
   efsFilerId,
   members,
   actBlueAccountId,
+  actBlueAPICredentials,
 }: IGenCommitteeConfig): ICommittee => {
   const randomFirstName = faker.name.firstName();
   const randomLastName = faker.name.lastName();
@@ -75,5 +78,6 @@ export const genCommittee = ({
     efsElectionId: efsElectionId || faker.datatype.number(5000000),
     efsFilerId: efsFilerId || faker.datatype.number(5000000),
     actBlueAccountId,
+    actBlueAPICredentials,
   };
 };

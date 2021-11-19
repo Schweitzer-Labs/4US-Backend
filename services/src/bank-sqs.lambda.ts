@@ -33,17 +33,13 @@ let appKey: string;
 let finicityConfig: FinicityConfig;
 
 export default async (event: SQSEvent): Promise<any> => {
-  if (!partnerId || !partnerSecret || !appKey) {
-    partnerId = await getFinicityPartnerId(parameterStore)(runenv);
-    partnerSecret = await getFinicityPartnerSecret(parameterStore)(runenv);
-    appKey = await getFinicityAppKey(parameterStore)(runenv);
-
+  if (!partnerId || !partnerSecret || !appKey)
     finicityConfig = {
-      partnerId,
-      partnerSecret,
-      appKey,
+      partnerId: await getFinicityPartnerId(parameterStore)(runenv),
+      partnerSecret: await getFinicityPartnerSecret(parameterStore)(runenv),
+      appKey: await getFinicityAppKey(parameterStore)(runenv),
     };
-  }
+
   for (const record of event.Records) {
     const res = await pipe(
       decodeRawData("Committee Id")(t.string)(record.body),

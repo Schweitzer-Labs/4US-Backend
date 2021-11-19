@@ -20,7 +20,7 @@ export enum PurposeCode {
   VOTER = "VOTER",
   WAGES = "WAGES",
   BKFEE = "BKFEE",
-  LWNSN = "FUNDR",
+  LWNSN = "LWNSN",
   UTILS = "UTILS",
   CCP = "CCP",
   BKKP = "BKKP",

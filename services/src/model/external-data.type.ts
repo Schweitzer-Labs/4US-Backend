@@ -2,8 +2,16 @@ import * as t from "io-ts";
 import { State } from "../utils/enums/state.enum";
 import { fromEnum } from "../utils/from-enum.utils";
 import { EmploymentStatus } from "../utils/enums/employment-status";
+import { TaskEither } from "fp-ts/TaskEither";
+import { ApplicationError } from "../utils/application-error";
+import { ICommittee } from "./committee.type";
+import { DynamoDB } from "aws-sdk";
+import { EntityType } from "../utils/enums/entity-type.enum";
+import { Stripe } from "stripe";
+import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
+import { PaymentMethod } from "../utils/enums/payment-method.enum";
 
-const ExternalTxnReq = t.type({
+const ExternalContribReq = t.type({
   id: t.string,
   recipientId: t.string,
   source: t.string,
@@ -16,9 +24,37 @@ const ExternalTxnReq = t.type({
   state: fromEnum<State>("State", State),
   country: t.string,
   postalCode: t.string,
+  entityType: fromEnum<EntityType>("EntityType", EntityType),
+  paymentMethod: fromEnum<PaymentMethod>("PaymentMethod", PaymentMethod),
 });
 
-const ExternalTxnOpt = t.partial({
+const ProcessorFeeDataReq = t.type({
+  amount: t.number,
+  entityName: t.string,
+  paymentDate: t.number,
+  addressLine1: t.string,
+  city: t.string,
+  state: fromEnum<State>("State", State),
+  postalCode: t.string,
+  country: t.string,
+});
+
+const ProcessorFeeDataOpt = t.partial({
+  addressLine2: t.string,
+  checkNumber: t.string,
+  payoutId: t.string,
+});
+
+export const ProcessorFeeData = t.intersection([
+  ProcessorFeeDataReq,
+  ProcessorFeeDataOpt,
+]);
+
+export type IProcessorFeeData = t.TypeOf<typeof ProcessorFeeData>;
+
+const ExternalContribOpt = t.partial({
+  payoutDate: t.number,
+  payoutId: t.string,
   emailAddress: t.string,
   employer: t.string,
   employmentStatus: fromEnum<EmploymentStatus>(
@@ -33,14 +69,43 @@ const ExternalTxnOpt = t.partial({
   middleName: t.string,
   reportType: t.string,
   metadata: t.unknown,
+  checkNumber: t.string,
+  processorFeeData: ProcessorFeeData,
 });
 
-export const ExternalTxn = t.intersection([ExternalTxnReq, ExternalTxnOpt]);
+export const ExternalContrib = t.intersection([
+  ExternalContribReq,
+  ExternalContribOpt,
+]);
 
-export type IExternalTxn = t.TypeOf<typeof ExternalTxn>;
+export type IExternalContrib = t.TypeOf<typeof ExternalContrib>;
 
-export const ExternalData = t.type({
-  transactions: t.array(ExternalTxn),
-});
+export type ContributionMapper = (a: any) => IExternalContrib;
 
-export type IExternalData = t.TypeOf<typeof ExternalData>;
+export type IsNewValidator = (
+  transactionTable: string
+) => (
+  dynamoDB: DynamoDB
+) => (
+  committeeId: string
+) => (txnId: string) => TaskEither<ApplicationError, boolean>;
+
+export type CommitteeGetter = (
+  committeeTable: string
+) => (
+  dynamoDB: DynamoDB
+) => (recipientId: string) => TaskEither<ApplicationError, ICommittee>;
+
+export interface IExternalTxnsToDDBDeps {
+  committeesTable: string;
+  billableEventsTable: string;
+  donorsTableName: string;
+  transactionsTableName: string;
+  rulesTableName: string;
+  dynamoDB: DynamoDB;
+  stripe: Stripe;
+  lexisNexisConfig: ILexisNexisConfig;
+  committeeGetter: CommitteeGetter;
+  contributionMapper: ContributionMapper;
+  isNewValidator: IsNewValidator;
+}
