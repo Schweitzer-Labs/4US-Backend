@@ -30,7 +30,7 @@ ExternalContribSQSFunction:
         RULES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.RulesTableName
         BILLABLE_EVENTS_DDB_TABLE_NAME:
-          !GetAtt DynamoDBsTemplate.Outputs.BillableEv entsTableName
+          !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableName
 
 ExternalConfigSQSInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig
