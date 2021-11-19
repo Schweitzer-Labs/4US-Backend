@@ -10,10 +10,6 @@ import {
   IActBluePaidContribution,
 } from "../clients/actblue/actblue.decoders";
 import { DynamoDB } from "aws-sdk";
-import {
-  IGetTxnByActBlueTxnIdArgs,
-  isNewActBlueTxn,
-} from "../utils/model/transaction/get-txn-by-actblue-id.utils";
 import { State } from "../utils/enums/state.enum";
 import { Source } from "../utils/enums/source.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
@@ -67,8 +63,6 @@ const contributionMapper: ContributionMapper = (
   },
 });
 
-const isNewValidator: IsNewValidator = isNewActBlueTxn;
-
 // @Todo refactor with currying
 // https://samhh.github.io/fp-ts-std/modules/Function.ts.html
 export const syncActBlue =
@@ -94,5 +88,4 @@ export const syncActBlue =
       lexisNexisConfig,
       committeeGetter,
       contributionMapper,
-      isNewValidator,
     })(actBlueContribs);

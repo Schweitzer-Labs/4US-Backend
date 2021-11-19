@@ -107,5 +107,4 @@ export interface IExternalTxnsToDDBDeps {
   lexisNexisConfig: ILexisNexisConfig;
   committeeGetter: CommitteeGetter;
   contributionMapper: ContributionMapper;
-  isNewValidator: IsNewValidator;
 }
