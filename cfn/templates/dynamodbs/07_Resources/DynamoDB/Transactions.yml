@@ -14,6 +14,8 @@ Transactions:
         AttributeType: S
       - AttributeName: actBlueTransactionId
         AttributeType: S
+      - AttributeName: externalTransactionId
+        AttributeType: S
     KeySchema:
       - KeyType: HASH
         AttributeName: committeeId
