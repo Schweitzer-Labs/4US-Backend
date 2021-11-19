@@ -73,7 +73,7 @@ export const ActBluePaidContributionOpt = t.partial({
   ["Employer Addr1"]: t.string,
   ["Employer Addr2"]: t.string,
   ["Employer City"]: t.string,
-  ["Employer State"]: fromEnum<State>("State", State),
+  ["Employer State"]: t.string,
   ["Employer ZIP"]: t.string,
   ["Employer Country"]: t.string,
   ["Donor ID"]: t.string,

@@ -74,7 +74,7 @@ describe("SQS Processor for committee's ActBlue Contributions", function () {
     const res = await actBlueSqs(sqsEvent);
     console.log(res);
 
-    expect(res).to.equal("ActBlue SQS function invoked");
+    expect(res).to.equal("ActBlue SQS invocation complete");
   });
 
   after(async () => {

@@ -2,10 +2,7 @@ import { DynamoDB } from "aws-sdk";
 import { ICommittee } from "../model/committee.type";
 import { pipe } from "fp-ts/function";
 import {
-  CommitteeGetter,
-  ContributionMapper,
   IExternalContrib,
-  IExternalData,
   IExternalTxnsToDDBDeps,
   IsNewValidator,
 } from "../model/external-data.type";
@@ -13,27 +10,25 @@ import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
 import { taskEither } from "fp-ts";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
-import { getCommitteeByActBlueAccountIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
 import { getOneFromList } from "../utils/get-one-from-list.utils";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
-import { isNewActBlueTxn } from "../utils/model/transaction/get-txn-by-actblue-id.utils";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
-import { ANONYMOUS, SYSTEM } from "../utils/tokens/users.token";
+import { SYSTEM } from "../utils/tokens/users.token";
 import * as Array from "fp-ts/lib/Array";
 import { ITransaction } from "../model/transaction.type";
 import { genTxnId } from "../utils/gen-txn-id.utils";
 import { Direction } from "../utils/enums/direction.enum";
-import { now } from "../utils/time.utils";
 import { Source } from "../utils/enums/source.enum";
 import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { formatDate } from "../clients/actblue/actblue.decoders";
 import { PurposeCode } from "../utils/enums/purpose-code.enum";
+import { putTransactionAndDecode } from "../utils/model/transaction/put-transaction.utils";
+import { mLog } from "../utils/m-log.utils";
 
 export const syncExternalContributions =
-  <schema>({
+  ({
     committeesTable,
     billableEventsTable,
     donorsTableName,
@@ -45,8 +40,8 @@ export const syncExternalContributions =
     committeeGetter,
     isNewValidator,
     contributionMapper,
-  }: IExternalTxnsToDDBDeps<schema>) =>
-  (data: schema[]): TaskEither<ApplicationError, IExternalContrib[]> =>
+  }: IExternalTxnsToDDBDeps) =>
+  (data: any): TaskEither<ApplicationError, IExternalContrib[]> =>
     pipe(
       taskEither.of(data.map(contributionMapper)),
       taskEither.chain((contributions) =>
@@ -109,6 +104,8 @@ const syncContrib =
                 )
               ),
               taskEither.map(externalContribAndTxnToFeeTxn(extContrib)),
+              taskEither.chain(putTransactionAndDecode(txnsTableName)(ddb)),
+              taskEither.chain(mLog("Transaction put")),
               taskEither.map(() => extContrib)
             )
           : taskEither.of(extContrib)
@@ -137,6 +134,7 @@ const extContribToCreateContribInput =
     employmentStatus: extContrib.employmentStatus,
     occupation: extContrib.occupation,
     phoneNumber: extContrib.phoneNumber,
+    source: Source.ActBlue,
   });
 
 const externalContribAndTxnToFeeTxn =
@@ -144,21 +142,15 @@ const externalContribAndTxnToFeeTxn =
   (txn: ITransaction): ITransaction => ({
     id: genTxnId(),
     source: Source.ActBlue,
-    amount: c.processorFee,
-    entityName: c.processorEntityName,
-    addressLine1: c.processorEntityName,
-    addressLine2: c.processorEntityName,
-    city: c.processorCity,
-    state: c.processorState,
-    postalCode: c.processorPostalCode,
+    ...c.processorFeeData,
     committeeId: txn.committeeId,
     direction: Direction.Out,
-    paymentDate: c.payoutDate,
+    paymentDate: c.processorFeeData.paymentDate,
     bankVerified: false,
     ruleVerified: true,
-    initiatedTimestamp: now(),
+    initiatedTimestamp: c.paymentDate,
     transactionType: TransactionType.Disbursement,
-    paymentMethod: c.paymentMethod,
+    paymentMethod: PaymentMethod.Check,
     isSubcontracted: false,
     isPartialPayment: false,
     isExistingLiability: false,

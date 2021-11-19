@@ -14,12 +14,9 @@ import {
   IGetTxnByActBlueTxnIdArgs,
   isNewActBlueTxn,
 } from "../utils/model/transaction/get-txn-by-actblue-id.utils";
-import * as t from "io-ts";
-import { fromEnum } from "../utils/from-enum.utils";
 import { State } from "../utils/enums/state.enum";
 import { Source } from "../utils/enums/source.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
-import { flow } from "fp-ts/function";
 import { getCommitteeByActBlueAccountIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
 import { syncExternalContributions } from "../pipes/external-txns-to-ddb.pipe";
 import { Stripe } from "stripe";
@@ -27,17 +24,19 @@ import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { dollarStrToCents } from "../utils/cents.util";
 
 const committeeGetter: CommitteeGetter =
   getCommitteeByActBlueAccountIdAndDecode;
 
-const contributionMapper: ContributionMapper<IActBluePaidContribution> = (
-  ab
-) => ({
+const contributionMapper: ContributionMapper = (
+  ab: IActBluePaidContribution
+): IExternalContrib => ({
   id: ab["Receipt ID"],
   recipientId: ab["Recipient ID"],
   source: Source.ActBlue,
   paymentDate: formatDate(ab["Date"]),
+  emailAddress: ab["Donor Email"],
   amount: dollarStrToCents(ab["Amount"]),
   firstName: ab["Donor First Name"],
   lastName: ab["Donor Last Name"],
@@ -47,6 +46,7 @@ const contributionMapper: ContributionMapper<IActBluePaidContribution> = (
   state: ab["Donor State"],
   country: ab["Donor Country"],
   postalCode: ab["Donor ZIP"],
+  phoneNumber: ab["Donor Phone"],
   payoutId: ab["Disbursement ID"],
   payoutDate: formatDate(ab["Disbursement Date"]),
   occupation: ab["Donor Occupation"],
@@ -55,13 +55,16 @@ const contributionMapper: ContributionMapper<IActBluePaidContribution> = (
   entityType: EntityType.Ind,
   paymentMethod: PaymentMethod.Credit,
   checkNumber: ab["Check Number"],
-  processorFee: dollarStrToCents(ab["Fee"]),
-  processorEntityName: "ActBlue Technical Services",
-  processorAddressLine1: "366 Summer Street",
-  processorCity: "Somerville",
-  processorState: State.MA,
-  processorPostalCode: "02144-3132",
-  processorCountry: "US",
+  processorFeeData: {
+    amount: dollarStrToCents(ab["Fee"]),
+    entityName: "ActBlue Technical Services",
+    addressLine1: "366 Summer Street",
+    city: "Somerville",
+    state: State.MA,
+    postalCode: "02144-3132",
+    country: "US",
+    paymentDate: formatDate(ab["Disbursement Date"]),
+  },
 });
 
 const isNewValidator: IsNewValidator = isNewActBlueTxn;
@@ -69,9 +72,6 @@ const isNewValidator: IsNewValidator = isNewActBlueTxn;
 // @Todo refactor with currying
 // https://samhh.github.io/fp-ts-std/modules/Function.ts.html
 export const syncActBlue =
-  <IActBluePaidContribution>(committeeGetter: CommitteeGetter) =>
-  (contributionMapper: ContributionMapper<IActBluePaidContribution>) =>
-  (isNewValidator: IsNewValidator) =>
   (committeesTable: string) =>
   (billableEventsTable: string) =>
   (donorsTableName: string) =>
@@ -83,7 +83,7 @@ export const syncActBlue =
   (
     actBlueContribs: IActBluePaidContribution[]
   ): TaskEither<ApplicationError, IExternalContrib[]> =>
-    syncExternalContributions<IActBluePaidContribution>({
+    syncExternalContributions({
       committeesTable,
       billableEventsTable,
       donorsTableName,

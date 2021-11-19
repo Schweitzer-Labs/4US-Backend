@@ -1,2 +1,2 @@
-const dollarStrToCents = (dollarStr: string): number =>
-  parseFloat(dollarStr) * 100;
+export const dollarStrToCents = (dollarStr: string): number =>
+  Math.round(parseFloat(dollarStr) * 100);

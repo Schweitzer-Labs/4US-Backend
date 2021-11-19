@@ -15,6 +15,7 @@ import {
   InKindType,
   PaymentMethod,
 } from "../../utils/enums/payment-method.enum";
+import { Source } from "../../utils/enums/source.enum";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -169,4 +170,6 @@ export class CreateContributionInput {
   inKindDescription?: string;
 
   actBlueTransactionId?: string;
+
+  source?: Source;
 }

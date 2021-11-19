@@ -28,6 +28,30 @@ const ExternalContribReq = t.type({
   paymentMethod: fromEnum<PaymentMethod>("PaymentMethod", PaymentMethod),
 });
 
+const ProcessorFeeDataReq = t.type({
+  amount: t.number,
+  entityName: t.string,
+  paymentDate: t.number,
+  addressLine1: t.string,
+  city: t.string,
+  state: fromEnum<State>("State", State),
+  postalCode: t.string,
+  country: t.string,
+});
+
+const ProcessorFeeDataOpt = t.partial({
+  addressLine2: t.string,
+  checkNumber: t.string,
+  payoutId: t.string,
+});
+
+export const ProcessorFeeData = t.intersection([
+  ProcessorFeeDataReq,
+  ProcessorFeeDataOpt,
+]);
+
+export type IProcessorFeeData = t.TypeOf<typeof ProcessorFeeData>;
+
 const ExternalContribOpt = t.partial({
   payoutDate: t.number,
   payoutId: t.string,
@@ -46,14 +70,7 @@ const ExternalContribOpt = t.partial({
   reportType: t.string,
   metadata: t.unknown,
   checkNumber: t.string,
-  processorFee: t.number,
-  processorEntityName: t.string,
-  processorAddressLine1: t.string,
-  processorAddressLine2: t.string,
-  processorCity: t.string,
-  processorState: fromEnum<State>("State", State),
-  processorPostalCode: t.string,
-  processorCountry: t.string,
+  processorFeeData: ProcessorFeeData,
 });
 
 export const ExternalContrib = t.intersection([
@@ -63,13 +80,7 @@ export const ExternalContrib = t.intersection([
 
 export type IExternalContrib = t.TypeOf<typeof ExternalContrib>;
 
-export const ExternalData = t.type({
-  contributions: t.array(ExternalContrib),
-});
-
-export type IExternalData = t.TypeOf<typeof ExternalData>;
-
-export type ContributionMapper<a> = (a: a) => IExternalContrib;
+export type ContributionMapper = (a: any) => IExternalContrib;
 
 export type IsNewValidator = (
   transactionTable: string
@@ -85,7 +96,7 @@ export type CommitteeGetter = (
   dynamoDB: DynamoDB
 ) => (recipientId: string) => TaskEither<ApplicationError, ICommittee>;
 
-export interface IExternalTxnsToDDBDeps<schema> {
+export interface IExternalTxnsToDDBDeps {
   committeesTable: string;
   billableEventsTable: string;
   donorsTableName: string;
@@ -95,31 +106,6 @@ export interface IExternalTxnsToDDBDeps<schema> {
   stripe: Stripe;
   lexisNexisConfig: ILexisNexisConfig;
   committeeGetter: CommitteeGetter;
-  contributionMapper: ContributionMapper<schema>;
+  contributionMapper: ContributionMapper;
   isNewValidator: IsNewValidator;
 }
-
-export const toDepsFromObject =
-  <schema>(committeeGetter: CommitteeGetter) =>
-  (contributionMapper: ContributionMapper<schema>) =>
-  (isNewValidator: IsNewValidator) =>
-  (committeesTable: string) =>
-  (billableEventsTable: string) =>
-  (donorsTableName: string) =>
-  (transactionsTableName: string) =>
-  (rulesTableName: string) =>
-  (dynamoDB: DynamoDB) =>
-  (stripe: Stripe) =>
-  (lexisNexisConfig: ILexisNexisConfig): IExternalTxnsToDDBDeps<schema> => ({
-    committeesTable,
-    billableEventsTable,
-    donorsTableName,
-    transactionsTableName,
-    rulesTableName,
-    dynamoDB,
-    stripe,
-    lexisNexisConfig,
-    committeeGetter,
-    contributionMapper,
-    isNewValidator,
-  });
