@@ -93,7 +93,7 @@ const TransactionOptional = t.partial({
   finicityPaymentMethod: t.string,
   employmentStatus: t.string,
   donorVerificationScore: t.number,
-  businessIdVerificationScore: t.unknown,
+  businessIdVerificationScore: t.string,
   businessIdRequestTimestamp: t.number,
   businessIdRawResponse: t.unknown,
   inKindType: t.string,

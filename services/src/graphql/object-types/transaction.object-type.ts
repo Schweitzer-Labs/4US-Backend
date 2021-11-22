@@ -228,6 +228,12 @@ export class Transaction implements ITransaction {
   @Field({ nullable: true })
   donorVerificationScore?: number;
 
+  @Field({ nullable: true })
+  citizenshipScore?: string;
+
+  @Field({ nullable: true })
+  businessIdVerificationScore?: string;
+
   @Field((type) => InKindType, { nullable: true })
   inKindType?: string;
 

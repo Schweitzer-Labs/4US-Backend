@@ -94,7 +94,7 @@ const resToTxn =
         ...txn,
         businessIdRawResponse: data,
         businessIdRequestTimestamp,
-        businessIdComprehensiveVerificationScore: 0,
+        businessIdVerificationScore: "0",
       });
     } else {
       return taskEither.of({
