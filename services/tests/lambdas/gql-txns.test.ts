@@ -95,6 +95,7 @@ const getTxnQuery = (committeeId) => (tid: string) =>
       finicityDescription
       ruleVerified
       bankVerified
+      businessIdVerificationScore
     }
   }
 `;
@@ -507,6 +508,33 @@ describe("Committee GraphQL Lambda", function () {
 
       expect(resBody.errors.length > 0).to.equal(true);
     });
+    it("Exposes Business verification score ", async () => {
+      const inputVar = genCreateDisbInput({
+        committeeId,
+      });
+
+      const createRes: any = await lambdaPromise(
+          graphql,
+          genGraphQLProxy(createDisb, validUsername, inputVar),
+          {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      const tid = body.data.createDisbursement.id;
+
+      const txnRes: any = await lambdaPromise(
+          graphql,
+          genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {}),
+          {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+      
+      const businessIdVerificationScore = txnResBody.data.transaction.businessIdVerificationScore
+
+      expect(isNaN(businessIdVerificationScore)).to.equal(false);
+    });
   });
   describe("Amend Disbursement", function () {
     it("Supports amending a disbursement", async () => {
@@ -835,7 +863,7 @@ describe("Committee GraphQL Lambda", function () {
       expect(txnResBody.errors[0].message).to.equal(
         `${newTxn.source} transactions cannot be deleted.`
       );
-    });
+    })
   });
   after(async () => {
     await deleteCommittee(committeesTableName)(dynamoDB)(committee);
