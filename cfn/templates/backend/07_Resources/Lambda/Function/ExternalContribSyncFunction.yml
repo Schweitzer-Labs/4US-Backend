@@ -24,7 +24,7 @@ ExternalContribSyncFunction:
           !Ref LambdaRunEnvironment
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
-        BANK_SQS_URL:
+        EXTERNAL_CONTRIB_SQS_URL:
           !Ref ExternalContribQueue
 
 ExternalContribSyncInvokeConfig:
