@@ -16,14 +16,19 @@ import { getActBlueCSVMetadata } from "../clients/actblue/actblue.client";
 import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { sendMessage } from "../utils/send-sqs.utils";
 import { mLog } from "../utils/m-log.utils";
+import * as t from "io-ts";
+import { fromEnum } from "../utils/from-enum.utils";
+import { Source } from "../utils/enums/source.enum";
 
 const reportMonthRange = 6;
 
-export interface IActBlueSQSMsgBody {
-  committeeId: string;
-  csvType: ActBlueCSVType;
-  csvId: string;
-}
+export const ActBlueSQSMsgBody = t.type({
+  committeeId: t.string,
+  csvType: fromEnum<ActBlueCSVType>("ActBlueCSVType", ActBlueCSVType),
+  csvId: t.string,
+});
+
+export type IActBlueSQSMsgBody = t.TypeOf<typeof ActBlueSQSMsgBody>;
 
 const comToCreds = (com: ICommittee): IActBlueAPICredentials =>
   com.actBlueAPICredentials;
@@ -62,7 +67,10 @@ const actBlueCommitteeToSQS =
   (sqs: SQS) =>
   (com: ICommittee): TaskEither<ApplicationError, unknown> =>
     pipe(
-      te.of(comToCreds(com)),
+      te.of(com),
+      te.chain(mLog("Committee received: ")),
+      te.map(comToCreds),
+      te.chain(mLog("ActBlue API creds retrieved:")),
       te.chain(credsToCsvMetadata(csvType)),
       te.chain(mLog("CSV request completed. CSV Metadata:")),
       te.map(csvMetadataToMsgBody(com)),

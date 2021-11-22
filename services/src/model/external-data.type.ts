@@ -10,11 +10,12 @@ import { EntityType } from "../utils/enums/entity-type.enum";
 import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
+import { Source } from "../utils/enums/source.enum";
 
 const ExternalContribReq = t.type({
   id: t.string,
   recipientId: t.string,
-  source: t.string,
+  source: fromEnum<Source>("Source", Source),
   paymentDate: t.number,
   amount: t.number,
   firstName: t.string,
@@ -96,16 +97,19 @@ export type CommitteeGetter = (
   dynamoDB: DynamoDB
 ) => (recipientId: string) => TaskEither<ApplicationError, ICommittee>;
 
+export type CommitteeValidator = (
+  committee: ICommittee
+) => (externalAccountId: string) => boolean;
+
 export interface IExternalTxnsToDDBDeps {
   committeesTable: string;
   billableEventsTable: string;
-  donorsTableName: string;
-  transactionsTableName: string;
-  rulesTableName: string;
+  donorsTable: string;
+  transactionsTable: string;
+  rulesTable: string;
   dynamoDB: DynamoDB;
   stripe: Stripe;
   lexisNexisConfig: ILexisNexisConfig;
-  committeeGetter: CommitteeGetter;
+  committeeValidator: CommitteeValidator;
   contributionMapper: ContributionMapper;
-  isNewValidator: IsNewValidator;
 }

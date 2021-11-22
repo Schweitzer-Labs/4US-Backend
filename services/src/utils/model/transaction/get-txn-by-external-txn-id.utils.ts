@@ -6,28 +6,28 @@ import { StatusCodes } from "http-status-codes";
 import { taskEither } from "fp-ts";
 import { QueryInput } from "aws-sdk/clients/dynamodb";
 
-const logPrefix = "Get Transaction by ActBlue Transaction Id";
+const logPrefix = "Get Transaction by External Transaction Id";
 
-export interface IGetTxnByActBlueTxnIdArgs {
+export interface IGetTxnByExternalTxnIdArgs {
   committeeId: string;
-  actBlueTransactionId: string;
+  externalTransactionId: string;
 }
 
-export const actBlueTxnExistsUnsafe =
+export const externalTxnExistsUnsafe =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   async ({
     committeeId,
-    actBlueTransactionId,
-  }: IGetTxnByActBlueTxnIdArgs): Promise<boolean> => {
+    externalTransactionId,
+  }: IGetTxnByExternalTxnIdArgs): Promise<boolean> => {
     const query: QueryInput = {
       TableName: txnsTableName,
-      IndexName: "TransactionsByActBlueTransactionId",
+      IndexName: "TransactionsByExternalTransactionId",
       KeyConditionExpression:
-        "committeeId = :committeeId AND actBlueTransactionId = :actBlueTransactionId",
+        "committeeId = :committeeId AND externalTransactionId = :externalTransactionId",
       ExpressionAttributeValues: {
         ":committeeId": { S: committeeId },
-        ":actBlueTransactionId": { S: actBlueTransactionId },
+        ":externalTransactionId": { S: externalTransactionId },
       },
     };
 
@@ -40,31 +40,31 @@ export const actBlueTxnExistsUnsafe =
     return marshalledRes.length > 0;
   };
 
-export const actBlueTxnExists =
+export const externalTxnExists =
   (txnsTable: string) =>
   (dynamoDB: DynamoDB) =>
-  (args: IGetTxnByActBlueTxnIdArgs): TaskEither<ApplicationError, boolean> =>
+  (args: IGetTxnByExternalTxnIdArgs): TaskEither<ApplicationError, boolean> =>
     pipe(
       tryCatch<ApplicationError, boolean>(
-        () => actBlueTxnExistsUnsafe(txnsTable)(dynamoDB)(args),
+        () => externalTxnExistsUnsafe(txnsTable)(dynamoDB)(args),
         (e) =>
           new ApplicationError(
-            "Get transactions by ActBlue Transactions ID request failed",
+            "Get transactions by ExternalTxn Transactions ID request failed",
             e,
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       )
     );
 
-export const isNewActBlueTxn =
+export const isNewExternalTxn =
   (txnsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (committeeId: string) =>
-  (actBlueTransactionId: string): TaskEither<ApplicationError, boolean> =>
+  (externalTransactionId: string): TaskEither<ApplicationError, boolean> =>
     pipe(
-      actBlueTxnExists(txnsTableName)(dynamoDB)({
+      externalTxnExists(txnsTableName)(dynamoDB)({
         committeeId,
-        actBlueTransactionId,
+        externalTransactionId,
       }),
       taskEither.map((res) => !res)
     );

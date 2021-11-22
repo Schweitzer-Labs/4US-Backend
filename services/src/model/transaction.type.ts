@@ -99,6 +99,7 @@ const TransactionOptional = t.partial({
   inKindType: t.string,
   inKindDescription: t.string,
   owners: Owners,
+  externalTransactionId: t.string,
 });
 
 export const Transaction = t.intersection([

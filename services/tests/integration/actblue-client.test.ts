@@ -34,7 +34,7 @@ const creds: IActBlueAPICredentials = {
 
 describe("ActBlue Client", function () {
   describe("CSV generation", function () {
-    it("Request CSV generation and retrieves an CSV Metadata", async () => {
+    it("Request CSV generation and retrieves a CSV Metadata", async () => {
       const rn = now();
       const sixMAgo = nMonthsAgo(6)(rn);
 
@@ -61,14 +61,14 @@ describe("ActBlue Client", function () {
         throw Error("request failed");
       }
 
-      await sleep(3000);
+      await sleep(6000);
 
       csvId = eitherCSVId.right.csvId;
     });
 
     it("Retrieves typed data from a CSV Id", async () => {
       const res: IActBluePaidContribution[] = await pipe(
-        actBlueCSVMetadataToTypedData(creds)(csvId),
+        actBlueCSVMetadataToTypedData(csvId)(creds),
         taskEither.fold(
           () => task.of([]),
           (res) => task.of(res)

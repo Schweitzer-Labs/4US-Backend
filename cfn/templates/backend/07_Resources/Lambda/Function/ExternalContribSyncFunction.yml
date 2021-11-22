@@ -1,12 +1,12 @@
-ActBlueSyncFunction:
+ExternalContribSyncFunction:
   Type: "AWS::Serverless::Function"
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-ActBlueSyncFunction
+    FunctionName: !Sub ${AWS::StackName}-ExternalContribSyncFunction
     Runtime: nodejs14.x
     CodeUri: lambdas/
     Layers:
       - !Ref ServicesLayer
-    Handler: app.actBlueSync
+    Handler: app.externalContribSync
     Role: !GetAtt LambdaBankSyncRole.Arn
     Timeout: 40
     MemorySize: 300
@@ -25,12 +25,12 @@ ActBlueSyncFunction:
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
         BANK_SQS_URL:
-          !Ref ActBlueQueue
+          !Ref ExternalContribQueue
 
-ActBlueSyncInvokeConfig:
+ExternalContribSyncInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig
   Properties:
-    FunctionName: !Ref ActBlueSyncFunction
+    FunctionName: !Ref ExternalContribSyncFunction
     Qualifier: "$LATEST"
     MaximumRetryAttempts: 0
     DestinationConfig:

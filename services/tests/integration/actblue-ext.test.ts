@@ -8,14 +8,8 @@ import { genCommittee } from "../utils/gen-committee.util";
 import { getStripeApiKey } from "../../src/utils/config";
 import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { sleep } from "../../src/utils/sleep.utils";
-import { syncExternalContributions } from "../../src/pipes/external-txns-to-ddb.pipe";
-import { getCommitteeByActBlueAccountIdAndDecode } from "../../src/utils/model/committee/get-committee-by-actblue-id.utils";
-import { isNewActBlueTxn } from "../../src/utils/model/transaction/get-txn-by-actblue-id.utils";
 import { syncActBlue } from "../../src/external-data/act-blue.external-data";
-import {
-  ActBlueCSVType,
-  IActBluePaidContribution,
-} from "../../src/clients/actblue/actblue.decoders";
+import { ActBlueCSVType } from "../../src/clients/actblue/actblue.decoders";
 import { nMonthsAgo, now } from "../../src/utils/time.utils";
 import {
   actBlueCSVMetadataToTypedData,
@@ -25,16 +19,18 @@ import { isLeft } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { IExternalContrib } from "../../src/model/external-data.type";
-import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import { mLog } from "../../src/utils/m-log.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 
 dotenv.config();
 
-const billableEventsTableName = process.env.BILLABLE_EVENTS_DDB_TABLE_NAME;
-const donorsTable = process.env.DONORS_DDB_TABLE_NAME;
-const txnsTable = process.env.TRANSACTIONS_DDB_TABLE_NAME;
-const rulesTable = process.env.RULES_DDB_TABLE_NAME;
-const comsTable = process.env.COMMITTEES_DDB_TABLE_NAME;
+const billableEventsTable: any = process.env.BILLABLE_EVENTS_DDB_TABLE_NAME;
+const transactionsTable: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
+const committeesTable: any = process.env.COMMITTEES_DDB_TABLE_NAME;
+const donorsTable: any = process.env.DONORS_DDB_TABLE_NAME;
+const rulesTable: any = process.env.RULES_DDB_TABLE_NAME;
+const runenv: any = process.env.RUNENV;
+
 const lnUsername = process.env.LN_USERNAME;
 const lnPassword = process.env.LN_PASSWORD;
 const actBlueSecret = process.env.ACTBLUE_CLIENT_SECRET;
@@ -85,7 +81,7 @@ describe("ActBlue to External Transaction Synchronization", function () {
       apiVersion: "2020-08-27",
     });
 
-    await putCommittee(comsTable)(ddb)(committee);
+    await putCommittee(committeesTable)(ddb)(committee);
     const rn = now();
     const sixMAgo = nMonthsAgo(6)(rn);
 
@@ -102,14 +98,21 @@ describe("ActBlue to External Transaction Synchronization", function () {
       throw new Error("ActBlue csv request failed");
 
     const eitherContribs = await pipe(
-      actBlueCSVMetadataToTypedData(committee.actBlueAPICredentials)(
-        eitherCsvMetadata.right.csvId
+      actBlueCSVMetadataToTypedData(eitherCsvMetadata.right.csvId)(
+        committee.actBlueAPICredentials
       ),
       taskEither.chain(mLog("csv data parsed")),
       taskEither.chain(
-        syncActBlue(comsTable)(billableEventsTableName)(donorsTable)(txnsTable)(
-          rulesTable
-        )(ddb)(stripe)(lnConfig)
+        syncActBlue({
+          transactionsTable,
+          billableEventsTable,
+          rulesTable,
+          donorsTable,
+          committeesTable,
+          dynamoDB: ddb,
+          lexisNexisConfig: lnConfig,
+          stripe,
+        })(committee.id)
       )
     )();
 

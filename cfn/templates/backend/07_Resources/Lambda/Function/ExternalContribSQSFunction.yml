@@ -1,12 +1,12 @@
-ActBlueSQSFunction:
+ExternalContribSQSFunction:
   Type: AWS::Serverless::Function
   Properties:
-    FunctionName: !Sub ${AWS::StackName}-ActBlueSQSFunction
-    Description: Sync Transactions with ActBlue Account
+    FunctionName: !Sub ${AWS::StackName}-ExternalContribSQSFunction
+    Description: Sync Transactions with an external contributions account
     CodeUri: lambdas/
     Layers:
       - !Ref ServicesLayer
-    Handler: app.actBlueSQS
+    Handler: app.externalContribSQS
     Runtime: nodejs14.x
     Role: !GetAtt LambdaExternalDataRole.Arn
     Events:
@@ -14,7 +14,7 @@ ActBlueSQSFunction:
         Type: SQS
         Properties:
           BatchSize: 1
-          Queue: !GetAtt ActBlueQueue.Arn
+          Queue: !GetAtt ExternalContribQueue.Arn
     DeadLetterQueue:
       TargetArn: !Ref LambdaDLQ
       Type: SNS
@@ -25,11 +25,17 @@ ActBlueSQSFunction:
           !GetAtt DynamoDBsTemplate.Outputs.TransactionsTableName
         COMMITTEES_DDB_TABLE_NAME:
           !GetAtt DynamoDBsTemplate.Outputs.CommitteesTableName
+        DONORS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.DonorsTableName
+        RULES_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.RulesTableName
+        BILLABLE_EVENTS_DDB_TABLE_NAME:
+          !GetAtt DynamoDBsTemplate.Outputs.BillableEventsTableName
 
-ActBlueSQSInvokeConfig:
+ExternalConfigSQSInvokeConfig:
   Type: AWS::Lambda::EventInvokeConfig
   Properties:
-    FunctionName: !Ref ActBlueSQSFunction
+    FunctionName: !Ref ExternalContribSQSFunction
     Qualifier: "$LATEST"
     MaximumRetryAttempts: 0
     DestinationConfig:

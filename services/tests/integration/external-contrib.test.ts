@@ -5,7 +5,7 @@ import { putCommittee } from "../../src/utils/model/committee/put-committee.util
 import { DynamoDB } from "aws-sdk";
 import { genCommittee } from "../utils/gen-committee.util";
 import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
-import { syncExternalContributions } from "../../src/pipes/external-txns-to-ddb.pipe";
+import { syncExternalContributions } from "../../src/pipes/external-contribs/external-txns-to-ddb.pipe";
 import { IExternalContrib } from "../../src/model/external-data.type";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { now } from "../../src/utils/time.utils";
@@ -20,9 +20,9 @@ import { getStripeApiKey } from "../../src/utils/config";
 import { Stripe } from "stripe";
 import { EntityType } from "../../src/utils/enums/entity-type.enum";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
-import { isNewActBlueTxn } from "../../src/utils/model/transaction/get-txn-by-actblue-id.utils";
 import { getCommitteeByActBlueAccountIdAndDecode } from "../../src/utils/model/committee/get-committee-by-actblue-id.utils";
 import { sleep } from "../../src/utils/sleep.utils";
+import { Source } from "../../src/utils/enums/source.enum";
 
 dotenv.config();
 
@@ -77,7 +77,7 @@ const mockExternalContrib = (): IExternalContrib => ({
     amount: 60,
     ...processorData,
   },
-  source: "ActBlue",
+  source: Source.ActBlue,
   paymentDate: now(),
   amount: faker.datatype.number({
     min: 1000,
@@ -117,16 +117,15 @@ describe("Syncs external contributions with a platform account", function () {
     await syncExternalContributions({
       committeesTable: comsTable,
       billableEventsTable: billableEventsTableName,
-      donorsTableName: donorsTable,
-      transactionsTableName: txnsTable,
-      rulesTableName: rulesTable,
+      donorsTable: donorsTable,
+      transactionsTable: txnsTable,
+      rulesTable: rulesTable,
       dynamoDB: ddb,
       stripe: stripe,
       lexisNexisConfig: lnConfig,
-      committeeGetter: getCommitteeByActBlueAccountIdAndDecode,
-      isNewValidator: isNewActBlueTxn,
+      committeeValidator: (com) => (id) => com.actBlueAccountId === id,
       contributionMapper: (val) => val,
-    })(testingData)();
+    })(committee.id)(testingData)();
   });
   it("External transactions are saved to database", async () => {
     const txns = await pipe(

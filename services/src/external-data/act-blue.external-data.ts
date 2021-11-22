@@ -1,24 +1,18 @@
 import {
   CommitteeGetter,
+  CommitteeValidator,
   ContributionMapper,
   IExternalContrib,
-  IExternalTxnsToDDBDeps,
-  IsNewValidator,
 } from "../model/external-data.type";
 import {
   formatDate,
   IActBluePaidContribution,
 } from "../clients/actblue/actblue.decoders";
 import { DynamoDB } from "aws-sdk";
-import {
-  IGetTxnByActBlueTxnIdArgs,
-  isNewActBlueTxn,
-} from "../utils/model/transaction/get-txn-by-actblue-id.utils";
 import { State } from "../utils/enums/state.enum";
 import { Source } from "../utils/enums/source.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
-import { getCommitteeByActBlueAccountIdAndDecode } from "../utils/model/committee/get-committee-by-actblue-id.utils";
-import { syncExternalContributions } from "../pipes/external-txns-to-ddb.pipe";
+import { syncExternalContributions } from "../pipes/external-contribs/external-txns-to-ddb.pipe";
 import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
@@ -26,8 +20,8 @@ import { ApplicationError } from "../utils/application-error";
 import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { dollarStrToCents } from "../utils/cents.util";
 
-const committeeGetter: CommitteeGetter =
-  getCommitteeByActBlueAccountIdAndDecode;
+const committeeValidator: CommitteeValidator = (com) => (id) =>
+  com.actBlueAccountId === id;
 
 const contributionMapper: ContributionMapper = (
   ab: IActBluePaidContribution
@@ -67,32 +61,27 @@ const contributionMapper: ContributionMapper = (
   },
 });
 
-const isNewValidator: IsNewValidator = isNewActBlueTxn;
+interface ISyncActBlueConfig {
+  committeesTable: string;
+  billableEventsTable: string;
+  donorsTable: string;
+  transactionsTable: string;
+  rulesTable: string;
+  dynamoDB: DynamoDB;
+  stripe: Stripe;
+  lexisNexisConfig: ILexisNexisConfig;
+}
 
 // @Todo refactor with currying
 // https://samhh.github.io/fp-ts-std/modules/Function.ts.html
 export const syncActBlue =
-  (committeesTable: string) =>
-  (billableEventsTable: string) =>
-  (donorsTableName: string) =>
-  (transactionsTableName: string) =>
-  (rulesTableName: string) =>
-  (dynamoDB: DynamoDB) =>
-  (stripe: Stripe) =>
-  (lexisNexisConfig: ILexisNexisConfig) =>
+  (config: ISyncActBlueConfig) =>
+  (committeeId: string) =>
   (
     actBlueContribs: IActBluePaidContribution[]
   ): TaskEither<ApplicationError, IExternalContrib[]> =>
     syncExternalContributions({
-      committeesTable,
-      billableEventsTable,
-      donorsTableName,
-      transactionsTableName,
-      rulesTableName,
-      dynamoDB,
-      stripe,
-      lexisNexisConfig,
-      committeeGetter,
+      ...config,
+      committeeValidator,
       contributionMapper,
-      isNewValidator,
-    })(actBlueContribs);
+    })(committeeId)(actBlueContribs);

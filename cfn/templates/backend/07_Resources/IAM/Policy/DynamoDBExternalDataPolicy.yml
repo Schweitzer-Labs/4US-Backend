@@ -8,6 +8,7 @@ DynamoDBExternalDataPolicy:
         - Effect: Allow
           Resource:
             - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByActBlueTransactionId
+            - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByExternalTransactionId
           Action:
             - dynamodb:Scan
             - dynamodb:Query
