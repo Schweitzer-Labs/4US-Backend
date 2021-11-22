@@ -1,42 +1,42 @@
 import { DynamoDB } from "aws-sdk";
-import { ICommittee } from "../model/committee.type";
+import { ICommittee } from "../../model/committee.type";
 import { pipe } from "fp-ts/function";
 import {
   CommitteeValidator,
   IExternalContrib,
   IExternalTxnsToDDBDeps,
   IsNewValidator,
-} from "../model/external-data.type";
-import { ApplicationError } from "../utils/application-error";
+} from "../../model/external-data.type";
+import { ApplicationError } from "../../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
 import { taskEither } from "fp-ts";
-import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
-import { getOneFromList } from "../utils/get-one-from-list.utils";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
-import { EntityType } from "../utils/enums/entity-type.enum";
-import { runRulesAndProcess } from "./run-rules-and-process.pipe";
+import { CreateContributionInput } from "../../graphql/input-types/create-contribution.input-type";
+import { getOneFromList } from "../../utils/get-one-from-list.utils";
+import { PaymentMethod } from "../../utils/enums/payment-method.enum";
+import { EntityType } from "../../utils/enums/entity-type.enum";
+import { runRulesAndProcess } from "../run-rules-and-process.pipe";
 import { Stripe } from "stripe";
-import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
-import { SYSTEM } from "../utils/tokens/users.token";
+import { ILexisNexisConfig } from "../../clients/lexis-nexis/lexis-nexis.client";
+import { SYSTEM } from "../../utils/tokens/users.token";
 import * as Array from "fp-ts/lib/Array";
-import { ITransaction } from "../model/transaction.type";
-import { genTxnId } from "../utils/gen-txn-id.utils";
-import { Direction } from "../utils/enums/direction.enum";
-import { Source } from "../utils/enums/source.enum";
-import { TransactionType } from "../utils/enums/transaction-type.enum";
-import { PurposeCode } from "../utils/enums/purpose-code.enum";
-import { putTransactionAndDecode } from "../utils/model/transaction/put-transaction.utils";
-import { mLog } from "../utils/m-log.utils";
-import { isNewExternalTxn } from "../utils/model/transaction/get-txn-by-external-txn-id.utils";
-import { getCommitteeById } from "../utils/model/committee/get-committee-by-id.query";
+import { ITransaction } from "../../model/transaction.type";
+import { genTxnId } from "../../utils/gen-txn-id.utils";
+import { Direction } from "../../utils/enums/direction.enum";
+import { Source } from "../../utils/enums/source.enum";
+import { TransactionType } from "../../utils/enums/transaction-type.enum";
+import { PurposeCode } from "../../utils/enums/purpose-code.enum";
+import { putTransactionAndDecode } from "../../utils/model/transaction/put-transaction.utils";
+import { mLog } from "../../utils/m-log.utils";
+import { isNewExternalTxn } from "../../utils/model/transaction/get-txn-by-external-txn-id.utils";
+import { getCommitteeById } from "../../utils/model/committee/get-committee-by-id.query";
 
 export const syncExternalContributions =
   ({
     committeesTable,
     billableEventsTable,
-    donorsTableName,
-    transactionsTableName,
-    rulesTableName,
+    donorsTable,
+    transactionsTable,
+    rulesTable,
     dynamoDB,
     stripe,
     lexisNexisConfig,
@@ -54,9 +54,9 @@ export const syncExternalContributions =
             recipientIdMatchesCommittee(committeeValidator)(contributions)
           ),
           taskEither.chain(
-            syncContribs(billableEventsTable)(donorsTableName)(
-              transactionsTableName
-            )(rulesTableName)(dynamoDB)(stripe)(lexisNexisConfig)(contributions)
+            syncContribs(billableEventsTable)(donorsTable)(transactionsTable)(
+              rulesTable
+            )(dynamoDB)(stripe)(lexisNexisConfig)(contributions)
           )
         )
       )
@@ -75,7 +75,10 @@ const recipientIdMatchesCommittee =
           : taskEither.left(
               new ApplicationError(
                 "Committee External account id does not match the recipient ID in the data.",
-                id
+                {
+                  idFromData: id,
+                  committee: com,
+                }
               )
             )
       )
@@ -156,7 +159,7 @@ const extContribToCreateContribInput =
     employmentStatus: extContrib.employmentStatus,
     occupation: extContrib.occupation,
     phoneNumber: extContrib.phoneNumber,
-    source: Source.ActBlue,
+    source: extContrib.source,
   });
 
 const externalContribAndTxnToFeeTxn =

@@ -12,7 +12,7 @@ import { DynamoDB } from "aws-sdk";
 import { State } from "../utils/enums/state.enum";
 import { Source } from "../utils/enums/source.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
-import { syncExternalContributions } from "../pipes/external-txns-to-ddb.pipe";
+import { syncExternalContributions } from "../pipes/external-contribs/external-txns-to-ddb.pipe";
 import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
@@ -61,30 +61,27 @@ const contributionMapper: ContributionMapper = (
   },
 });
 
+interface ISyncActBlueConfig {
+  committeesTable: string;
+  billableEventsTable: string;
+  donorsTable: string;
+  transactionsTable: string;
+  rulesTable: string;
+  dynamoDB: DynamoDB;
+  stripe: Stripe;
+  lexisNexisConfig: ILexisNexisConfig;
+}
+
 // @Todo refactor with currying
 // https://samhh.github.io/fp-ts-std/modules/Function.ts.html
 export const syncActBlue =
-  (committeesTable: string) =>
-  (billableEventsTable: string) =>
-  (donorsTableName: string) =>
-  (transactionsTableName: string) =>
-  (rulesTableName: string) =>
-  (dynamoDB: DynamoDB) =>
-  (stripe: Stripe) =>
-  (lexisNexisConfig: ILexisNexisConfig) =>
+  (config: ISyncActBlueConfig) =>
   (committeeId: string) =>
   (
     actBlueContribs: IActBluePaidContribution[]
   ): TaskEither<ApplicationError, IExternalContrib[]> =>
     syncExternalContributions({
-      committeesTable,
-      billableEventsTable,
-      donorsTableName,
-      transactionsTableName,
-      rulesTableName,
-      dynamoDB,
-      stripe,
-      lexisNexisConfig,
+      ...config,
       committeeValidator,
       contributionMapper,
     })(committeeId)(actBlueContribs);

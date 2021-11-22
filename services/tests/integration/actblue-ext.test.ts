@@ -24,11 +24,12 @@ import { deleteCommittee } from "../../src/utils/model/committee/delete-committe
 
 dotenv.config();
 
-const billableEventsTableName = process.env.BILLABLE_EVENTS_DDB_TABLE_NAME;
-const donorsTable = process.env.DONORS_DDB_TABLE_NAME;
-const txnsTable = process.env.TRANSACTIONS_DDB_TABLE_NAME;
-const rulesTable = process.env.RULES_DDB_TABLE_NAME;
-const comsTable = process.env.COMMITTEES_DDB_TABLE_NAME;
+const billableEventsTable: any = process.env.BILLABLE_EVENTS_DDB_TABLE_NAME;
+const transactionsTable: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
+const committeesTable: any = process.env.COMMITTEES_DDB_TABLE_NAME;
+const donorsTable: any = process.env.DONORS_DDB_TABLE_NAME;
+const rulesTable: any = process.env.RULES_DDB_TABLE_NAME;
+const runenv: any = process.env.RUNENV;
 
 const lnUsername = process.env.LN_USERNAME;
 const lnPassword = process.env.LN_PASSWORD;
@@ -80,7 +81,7 @@ describe("ActBlue to External Transaction Synchronization", function () {
       apiVersion: "2020-08-27",
     });
 
-    await putCommittee(comsTable)(ddb)(committee);
+    await putCommittee(committeesTable)(ddb)(committee);
     const rn = now();
     const sixMAgo = nMonthsAgo(6)(rn);
 
@@ -97,14 +98,21 @@ describe("ActBlue to External Transaction Synchronization", function () {
       throw new Error("ActBlue csv request failed");
 
     const eitherContribs = await pipe(
-      actBlueCSVMetadataToTypedData(committee.actBlueAPICredentials)(
-        eitherCsvMetadata.right.csvId
+      actBlueCSVMetadataToTypedData(eitherCsvMetadata.right.csvId)(
+        committee.actBlueAPICredentials
       ),
       taskEither.chain(mLog("csv data parsed")),
       taskEither.chain(
-        syncActBlue(comsTable)(billableEventsTableName)(donorsTable)(txnsTable)(
-          rulesTable
-        )(ddb)(stripe)(lnConfig)(committee.id)
+        syncActBlue({
+          transactionsTable,
+          billableEventsTable,
+          rulesTable,
+          donorsTable,
+          committeesTable,
+          dynamoDB: ddb,
+          lexisNexisConfig: lnConfig,
+          stripe,
+        })(committee.id)
       )
     )();
 

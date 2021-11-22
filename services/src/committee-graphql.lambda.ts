@@ -8,8 +8,6 @@ dotenv.config();
 
 const corsOrigin = process.env.CORS_ORIGIN;
 
-console.log("force change 1");
-
 const schema = buildSchemaSync({
   resolvers: [AppResolver],
 });

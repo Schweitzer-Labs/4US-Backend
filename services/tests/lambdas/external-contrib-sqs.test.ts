@@ -5,7 +5,7 @@ import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { genCommittee } from "../utils/gen-committee.util";
 import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
-import actBlueSqs from "../../src/actblue-sqs.lambda";
+import externalContrib from "../../src/external-contrib-sqs.lambda";
 import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { SQSEvent } from "aws-lambda";
 import { genSQSEventWithBody } from "../utils/gen-sqs-event.util";
@@ -28,6 +28,7 @@ const dynamoDB = new DynamoDB();
 
 const secret = process.env.ACTBLUE_CLIENT_SECRET;
 const uuid = process.env.ACTBLUE_CLIENT_UUID;
+const actBlueAccountId = process.env.ACTBLUE_ACCOUNT_ID;
 const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 
 const actBlueCreds = <IActBlueAPICredentials>{
@@ -45,6 +46,7 @@ const committee = genCommittee({
   state: "ny",
   tzDatabaseName: "America/New_York",
   actBlueAPICredentials: actBlueCreds,
+  actBlueAccountId,
 });
 
 const reportType = ActBlueCSVType.PaidContributions;
@@ -62,7 +64,7 @@ describe("SQS Processor for committee's ActBlue Contributions", function () {
     )(sixMAgo)(rn)();
 
     if (isLeft(eitherCsvMetadata))
-      throw new Error("ActBlue csv request failed");
+      throw new Error("External Contrib csv request failed");
 
     sqsEvent = genSQSEventWithBody(<IActBlueSQSMsgBody>{
       committeeId: committee.id,
@@ -71,10 +73,10 @@ describe("SQS Processor for committee's ActBlue Contributions", function () {
     });
   });
   it("ActBlue SQS runs successfully", async () => {
-    const res = await actBlueSqs(sqsEvent);
+    const res = await externalContrib(sqsEvent);
     console.log(res);
 
-    expect(res).to.equal("ActBlue SQS invocation complete");
+    expect(res).to.equal("External Contribs SQS invocation complete");
   });
 
   after(async () => {

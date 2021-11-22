@@ -56,9 +56,9 @@ const getActBlueCSVById =
     );
 
 export const actBlueCSVMetadataToTypedData =
-  (creds: IActBlueAPICredentials) =>
+  (reportId: string) =>
   (
-    reportId: string
+    creds: IActBlueAPICredentials
   ): TaskEither<ApplicationError, IActBluePaidContribution[]> =>
     pipe(
       getActBlueCSVById(creds)(reportId),
