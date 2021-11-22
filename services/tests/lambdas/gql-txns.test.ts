@@ -530,7 +530,7 @@ describe("Committee GraphQL Lambda", function () {
       );
 
       const txnResBody = JSON.parse(txnRes.body);
-      
+
       const businessIdVerificationScore = txnResBody.data.transaction.businessIdVerificationScore
 
       expect(isNaN(businessIdVerificationScore)).to.equal(false);
