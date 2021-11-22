@@ -23,6 +23,7 @@ import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { getCommitteeByActBlueAccountIdAndDecode } from "../../src/utils/model/committee/get-committee-by-actblue-id.utils";
 import { sleep } from "../../src/utils/sleep.utils";
 import { Source } from "../../src/utils/enums/source.enum";
+import { IActBlueAPICredentials } from "../../src/clients/actblue/actblue.decoders";
 
 dotenv.config();
 
@@ -36,17 +37,24 @@ const lnPassword = process.env.LN_PASSWORD;
 const ps = new AWS.SSM();
 let stripe: Stripe;
 
+const actBlueSecret = process.env.ACTBLUE_CLIENT_SECRET;
+const actBlueUuid = process.env.ACTBLUE_CLIENT_UUID;
+const actBlueAccountId = process.env.ACTBLUE_ACCOUNT_ID;
+
 const lnConfig: ILexisNexisConfig = {
   username: lnUsername,
   password: lnPassword,
+};
+
+const actBlueAPICredentials: IActBlueAPICredentials = {
+  clientUUID: actBlueUuid,
+  clientSecret: actBlueSecret,
 };
 
 AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
 const ddb = new DynamoDB();
-
-const actBlueAccountId = genTxnId();
 
 const committee = genCommittee({
   district: "53",
@@ -58,6 +66,7 @@ const committee = genCommittee({
   state: "ny",
   tzDatabaseName: "America/New_York",
   actBlueAccountId,
+  actBlueAPICredentials,
 });
 
 const processorData = {
