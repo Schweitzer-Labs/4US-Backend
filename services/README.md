@@ -15,7 +15,11 @@ The following Lambdas, as seen in the [src/](./src) directory provide the entry 
 
 [`Bank Sync Lambda`](./src/bank-sync.lambda.ts): Queues committees for bank data synchronization. Runs at a configured interval (currently 5 minutes).
 
-[`Bank SQS Lambda`](./src/bank-sqs.lambda.ts): Processes items in the bank data synchronization queue (BankQueue), making requests to our bank data providers and ensuring the committee's transaction data is up-to-date.
+[`Bank SQS Lambda`](./src/bank-sqs.lambda.ts): Processes items in the bank data synchronization queue ([BankQueue](cfn/templates/backend/07_Resources/SQS/BankQueue.yml)), making requests to our bank data providers and ensuring the committee's transaction data is up-to-date.
+
+[`External Contribution Sync Lambda`](./src/external-contrib-sync.lambda.ts): Queues committees for external contribution data synchronization. Runs at a configured interval (currently 5 minutes).
+
+[`External Contribution SQS Lambda`](./src/external-contrib-sqs.lambda.ts): Processes items in the external contributions queue ([ExternalContribQueue](cfn/templates/backend/07_Resources/SQS/ExternalContribQueue.yml)), making requests to external data providers and ensuring the committee's external contribution data is up-to-date.
 
 [`Stripe Webhook Lambda`](./src/strato-sqs.lambda.ts): Handles Stripe initiated HTTP requests of events we've subscribed to via the [Stripe webhooks UI](https://dashboard.stripe.com/webhooks). We're currently utilizing Stripe's payout paid event to request a reconciliation report and a report generated event to use the resulting reconciliation report data to reconcile transactions.
 
