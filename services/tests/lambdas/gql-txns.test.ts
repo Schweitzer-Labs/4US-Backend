@@ -514,9 +514,9 @@ describe("Committee GraphQL Lambda", function () {
       });
 
       const createRes: any = await lambdaPromise(
-          graphql,
-          genGraphQLProxy(createDisb, validUsername, inputVar),
-          {}
+        graphql,
+        genGraphQLProxy(createDisb, validUsername, inputVar),
+        {}
       );
 
       const body = JSON.parse(createRes.body);
@@ -524,14 +524,15 @@ describe("Committee GraphQL Lambda", function () {
       const tid = body.data.createDisbursement.id;
 
       const txnRes: any = await lambdaPromise(
-          graphql,
-          genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {}),
-          {}
+        graphql,
+        genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {}),
+        {}
       );
 
       const txnResBody = JSON.parse(txnRes.body);
 
-      const businessIdVerificationScore = txnResBody.data.transaction.businessIdVerificationScore
+      const businessIdVerificationScore =
+        txnResBody.data.transaction.businessIdVerificationScore;
 
       expect(isNaN(businessIdVerificationScore)).to.equal(false);
     });
@@ -863,7 +864,7 @@ describe("Committee GraphQL Lambda", function () {
       expect(txnResBody.errors[0].message).to.equal(
         `${newTxn.source} transactions cannot be deleted.`
       );
-    })
+    });
   });
   after(async () => {
     await deleteCommittee(committeesTableName)(dynamoDB)(committee);

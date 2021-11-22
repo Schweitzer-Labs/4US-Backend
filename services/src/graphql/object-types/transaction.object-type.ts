@@ -227,7 +227,7 @@ export class Transaction implements ITransaction {
 
   @Field({ nullable: true })
   donorVerificationScore?: number;
-  
+
   @Field({ nullable: true })
   businessIdVerificationScore?: string;
 
