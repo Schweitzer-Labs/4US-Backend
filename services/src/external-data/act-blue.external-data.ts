@@ -72,8 +72,6 @@ interface ISyncActBlueConfig {
   lexisNexisConfig: ILexisNexisConfig;
 }
 
-// @Todo refactor with currying
-// https://samhh.github.io/fp-ts-std/modules/Function.ts.html
 export const syncActBlue =
   (config: ISyncActBlueConfig) =>
   (committeeId: string) =>
