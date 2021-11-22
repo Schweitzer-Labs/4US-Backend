@@ -21,6 +21,7 @@ import { taskEither } from "fp-ts";
 import { IExternalContrib } from "../../src/model/external-data.type";
 import { mLog } from "../../src/utils/m-log.utils";
 import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
+import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ AWS.config.apiVersions = {
 const ddb = new DynamoDB();
 
 const committee = genCommittee({
+  id: `actblue-${genTxnId()}`,
   district: "53",
   officeType: "senate",
   party: "democrat",
@@ -130,8 +132,6 @@ describe("ActBlue to External Transaction Synchronization", function () {
   });
 
   after(async () => {
-    console.log("committee ID");
-    console.log(committee.id);
-    // await deleteCommittee(comsTable)(ddb)(committee);
+    await deleteCommittee(committeesTable)(ddb)(committee);
   });
 });

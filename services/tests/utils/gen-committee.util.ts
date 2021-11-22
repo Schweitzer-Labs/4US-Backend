@@ -6,6 +6,7 @@ import { ICommittee } from "../../src/model/committee.type";
 import { IActBlueAPICredentials } from "../../src/clients/actblue/actblue.decoders";
 
 interface IGenCommitteeConfig {
+  id?: string;
   state?: string;
   scope?: string;
   officeType?: string;
@@ -30,6 +31,7 @@ interface IGenCommitteeConfig {
 }
 
 export const genCommittee = ({
+  id,
   state,
   scope,
   officeType,
@@ -55,7 +57,7 @@ export const genCommittee = ({
   const randomFirstName = faker.name.firstName();
   const randomLastName = faker.name.lastName();
   return {
-    id: genTxnId(),
+    id: id || genTxnId(),
     committeeName: `Vote for ${candidateFirstName || randomLastName}`,
     candidateFirstName: candidateFirstName || randomFirstName,
     candidateLastName: candidateLastName || randomLastName,
