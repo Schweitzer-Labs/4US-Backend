@@ -77,6 +77,7 @@ const processorData = {
   postalCode: faker.address.zipCode(),
   country: "US",
   paymentDate: now(),
+  paymentMethod: PaymentMethod.Check,
 };
 
 const mockExternalContrib = (): IExternalContrib => ({

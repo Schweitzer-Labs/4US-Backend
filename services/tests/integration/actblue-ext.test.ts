@@ -132,6 +132,7 @@ describe("ActBlue to External Transaction Synchronization", function () {
   });
 
   after(async () => {
+    console.log(committee.id);
     await deleteCommittee(committeesTable)(ddb)(committee);
   });
 });

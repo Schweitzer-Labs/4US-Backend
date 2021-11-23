@@ -82,6 +82,42 @@ export class OwnerSchema {
 }
 
 @ObjectType()
+export class ProcessorFeeData {
+  @Field()
+  amount: number;
+
+  @Field((type) => PaymentMethod)
+  paymentMethod: PaymentMethod;
+
+  @Field()
+  entityName: string;
+
+  @Field()
+  paymentDate: number;
+
+  @Field()
+  addressLine1: string;
+
+  @Field({ nullable: true })
+  addressLine2?: string;
+
+  @Field()
+  city: string;
+
+  @Field((type) => State)
+  state: State;
+
+  @Field()
+  postalCode: string;
+
+  @Field()
+  country: string;
+
+  @Field({ nullable: true })
+  checkNumber?: string;
+}
+
+@ObjectType()
 export class Transaction implements ITransaction {
   @Field((type) => ID)
   id;
@@ -233,4 +269,13 @@ export class Transaction implements ITransaction {
 
   @Field({ nullable: true })
   inKindDescription?: string;
+
+  @Field((type) => ProcessorFeeData, { nullable: true })
+  processorFeeData?: ProcessorFeeData;
+
+  @Field({ nullable: true })
+  externalTransactionId?: string;
+
+  @Field({ nullable: true })
+  externalTransactionPayoutId?: string;
 }

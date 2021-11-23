@@ -58,6 +58,9 @@ const contributionMapper: ContributionMapper = (
     postalCode: "02144-3132",
     country: "US",
     paymentDate: formatDate(ab["Disbursement Date"]),
+    // @ToDo infer payment method from the report
+    paymentMethod: PaymentMethod.Check,
+    checkNumber: ab["Check Number"],
   },
 });
 

@@ -36,6 +36,7 @@ const ProcessorFeeDataReq = t.type({
   addressLine1: t.string,
   city: t.string,
   state: fromEnum<State>("State", State),
+  paymentMethod: fromEnum<PaymentMethod>("PaymentMethod", PaymentMethod),
   postalCode: t.string,
   country: t.string,
 });

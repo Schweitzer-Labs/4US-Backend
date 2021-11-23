@@ -34,6 +34,9 @@ export const reconcileTxnWithTxns =
       taskEither.chain(deleteTxnPipe(txnsTableName)(dynamoDB))
     );
 
+//@ToDo Reconcile payout
+// export const assertTxnsBelongTogether = (  txn: ITransaction): TaskEither<ApplicationError, ITransaction> => {
+
 export const assertTxnAsBankTxn = (
   txn: ITransaction
 ): TaskEither<ApplicationError, ITransaction> => {

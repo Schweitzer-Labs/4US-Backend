@@ -16,6 +16,7 @@ import {
   PaymentMethod,
 } from "../../utils/enums/payment-method.enum";
 import { Source } from "../../utils/enums/source.enum";
+import { IProcessorFeeData } from "../../model/external-data.type";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -171,5 +172,9 @@ export class CreateContributionInput {
 
   externalTransactionId?: string;
 
+  externalTransactionPayoutId?: string;
+
   source?: Source;
+
+  processorFeeData?: IProcessorFeeData;
 }

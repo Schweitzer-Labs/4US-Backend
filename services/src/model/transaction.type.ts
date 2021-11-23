@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 import { FinicityTransaction } from "../clients/finicity/finicity.decoders";
+import { ProcessorFeeData } from "./external-data.type";
 
 export enum SchemaVersion {
   V1 = "v1",
@@ -100,6 +101,8 @@ const TransactionOptional = t.partial({
   inKindDescription: t.string,
   owners: Owners,
   externalTransactionId: t.string,
+  processorFeeData: ProcessorFeeData,
+  externalTransactionPayoutId: t.string,
 });
 
 export const Transaction = t.intersection([

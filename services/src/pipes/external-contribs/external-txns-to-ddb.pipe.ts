@@ -5,7 +5,6 @@ import {
   CommitteeValidator,
   IExternalContrib,
   IExternalTxnsToDDBDeps,
-  IsNewValidator,
 } from "../../model/external-data.type";
 import { ApplicationError } from "../../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
@@ -140,6 +139,7 @@ const extContribToCreateContribInput =
   (com: ICommittee) =>
   (extContrib: IExternalContrib): CreateContributionInput => ({
     externalTransactionId: extContrib.id,
+    externalTransactionPayoutId: extContrib.payoutId,
     processPayment: false,
     committeeId: com.id,
     paymentMethod: PaymentMethod.Credit,
@@ -159,7 +159,9 @@ const extContribToCreateContribInput =
     employmentStatus: extContrib.employmentStatus,
     occupation: extContrib.occupation,
     phoneNumber: extContrib.phoneNumber,
+    checkNumber: extContrib.checkNumber,
     source: extContrib.source,
+    processorFeeData: extContrib.processorFeeData,
   });
 
 const externalContribAndTxnToFeeTxn =
@@ -175,11 +177,11 @@ const externalContribAndTxnToFeeTxn =
     ruleVerified: true,
     initiatedTimestamp: c.paymentDate,
     transactionType: TransactionType.Disbursement,
-    paymentMethod: PaymentMethod.Check,
     isSubcontracted: false,
     isPartialPayment: false,
     isExistingLiability: false,
     purposeCode: PurposeCode.FUNDR,
     checkNumber: c.checkNumber,
     externalTransactionId: c.id,
+    externalTransactionPayoutId: c.payoutId,
   });
