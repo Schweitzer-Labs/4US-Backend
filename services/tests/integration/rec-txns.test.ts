@@ -11,6 +11,11 @@ import { Stripe } from "stripe";
 import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import { getStripeApiKey } from "../../src/utils/config";
 import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
+import { putTransaction } from "../../src/utils/model/transaction/put-transaction.utils";
+import {
+  toMockContrib,
+  toMockDisb,
+} from "../../src/demo/utils/seed-bank-records.util";
 
 dotenv.config();
 
@@ -76,6 +81,10 @@ describe("Transaction Reconciliation", function () {
     });
 
     await putCommittee(committeesTable)(ddb)(committee);
+
+    await putTransaction(transactionsTable)(ddb)(
+      toMockContrib("actblue-1637764328873-FKiZk4")
+    );
   });
   describe("External Contrib", function () {
     before(async () => {
@@ -112,8 +121,8 @@ describe("Transaction Reconciliation", function () {
     });
   });
   after(async () => {
-    await deleteCommittee(committeesTable)(ddb)(committee);
+    // await deleteCommittee(committeesTable)(ddb)(committee);
   });
 });
 
-expect(true).to.equal(false);
+// expect(true).to.equal(false);
