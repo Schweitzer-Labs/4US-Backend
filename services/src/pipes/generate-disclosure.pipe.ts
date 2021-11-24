@@ -22,7 +22,7 @@ export const generateDisclosureOrError =
     );
 
 // Timezone of offset for eastern time
-const offset = 60 * 60 * 2;
+const offset = 60 * 60 * 3;
 
 export const generateDisclosure =
   (committee: ICommittee) =>
