@@ -85,7 +85,8 @@ describe("ActBlue to External Transaction Synchronization", function () {
 
     await putCommittee(committeesTable)(ddb)(committee);
     const rn = now();
-    const sixMAgo = nMonthsAgo(6)(rn);
+
+    const sixMAgo = nMonthsAgo(6)(rn) + 1000 * 60 * 60 * 24;
 
     const eitherCsvMetadata = await getActBlueCSVMetadata(reportType)(
       committee.actBlueAPICredentials
@@ -94,7 +95,7 @@ describe("ActBlue to External Transaction Synchronization", function () {
     if (isLeft(eitherCsvMetadata))
       throw new Error("ActBlue csv request failed");
 
-    await sleep(5000);
+    await sleep(12000);
 
     if (isLeft(eitherCsvMetadata))
       throw new Error("ActBlue csv request failed");
@@ -133,6 +134,6 @@ describe("ActBlue to External Transaction Synchronization", function () {
 
   after(async () => {
     console.log(committee.id);
-    await deleteCommittee(committeesTable)(ddb)(committee);
+    // await deleteCommittee(committeesTable)(ddb)(committee);
   });
 });

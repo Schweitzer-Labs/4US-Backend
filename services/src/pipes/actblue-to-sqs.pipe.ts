@@ -39,7 +39,9 @@ const credsToCsvMetadata =
     creds: IActBlueAPICredentials
   ): TaskEither<ApplicationError, IActBlueCSVMetadata> => {
     const rightNow = now();
-    const sixMonthsAgo = nMonthsAgo(reportMonthRange)(rightNow);
+    // Sometimes this isn't exactly 6 months ago and ActBlue gives us 422, so we add a day
+    const sixMonthsAgo =
+      nMonthsAgo(reportMonthRange)(rightNow) + 1000 * 60 * 60 * 24;
     return getActBlueCSVMetadata(csvType)(creds)(sixMonthsAgo)(rightNow);
   };
 
