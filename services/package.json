@@ -6,6 +6,7 @@
   "author": "4US",
   "dependencies": {
     "@types/jsonexport": "^3.0.2",
+    "@babel/polyfill": "^7.12.1",
     "apollo-server": "^2.25.0",
     "apollo-server-lambda": "^2.25.0",
     "axios": "^0.21.1",
