@@ -1,3 +1,5 @@
+import { now } from "../../utils/time.utils";
+
 export const unverifiedContributionsData: any = [
   {
     amount: 50,
@@ -9,7 +11,7 @@ export const unverifiedContributionsData: any = [
     paymentMethod: "Credit",
     bankVerified: false,
     ruleVerified: true,
-    initiatedTimestamp: 1626095268546,
+    initiatedTimestamp: now(),
     lastName: "Lopez",
     addressLine1: "139 Adrianna Squares",
     city: "New Sadiechester",
