@@ -81,7 +81,7 @@ const toAttributedRow =
       paymentMethod: paymentMethodStr,
     } = txn;
     const paymentMethod: any = paymentMethodStr;
-    const filingPeriod = getFilingPeriod(committee);
+    // const filingPeriod = getFilingPeriod(committee);
     return {
       // @Todo implement
       ["FILER_ID"]: committee.efsFilerId,
@@ -172,7 +172,7 @@ const toRow = (committee: ICommittee) => (txn: ITransaction) => {
   const entityType: any = entityTypeStr;
   const paymentMethod: any = paymentMethodStr;
   const purposeCode: any = purposeCodeString;
-  const filingPeriod = getFilingPeriod(committee);
+  // const filingPeriod = getFilingPeriod(committee);
   const inKindType: any = txn.inKindType;
   return {
     // @Todo implement
