@@ -61,7 +61,7 @@ export const getCommitteeById =
             StatusCodes.INTERNAL_SERVER_ERROR
           )
       ),
-      taskEither.chain(isEmpty(logPrefix)),
+      taskEither.chain(isEmpty(logPrefix)(committeeId)),
       taskEither.chain(validateDDBResponse(logPrefix)(Committee))
     );
   };

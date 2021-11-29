@@ -41,10 +41,10 @@ export const getTxnById =
       tryCatch<ApplicationError, any>(
         () => requestTxnById(txnsTableName)(dynamoDB)(committeeId)(txnId),
         (e) => {
-          return new ApplicationError("Get transaction request failed", e);
+          return new ApplicationError(`${logPrefix}: failed on id ${txnId}`, e);
         }
       ),
-      taskEither.chain(isEmpty(logPrefix)),
+      taskEither.chain(isEmpty(logPrefix)(txnId)),
       taskEither.chain(validateDDBResponse(logPrefix)(Transaction))
     );
   };

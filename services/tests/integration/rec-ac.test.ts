@@ -16,6 +16,14 @@ import {
   toMockContrib,
   toMockDisb,
 } from "../../src/demo/utils/seed-bank-records.util";
+import { committeeToAC } from "../utils/committee-to-actblue-sync.utils";
+import { ITransaction } from "../../src/model/transaction.type";
+import { ReconcileTxnInput } from "../../src/graphql/input-types/reconcile-txn.input-type";
+import { lambdaPromise } from "../../src/utils/lambda-promise.util";
+import graphql from "../../src/committee-graphql.lambda";
+import { genGraphQLProxy } from "../utils/gen-allowed-proxy.util";
+import { getTxnQuery, recTxnMutation } from "../utils/graphql.utils";
+import { qaUsers } from "../seed/qa-users.data";
 
 dotenv.config();
 
@@ -73,6 +81,12 @@ AWS.config.apiVersions = {
   dynamodb: "2012-08-10",
 };
 
+const validUsername = qaUsers[0];
+
+let acSum: number;
+let acContribs: IExternalContrib[];
+let matchingBankRecord: ITransaction;
+let unmatchingBankRecord: ITransaction;
 describe("Transaction Reconciliation", function () {
   before(async () => {
     const stripeApiKey = await getStripeApiKey(ps)("qa");
@@ -82,22 +96,65 @@ describe("Transaction Reconciliation", function () {
 
     await putCommittee(committeesTable)(ddb)(committee);
 
-    await putTransaction(transactionsTable)(ddb)(
-      toMockContrib("actblue-1637764328873-FKiZk4")
+    // import ActBlue transactions
+    acContribs = await committeeToAC({
+      committee,
+      lnConfig,
+      transactionsTable,
+      billableEventsTable,
+      rulesTable,
+      donorsTable,
+      committeesTable,
+      dynamoDB: ddb,
+      stripe,
+    });
+
+    acSum = acContribs.reduce(
+      (acc, val) => val.amount + val.processorFeeData.amount + acc,
+      0
+    );
+    // generate bank record transaction with matching total
+    matchingBankRecord = await putTransaction(transactionsTable)(ddb)(
+      toMockContrib(committee.id, acSum)
+    );
+
+    // generate bank record with non-matching total
+    unmatchingBankRecord = await putTransaction(transactionsTable)(ddb)(
+      toMockContrib(committee.id, acSum)
     );
   });
   describe("External Contrib", function () {
-    before(async () => {
-      // sync ActBlue transactions.
-      // generate bank record transaction with matching total
-      // generate bank record with non-matching total
-    });
     describe("Valid Inputs", function () {
       before(async () => {
-        // invoke valid attempt to reconcile
+        const recContribVars: ReconcileTxnInput = {
+          committeeId: committee.id,
+          bankTransaction: matchingBankRecord.id,
+          selectedTransactions: acContribs.map((val) => val.id),
+        };
+
+        const res = await lambdaPromise(
+          graphql,
+          genGraphQLProxy(recTxnMutation, validUsername, recContribVars),
+          {}
+        );
+        console.log("rec txn response", res);
       });
-      it("Removes bank transaction after reconciliation", async () => {});
-      it("Sets external contribs and fees to bank verified and tags them with bank data", async () => {});
+      it("Removes bank transaction after reconciliation", async () => {
+        const getTxnRes: any = await lambdaPromise(
+          graphql,
+          genGraphQLProxy(
+            getTxnQuery(committee.id)(matchingBankRecord.id),
+            validUsername,
+            {}
+          ),
+          {}
+        );
+        const txnResBody = JSON.parse(getTxnRes.body);
+        expect(txnResBody.errors.length > 0).to.equal(true);
+      });
+      it("Sets external contribs and fees to bank verified and tags them with bank data", async () => {
+        expect(true).to.equal(false);
+      });
     });
     describe("Invalid Inputs", function () {
       describe("Non-existent External Payout ID entered", function () {
@@ -121,8 +178,7 @@ describe("Transaction Reconciliation", function () {
     });
   });
   after(async () => {
+    console.log("committee ID", committee.id);
     // await deleteCommittee(committeesTable)(ddb)(committee);
   });
 });
-
-// expect(true).to.equal(false);

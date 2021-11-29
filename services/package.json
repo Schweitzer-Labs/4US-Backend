@@ -38,7 +38,7 @@
     "test-actblue-ext": "ts-mocha tests/integration/actblue-ext.test.ts --timeout 600000",
     "test-mail": "ts-mocha tests/lambdas/policapital-emailer.test.ts --timeout 600000",
     "gen-int-test": "cp tests/utils/blank-test.util.ts tests/integration/$NAME.test.ts",
-    "test-rec-txns": "ts-mocha tests/integration/rec-txns.test.ts --timeout 600000",
+    "test-rec-ac": "ts-mocha tests/integration/rec-ac.test.ts --timeout 600000",
     "compile": "npm install && tsc",
     "test-server": "ts-node-dev tests/server --watch"
   },

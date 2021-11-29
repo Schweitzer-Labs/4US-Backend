@@ -5,14 +5,14 @@ import { StatusCodes } from "http-status-codes";
 
 export const isEmpty =
   (logPrefix: string) =>
-  (val: any): TaskEither<ApplicationError, any> => {
-    return Object.keys(val)?.length > 0
+  (id: string) =>
+  (val: any): TaskEither<ApplicationError, any> =>
+    Object.keys(val)?.length > 0
       ? taskEither.right(val)
       : taskEither.left(
           new ApplicationError(
-            `${logPrefix}: Not Found`,
+            `${logPrefix}: Invalid ID ${id}`,
             {},
             StatusCodes.NOT_FOUND
           )
         );
-  };

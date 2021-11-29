@@ -22,6 +22,7 @@ import { IExternalContrib } from "../../src/model/external-data.type";
 import { mLog } from "../../src/utils/m-log.utils";
 import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { committeeToAC } from "../utils/committee-to-actblue-sync.utils";
 
 dotenv.config();
 
@@ -84,49 +85,18 @@ describe("ActBlue to External Transaction Synchronization", function () {
     });
 
     await putCommittee(committeesTable)(ddb)(committee);
-    const rn = now();
 
-    const sixMAgo = nMonthsAgo(6)(rn) + 1000 * 60 * 60 * 24;
-
-    const eitherCsvMetadata = await getActBlueCSVMetadata(reportType)(
-      committee.actBlueAPICredentials
-    )(sixMAgo)(rn)();
-
-    if (isLeft(eitherCsvMetadata))
-      throw new Error("ActBlue csv request failed");
-
-    await sleep(12000);
-
-    if (isLeft(eitherCsvMetadata))
-      throw new Error("ActBlue csv request failed");
-
-    const eitherContribs = await pipe(
-      actBlueCSVMetadataToTypedData(eitherCsvMetadata.right.csvId)(
-        committee.actBlueAPICredentials
-      ),
-      taskEither.chain(mLog("csv data parsed")),
-      taskEither.chain(
-        syncActBlue({
-          transactionsTable,
-          billableEventsTable,
-          rulesTable,
-          donorsTable,
-          committeesTable,
-          dynamoDB: ddb,
-          lexisNexisConfig: lnConfig,
-          stripe,
-        })(committee.id)
-      )
-    )();
-
-    if (isLeft(eitherContribs))
-      throw new Error("ActBlue committee sync failed");
-
-    console.log("res is here");
-
-    console.log(eitherContribs.right);
-
-    res = eitherContribs.right;
+    res = await committeeToAC({
+      committee,
+      lnConfig,
+      transactionsTable,
+      billableEventsTable,
+      rulesTable,
+      donorsTable,
+      committeesTable,
+      dynamoDB: ddb,
+      stripe,
+    });
   });
   it("Successfully imports ActBlue transactions", async () => {
     expect(res.length > 0).to.equal(true);
@@ -134,6 +104,6 @@ describe("ActBlue to External Transaction Synchronization", function () {
 
   after(async () => {
     console.log(committee.id);
-    // await deleteCommittee(committeesTable)(ddb)(committee);
+    await deleteCommittee(committeesTable)(ddb)(committee);
   });
 });

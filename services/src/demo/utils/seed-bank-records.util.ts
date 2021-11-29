@@ -14,8 +14,12 @@ import { taskEither } from "fp-ts";
 import { putTransactionAndDecode } from "../../utils/model/transaction/put-transaction.utils";
 import { SeedDemoBankRecordsInput } from "../../graphql/input-types/seed-demo-bank-records.input-type";
 
-const toMockDisb = (committeeId: string): ITransaction => {
+export const toMockDisb = (
+  committeeId: string,
+  amount?: number
+): ITransaction => {
   const timestamp = 1629975600000;
+  const amountVal = amount || 50000;
   const finData = {
     finicityBestRepresentation:
       "ORIG CO NAME INTUIT INC ORIG ID DESC DATE CO ENTRY DESCR SOFTWARE SEC CCD TRACE EED IND ID IND NAME SCHWEITZER LABORATORIE",
@@ -27,13 +31,12 @@ const toMockDisb = (committeeId: string): ITransaction => {
     finicityTransactionDate: timestamp,
     finicityTransactionId: 1,
   };
-  const amount = 50000;
   return {
     ...finData,
     committeeId,
     id: genTxnId(),
     direction: Direction.Out,
-    amount,
+    amount: amountVal,
     paymentMethod: PaymentMethod.Credit,
     bankVerified: true,
     ruleVerified: false,
@@ -43,7 +46,7 @@ const toMockDisb = (committeeId: string): ITransaction => {
     transactionType: TransactionType.Disbursement,
     finicityTransactionData: {
       id: 1,
-      amount,
+      amount: amountVal,
       accountId: 1,
       status: "complete",
       description: finData.finicityDescription,
@@ -61,9 +64,12 @@ const toMockDisb = (committeeId: string): ITransaction => {
   };
 };
 
-const toMockContrib = (committeeId: string): ITransaction => {
+export const toMockContrib = (
+  committeeId: string,
+  amount?: number
+): ITransaction => {
   const timestamp = now();
-  const amount = 120000;
+  const amountVal = amount || 120000;
   const finData = {
     finicityBestRepresentation:
       "ORIG CO NAME INTUIT INC ORIG ID DESC DATE CO ENTRY DESCR SOFTWARE SEC CCD TRACE EED IND ID IND NAME SCHWEITZER LABORATORIE",
@@ -80,7 +86,7 @@ const toMockContrib = (committeeId: string): ITransaction => {
     committeeId,
     id: genTxnId(),
     direction: Direction.In,
-    amount,
+    amount: amountVal,
     paymentMethod: PaymentMethod.Credit,
     bankVerified: true,
     ruleVerified: false,
@@ -90,7 +96,7 @@ const toMockContrib = (committeeId: string): ITransaction => {
     transactionType: TransactionType.Contribution,
     finicityTransactionData: {
       id: 1,
-      amount,
+      amount: amountVal,
       accountId: 1,
       status: "complete",
       description: finData.finicityDescription,
