@@ -15,7 +15,7 @@ import { putTransactionAndDecode } from "../../utils/model/put-transaction.utils
 import { SeedDemoBankRecordsInput } from "../../graphql/input-types/seed-demo-bank-records.input-type";
 
 const toMockDisb = (committeeId: string): ITransaction => {
-  const timestamp = 1637384400000;
+  const timestamp = now();
   const finData = {
     finicityBestRepresentation:
       "ORIG CO NAME INTUIT INC ORIG ID DESC DATE CO ENTRY DESCR SOFTWARE SEC CCD TRACE EED IND ID IND NAME SCHWEITZER LABORATORIE",
@@ -62,7 +62,7 @@ const toMockDisb = (committeeId: string): ITransaction => {
 };
 
 const toMockContrib = (committeeId: string): ITransaction => {
-  const timestamp = 1637298000000;
+  const timestamp = now();
   const amount = 120000;
   const finData = {
     finicityBestRepresentation:
