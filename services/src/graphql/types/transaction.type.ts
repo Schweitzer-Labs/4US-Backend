@@ -228,4 +228,7 @@ export class Transaction implements ITransaction {
 
   @Field({ nullable: true })
   inKindDescription?: string;
+
+  @Field({ nullable: true })
+  explanation?: string;
 }

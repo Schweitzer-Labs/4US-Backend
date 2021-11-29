@@ -342,6 +342,9 @@ const txnToMemo = (txn: ITransaction): string => {
     case PaymentMethod.InKind:
       return txn.inKindDescription;
     default:
+      if (txn.purposeCode === PurposeCode.OTHER) {
+        return txn.explanation || "NULL";
+      }
       return "NULL";
   }
 };

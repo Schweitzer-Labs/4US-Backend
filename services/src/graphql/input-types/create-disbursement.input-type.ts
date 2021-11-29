@@ -75,4 +75,7 @@ export class CreateDisbursementInput {
   @Field({ nullable: true })
   @MinLength(1)
   addressLine2?: string;
+
+  @Field({ nullable: true })
+  explanation?: string;
 }
