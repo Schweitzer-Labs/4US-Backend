@@ -52,7 +52,7 @@ import {
   validateContrib,
   validateContribOrThrowGQLError,
 } from "./validators/contrib.validator";
-import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
+import { recTxns } from "../pipes/reconcile/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
 import { Report } from "./object-types/report.object-type";
@@ -375,11 +375,7 @@ export class AppResolver {
           currentUser
         )
       ),
-      te.chain(() =>
-        reconcileTxnWithTxns(txnsTableName)(ddb)(r.committeeId)(
-          r.bankTransaction
-        )(r.selectedTransactions)
-      ),
+      te.chain(recTxns(txnsTableName)(ddb)(r)),
       te.chain((txn) =>
         pipe(
           refreshAggsFromTxn(aggTable)(txnsTableName)(ddb)(txn),

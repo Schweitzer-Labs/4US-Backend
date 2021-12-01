@@ -41,7 +41,7 @@ export const txnsToAgg =
           acc.balance = acc.balance + txn.amount;
         }
       }
-      /// Total Spent
+      // Total Spent
       if (txn.direction === Direction.Out) {
         if (txn.bankVerified) {
           acc.totalSpent = acc.totalSpent + txn.amount;

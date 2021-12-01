@@ -48,7 +48,7 @@ export const recTxnsAndDecode =
       te.chain(decodeRawData("Reconcile txns")(Transactions))
     );
 
-export const recTxns =
+const recTxns =
   (txnsTable: string) =>
   (ddb: DynamoDB) =>
   async (txns: ITransaction[]): Promise<ITransaction[]> => {

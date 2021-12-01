@@ -12,7 +12,10 @@ import { DynamoDB } from "aws-sdk";
 import { State } from "../utils/enums/state.enum";
 import { Source } from "../utils/enums/source.enum";
 import { EntityType } from "../utils/enums/entity-type.enum";
-import { syncExternalContributions } from "../pipes/external-contribs/external-txns-to-ddb.pipe";
+import {
+  ISyncContribResult,
+  syncExternalContributions,
+} from "../pipes/external-contribs/external-txns-to-ddb.pipe";
 import { Stripe } from "stripe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
@@ -80,7 +83,7 @@ export const syncActBlue =
   (committeeId: string) =>
   (
     actBlueContribs: IActBluePaidContribution[]
-  ): TaskEither<ApplicationError, IExternalContrib[]> =>
+  ): TaskEither<ApplicationError, ISyncContribResult[]> =>
     syncExternalContributions({
       ...config,
       committeeValidator,

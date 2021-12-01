@@ -15,6 +15,7 @@ import { nMonthsAgo, now } from "../../src/utils/time.utils";
 import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
+import { ISyncContribResult } from "../../src/pipes/external-contribs/external-txns-to-ddb.pipe";
 
 interface Args {
   committee: ICommittee;
@@ -38,7 +39,7 @@ export const committeeToAC = async ({
   committeesTable,
   dynamoDB,
   stripe,
-}: Args): Promise<IExternalContrib[]> => {
+}: Args): Promise<ISyncContribResult[]> => {
   const rn = now();
 
   const sixMAgo = nMonthsAgo(6)(rn) + 1000 * 60 * 60 * 24;
@@ -57,7 +58,6 @@ export const committeeToAC = async ({
     actBlueCSVMetadataToTypedData(eitherCsvMetadata.right.csvId)(
       committee.actBlueAPICredentials
     ),
-    taskEither.chain(mLog("csv data parsed")),
     taskEither.chain(
       syncActBlue({
         transactionsTable,

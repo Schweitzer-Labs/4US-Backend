@@ -43,7 +43,7 @@ export const syncExternalContributions =
     contributionMapper,
   }: IExternalTxnsToDDBDeps) =>
   (committeeId: string) =>
-  (data: any): TaskEither<ApplicationError, IExternalContrib[]> =>
+  (data: any): TaskEither<ApplicationError, ISyncContribResult[]> =>
     pipe(
       taskEither.of(data.map(contributionMapper)),
       taskEither.chain((contributions) =>
@@ -83,6 +83,16 @@ const recipientIdMatchesCommittee =
       )
     );
 
+export enum Result {
+  NoOp = "NoOp",
+  Created = "Created",
+}
+export interface ISyncContribResult {
+  result: Result;
+  externalContribution: IExternalContrib;
+  transaction?: ITransaction;
+}
+
 const syncContribs =
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
@@ -92,7 +102,7 @@ const syncContribs =
   (stripe: Stripe) =>
   (lnConfig: ILexisNexisConfig) =>
   (inputs: IExternalContrib[]) =>
-  (committee: ICommittee): TaskEither<ApplicationError, IExternalContrib[]> =>
+  (committee: ICommittee): TaskEither<ApplicationError, ISyncContribResult[]> =>
     Array.traverse(taskEither.ApplicativeSeq)(
       syncContrib(billableEventsTableName)(donorsTableName)(txnsTableName)(
         rulesTableName
@@ -110,7 +120,7 @@ const syncContrib =
   (committee: ICommittee) =>
   (
     extContrib: IExternalContrib
-  ): TaskEither<ApplicationError, IExternalContrib> =>
+  ): TaskEither<ApplicationError, ISyncContribResult> =>
     pipe(
       isNewExternalTxn(txnsTableName)(ddb)(committee.id)(extContrib.id),
       taskEither.chain((isNew) =>
@@ -129,9 +139,16 @@ const syncContrib =
               taskEither.map(externalContribAndTxnToFeeTxn(extContrib)),
               taskEither.chain(putTransactionAndDecode(txnsTableName)(ddb)),
               taskEither.chain(mLog("Transaction put")),
-              taskEither.map(() => extContrib)
+              taskEither.map((txn) => ({
+                result: Result.Created,
+                externalContribution: extContrib,
+                transaction: txn,
+              }))
             )
-          : taskEither.of(extContrib)
+          : taskEither.of(<ISyncContribResult>{
+              result: Result.NoOp,
+              externalContribution: extContrib,
+            })
       )
     );
 
@@ -182,6 +199,7 @@ const externalContribAndTxnToFeeTxn =
     isExistingLiability: false,
     purposeCode: PurposeCode.FUNDR,
     checkNumber: c.checkNumber,
+    feeForTxn: txn.id,
     externalTransactionId: c.id,
     externalTransactionPayoutId: c.payoutId,
   });
