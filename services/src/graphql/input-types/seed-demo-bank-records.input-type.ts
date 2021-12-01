@@ -18,4 +18,7 @@ export class SeedDemoBankRecordsInput {
 
   @Field((type) => TransactionType)
   transactionType?: TransactionType;
+
+  @Field({ nullable: true })
+  amount: number;
 }
