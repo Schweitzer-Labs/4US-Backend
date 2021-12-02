@@ -24,6 +24,7 @@ import {
   ISyncContribResult,
   Result,
 } from "../../src/pipes/external-contribs/external-txns-to-ddb.pipe";
+import { groupContribByPayoutId } from "../utils/group-contribs-by-payout-id.util";
 
 dotenv.config();
 
@@ -83,8 +84,8 @@ AWS.config.apiVersions = {
 
 const validUsername = qaUsers[0];
 
-let acSum: number;
-let acContribs: ISyncContribResult[];
+let payoutSetIds: string[];
+let payoutSetSum: number;
 let matchingBankRecord: ITransaction;
 let unmatchingBankRecord: ITransaction;
 describe("Transaction Reconciliation", function () {
@@ -97,7 +98,7 @@ describe("Transaction Reconciliation", function () {
     await putCommittee(committeesTable)(ddb)(committee);
 
     // import ActBlue transactions
-    acContribs = await committeeToAC({
+    const acContribs = await committeeToAC({
       committee,
       lnConfig,
       transactionsTable,
@@ -109,23 +110,28 @@ describe("Transaction Reconciliation", function () {
       stripe,
     });
 
-    acSum = acContribs.reduce((acc, val) => {
-      let amount =
-        val.result === Result.Created
-          ? val.externalContribution.amount +
-            val.externalContribution.processorFeeData.amount
-          : 0;
+    const payoutSets = groupContribByPayoutId(acContribs);
+
+    const payoutSetId = Object.keys(payoutSets)[0];
+
+    const payoutSet = payoutSets[payoutSetId];
+
+    payoutSetIds = payoutSet.map((txn) => txn.id);
+
+    payoutSetSum = payoutSet.reduce((acc, txn) => {
+      let amount = txn.amount - txn.processorFeeData.amount;
       return amount + acc;
     }, 0);
     // generate bank record transaction with matching total
     matchingBankRecord = await putTransaction(transactionsTable)(ddb)(
-      toMockContrib(acSum)(committee.id)
+      toMockContrib(payoutSetSum)(committee.id)
     );
 
     // generate bank record with non-matching total
     unmatchingBankRecord = await putTransaction(transactionsTable)(ddb)(
       toMockContrib(50)(committee.id)
     );
+    console.log("payout set id", payoutSetId);
   });
   describe("External Contrib", function () {
     describe("Valid Inputs", function () {
@@ -133,7 +139,7 @@ describe("Transaction Reconciliation", function () {
         const recContribVars: ReconcileTxnInput = {
           committeeId: committee.id,
           bankTransaction: matchingBankRecord.id,
-          selectedTransactions: acContribs.map((val) => val.transaction.id),
+          selectedTransactions: payoutSetIds,
         };
 
         const res = await lambdaPromise(
@@ -184,6 +190,7 @@ describe("Transaction Reconciliation", function () {
   });
   after(async () => {
     console.log("committee ID", committee.id);
+
     await deleteCommittee(committeesTable)(ddb)(committee);
   });
 });

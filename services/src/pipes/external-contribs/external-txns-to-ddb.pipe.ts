@@ -90,7 +90,8 @@ export enum Result {
 export interface ISyncContribResult {
   result: Result;
   externalContribution: IExternalContrib;
-  transaction?: ITransaction;
+  contribTransaction?: ITransaction;
+  feeTransaction?: ITransaction;
 }
 
 const syncContribs =
@@ -136,14 +137,23 @@ const syncContrib =
                   committee
                 )
               ),
-              taskEither.map(externalContribAndTxnToFeeTxn(extContrib)),
-              taskEither.chain(putTransactionAndDecode(txnsTableName)(ddb)),
-              taskEither.chain(mLog("Transaction put")),
-              taskEither.map((txn) => ({
-                result: Result.Created,
-                externalContribution: extContrib,
-                transaction: txn,
-              }))
+              taskEither.chain((contribTxn) =>
+                pipe(
+                  taskEither.of(
+                    externalContribAndTxnToFeeTxn(extContrib)(contribTxn)
+                  ),
+                  taskEither.chain(putTransactionAndDecode(txnsTableName)(ddb)),
+                  taskEither.map(
+                    (feeTxn: ITransaction) =>
+                      <ISyncContribResult>{
+                        result: Result.Created,
+                        externalContribution: extContrib,
+                        feeTransaction: feeTxn,
+                        contribTransaction: contribTxn,
+                      }
+                  )
+                )
+              )
             )
           : taskEither.of(<ISyncContribResult>{
               result: Result.NoOp,

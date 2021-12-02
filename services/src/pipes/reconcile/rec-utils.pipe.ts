@@ -32,15 +32,18 @@ export const selectedTxnsAreUnreconciled = (
 
 export const selectedTxnsTotalMatchesBank =
   (calcTotal: TotalCalculator) =>
-  (input: ILoadedRecInput): TaskEither<ApplicationError, ILoadedRecInput> =>
-    calcTotal(input.selectedTxns) === input.bankTxn.amount
+  (input: ILoadedRecInput): TaskEither<ApplicationError, ILoadedRecInput> => {
+    const total = calcTotal(input.selectedTxns);
+
+    return total === input.bankTxn.amount
       ? taskEither.right(input)
       : taskEither.left(
           new ApplicationError(
-            "Selected transactions must add up to bank transaction total",
+            `Selected transactions sum of ${total} must add up to bank transaction amount ${input.bankTxn.amount}`,
             {}
           )
         );
+  };
 
 export const loadRecInput =
   (txnTable: string) =>
