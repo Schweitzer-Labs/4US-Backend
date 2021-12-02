@@ -16,6 +16,7 @@ export const getExtContribs = (input: SeedExtContribsInput): ITransaction[] =>
       )(val.contribTransaction),
       flow(
         setCommitteeId(input.committeeId),
+        setSource(input.externalSource),
         setVendor(input.externalSource)
       )(val.feeTransaction),
     ],
