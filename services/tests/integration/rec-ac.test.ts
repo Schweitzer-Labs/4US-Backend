@@ -155,7 +155,6 @@ describe("Transaction Reconciliation", function () {
         );
         const txnResBody = JSON.parse(getTxnRes.body);
 
-        console.log();
         expect(txnResBody.errors.length > 0).to.equal(true);
       });
       it("Sets external contribs and fees to bank verified and tags them with bank data", async () => {
