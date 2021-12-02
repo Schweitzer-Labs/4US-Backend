@@ -17,7 +17,7 @@ import { SeedDemoBankRecordsInput } from "../../graphql/input-types/seed-demo-ba
 export const toMockDisb =
   (amount?: number) =>
   (committeeId: string): ITransaction => {
-    const timestamp = 1629975600000;
+    const timestamp = now();
     const amountVal = amount || 50000;
     const finData = {
       finicityBestRepresentation:
