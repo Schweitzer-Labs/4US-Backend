@@ -25,6 +25,7 @@ import {
   Result,
 } from "../../src/pipes/external-contribs/external-txns-to-ddb.pipe";
 import { groupContribByPayoutId } from "../utils/group-contribs-by-payout-id.util";
+import { calcExtPayoutSet } from "../utils/calc-ext-payout-sum.util";
 
 dotenv.config();
 
@@ -111,17 +112,12 @@ describe("Transaction Reconciliation", function () {
     });
 
     const payoutSets = groupContribByPayoutId(acContribs);
-
     const payoutSetId = Object.keys(payoutSets)[0];
-
     const payoutSet = payoutSets[payoutSetId];
 
     payoutSetIds = payoutSet.map((txn) => txn.id);
 
-    payoutSetSum = payoutSet.reduce((acc, txn) => {
-      let amount = txn.amount - txn.processorFeeData.amount;
-      return amount + acc;
-    }, 0);
+    payoutSetSum = calcExtPayoutSet(payoutSet);
     // generate bank record transaction with matching total
     matchingBankRecord = await putTransaction(transactionsTable)(ddb)(
       toMockContrib(payoutSetSum)(committee.id)
@@ -133,59 +129,59 @@ describe("Transaction Reconciliation", function () {
     );
     console.log("payout set id", payoutSetId);
   });
-  describe("External Contrib", function () {
-    describe("Valid Inputs", function () {
-      before(async () => {
-        const recContribVars: ReconcileTxnInput = {
-          committeeId: committee.id,
-          bankTransaction: matchingBankRecord.id,
-          selectedTransactions: payoutSetIds,
-        };
+  describe("Valid Inputs", function () {
+    before(async () => {
+      const recContribVars: ReconcileTxnInput = {
+        committeeId: committee.id,
+        bankTransaction: matchingBankRecord.id,
+        selectedTransactions: payoutSetIds,
+      };
 
-        const res = await lambdaPromise(
-          graphql,
-          genGraphQLProxy(recTxnMutation, validUsername, recContribVars),
-          {}
-        );
-        console.log("rec txn response", res);
-      });
-      it("Removes bank transaction after reconciliation", async () => {
-        const getTxnRes: any = await lambdaPromise(
-          graphql,
-          genGraphQLProxy(
-            getTxnQuery(committee.id)(matchingBankRecord.id),
-            validUsername,
-            {}
-          ),
-          {}
-        );
-        const txnResBody = JSON.parse(getTxnRes.body);
-
-        expect(txnResBody.errors.length > 0).to.equal(true);
-      });
-      it("Sets external contribs and fees to bank verified and tags them with bank data", async () => {
-        expect(true).to.equal(false);
-      });
+      const res = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(recTxnMutation, validUsername, recContribVars),
+        {}
+      );
     });
-    describe("Invalid Inputs", function () {
-      describe("Non-existent External Payout ID entered", function () {
-        before(async () => {
-          // invoke invalid attempt to reconcile with bad external payout ID
-        });
-        it("Returns error", async () => {});
-      });
-      describe("Non-existent bank record transaction", function () {
-        before(async () => {
-          // invoke invalid attempt to reconcile with bad bank record ID
-        });
-        it("Returns error", async () => {});
-      });
-      describe("Mismatched payout to bank transaction", function () {
-        before(async () => {
-          // invoke invalid attempt to reconcile with
-        });
-        it("Returns error", async () => {});
-      });
+    it("Removes bank transaction after reconciliation", async () => {
+      const getTxnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTxnQuery(committee.id)(matchingBankRecord.id),
+          validUsername,
+          {}
+        ),
+        {}
+      );
+      const txnResBody = JSON.parse(getTxnRes.body);
+
+      expect(txnResBody.errors.length > 0).to.equal(true);
+    });
+    it("Sets external contribs and fees to bank verified and tags them with bank data", async () => {
+      const getTxnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(
+          getTxnQuery(committee.id)(payoutSetIds[0]),
+          validUsername,
+          {}
+        ),
+        {}
+      );
+
+      const txnResBody = JSON.parse(getTxnRes.body);
+      const data = txnResBody.data.transaction;
+
+      expect(data.finicityBestRepresentation).to.equal(
+        matchingBankRecord.finicityBestRepresentation
+      );
+      expect(data.finicityNormalizedPayeeName).to.equal(
+        matchingBankRecord.finicityNormalizedPayeeName
+      );
+      expect(data.finicityDescription).to.equal(
+        matchingBankRecord.finicityDescription
+      );
+      expect(data.ruleVerified).to.equal(true);
+      expect(data.bankVerified).to.equal(true);
     });
   });
   after(async () => {
