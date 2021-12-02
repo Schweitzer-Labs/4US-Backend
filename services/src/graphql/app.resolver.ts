@@ -74,6 +74,13 @@ import { validateCard } from "./validators/card.validators";
 import { validateCheck } from "./validators/check.validators";
 import { validateReconcileInput } from "./validators/reconcile.validators";
 import { ITransaction } from "../model/transaction.type";
+import { getExtContribs } from "../demo/data/ext-contribs.data";
+import { SeedExtContribsInput } from "./input-types/seed-ext-contribs.input-type";
+import {
+  putTransaction,
+  putTransactionAndDecode,
+} from "../utils/model/transaction/put-transaction.utils";
+import * as Array from "fp-ts/Array";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();
@@ -475,6 +482,30 @@ export class AppResolver {
     if (isLeft(res)) throw res.left;
 
     await refreshAggs(aggTable)(txnsTableName)(ddb)(d.committeeId)();
+
+    return res.right;
+  }
+
+  @Mutation((returns) => [Transaction])
+  async seedDemoExternalContributions(
+    @Arg("seedExternContributionsInput") s: SeedExtContribsInput,
+    @CurrentUser() currentUser: string
+  ) {
+    if (s.password !== demoPasscode || runenv === "prod")
+      throw new UnauthorizedError();
+
+    const res = await pipe(
+      te.of(getExtContribs(s)),
+      te.chain(
+        Array.traverse(te.ApplicativeSeq)(
+          putTransactionAndDecode(txnsTableName)(ddb)
+        )
+      )
+    )();
+
+    if (isLeft(res)) throw res.left;
+
+    await refreshAggs(aggTable)(txnsTableName)(ddb)(s.committeeId)();
 
     return res.right;
   }

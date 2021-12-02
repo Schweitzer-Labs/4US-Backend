@@ -189,7 +189,6 @@ const toCsv = async () => {
     })
   );
   const res = await jsonexport.default(txns);
-  console.log(res);
 
   return res;
 };

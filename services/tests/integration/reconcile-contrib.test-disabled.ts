@@ -34,7 +34,6 @@ describe("Reconcile contributions flow", function () {
   describe("Payout notification processing", function () {
     it("Sends a request to run a payout report", async () => {
       const res = await runReportAndDecode(stripe)(stripeAccount)();
-      console.log(res);
       if (isLeft(res)) {
         throw new ApplicationError("Run report decode failed", {});
       }
@@ -45,7 +44,6 @@ describe("Reconcile contributions flow", function () {
   describe("Payout Report Updated processing", function () {
     it("Receive a valid response from a valid request", async () => {
       const res = await runReportAndDecode(stripe)(stripeAccount)();
-      console.log(res);
       if (isLeft(res)) {
         throw new ApplicationError("Run report decode failed", {});
       }

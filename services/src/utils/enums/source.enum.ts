@@ -3,11 +3,13 @@ export enum Source {
   DASHBOARD = "dashboard",
   FINICITY = "finicity",
   ActBlue = "ActBlue",
+  WinRed = "WinRed",
 }
 
 export enum ExternalSource {
   FINICITY = "finicity",
   ActBlue = "ActBlue",
+  WinRed = "WinRed",
 }
 
 export const sources: Source[] = [
@@ -15,4 +17,5 @@ export const sources: Source[] = [
   Source.DASHBOARD,
   Source.FINICITY,
   Source.ActBlue,
+  Source.WinRed,
 ];

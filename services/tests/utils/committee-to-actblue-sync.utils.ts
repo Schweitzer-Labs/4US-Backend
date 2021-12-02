@@ -74,9 +74,5 @@ export const committeeToAC = async ({
 
   if (isLeft(eitherContribs)) throw new Error("ActBlue committee sync failed");
 
-  console.log("res is here");
-
-  console.log(eitherContribs.right);
-
   return eitherContribs.right;
 };

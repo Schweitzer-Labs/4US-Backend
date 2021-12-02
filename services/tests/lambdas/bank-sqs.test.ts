@@ -41,7 +41,6 @@ describe("Processes a committee's transactions", function () {
   });
   it("Sync runs successfully", async () => {
     const res = await bankSqs(sqsEvent);
-    console.log(res);
 
     expect(res).to.equal(true);
   });
