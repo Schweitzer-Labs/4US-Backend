@@ -20,7 +20,6 @@ import { getStripeApiKey } from "../../../src/utils/config";
 import { Stripe } from "stripe";
 import { EntityType } from "../../../src/utils/enums/entity-type.enum";
 import { PaymentMethod } from "../../../src/utils/enums/payment-method.enum";
-import { getCommitteeByActBlueAccountIdAndDecode } from "../../../src/utils/model/committee/get-committee-by-actblue-id.utils";
 import { sleep } from "../../../src/utils/sleep.utils";
 import { Source } from "../../../src/utils/enums/source.enum";
 import { IActBlueAPICredentials } from "../../../src/clients/actblue/actblue.decoders";

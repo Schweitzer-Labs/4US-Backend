@@ -12,8 +12,6 @@ Transactions:
         AttributeType: S
       - AttributeName: donorId
         AttributeType: S
-      - AttributeName: actBlueTransactionId
-        AttributeType: S
       - AttributeName: externalTransactionId
         AttributeType: S
     KeySchema:
@@ -32,14 +30,6 @@ Transactions:
             AttributeName: donorId
         Projection:
           ProjectionType: ALL
-      - IndexName: TransactionsByActBlueTransactionId
-        KeySchema:
-          - KeyType: HASH
-            AttributeName: committeeId
-          - KeyType: RANGE
-            AttributeName: actBlueTransactionId
-        Projection:
-          ProjectionType: KEYS_ONLY
       - IndexName: TransactionsByExternalTransactionId
         KeySchema:
           - KeyType: HASH
