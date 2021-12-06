@@ -48,22 +48,28 @@ const aggregateBalance =
   };
 
 interface IRuleResult {
-  balance: number;
+  balanceAtRuleRun: number;
   remaining: number;
   rule: IRule;
-  invalid?: boolean;
+  verdict: Verdict;
 }
 
 const runRule =
   (allowInvalid: boolean) =>
   (attemptedAmount: number) =>
   (rule: IRule) =>
-  (balance: number): TaskEither<ApplicationError, IRuleResult> => {
-    const remaining = rule.limit - balance;
-    const exceedsLimit = balance + attemptedAmount > rule.limit;
+  (balanceAtRuleRun: number): TaskEither<ApplicationError, IRuleResult> => {
+    const remaining = rule.limit - balanceAtRuleRun;
+    const exceedsLimit = balanceAtRuleRun + attemptedAmount > rule.limit;
     if (exceedsLimit)
       if (allowInvalid)
-        return te.right({ balance, remaining, rule, invalid: true });
+        // @ToDo make remaining update calc more explicit
+        return te.right({
+          balanceAtRuleRun,
+          remaining,
+          rule,
+          verdict: Verdict.ExceedsLimit,
+        });
       else
         return te.left(
           new ApplicationError(
@@ -72,7 +78,13 @@ const runRule =
             StatusCodes.UNAUTHORIZED
           )
         );
-    else return te.right({ balance, remaining, rule });
+    else
+      return te.right({
+        balanceAtRuleRun,
+        remaining,
+        rule,
+        verdict: Verdict.Passing,
+      });
   };
 
 const committeeDonorAndRuleToDetermination =
@@ -90,13 +102,19 @@ const committeeDonorAndRuleToDetermination =
       te.chain(runRule(allowInvalid)(ccInput.amount)(rule))
     );
 
+export enum Verdict {
+  Passing = "Accepted",
+  ExceedsLimit = "ExceedsLimit",
+}
+
 export interface IComplianceResult {
   donor?: IDonor;
   committee: ICommittee;
   createContributionInput: CreateContributionInput;
   rule?: IRule;
-  balance?: number;
+  balanceAtRuleRun?: number;
   remaining?: number;
+  verdict?: Verdict;
 }
 
 export const runComplianceCheck =
@@ -114,13 +132,14 @@ export const runComplianceCheck =
           dynamoDB
         )(createContributionInput)(committee)(donor)
       ),
-      te.map(({ rule, balance, remaining }) => ({
+      te.map(({ rule, balanceAtRuleRun, remaining, verdict }) => ({
         donor,
         committee,
         rule,
-        balance,
+        balanceAtRuleRun,
         remaining,
         createContributionInput,
+        verdict,
       }))
     );
   };

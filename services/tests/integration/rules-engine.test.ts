@@ -15,6 +15,8 @@ import { getStripeApiKey } from "../../src/utils/config";
 import { runRulesAndProcess } from "../../src/pipes/run-rules-and-process.pipe";
 import { Stripe } from "stripe";
 import { ApplicationError } from "../../src/utils/application-error";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
+import { Verdict } from "../../src/pipes/compliance-check.pipe";
 
 dotenv.config();
 
@@ -60,9 +62,11 @@ describe("Rules engine", function () {
     });
 
     const res = await pipe(
-      runRulesEngine(false)(billableEventsTableName)(donorsTable)(txnsTable)(
-        rulesTable
-      )(dynamoDB)(instantIdConfig)(committee)(contrib),
+      runRulesEngine({ allowInvalid: false, idVerifyEnabled: true })(
+        billableEventsTableName
+      )(donorsTable)(txnsTable)(rulesTable)(dynamoDB)(instantIdConfig)(
+        committee
+      )(contrib),
       taskEither.fold(
         (e) => {
           return task.of(e.data.remaining);
@@ -74,9 +78,32 @@ describe("Rules engine", function () {
     expect(res).to.equal(750000);
   });
 
-  it("Allows a contribution within committee's limit", async () => {
-    await putCommittee(comsTable)(dynamoDB)(committee);
+  it("Allows an excess contribution when allow invalid is enabled", async () => {
+    const contrib = genCreateContribInput({
+      committeeId: committee.id,
+      amount: 750001,
+      entityType: EntityType.Ind,
+    });
 
+    const res = await pipe(
+      runRulesEngine({
+        allowInvalid: true,
+        idVerifyEnabled: true,
+      })(billableEventsTableName)(donorsTable)(txnsTable)(rulesTable)(dynamoDB)(
+        instantIdConfig
+      )(committee)(contrib),
+      taskEither.fold(
+        (e) => task.of("failed"),
+        (res) => {
+          return task.of(res.verdict);
+        }
+      )
+    )();
+
+    expect(res).to.equal(Verdict.ExceedsLimit);
+  });
+
+  it("Allows a contribution within committee's limit", async () => {
     const contrib = genCreateContribInput({
       committeeId: committee.id,
       amount: 750000,
@@ -84,13 +111,16 @@ describe("Rules engine", function () {
     });
 
     const res = await pipe(
-      runRulesEngine(false)(billableEventsTableName)(donorsTable)(txnsTable)(
-        rulesTable
-      )(dynamoDB)(instantIdConfig)(committee)(contrib),
+      runRulesEngine({
+        allowInvalid: false,
+        idVerifyEnabled: true,
+      })(billableEventsTableName)(donorsTable)(txnsTable)(rulesTable)(dynamoDB)(
+        instantIdConfig
+      )(committee)(contrib),
       taskEither.fold(
         (e) => task.of(e.data.remaining),
         (res) => {
-          return task.of(res.balance);
+          return task.of(res.balanceAtRuleRun);
         }
       )
     )();
@@ -99,7 +129,8 @@ describe("Rules engine", function () {
   });
 
   describe("Aggregate Duration", function () {
-    it("Stops contribution exceeding aggregate duration of calendar year for corp donors", async () => {
+    let lastYearContrib;
+    before(async () => {
       // Set Up
 
       const ps = new AWS.SSM();
@@ -120,7 +151,7 @@ describe("Rules engine", function () {
         paymentDate: paymentDateOfToday,
       });
 
-      const lastYearContrib = {
+      lastYearContrib = {
         ...thisYearContrib,
         paymentDate: paymentDateOfLastYear,
         amount: 500001,
@@ -143,20 +174,32 @@ describe("Rules engine", function () {
 
       if (stagingRes === "fail")
         throw new ApplicationError("staging failed", {});
-
+    });
+    it("Stops contribution exceeding aggregate duration of calendar year for corp donors", async () => {
       const res = await pipe(
-        runRulesEngine(false)(billableEventsTableName)(donorsTable)(txnsTable)(
-          rulesTable
-        )(dynamoDB)(instantIdConfig)(committee)(lastYearContrib),
+        runRulesEngine({
+          allowInvalid: false,
+          idVerifyEnabled: true,
+        })(billableEventsTableName)(donorsTable)(txnsTable)(rulesTable)(
+          dynamoDB
+        )(instantIdConfig)(committee)(lastYearContrib),
         taskEither.fold(
           (e) => {
             return task.of(e.data.remaining);
           },
-          (s) => task.of("worked")
+          (s) => {
+            console.log("invalid res", s);
+            return task.of("worked");
+          }
         )
       )();
 
+      console.log();
+
       expect(res).to.equal(500000);
     });
+  });
+  after(async () => {
+    await deleteCommittee(comsTable)(dynamoDB)(committee);
   });
 });

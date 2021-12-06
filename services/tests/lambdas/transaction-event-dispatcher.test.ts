@@ -15,6 +15,7 @@ import {
 import { initStratoConfig } from "../../src/clients/dapp/dapp.decoders";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
 import { isLeft } from "fp-ts/Either";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 
 dotenv.config();
 
@@ -94,4 +95,8 @@ describe("Transaction Event Dispatch", function () {
   //
   //   expect(txn?.blockchainMetadata?.txResult?.status).to.equal("success");
   // });
+
+  after(async () => {
+    await deleteCommittee(committeesTableName)(dynamoDB)(committee);
+  });
 });

@@ -33,6 +33,7 @@ import { disableFinicity } from "../../src/utils/disable-finicity.utils";
 import { genCommittee } from "../utils/gen-committee.util";
 import { unverifiedContributionsData } from "../seed/unverified-contributions.data";
 import { payoutReconcilationReportData } from "../seed/payout-reconcilation-report.data";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 
 dotenv.config();
 
@@ -193,9 +194,9 @@ describe("Model Utils", function () {
     // expect(txns.length).to.equal(matches.length);
   });
 
-  // after(async () => {
-  //   await deleteCommittee(committeesTableName)(dynamoDB)(committee);
-  // });
+  after(async () => {
+    await deleteCommittee(committeesTableName)(dynamoDB)(committee);
+  });
 });
 
 const withinADayOf = (d1) => (d2) => Math.abs(d1 - d2) < 1000 * 60 * 60 * 24;
