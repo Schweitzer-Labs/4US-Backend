@@ -41,7 +41,7 @@ const anonymizeTxn = (txn: ITransaction): ITransaction => {
     addressLine2: faker.address.secondaryAddress(),
     city: faker.address.city(),
     emailAddress: `${firstName}_${lastName}@yopmail.com`,
-    phoneNumber: faker.phone.phoneNumber(),
+    phoneNumber: faker.phone.phoneNumber("(###) ###-####"),
     employer: faker.company.companyName(),
   };
 };
