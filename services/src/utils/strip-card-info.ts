@@ -1,4 +1,4 @@
-import { IContribution } from "../either-tasks/event-to-contribution";
+import { IContribution } from "../pipes/event-to-contribution";
 import { Source } from "./enums/source.enum";
 
 export const stripCardInfo = ({

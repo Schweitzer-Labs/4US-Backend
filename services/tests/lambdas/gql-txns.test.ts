@@ -5,25 +5,39 @@ import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { sleep } from "../../src/utils/sleep.utils";
 import { genCommittee } from "../utils/gen-committee.util";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import * as dotenv from "dotenv";
 import { qaUsers } from "../seed/qa-users.data";
-import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
 import { genCreateContribInput } from "../utils/gen-create-contrib-input.util";
 import { lambdaPromise } from "../../src/utils/lambda-promise.util";
 import { genContributionRecord } from "../utils/gen-contribution.util";
-import { putTransaction } from "../../src/utils/model/put-transaction.utils";
+import { putTransaction } from "../../src/utils/model/transaction/put-transaction.utils";
 import { genCreateDisbInput } from "../utils/gen-create-disb-input.util";
 import { genAmendDisbInput } from "../utils/gen-amend-disb-input.util";
 import * as faker from "faker";
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { ITransaction } from "../../src/model/transaction.type";
 import { now, milliToEpoch } from "../../src/utils/time.utils";
 import { genFinicityTxn } from "../utils/gen-finicity-txn.util";
 import { Direction } from "../../src/utils/enums/direction.enum";
 import { ReconcileTxnInput } from "../../src/graphql/input-types/reconcile-txn.input-type";
 import { genAmendContribInput } from "../utils/get-amend-disb-input.util";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
+import { Source } from "../../src/utils/enums/source.enum";
+import {
+  aggregationsQuery,
+  amendContribMut,
+  amendDisbMut,
+  createContribMut,
+  createDisb,
+  deleteTxnMut,
+  getAllTransactionsQuery,
+  getCommitteeQuery,
+  getTransactionsByDonorIdQuery,
+  getTxnQuery,
+  recTxnMutation,
+} from "../utils/graphql.utils";
 
 dotenv.config();
 
@@ -56,302 +70,6 @@ const committee = genCommittee({
 
 const committeeId = committee.id;
 
-const getAllTransactionsQuery = `
-  query {
-    transactions(committeeId: "${committeeId}") {
-      lastName
-      firstName
-      amount
-      direction
-    }
-  }
-`;
-
-const getTransactionsByDonorIdQuery = (donorId: string) => `
-  query {
-    transactions(committeeId: "${committeeId}", donorId: "${donorId}") {
-      donorId
-      lastName
-      firstName
-      amount
-      direction
-    }
-  }
-`;
-
-const getTxnQuery = (committeeId) => (tid: string) =>
-  `
-  query {
-    transaction(committeeId: "${committeeId}", id: "${tid}") {
-      id
-      entityName
-      addressLine1
-      finicityCategory
-      finicityBestRepresentation
-      finicityPostedDate
-      finicityTransactionDate
-      finicityNormalizedPayeeName
-      finicityDescription
-      ruleVerified
-      bankVerified
-    }
-  }
-`;
-
-const getCommitteeQuery = `
-  query {
-    committee(committeeId: "${committeeId}") {
-      id
-      candidateFirstName
-    }
-  }
-`;
-
-const aggregationsQuery = `
-  query {
-    aggregations(committeeId: "${committeeId}") {
-      balance,
-      totalRaised,
-      totalSpent,
-      totalDonors,
-      totalTransactions,
-      totalContributionsInProcessing,
-      totalDisbursementsInProcessing,
-      needsReviewCount
-    }
-  }
-`;
-
-const createDisb = `
-  mutation(
-      $committeeId: String!
-      $amount: Float!
-      $paymentMethod: PaymentMethod!
-      $entityName: String!
-      $addressLine1: String!
-      $city: String!
-      $state: State!
-      $postalCode: String!
-      $isSubcontracted: Boolean!
-      $isPartialPayment: Boolean!
-      $isExistingLiability: Boolean!
-      $purposeCode: PurposeCode!
-      $paymentDate: Float!
-      $checkNumber: String
-      $addressLine2: String
-    ) {
-      createDisbursement(createDisbursementData: {
-        committeeId: $committeeId
-        amount: $amount
-        paymentMethod: $paymentMethod
-        entityName: $entityName
-        addressLine1: $addressLine1
-        city: $city
-        state: $state
-        postalCode: $postalCode
-        isSubcontracted: $isSubcontracted
-        isPartialPayment: $isPartialPayment
-        isExistingLiability: $isExistingLiability
-        purposeCode: $purposeCode
-        paymentDate: $paymentDate
-        checkNumber: $checkNumber
-        addressLine2: $addressLine2
-      }) {
-        id
-      }
-    }
-`;
-
-const amendDisbMut = `
-    mutation (
-      $committeeId: String!
-      $transactionId: String!
-      $entityName: String
-      $addressLine1: String
-      $addressLine2: String
-      $city: String
-      $state: State
-      $postalCode: String
-      $paymentDate: Float
-      $checkNumber: String
-      $purposeCode: PurposeCode
-      $isExistingLiability: Boolean
-      $isPartialPayment: Boolean
-      $isSubContracted: Boolean
-    ) {
-      amendDisbursement(
-        amendDisbursementData: {
-          committeeId: $committeeId
-          transactionId: $transactionId
-          entityName: $entityName
-          addressLine1: $addressLine1
-          addressLine2: $addressLine2
-          city: $city
-          state: $state
-          postalCode: $postalCode
-          paymentDate: $paymentDate
-          checkNumber: $checkNumber
-          purposeCode: $purposeCode
-          isExistingLiability: $isExistingLiability
-          isPartialPayment: $isPartialPayment
-          isSubcontracted: $isSubContracted
-        }
-      ) {
-        id
-      }
-    }
-`;
-
-const createContribMut = `
-mutation(
-      $committeeId: String!
-      $amount: Float!
-      $paymentMethod: PaymentMethod!
-      $firstName: String!
-      $lastName: String!
-      $addressLine1: String!
-      $city: String!
-      $state: State!
-      $postalCode: String!
-      $entityType: EntityType!
-      $emailAddress: String
-      $paymentDate: Float!
-      $cardNumber: String
-      $cardExpirationMonth: Float
-      $cardExpirationYear: Float
-      $cardCVC: String
-      $checkNumber: String
-      $entityName: String
-      $employer: String
-      $occupation: String
-      $middleName: String
-      $refCode: String
-      $processPayment: Boolean!
-    ) {
-      createContribution(createContributionData: {
-        committeeId: $committeeId
-        amount: $amount
-        paymentMethod: $paymentMethod
-        firstName: $firstName
-        lastName: $lastName
-        addressLine1: $addressLine1
-        city: $city
-        state: $state
-        postalCode: $postalCode
-        entityType: $entityType
-        emailAddress: $emailAddress
-        paymentDate: $paymentDate
-        cardNumber: $cardNumber
-        cardExpirationMonth: $cardExpirationMonth
-        cardExpirationYear: $cardExpirationYear
-        cardCVC: $cardCVC
-        checkNumber: $checkNumber
-        entityName: $entityName
-        employer: $employer
-        occupation: $occupation
-        middleName: $middleName
-        refCode: $refCode
-        processPayment: $processPayment
-      }) {
-        id
-        amount
-      }
-    }
-`;
-
-const amendContribMut = `
-  mutation(
-      $committeeId: String!
-      $transactionId: String!
-      $amount: Float
-      $paymentMethod: PaymentMethod
-      $firstName: String
-      $lastName: String
-      $addressLine1: String
-      $city: String
-      $state: State
-      $postalCode: String
-      $entityType: EntityType
-      $emailAddress: String
-      $paymentDate: Float
-      $checkNumber: String
-      $entityName: String
-      $employer: String
-      $occupation: String
-      $middleName: String
-      $refCode: String
-      $addressLine2: String
-      $companyName: String
-      $phoneNumber: String
-      $attestsToBeingAnAdultCitizen: Boolean
-      $employmentStatus: EmploymentStatus
-    ) {
-      amendContribution(
-        amendContributionData: {
-          committeeId: $committeeId
-          transactionId: $transactionId
-          amount: $amount
-          paymentMethod: $paymentMethod
-          firstName: $firstName
-          lastName: $lastName
-          addressLine1: $addressLine1
-          city: $city
-          state: $state
-          postalCode: $postalCode
-          entityType: $entityType
-          emailAddress: $emailAddress
-          paymentDate: $paymentDate
-          checkNumber: $checkNumber
-          entityName: $entityName
-          employer: $employer
-          occupation: $occupation
-          middleName: $middleName
-          refCode: $refCode
-          addressLine2: $addressLine2
-          companyName: $companyName
-          phoneNumber: $phoneNumber
-          attestsToBeingAnAdultCitizen: $attestsToBeingAnAdultCitizen
-          employmentStatus: $employmentStatus
-        }
-      ) {
-        id
-        amount
-      }
-    }
-`;
-
-const recTxnMutation = `
-    mutation(
-      $committeeId: String!,
-      $selectedTransactions: [String!]!,
-      $bankTransaction: String!
-    ) {
-      reconcileTransaction(
-        reconcileTransactionData: {
-            selectedTransactions: $selectedTransactions,
-            bankTransaction: $bankTransaction,
-            committeeId: $committeeId
-        }
-      ) {
-        id
-      }
-    }
-`;
-
-const deleteTxnMut = `
-  mutation(
-    $id: String!
-    $committeeId: String!
-  ) {
-    deleteTransaction(
-      id: $id
-      committeeId: $committeeId
-    ) {
-      amount
-    }
-  }
-`;
-
 describe("Committee GraphQL Lambda", function () {
   before(async () => {
     await putCommittee(committeesTableName)(dynamoDB)(committee);
@@ -361,7 +79,7 @@ describe("Committee GraphQL Lambda", function () {
     it("Prevents a non-member user from querying a committee", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(getCommitteeQuery, invalidUsername),
+        genGraphQLProxy(getCommitteeQuery(committeeId), invalidUsername),
         {}
       );
       const body = JSON.parse(res.body);
@@ -370,7 +88,7 @@ describe("Committee GraphQL Lambda", function () {
     it("Prevents a non-member user from querying a transaction", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(getAllTransactionsQuery, invalidUsername),
+        genGraphQLProxy(getAllTransactionsQuery(committeeId), invalidUsername),
         {}
       );
       const body = JSON.parse(res.body);
@@ -379,7 +97,7 @@ describe("Committee GraphQL Lambda", function () {
     it("Prevents a non-member user from querying an aggregation", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(aggregationsQuery, invalidUsername),
+        genGraphQLProxy(aggregationsQuery(committeeId), invalidUsername),
         {}
       );
       const body = JSON.parse(res.body);
@@ -388,26 +106,26 @@ describe("Committee GraphQL Lambda", function () {
   });
   describe("Transactions", function () {
     it("Get by Committee ID", async () => {
-      const txn = genContributionRecord(committeeId);
+      const txn = genContributionRecord({ committeeId });
       await putTransaction(txnsTableName)(dynamoDB)(txn);
       await sleep(1000);
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(getAllTransactionsQuery, validUsername),
+        genGraphQLProxy(getAllTransactionsQuery(committeeId), validUsername),
         {}
       );
       const body = JSON.parse(res.body);
       expect(body.data.transactions.length > 0).to.equal(true);
     });
     it("Get by Committee ID and Donor ID", async () => {
-      const txn = genContributionRecord(committeeId);
+      const txn = genContributionRecord({ committeeId });
       await putTransaction(txnsTableName)(dynamoDB)(txn);
       await sleep(1000);
 
       const res: any = await lambdaPromise(
         graphql,
         genGraphQLProxy(
-          getTransactionsByDonorIdQuery(txn.donorId),
+          getTransactionsByDonorIdQuery(committeeId)(txn.donorId),
           validUsername
         ),
         {}
@@ -420,7 +138,7 @@ describe("Committee GraphQL Lambda", function () {
     it("Get by Committee ID", async () => {
       const res: any = await lambdaPromise(
         graphql,
-        genGraphQLProxy(getCommitteeQuery, validUsername),
+        genGraphQLProxy(getCommitteeQuery(committeeId), validUsername),
         {}
       );
       const body = JSON.parse(res.body);
@@ -429,7 +147,10 @@ describe("Committee GraphQL Lambda", function () {
   });
   describe("Aggregations", function () {
     it("Get by Committee ID", async () => {
-      const query = genGraphQLProxy(aggregationsQuery, validUsername);
+      const query = genGraphQLProxy(
+        aggregationsQuery(committeeId),
+        validUsername
+      );
       const res: any = await lambdaPromise(graphql, query, {});
 
       const body = JSON.parse(res.body);
@@ -505,6 +226,34 @@ describe("Committee GraphQL Lambda", function () {
       const resBody = JSON.parse(createRes.body);
 
       expect(resBody.errors.length > 0).to.equal(true);
+    });
+    it("Exposes Business verification score ", async () => {
+      const inputVar = genCreateDisbInput({
+        committeeId,
+      });
+
+      const createRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(createDisb, validUsername, inputVar),
+        {}
+      );
+
+      const body = JSON.parse(createRes.body);
+
+      const tid = body.data.createDisbursement.id;
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(getTxnQuery(committee.id)(tid), validUsername, {}),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+
+      const businessIdVerificationScore =
+        txnResBody.data.transaction.businessIdVerificationScore;
+
+      expect(isNaN(businessIdVerificationScore)).to.equal(false);
     });
   });
   describe("Amend Disbursement", function () {
@@ -778,7 +527,7 @@ describe("Committee GraphQL Lambda", function () {
 
       const txnResBody = JSON.parse(txnRes.body);
       expect(txnResBody.errors[0].message).to.equal(
-        "Get Transaction by ID: Not Found"
+        `Get Transaction by ID: Invalid ID ${id}`
       );
     });
     it("Stops a processed transaction from deletion", async () => {
@@ -809,6 +558,30 @@ describe("Committee GraphQL Lambda", function () {
       console.log(txnResBody);
       expect(txnResBody.errors[0].message).to.equal(
         "Transaction is not unreconciled or unprocessed."
+      );
+    });
+    it("Stops a External Source transaction from deletion", async () => {
+      const source = Source.ActBlue;
+      const newTxn = genContributionRecord({ committeeId, source });
+
+      await putTransaction(txnsTableName)(dynamoDB)(newTxn);
+      await sleep(1000);
+
+      const id = newTxn.id;
+
+      const txnRes: any = await lambdaPromise(
+        graphql,
+        genGraphQLProxy(deleteTxnMut, validUsername, {
+          committeeId,
+          id,
+        }),
+        {}
+      );
+
+      const txnResBody = JSON.parse(txnRes.body);
+      console.log(txnResBody);
+      expect(txnResBody.errors[0].message).to.equal(
+        `${newTxn.source} transactions cannot be deleted.`
       );
     });
   });

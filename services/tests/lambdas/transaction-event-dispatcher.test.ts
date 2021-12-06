@@ -5,8 +5,6 @@ import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import { genCommittee } from "../utils/gen-committee.util";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
-import { verifiedDispatch } from "../events/verified-dispatch.ddb";
 import {
   getStratoENodeUrl,
   getStratoNodeUrl,
@@ -17,6 +15,7 @@ import {
 import { initStratoConfig } from "../../src/clients/dapp/dapp.decoders";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
 import { isLeft } from "fp-ts/Either";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 
 dotenv.config();
 
@@ -96,4 +95,8 @@ describe("Transaction Event Dispatch", function () {
   //
   //   expect(txn?.blockchainMetadata?.txResult?.status).to.equal("success");
   // });
+
+  after(async () => {
+    await deleteCommittee(committeesTableName)(dynamoDB)(committee);
+  });
 });

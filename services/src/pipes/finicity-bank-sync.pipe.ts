@@ -3,20 +3,16 @@ import { DynamoDB, SQS } from "aws-sdk";
 import { taskEither } from "fp-ts";
 import { right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import * as FPArray from "fp-ts/lib/Array";
 
 import {
   FinicityConfig,
   IFinicityTransaction,
 } from "../clients/finicity/finicity.decoders";
-import {
-  ITransaction,
-  Transactions,
-} from "../queries/search-transactions.decoder";
+import { ITransaction, Transactions } from "../model/transaction.type";
 import { getTransactions } from "../clients/finicity/finicity.client";
 import { epochToMilli, milliToEpoch, now } from "../utils/time.utils";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/transaction/search-transactions.query";
 import { Direction } from "../utils/enums/direction.enum";
 import { dateToTxnId } from "../utils/gen-txn-id.utils";
 import { Source } from "../utils/enums/source.enum";
@@ -26,8 +22,9 @@ import { FinicityTransactionType } from "../utils/enums/finicity-transaction-typ
 import {
   putTransaction,
   putTransactionAndDecode,
-} from "../utils/model/put-transaction.utils";
+} from "../utils/model/transaction/put-transaction.utils";
 import { decodeRawData } from "../utils/decode-raw-data.util";
+import { ICommittee } from "../model/committee.type";
 
 export const syncCommittee =
   (config: FinicityConfig) =>

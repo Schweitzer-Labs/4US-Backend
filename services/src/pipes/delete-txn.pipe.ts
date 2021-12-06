@@ -1,13 +1,14 @@
 import { pipe } from "fp-ts/function";
-import { getTxnById } from "../utils/model/get-txn-by-id.utils";
+import { getTxnById } from "../utils/model/transaction/get-txn-by-id.utils";
 import { taskEither } from "fp-ts";
-import { deleteTxnPipe } from "../utils/model/delete-txn.utils";
+import { deleteTxnPipe } from "../utils/model/transaction/delete-txn.utils";
 import { DynamoDB } from "aws-sdk";
-import { ICommittee } from "../queries/get-committee-by-id.query";
 import { TransactionArg } from "../graphql/args/transaction.arg";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../model/transaction.type";
+import { ExternalSource } from "../utils/enums/source.enum";
+import { enumToValues } from "../utils/enums/poly.util";
 
 export const deleteUnreconciledTxn =
   (txnTable: string) =>
@@ -15,11 +16,12 @@ export const deleteUnreconciledTxn =
   (txnArgs: TransactionArg): TaskEither<ApplicationError, ITransaction> =>
     pipe(
       getTxnById(txnTable)(ddb)(txnArgs.committeeId)(txnArgs.id),
-      taskEither.chain(isReconciled),
+      taskEither.chain(isNotReconciled),
+      taskEither.chain(isNotExternalContrib),
       taskEither.chain(deleteTxnPipe(txnTable)(ddb))
     );
 
-const isReconciled = (
+const isNotReconciled = (
   txn: ITransaction
 ): TaskEither<ApplicationError, ITransaction> =>
   txn.bankVerified === false && !txn.stripePaymentIntentId
@@ -30,3 +32,15 @@ const isReconciled = (
           txn
         )
       );
+
+const isNotExternalContrib = (
+  txn: ITransaction
+): TaskEither<ApplicationError, ITransaction> =>
+  enumToValues(ExternalSource).includes(txn.source)
+    ? taskEither.left(
+        new ApplicationError(
+          `${txn.source} transactions cannot be deleted.`,
+          txn
+        )
+      )
+    : taskEither.right(txn);

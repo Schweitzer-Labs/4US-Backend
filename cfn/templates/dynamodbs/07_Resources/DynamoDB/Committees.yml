@@ -8,9 +8,18 @@ Committees:
     AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
+      - AttributeName: actBlueAccountId
+        AttributeType: S
     KeySchema:
       - KeyType: HASH
         AttributeName: id
+    GlobalSecondaryIndexes:
+      - IndexName: CommitteesByActBlueAccountId
+        KeySchema:
+          - KeyType: HASH
+            AttributeName: actBlueAccountId
+        Projection:
+          ProjectionType: ALL
     StreamSpecification:
       StreamViewType: NEW_IMAGE
     Replicas:

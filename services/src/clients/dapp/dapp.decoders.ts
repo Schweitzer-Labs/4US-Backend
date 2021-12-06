@@ -4,9 +4,9 @@ import { ApplicationError } from "../../utils/application-error";
 import * as t from "io-ts";
 import { TaskEither } from "fp-ts/TaskEither";
 import { decodeError } from "../../utils/decode-error.util";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 import { Config } from "blockapps-rest";
 import { dashToUnderscore } from "../../utils/dash-to-underscore.utils";
+import { ICommittee } from "../../model/committee.type";
 
 export interface IStratoSDKConfig {
   config: Config;

@@ -7,20 +7,20 @@ import {
   UnauthorizedError,
 } from "type-graphql";
 
-import { Committee } from "./types/committee.type";
-import { Transaction } from "./types/transaction.type";
-import { Aggregations } from "./types/aggregations.type";
+import { Committee } from "./object-types/committee.object-type";
+import { Transaction } from "./object-types/transaction.object-type";
+import { Aggregations } from "./object-types/aggregations.object-type";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
-import { searchTransactions } from "../queries/search-transactions.query";
+import { searchTransactions } from "../utils/model/transaction/search-transactions.query";
 import { TransactionsArg } from "./args/transactions.arg";
 import { isLeft } from "fp-ts/Either";
-import CurrentUser from "../decorators/current-user.decorator";
+import CurrentUser from "./decorators/current-user.decorator";
 import {
   loadCommitteeOrError,
   loadCommitteeOrThrow,
-} from "../utils/model/load-committee-or-throw.utils";
+} from "../utils/model/committee/load-committee-or-throw.utils";
 import { CreateContributionInput } from "./input-types/create-contribution.input-type";
 import { taskEither as te } from "fp-ts";
 import {
@@ -38,12 +38,11 @@ import {
 } from "../utils/config";
 import { Stripe } from "stripe";
 import { ValidationError } from "apollo-server-lambda";
-import { PaymentMethod } from "../utils/enums/payment-method.enum";
 import { CreateDisbursementInput } from "./input-types/create-disbursement.input-type";
 import { runRulesAndProcess } from "../pipes/run-rules-and-process.pipe";
 import * as https from "https";
 import { TransactionArg } from "./args/transaction.arg";
-import { getTxnById } from "../utils/model/get-txn-by-id.utils";
+import { getTxnById } from "../utils/model/transaction/get-txn-by-id.utils";
 import { ReconcileTxnInput } from "./input-types/reconcile-txn.input-type";
 import { AmendDisbInput } from "./input-types/amend-disb.input-type";
 import { amendDisb } from "../pipes/amend-disb.pipe";
@@ -53,15 +52,12 @@ import {
   validateContrib,
   validateContribOrThrowGQLError,
 } from "./validators/contrib.validator";
-import { reconcileTxnWithTxns } from "../pipes/reconcile-txn.pipe";
+import { recTxns } from "../pipes/reconcile/reconcile-txn.pipe";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { verifyAndCreateDisb } from "../pipes/verify-and-create-disb.pipe";
-import { Report } from "./types/report.type";
-import {
-  generateDisclosure,
-  generateDisclosureOrError,
-} from "../pipes/generate-disclosure.pipe";
-import { getAggsByCommitteeId } from "../utils/model/get-aggs.utils";
+import { Report } from "./object-types/report.object-type";
+import { generateDisclosureOrError } from "../pipes/generate-disclosure.pipe";
+import { getAggsByCommitteeId } from "../utils/model/aggs/get-aggs.utils";
 import { refreshAggs, refreshAggsFromTxn } from "../pipes/refresh-aggs.pipe";
 import { GenCommitteeInput } from "./input-types/gen-committee.input-type";
 import { initStratoConfig } from "../clients/dapp/dapp.decoders";
@@ -77,7 +73,14 @@ import { teToRightOrThrow } from "../utils/te-to-right-or-throw.util";
 import { validateCard } from "./validators/card.validators";
 import { validateCheck } from "./validators/check.validators";
 import { validateReconcileInput } from "./validators/reconcile.validators";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../model/transaction.type";
+import { getExtContribs } from "../demo/data/ext-contribs.data";
+import { SeedExtContribsInput } from "./input-types/seed-ext-contribs.input-type";
+import {
+  putTransaction,
+  putTransactionAndDecode,
+} from "../utils/model/transaction/put-transaction.utils";
+import * as Array from "fp-ts/Array";
 
 const demoPasscode = "f4jp1i";
 dotenv.config();
@@ -260,11 +263,12 @@ export class AppResolver {
         pipe(
           validateContrib(committee)(contribInput),
           te.chain(() =>
-            runRulesAndProcess(billableEventsTableName)(donorsTableName)(
-              txnsTableName
-            )(rulesTableName)(ddb)(this.stripe)(lnConfig)(currentUser)(
-              committee
-            )(contribInput)
+            runRulesAndProcess({
+              allowInvalid: false,
+              idVerifyEnabled: true,
+            })(billableEventsTableName)(donorsTableName)(txnsTableName)(
+              rulesTableName
+            )(ddb)(this.stripe)(lnConfig)(currentUser)(committee)(contribInput)
           )
         )
       ),
@@ -379,11 +383,7 @@ export class AppResolver {
           currentUser
         )
       ),
-      te.chain(() =>
-        reconcileTxnWithTxns(txnsTableName)(ddb)(r.committeeId)(
-          r.bankTransaction
-        )(r.selectedTransactions)
-      ),
+      te.chain(recTxns(txnsTableName)(ddb)(r)),
       te.chain((txn) =>
         pipe(
           refreshAggsFromTxn(aggTable)(txnsTableName)(ddb)(txn),
@@ -396,7 +396,7 @@ export class AppResolver {
     return await teToRightOrThrow(res);
   }
 
-  // Demo
+  // Demo Generation Code
 
   @Mutation((returns) => Committee)
   async generateCommittee(
@@ -483,6 +483,30 @@ export class AppResolver {
     if (isLeft(res)) throw res.left;
 
     await refreshAggs(aggTable)(txnsTableName)(ddb)(d.committeeId)();
+
+    return res.right;
+  }
+
+  @Mutation((returns) => [Transaction])
+  async seedDemoExternalContributions(
+    @Arg("seedExternContributionsInput") s: SeedExtContribsInput,
+    @CurrentUser() currentUser: string
+  ) {
+    if (s.password !== demoPasscode || runenv === "prod")
+      throw new UnauthorizedError();
+
+    const res = await pipe(
+      te.of(getExtContribs(s)),
+      te.chain(
+        Array.traverse(te.ApplicativeSeq)(
+          putTransactionAndDecode(txnsTableName)(ddb)
+        )
+      )
+    )();
+
+    if (isLeft(res)) throw res.left;
+
+    await refreshAggs(aggTable)(txnsTableName)(ddb)(s.committeeId)();
 
     return res.right;
   }

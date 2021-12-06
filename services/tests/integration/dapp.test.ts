@@ -20,9 +20,9 @@ import {
   getStratoOAuthOpenIdDiscoveryUrl,
 } from "../../src/utils/config";
 import { sleep } from "../../src/utils/sleep.utils";
-import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import { ApplicationError } from "../../src/utils/application-error";
-import { ICommittee } from "../../src/queries/get-committee-by-id.query";
+import { ICommittee } from "../../src/model/committee.type";
 
 dotenv.config();
 
@@ -35,28 +35,6 @@ const committeesTableName: any = process.env.COMMITTEES_DDB_TABLE_NAME;
 const txnsTableName: any = process.env.TRANSACTIONS_DDB_TABLE_NAME;
 const env: any = process.env.RUNENV;
 
-// const eNodeUrl =
-//   "enode://042cf697543c8b1d1f64e531af83f5f78d2d0d9bb77e42c5d366092b13eec4ed6f418c5a1036feccfc9b234ce1d7dc4edbb22516dfa37cf269ae11e3dac0394112@54.80.236.98:30303";
-//
-// // // Dev
-// const config: IStratoSDKConfig = {
-//   apiDebug: false,
-//   timeout: 600000,
-//   nodes: [
-//     {
-//       id: 0,
-//       url: "https://schweitzerlabs-dev1.partnernet.blockapps.net:8080",
-//       oauth: {
-//         clientId: "dev",
-//         clientSecret: "cc89585a-8841-43ee-814e-97d217d4c016",
-//         openIdDiscoveryUrl:
-//           "https://keycloak.blockapps.net/auth/realms/hosting-schweitzer-labs/.well-known/openid-configuration",
-//       },
-//     },
-//   ],
-//   eNodeUrl,
-// };
-
 let nodeUrl: string;
 let eNodeUrl: string;
 let oauthClientId: string;
@@ -65,37 +43,6 @@ let oauthOpenIdDiscoveryUrl: string;
 let stratoConf: any;
 
 const ps = new AWS.SSM();
-
-//
-// const config: IStratoSDKConfig = initStratoConfig({
-//   nodeId: number;
-//   nodeUrl: string;
-//   eNodeUrl: string;
-//   port: number;
-//   oauthClientId: string;
-//   oauthClientSecret: string;
-//   oauthOpenIdDiscoveryUrl: string;
-// })
-
-// Prod
-// const config: IStratoSDKConfig = {
-//   apiDebug: false,
-//   timeout: 600000,
-//   nodes: [
-//     {
-//       id: 0,
-//       url: "https://schweitzerlabs1.hosting.blockapps.net:8080",
-//       port: 8080,
-//       oauth: {
-//         clientId: "27qebqot4nmest9f0pen8q8v5i",
-//         clientSecret: "77hes2rvk922unfcnfe7bettjd00sphrl1vt0490dfp7qupvv9u",
-//         scope: "https://4us/strato/dummy",
-//         openIdDiscoveryUrl:
-//           "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_xEOZcvQ5t/.well-known/openid-configuration",
-//       },
-//     },
-//   ],
-// };
 
 const genNYCommittee = () =>
   genCommittee({
@@ -172,7 +119,8 @@ describe("DAPP Tests", async () => {
       });
 
       it("Supports committing a transaction", async () => {
-        const txn = genContributionRecord(committee.id);
+        const committeeId = committee.id
+        const txn = genContributionRecord({committeeId});
 
         const res = await commitTransaction(stratoConf)(txnsTableName)(
           dynamoDB

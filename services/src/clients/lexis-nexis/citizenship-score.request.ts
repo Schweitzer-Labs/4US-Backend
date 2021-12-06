@@ -5,13 +5,12 @@ import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { now } from "../../utils/time.utils";
-import { IDonor, IDonorInput } from "../../queries/search-donors.decoder";
+import { IDonor, IDonorInput } from "../../model/donor.type";
 import { DueDiligenceAttributesResponse } from "./lexis-nexis.decoder";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 import {
   BillableEventName,
   putBillableEvent,
-} from "../../utils/model/put-billable-event.utils";
+} from "../../utils/model/billable-events/put-billable-event.utils";
 import { DynamoDB } from "aws-sdk";
 import { genTxnId } from "../../utils/gen-txn-id.utils";
 import axios from "axios";
@@ -20,6 +19,7 @@ import {
   dueDiligenceAttributesEndpoint,
   ILexisNexisConfig,
 } from "./lexis-nexis.client";
+import { ICommittee } from "../../model/committee.type";
 
 const prefix = "Lexis-nexis citizenship score";
 

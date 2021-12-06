@@ -22,7 +22,6 @@ export const validateCard = (
     [PaymentMethod.Credit, PaymentMethod.Debit].includes(paymentMethod) &&
     processPayment
   ) {
-    console.log("early card error caught");
     if (
       !cardCVC ||
       !cardNumber ||

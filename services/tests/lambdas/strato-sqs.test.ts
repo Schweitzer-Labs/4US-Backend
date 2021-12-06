@@ -1,10 +1,9 @@
 import { expect } from "chai";
 import { Either, isLeft } from "fp-ts/Either";
 import { ApplicationError } from "../../src/utils/application-error";
-import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { launchCommittee } from "../../src/clients/dapp/dapp.client";
 import { genContributionRecord } from "../utils/gen-contribution.util";
-import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import {
   getStratoENodeUrl,
   getStratoNodeUrl,
@@ -18,7 +17,8 @@ import * as dotenv from "dotenv";
 import { DynamoDB } from "aws-sdk";
 import { genCommittee } from "../utils/gen-committee.util";
 import stratoSQS from "../../src/strato-sqs.lambda";
-import { genSQSEvent } from "../utils/gen-sqs-event.util";
+import { genSQSEventWithStr } from "../utils/gen-sqs-event.util";
+import { ICommittee } from "../../src/model/committee.type";
 
 dotenv.config();
 
@@ -94,12 +94,14 @@ describe("Strato SQS", function () {
   });
 
   it("Supports committing a transaction", async () => {
+    const committeeId = committee.id;
+
     const txn = {
-      ...genContributionRecord(committee.id),
+      ...genContributionRecord({ committeeId }),
       bankVerified: true,
       ruleVerified: true,
     };
-    const event = genSQSEvent(JSON.stringify(txn));
+    const event = genSQSEventWithStr(JSON.stringify(txn));
 
     const res = await stratoSQS(event, {});
 

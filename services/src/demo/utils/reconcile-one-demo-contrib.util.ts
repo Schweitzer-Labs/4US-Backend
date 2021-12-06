@@ -1,14 +1,14 @@
-import { searchTransactions } from "../../queries/search-transactions.query";
+import { searchTransactions } from "../../utils/model/transaction/search-transactions.query";
 import { Order } from "../../utils/enums/order.enum";
 import { TransactionType } from "../../utils/enums/transaction-type.enum";
 import { DynamoDB } from "aws-sdk";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../../utils/application-error";
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ITransaction } from "../../model/transaction.type";
 import { taskEither } from "fp-ts";
 import { validateDemoCommittee } from "./validate-demo-committee.utils";
 import { pipe } from "fp-ts/function";
-import { putTransactionAndDecode } from "../../utils/model/put-transaction.utils";
+import { putTransactionAndDecode } from "../../utils/model/transaction/put-transaction.utils";
 
 export const reconcileOneDemoContrib =
   (txnTable: string) =>

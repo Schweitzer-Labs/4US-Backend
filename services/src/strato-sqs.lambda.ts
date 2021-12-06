@@ -13,7 +13,7 @@ import {
 import { initStratoConfig } from "./clients/dapp/dapp.decoders";
 import { pipe } from "fp-ts/function";
 import { decodeRawData } from "./utils/decode-raw-data.util";
-import { Transaction } from "./queries/search-transactions.decoder";
+import { Transaction } from "./model/transaction.type";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 

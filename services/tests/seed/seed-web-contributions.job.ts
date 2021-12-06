@@ -1,4 +1,4 @@
-import { putTransaction } from "../../src/utils/model/put-transaction.utils";
+import { putTransaction } from "../../src/utils/model/transaction/put-transaction.utils";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { Direction } from "../../src/utils/enums/direction.enum";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";

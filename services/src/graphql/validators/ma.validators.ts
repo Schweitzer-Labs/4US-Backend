@@ -1,5 +1,3 @@
-import { ICommittee } from "../../queries/get-committee-by-id.query";
-import { CreateContributionInput } from "../input-types/create-contribution.input-type";
 import { left, right, TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../../utils/application-error";
 import { EntityType } from "../../utils/enums/entity-type.enum";
@@ -8,6 +6,7 @@ import { EmploymentStatus } from "../../utils/enums/employment-status";
 import { State } from "../../utils/enums/state.enum";
 import { taskEither } from "fp-ts";
 import { ContribInput } from "../input-types/contrib-input.input-type";
+import { ICommittee } from "../../model/committee.type";
 
 export const validateMAContrib =
   (committee: ICommittee) =>

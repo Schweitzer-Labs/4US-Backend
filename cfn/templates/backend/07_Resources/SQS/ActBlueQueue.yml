@@ -1,0 +1,10 @@
+ActBlueQueue:
+  Type: AWS::SQS::Queue
+  Properties:
+    QueueName: !Sub ${LambdaRunEnvironment}-${Domain}-ActBlueQueue.fifo
+    FifoQueue: true
+    ContentBasedDeduplication: true
+    KmsMasterKeyId: alias/aws/sqs
+    RedrivePolicy:
+      deadLetterTargetArn: !Ref SQSDLQ
+      maxReceiveCount: 3

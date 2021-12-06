@@ -15,7 +15,8 @@ import {
   InKindType,
   PaymentMethod,
 } from "../../utils/enums/payment-method.enum";
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { Source } from "../../utils/enums/source.enum";
+import { IProcessorFeeData } from "../../model/external-data.type";
 
 registerEnumType(EntityType, {
   name: "EntityType",
@@ -168,4 +169,12 @@ export class CreateContributionInput {
   @Field({ nullable: true })
   @MinLength(2)
   inKindDescription?: string;
+
+  externalTransactionId?: string;
+
+  externalTransactionPayoutId?: string;
+
+  source?: Source;
+
+  processorFeeData?: IProcessorFeeData;
 }

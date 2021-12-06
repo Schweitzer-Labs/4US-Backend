@@ -3,20 +3,20 @@ import { donorInputToInstantIdResult } from "../clients/lexis-nexis/consumer-id.
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
 import { pipe } from "fp-ts/function";
-import { putDonor } from "../utils/model/put-donor.utils";
+import { putDonor } from "../utils/model/donor/put-donor.utils";
 import { genTxnId } from "../utils/gen-txn-id.utils";
 import { now } from "../utils/time.utils";
-import { genFlacspee } from "../utils/model/gen-donor-match.utils";
+import { genFlacspee } from "../utils/model/donor/gen-donor-match.utils";
 import { taskEither } from "fp-ts";
 import {
   donorInputToDonors,
   getDonorByLNId,
-} from "../queries/search-donors.query";
-import { IDonor, IDonorInput } from "../queries/search-donors.decoder";
-import { ICommittee } from "../queries/get-committee-by-id.query";
+} from "../utils/model/donor/search-donors.query";
+import { IDonor, IDonorInput } from "../model/donor.type";
 import { Plan } from "../utils/enums/plan.enum";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { donorToCitizenshipScore } from "../clients/lexis-nexis/citizenship-score.request";
+import { ICommittee } from "../model/committee.type";
 
 const saveDonor =
   (donorsTableName: string) =>
@@ -37,13 +37,14 @@ const donorInputToDonor = (donorInput: IDonorInput): IDonor => ({
 });
 
 const donorInputToVerifiedDonor =
+  (idVerifyEnabled: boolean) =>
   (billableEventsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (config: ILexisNexisConfig) =>
   (committee: ICommittee) =>
   (donorInput: IDonorInput): TaskEither<ApplicationError, IDonor> =>
     // Primitive feature configuration support
-    committee.platformPlan === Plan.Policapital
+    committee.platformPlan === Plan.Policapital || !idVerifyEnabled
       ? taskEither.of(donorInputToDonor(donorInput))
       : pipe(
           donorInputToInstantIdResult(billableEventsTableName)(dynamoDB)(
@@ -57,6 +58,7 @@ const donorInputToVerifiedDonor =
         );
 
 const verifyAndCreateDonorIfEmpty =
+  (idVerifyEnabled: boolean) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -70,9 +72,9 @@ const verifyAndCreateDonorIfEmpty =
       return taskEither.of(matchedDonors[0]);
     } else {
       return pipe(
-        donorInputToVerifiedDonor(billableEventsTableName)(dynamoDB)(config)(
-          committee
-        )(donorInput),
+        donorInputToVerifiedDonor(idVerifyEnabled)(billableEventsTableName)(
+          dynamoDB
+        )(config)(committee)(donorInput),
         taskEither.chain(
           matchDonorWithVerifierOrSave(donorsTableName)(dynamoDB)
         )
@@ -96,6 +98,7 @@ const matchDonorWithVerifierOrSave =
     );
 
 export const verifyDonor =
+  (idVerifyEnabled: boolean) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -105,8 +108,8 @@ export const verifyDonor =
     pipe(
       donorInputToDonors(donorsTableName)(dynamoDB)(donorInput),
       taskEither.chain(
-        verifyAndCreateDonorIfEmpty(billableEventsTableName)(donorsTableName)(
-          dynamoDB
-        )(config)(committee)(donorInput)
+        verifyAndCreateDonorIfEmpty(idVerifyEnabled)(billableEventsTableName)(
+          donorsTableName
+        )(dynamoDB)(config)(committee)(donorInput)
       )
     );

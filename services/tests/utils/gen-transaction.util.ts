@@ -1,7 +1,7 @@
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import { Direction, directions } from "../../src/utils/enums/direction.enum";
 import * as faker from "faker";
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
+import { ITransaction } from "../../src/model/transaction.type";
 import { now } from "../../src/utils/time.utils";
 import { Source, sources } from "../../src/utils/enums/source.enum";
 import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
