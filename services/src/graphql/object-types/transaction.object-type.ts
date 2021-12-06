@@ -13,6 +13,7 @@ import { EmploymentStatus } from "../../utils/enums/employment-status";
 import { State } from "../../utils/enums/state.enum";
 import { ITransaction } from "../../model/transaction.type";
 import { Source } from "../../utils/enums/source.enum";
+import { IRule, IRuleResult, Verdict } from "../../model/rule.type";
 
 registerEnumType(Direction, {
   name: "Direction",
@@ -54,6 +55,53 @@ registerEnumType(InKindType, {
   description: "Type of In-kind contribution",
 });
 
+registerEnumType(Verdict, {
+  name: "Verdict",
+  description: "The verdict of a rule run",
+});
+
+@ObjectType()
+export class Rule implements IRule {
+  @Field()
+  code: string;
+
+  @Field({ nullable: true })
+  state: string;
+
+  @Field({ nullable: true })
+  scope: string;
+
+  @Field({ nullable: true })
+  party: string;
+
+  @Field({ nullable: true })
+  race: string;
+
+  @Field({ nullable: true })
+  district: string;
+
+  @Field({ nullable: true })
+  county: string;
+
+  @Field({ nullable: true })
+  officeType: string;
+
+  @Field({ nullable: true })
+  ruleVersion: string;
+
+  @Field({ nullable: true })
+  entityType: string;
+
+  @Field({ nullable: true })
+  aggregateDuration: string;
+
+  @Field((type) => [String])
+  fields: string[];
+
+  @Field({ nullable: true })
+  limit?: number;
+}
+
 @ObjectType()
 export class OwnerSchema {
   @Field()
@@ -79,6 +127,21 @@ export class OwnerSchema {
 
   @Field()
   percentOwnership: string;
+}
+
+@ObjectType()
+export class RuleResult implements IRuleResult {
+  @Field()
+  balanceAtRuleRun: number;
+
+  @Field()
+  remaining: number;
+
+  @Field((type) => Verdict)
+  verdict: Verdict;
+
+  @Field((type) => Rule)
+  rule: Rule;
 }
 
 @ObjectType()
@@ -120,7 +183,7 @@ export class ProcessorFeeData {
 @ObjectType()
 export class Transaction implements ITransaction {
   @Field((type) => ID)
-  id;
+  id: string;
 
   @Field()
   committeeId: string;
@@ -281,4 +344,7 @@ export class Transaction implements ITransaction {
 
   @Field({ nullable: true })
   externalTransactionPayoutId?: string;
+
+  @Field((type) => RuleResult, { nullable: true })
+  ruleResult?: RuleResult;
 }

@@ -29,6 +29,7 @@ export const processContribution =
       committee,
       donor,
       rule,
+      ruleResult,
     } = complianceResult;
 
     console.log(
@@ -48,6 +49,7 @@ export const processContribution =
       bankVerified: false,
       ruleVerified: rule?.code ? true : false,
       source: Source.DASHBOARD,
+      ruleResult,
       ...c,
     };
 
@@ -55,9 +57,7 @@ export const processContribution =
       pipe(
         committeeContributionToPayment(stripe)({
           committee,
-          contribution: {
-            ...baseTxn,
-          },
+          contribution: baseTxn,
         }),
         taskEither.chain(paymentToDDB(txnsTableName)(dynamoDB))
       );

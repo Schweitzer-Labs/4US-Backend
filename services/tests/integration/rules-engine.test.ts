@@ -16,7 +16,7 @@ import { runRulesAndProcess } from "../../src/pipes/run-rules-and-process.pipe";
 import { Stripe } from "stripe";
 import { ApplicationError } from "../../src/utils/application-error";
 import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
-import { Verdict } from "../../src/pipes/compliance-check.pipe";
+import { Verdict } from "../../src/model/rule.type";
 
 dotenv.config();
 

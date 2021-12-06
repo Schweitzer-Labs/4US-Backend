@@ -6,13 +6,19 @@ import { taskEither as te } from "fp-ts";
 import { ApplicationError } from "../utils/application-error";
 import { TaskEither } from "fp-ts/TaskEither";
 import { searchTransactions } from "../utils/model/transaction/search-transactions.query";
-import { AggregateDuration, IRule } from "../model/rule.type";
+import {
+  AggregateDuration,
+  IRule,
+  IRuleResult,
+  Verdict,
+} from "../model/rule.type";
 import { EntityType } from "../utils/enums/entity-type.enum";
 import { StatusCodes } from "http-status-codes";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
 import { ITransaction } from "../model/transaction.type";
 import { millisToYear } from "../utils/time.utils";
 import { ICommittee } from "../model/committee.type";
+import { mLog } from "../utils/m-log.utils";
 
 const committeeDonorAndRuleToBalance =
   (txnsTableName: string) =>
@@ -47,13 +53,6 @@ const aggregateBalance =
     return txns.filter(filter).reduce((acc, { amount }) => amount + acc, 0);
   };
 
-interface IRuleResult {
-  balanceAtRuleRun: number;
-  remaining: number;
-  rule: IRule;
-  verdict: Verdict;
-}
-
 const runRule =
   (allowInvalid: boolean) =>
   (attemptedAmount: number) =>
@@ -63,7 +62,6 @@ const runRule =
     const exceedsLimit = balanceAtRuleRun + attemptedAmount > rule.limit;
     if (exceedsLimit)
       if (allowInvalid)
-        // @ToDo make remaining update calc more explicit
         return te.right({
           balanceAtRuleRun,
           remaining,
@@ -99,14 +97,9 @@ const committeeDonorAndRuleToDetermination =
       committeeDonorAndRuleToBalance(txnsTableName)(dynamoDB)(ccInput)(
         committee
       )(donor)(rule),
-      te.chain(runRule(allowInvalid)(ccInput.amount)(rule))
+      te.chain(runRule(allowInvalid)(ccInput.amount)(rule)),
+      te.chain(mLog("Rule Run Result"))
     );
-
-export enum Verdict {
-  Passing = "Accepted",
-  ExceedsLimit = "ExceedsLimit",
-}
-
 export interface IComplianceResult {
   donor?: IDonor;
   committee: ICommittee;
@@ -115,6 +108,7 @@ export interface IComplianceResult {
   balanceAtRuleRun?: number;
   remaining?: number;
   verdict?: Verdict;
+  ruleResult?: IRuleResult;
 }
 
 export const runComplianceCheck =
@@ -132,14 +126,12 @@ export const runComplianceCheck =
           dynamoDB
         )(createContributionInput)(committee)(donor)
       ),
-      te.map(({ rule, balanceAtRuleRun, remaining, verdict }) => ({
+      te.map((ruleResult) => ({
         donor,
         committee,
-        rule,
-        balanceAtRuleRun,
-        remaining,
+        ruleResult,
+        ...ruleResult,
         createContributionInput,
-        verdict,
       }))
     );
   };

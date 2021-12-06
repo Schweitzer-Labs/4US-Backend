@@ -100,6 +100,7 @@ describe("ActBlue to External Transaction Synchronization", function () {
     });
   });
   it("Successfully imports ActBlue transactions", async () => {
+    console.log(JSON.stringify(res));
     expect(res.length > 0).to.equal(true);
   });
 
