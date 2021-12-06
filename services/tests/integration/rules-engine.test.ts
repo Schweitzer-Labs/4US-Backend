@@ -129,11 +129,12 @@ describe("Rules engine", function () {
       // Run
 
       const stagingRes = await pipe(
-        runRulesAndProcess(false)(billableEventsTableName)(donorsTable)(
-          txnsTable
-        )(rulesTable)(dynamoDB)(stripe)(instantIdConfig)(currentUser)(
-          committee
-        )(thisYearContrib),
+        runRulesAndProcess({
+          allowInvalid: false,
+          idVerifyEnabled: true,
+        })(billableEventsTableName)(donorsTable)(txnsTable)(rulesTable)(
+          dynamoDB
+        )(stripe)(instantIdConfig)(currentUser)(committee)(thisYearContrib),
         taskEither.fold(
           (e) => task.of("fail"),
           (res) => task.of("success")

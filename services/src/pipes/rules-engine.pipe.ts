@@ -12,8 +12,13 @@ import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { CreateContributionInput } from "../graphql/input-types/create-contribution.input-type";
 import { ICommittee } from "../model/committee.type";
 
+export interface IRunRuleConfig {
+  allowInvalid: boolean;
+  idVerifyEnabled: boolean;
+}
+
 export const runComplianceCheckOrSkip =
-  (allowInvalid: boolean) =>
+  (runRulConfig: IRunRuleConfig) =>
   (txnsTableName: string) =>
   (rulesTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -22,9 +27,9 @@ export const runComplianceCheckOrSkip =
   (donor: IDonor): TaskEither<ApplicationError, IComplianceResult> =>
     committee.platformPlan === Plan.Policapital
       ? skipComplianceCheck(committee)(contribInput)(donor)
-      : runComplianceCheck(allowInvalid)(txnsTableName)(rulesTableName)(
-          dynamoDB
-        )(contribInput)(committee)(donor);
+      : runComplianceCheck(runRulConfig.allowInvalid)(txnsTableName)(
+          rulesTableName
+        )(dynamoDB)(contribInput)(committee)(donor);
 
 const skipComplianceCheck =
   (committee: ICommittee) =>
@@ -37,7 +42,7 @@ const skipComplianceCheck =
     });
 
 export const runRulesEngine =
-  (allowInvalid: boolean) =>
+  (runRuleConfig: IRunRuleConfig) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
@@ -51,12 +56,12 @@ export const runRulesEngine =
     pipe(
       te.of(createContributionInputToDonorInput(contribInput)),
       te.chain(
-        verifyDonor(billableEventsTableName)(donorsTableName)(dynamoDB)(
-          lnConfig
-        )(committee)
+        verifyDonor(runRuleConfig.idVerifyEnabled)(billableEventsTableName)(
+          donorsTableName
+        )(dynamoDB)(lnConfig)(committee)
       ),
       te.chain(
-        runComplianceCheckOrSkip(allowInvalid)(txnsTableName)(rulesTableName)(
+        runComplianceCheckOrSkip(runRuleConfig)(txnsTableName)(rulesTableName)(
           dynamoDB
         )(contribInput)(committee)
       )

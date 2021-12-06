@@ -1,5 +1,5 @@
 import { pipe } from "fp-ts/function";
-import { runRulesEngine } from "./rules-engine.pipe";
+import { IRunRuleConfig, runRulesEngine } from "./rules-engine.pipe";
 import { taskEither as te } from "fp-ts";
 import { processContribution } from "./process-contribution.pipe";
 import { DynamoDB } from "aws-sdk";
@@ -12,7 +12,7 @@ import { CreateContributionInput } from "../graphql/input-types/create-contribut
 import { ICommittee } from "../model/committee.type";
 
 export const runRulesAndProcess =
-  (allowInvalid: boolean) =>
+  (runRuleConfig: IRunRuleConfig) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (txnsTableName: string) =>
@@ -26,7 +26,7 @@ export const runRulesAndProcess =
     createContributionInput: CreateContributionInput
   ): TaskEither<ApplicationError, ITransaction> =>
     pipe(
-      runRulesEngine(allowInvalid)(billableEventsTableName)(donorsTableName)(
+      runRulesEngine(runRuleConfig)(billableEventsTableName)(donorsTableName)(
         txnsTableName
       )(rulesTableName)(dynamoDB)(lnConfig)(committee)(createContributionInput),
       te.chain(

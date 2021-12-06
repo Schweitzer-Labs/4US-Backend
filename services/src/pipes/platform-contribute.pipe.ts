@@ -134,11 +134,12 @@ export const platformContribute =
               validateMAContrib(committee)(contrib),
               te.chain(() => validateNYContrib(contrib)),
               te.chain(() =>
-                runRulesAndProcess(false)(billableEventsTableName)(
-                  donorsTableName
-                )(txnsTableName)(rulesTableName)(dynamoDB)(stripe)(lnConfig)(
-                  ANONYMOUS
-                )(committee)(contrib)
+                runRulesAndProcess({
+                  allowInvalid: false,
+                  idVerifyEnabled: true,
+                })(billableEventsTableName)(donorsTableName)(txnsTableName)(
+                  rulesTableName
+                )(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(committee)(contrib)
               )
             )
           )

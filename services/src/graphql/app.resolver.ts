@@ -263,11 +263,12 @@ export class AppResolver {
         pipe(
           validateContrib(committee)(contribInput),
           te.chain(() =>
-            runRulesAndProcess(false)(billableEventsTableName)(donorsTableName)(
-              txnsTableName
-            )(rulesTableName)(ddb)(this.stripe)(lnConfig)(currentUser)(
-              committee
-            )(contribInput)
+            runRulesAndProcess({
+              allowInvalid: false,
+              idVerifyEnabled: true,
+            })(billableEventsTableName)(donorsTableName)(txnsTableName)(
+              rulesTableName
+            )(ddb)(this.stripe)(lnConfig)(currentUser)(committee)(contribInput)
           )
         )
       ),

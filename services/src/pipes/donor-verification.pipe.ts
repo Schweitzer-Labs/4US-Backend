@@ -37,13 +37,14 @@ const donorInputToDonor = (donorInput: IDonorInput): IDonor => ({
 });
 
 const donorInputToVerifiedDonor =
+  (idVerifyEnabled: boolean) =>
   (billableEventsTableName: string) =>
   (dynamoDB: DynamoDB) =>
   (config: ILexisNexisConfig) =>
   (committee: ICommittee) =>
   (donorInput: IDonorInput): TaskEither<ApplicationError, IDonor> =>
     // Primitive feature configuration support
-    committee.platformPlan === Plan.Policapital
+    committee.platformPlan === Plan.Policapital || !idVerifyEnabled
       ? taskEither.of(donorInputToDonor(donorInput))
       : pipe(
           donorInputToInstantIdResult(billableEventsTableName)(dynamoDB)(
@@ -57,6 +58,7 @@ const donorInputToVerifiedDonor =
         );
 
 const verifyAndCreateDonorIfEmpty =
+  (idVerifyEnabled: boolean) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -70,9 +72,9 @@ const verifyAndCreateDonorIfEmpty =
       return taskEither.of(matchedDonors[0]);
     } else {
       return pipe(
-        donorInputToVerifiedDonor(billableEventsTableName)(dynamoDB)(config)(
-          committee
-        )(donorInput),
+        donorInputToVerifiedDonor(idVerifyEnabled)(billableEventsTableName)(
+          dynamoDB
+        )(config)(committee)(donorInput),
         taskEither.chain(
           matchDonorWithVerifierOrSave(donorsTableName)(dynamoDB)
         )
@@ -96,6 +98,7 @@ const matchDonorWithVerifierOrSave =
     );
 
 export const verifyDonor =
+  (idVerifyEnabled: boolean) =>
   (billableEventsTableName: string) =>
   (donorsTableName: string) =>
   (dynamoDB: DynamoDB) =>
@@ -105,8 +108,8 @@ export const verifyDonor =
     pipe(
       donorInputToDonors(donorsTableName)(dynamoDB)(donorInput),
       taskEither.chain(
-        verifyAndCreateDonorIfEmpty(billableEventsTableName)(donorsTableName)(
-          dynamoDB
-        )(config)(committee)(donorInput)
+        verifyAndCreateDonorIfEmpty(idVerifyEnabled)(billableEventsTableName)(
+          donorsTableName
+        )(dynamoDB)(config)(committee)(donorInput)
       )
     );

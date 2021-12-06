@@ -23,6 +23,7 @@ import { mLog } from "../../../src/utils/m-log.utils";
 import { deleteCommittee } from "../../../src/utils/model/committee/delete-committee.utils";
 import { genTxnId } from "../../../src/utils/gen-txn-id.utils";
 import { committeeToAC } from "../../utils/committee-to-actblue-sync.utils";
+import { ISyncContribResult } from "../../../src/pipes/external-contribs/external-txns-to-ddb.pipe";
 
 dotenv.config();
 
@@ -76,7 +77,7 @@ AWS.config.apiVersions = {
 
 const reportType = ActBlueCSVType.PaidContributions;
 
-let res: IExternalContrib[];
+let res: ISyncContribResult[];
 describe("ActBlue to External Transaction Synchronization", function () {
   before(async () => {
     const stripeApiKey = await getStripeApiKey(ps)("qa");

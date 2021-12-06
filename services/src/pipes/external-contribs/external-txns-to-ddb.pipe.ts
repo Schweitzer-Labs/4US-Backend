@@ -131,11 +131,12 @@ const syncContrib =
                 extContribToCreateContribInput(committee)(extContrib)
               ),
               taskEither.chain(
-                runRulesAndProcess(true)(billableEventsTableName)(
-                  donorsTableName
-                )(txnsTableName)(rulesTableName)(ddb)(stripe)(lnConfig)(SYSTEM)(
-                  committee
-                )
+                runRulesAndProcess({
+                  allowInvalid: true,
+                  idVerifyEnabled: false,
+                })(billableEventsTableName)(donorsTableName)(txnsTableName)(
+                  rulesTableName
+                )(ddb)(stripe)(lnConfig)(SYSTEM)(committee)
               ),
               taskEither.chain((contribTxn) =>
                 pipe(

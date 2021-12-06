@@ -35,7 +35,7 @@
     "test-actblue": "ts-mocha tests/integration/actblue-client.test.ts --timeout 600000",
     "test-ext-sync": "ts-mocha tests/lambdas/external-contrib-sync.test.ts --timeout 600000",
     "test-ext-sqs": "ts-mocha tests/lambdas/external-contrib-sqs.test.ts --timeout 600000",
-    "test-actblue-ext": "ts-mocha tests/integration/ext-contribs/actblue-ext.test.ts --timeout 600000",
+    "test-ac-ext": "ts-mocha tests/integration/ext-contribs/actblue-ext.test.ts --timeout 600000",
     "test-mail": "ts-mocha tests/lambdas/policapital-emailer.test.ts --timeout 600000",
     "gen-int-test": "cp tests/utils/blank-test.util.ts tests/integration/$NAME.test.ts",
     "test-rec-ext-invalid": "ts-mocha tests/integration/ext-contribs/rec-ext-invalid.test.ts --timeout 600000",

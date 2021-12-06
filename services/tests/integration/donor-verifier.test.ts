@@ -33,7 +33,7 @@ describe("Donor Verifier", function () {
   it("Creates a verified individual donor record with new donor input", async () => {
     const donorInput = genDonorInput(EntityType.Ind);
     const res: any = await pipe(
-      verifyDonor(billableEventsTableName)(donorsTableName)(dynamoDB)(
+      verifyDonor(true)(billableEventsTableName)(donorsTableName)(dynamoDB)(
         instantIdConfig
       )(committee)(donorInput),
       taskEither.getOrElseW(() => {
@@ -48,7 +48,7 @@ describe("Donor Verifier", function () {
   it("Matches an existing individual donor with recognized donor input", async () => {
     const donorInput = genDonorInput(EntityType.Ind);
     const res1: any = await pipe(
-      verifyDonor(billableEventsTableName)(donorsTableName)(dynamoDB)(
+      verifyDonor(true)(billableEventsTableName)(donorsTableName)(dynamoDB)(
         instantIdConfig
       )(committee)(donorInput),
       taskEither.getOrElseW(() => {
@@ -57,7 +57,7 @@ describe("Donor Verifier", function () {
     )();
 
     const res2: any = await pipe(
-      verifyDonor(billableEventsTableName)(donorsTableName)(dynamoDB)(
+      verifyDonor(true)(billableEventsTableName)(donorsTableName)(dynamoDB)(
         instantIdConfig
       )(committee)(donorInput),
       taskEither.getOrElseW(() => {
@@ -71,7 +71,7 @@ describe("Donor Verifier", function () {
   it("Matches an existing non-individual donor with recognized donor input", async () => {
     const donorInput = genDonorInput(EntityType.Llc);
     const res1: any = await pipe(
-      verifyDonor(billableEventsTableName)(donorsTableName)(dynamoDB)(
+      verifyDonor(true)(billableEventsTableName)(donorsTableName)(dynamoDB)(
         instantIdConfig
       )(committee)(donorInput),
       taskEither.getOrElseW(() => {
@@ -80,7 +80,7 @@ describe("Donor Verifier", function () {
     )();
 
     const res2: any = await pipe(
-      verifyDonor(billableEventsTableName)(donorsTableName)(dynamoDB)(
+      verifyDonor(true)(billableEventsTableName)(donorsTableName)(dynamoDB)(
         instantIdConfig
       )(committee)(donorInput),
       taskEither.getOrElseW(() => {
