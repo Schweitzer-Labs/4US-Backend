@@ -1,28 +1,28 @@
 import { expect } from "chai";
 import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
-import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
+import { ILexisNexisConfig } from "../../../src/clients/lexis-nexis/lexis-nexis.client";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
-import { genCommittee } from "../utils/gen-committee.util";
-import { getStripeApiKey } from "../../src/utils/config";
-import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
-import { sleep } from "../../src/utils/sleep.utils";
-import { syncActBlue } from "../../src/external-data/act-blue.external-data";
-import { ActBlueCSVType } from "../../src/clients/actblue/actblue.decoders";
-import { nMonthsAgo, now } from "../../src/utils/time.utils";
+import { genCommittee } from "../../utils/gen-committee.util";
+import { getStripeApiKey } from "../../../src/utils/config";
+import { putCommittee } from "../../../src/utils/model/committee/put-committee.utils";
+import { sleep } from "../../../src/utils/sleep.utils";
+import { syncActBlue } from "../../../src/external-data/act-blue.external-data";
+import { ActBlueCSVType } from "../../../src/clients/actblue/actblue.decoders";
+import { nMonthsAgo, now } from "../../../src/utils/time.utils";
 import {
   actBlueCSVMetadataToTypedData,
   getActBlueCSVMetadata,
-} from "../../src/clients/actblue/actblue.client";
+} from "../../../src/clients/actblue/actblue.client";
 import { isLeft } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { taskEither } from "fp-ts";
-import { IExternalContrib } from "../../src/model/external-data.type";
-import { mLog } from "../../src/utils/m-log.utils";
-import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
-import { genTxnId } from "../../src/utils/gen-txn-id.utils";
-import { committeeToAC } from "../utils/committee-to-actblue-sync.utils";
+import { IExternalContrib } from "../../../src/model/external-data.type";
+import { mLog } from "../../../src/utils/m-log.utils";
+import { deleteCommittee } from "../../../src/utils/model/committee/delete-committee.utils";
+import { genTxnId } from "../../../src/utils/gen-txn-id.utils";
+import { committeeToAC } from "../../utils/committee-to-actblue-sync.utils";
 
 dotenv.config();
 

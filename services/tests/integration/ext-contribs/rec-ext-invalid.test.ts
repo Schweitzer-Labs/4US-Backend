@@ -2,30 +2,30 @@ import { expect } from "chai";
 import * as dotenv from "dotenv";
 import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
-import { ILexisNexisConfig } from "../../src/clients/lexis-nexis/lexis-nexis.client";
-import { genCommittee } from "../utils/gen-committee.util";
-import { genTxnId } from "../../src/utils/gen-txn-id.utils";
-import { ActBlueCSVType } from "../../src/clients/actblue/actblue.decoders";
+import { ILexisNexisConfig } from "../../../src/clients/lexis-nexis/lexis-nexis.client";
+import { genCommittee } from "../../utils/gen-committee.util";
+import { genTxnId } from "../../../src/utils/gen-txn-id.utils";
+import { ActBlueCSVType } from "../../../src/clients/actblue/actblue.decoders";
 import { Stripe } from "stripe";
-import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
-import { getStripeApiKey } from "../../src/utils/config";
-import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
-import { putTransaction } from "../../src/utils/model/transaction/put-transaction.utils";
-import { toMockContrib } from "../../src/demo/utils/seed-bank-records.util";
-import { committeeToAC } from "../utils/committee-to-actblue-sync.utils";
-import { ITransaction } from "../../src/model/transaction.type";
-import { ReconcileTxnInput } from "../../src/graphql/input-types/reconcile-txn.input-type";
-import { lambdaPromise } from "../../src/utils/lambda-promise.util";
-import graphql from "../../src/committee-graphql.lambda";
-import { genGraphQLProxy } from "../utils/gen-allowed-proxy.util";
-import { getTxnQuery, recTxnMutation } from "../utils/graphql.utils";
-import { qaUsers } from "../seed/qa-users.data";
+import { deleteCommittee } from "../../../src/utils/model/committee/delete-committee.utils";
+import { getStripeApiKey } from "../../../src/utils/config";
+import { putCommittee } from "../../../src/utils/model/committee/put-committee.utils";
+import { putTransaction } from "../../../src/utils/model/transaction/put-transaction.utils";
+import { toMockContrib } from "../../../src/demo/utils/seed-bank-records.util";
+import { committeeToAC } from "../../utils/committee-to-actblue-sync.utils";
+import { ITransaction } from "../../../src/model/transaction.type";
+import { ReconcileTxnInput } from "../../../src/graphql/input-types/reconcile-txn.input-type";
+import { lambdaPromise } from "../../../src/utils/lambda-promise.util";
+import graphql from "../../../src/committee-graphql.lambda";
+import { genGraphQLProxy } from "../../utils/gen-allowed-proxy.util";
+import { getTxnQuery, recTxnMutation } from "../../utils/graphql.utils";
+import { qaUsers } from "../../seed/qa-users.data";
 import {
   ISyncContribResult,
   Result,
-} from "../../src/pipes/external-contribs/external-txns-to-ddb.pipe";
-import { groupContribByPayoutId } from "../utils/group-contribs-by-payout-id.util";
-import { calcExtPayoutSet } from "../utils/calc-ext-payout-sum.util";
+} from "../../../src/pipes/external-contribs/external-txns-to-ddb.pipe";
+import { groupContribByPayoutId } from "../../utils/group-contribs-by-payout-id.util";
+import { calcExtPayoutSet } from "../../utils/calc-ext-payout-sum.util";
 
 dotenv.config();
 
