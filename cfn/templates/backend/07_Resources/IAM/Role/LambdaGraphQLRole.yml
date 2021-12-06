@@ -7,6 +7,7 @@ LambdaGraphQLRole:
       - !Ref DynamoDBAuditLogsPolicy
       - !Ref DynamoDBReadAggregatesPolicy
       - !Ref DynamoDBWriteAggregatesPolicy
+      - !Ref DynamoDBExternalDataPolicy
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:
