@@ -79,6 +79,7 @@ export const toMockContrib =
       finicityTransactionDate: timestamp,
       finicityTransactionId: 1,
     };
+
     return {
       ...finData,
       committeeId,
