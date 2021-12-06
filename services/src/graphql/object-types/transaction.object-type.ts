@@ -66,37 +66,37 @@ export class Rule implements IRule {
   code: string;
 
   @Field({ nullable: true })
-  state: string;
+  state?: string;
 
   @Field({ nullable: true })
-  scope: string;
+  scope?: string;
 
   @Field({ nullable: true })
-  party: string;
+  party?: string;
 
   @Field({ nullable: true })
-  race: string;
+  race?: string;
 
   @Field({ nullable: true })
-  district: string;
+  district?: string;
 
   @Field({ nullable: true })
-  county: string;
+  county?: string;
 
   @Field({ nullable: true })
-  officeType: string;
+  officeType?: string;
 
   @Field({ nullable: true })
-  ruleVersion: string;
+  ruleVersion?: string;
 
   @Field({ nullable: true })
-  entityType: string;
+  entityType?: string;
 
   @Field({ nullable: true })
-  aggregateDuration: string;
+  aggregateDuration?: string;
 
   @Field((type) => [String])
-  fields: string[];
+  fields?: string[];
 
   @Field({ nullable: true })
   limit?: number;
