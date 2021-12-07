@@ -4,6 +4,12 @@ import { ExternalSource } from "../../utils/enums/source.enum";
 import { flow } from "fp-ts/function";
 import { SeedExtContribsInput } from "../../graphql/input-types/seed-ext-contribs.input-type";
 import { State } from "../../utils/enums/state.enum";
+import { nDays, nMonths } from "../../utils/time.utils";
+
+const bumpPaymentDate = (txn: ITransaction) => ({
+  ...txn,
+  paymentDate: txn.paymentDate + nMonths(4) + nDays(24),
+});
 
 export const getExtContribs = (input: SeedExtContribsInput): ITransaction[] =>
   actblueExternalContribs.reduce(
@@ -12,12 +18,14 @@ export const getExtContribs = (input: SeedExtContribsInput): ITransaction[] =>
       flow(
         setCommitteeId(input.committeeId),
         anonymizeTxn,
-        setSource(input.externalSource)
+        setSource(input.externalSource),
+        bumpPaymentDate
       )(val.contribTransaction),
       flow(
         setCommitteeId(input.committeeId),
         setSource(input.externalSource),
-        setVendor(input.externalSource)
+        setVendor(input.externalSource),
+        bumpPaymentDate
       )(val.feeTransaction),
     ],
     []
