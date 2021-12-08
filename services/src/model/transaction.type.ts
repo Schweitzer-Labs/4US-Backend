@@ -106,6 +106,7 @@ const TransactionOptional = t.partial({
   externalTransactionPayoutId: t.string,
   feeForTxn: t.string,
   ruleResult: RuleResult,
+  explanation: t.string,
 });
 
 export const Transaction = t.intersection([

@@ -342,6 +342,9 @@ const txnToMemo = (txn: ITransaction): string => {
     case PaymentMethod.InKind:
       return txn.inKindDescription;
     default:
+      if (txn.purposeCode === PurposeCode.OTHER) {
+        return txn.explanation || "NULL";
+      }
       return "NULL";
   }
 };
@@ -429,6 +432,8 @@ const isPerson = (entityType: EntityType) =>
 const isNonEntityPerson = (entityType: EntityType) =>
   [EntityType.Ind, EntityType.Fam, EntityType.Can].includes(entityType);
 
+const sanitize = (str: string) => str.split(".").join("").split(",").join("");
+
 const getEntityName = (
   entityType: EntityType,
   firstName: string,
@@ -438,7 +443,7 @@ const getEntityName = (
   if (isNonEntityPerson(entityType)) {
     return `${firstName} ${lastName}`;
   } else {
-    return companyName;
+    return sanitize(companyName);
   }
 };
 

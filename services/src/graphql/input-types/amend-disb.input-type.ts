@@ -72,4 +72,7 @@ export class AmendDisbInput {
   // Required for PaymentMethod.Check
   @Field({ nullable: true })
   checkNumber?: string;
+
+  @Field({ nullable: true })
+  explanation?: string;
 }

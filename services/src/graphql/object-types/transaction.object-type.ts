@@ -347,4 +347,7 @@ export class Transaction implements ITransaction {
 
   @Field((type) => RuleResult, { nullable: true })
   ruleResult?: RuleResult;
+
+  @Field({ nullable: true })
+  explanation?: string;
 }
