@@ -9,7 +9,7 @@ PlatformUserPool:
     UsernameAttributes:
       - email
     AdminCreateUserConfig:
-      AllowAdminCreateUserOnly: true
+      AllowAdminCreateUserOnly: false
     AccountRecoverySetting:
       RecoveryMechanisms:
         - Name: verified_email

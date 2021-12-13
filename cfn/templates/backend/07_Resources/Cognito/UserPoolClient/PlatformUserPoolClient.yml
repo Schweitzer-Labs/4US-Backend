@@ -6,7 +6,6 @@ PlatformUserPoolClient:
     ClientName: !Sub ${LambdaRunEnvironment}-${Product}
     GenerateSecret: true
     AccessTokenValidity: 1
-    AllowAdminCreateUserOnly: false
     IdTokenValidity: 1
     RefreshTokenValidity: 30
     TokenValidityUnits:
