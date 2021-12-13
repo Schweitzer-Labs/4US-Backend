@@ -15,13 +15,13 @@ DashboardUserPoolClient:
     CallbackURLs:
       - !Sub https://dashboard.${Domain}.${TLD}
     {% if RUNENV == 'qa' %}
-    - http://localhost:3000
-    {% endif %}
+      - http://localhost:3000
+      {% endif %}
     LogoutURLs:
       - !Sub https://dashboard.${Domain}.${TLD}
     {% if RUNENV == 'qa' %}
-    - http://localhost:3000
-    {% endif %}
+      - http://localhost:3000
+      {% endif %}
     SupportedIdentityProviders:
       - COGNITO
     AllowedOAuthFlowsUserPoolClient: true
