@@ -35,7 +35,7 @@ export const generateDisclosure =
           txn.paymentDate - offset >=
             new Date("May 19, 2021").getTime() - offset &&
           txn.paymentDate - offset <=
-            new Date("December 30, 2021").getTime() - offset
+            new Date("December 30, 2023").getTime() - offset
         );
       })
       .reduce((acc, txn) => {
