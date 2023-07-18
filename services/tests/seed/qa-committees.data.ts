@@ -1,5 +1,5 @@
-import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { Plan } from "../../src/utils/enums/plan.enum";
+import { ICommittee } from "../../src/model/committee.type";
 
 export const qaCommitteesData: ICommittee[] = [
   {

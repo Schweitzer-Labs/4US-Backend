@@ -12,7 +12,7 @@ import { decodeRawData } from "./utils/decode-raw-data.util";
 import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { FinicityConfig } from "./clients/finicity/finicity.decoders";
-import { getCommitteeById } from "./queries/get-committee-by-id.query";
+import { getCommitteeById } from "./utils/model/committee/get-committee-by-id.query";
 import { syncCommittee } from "./pipes/finicity-bank-sync.pipe";
 import * as t from "io-ts";
 import { runReconcileOnCommittee } from "./demo/utils/run-rec.util";
@@ -33,17 +33,13 @@ let appKey: string;
 let finicityConfig: FinicityConfig;
 
 export default async (event: SQSEvent): Promise<any> => {
-  if (!partnerId || !partnerSecret || !appKey) {
-    partnerId = await getFinicityPartnerId(parameterStore)(runenv);
-    partnerSecret = await getFinicityPartnerSecret(parameterStore)(runenv);
-    appKey = await getFinicityAppKey(parameterStore)(runenv);
-
+  if (!partnerId || !partnerSecret || !appKey)
     finicityConfig = {
-      partnerId,
-      partnerSecret,
-      appKey,
+      partnerId: await getFinicityPartnerId(parameterStore)(runenv),
+      partnerSecret: await getFinicityPartnerSecret(parameterStore)(runenv),
+      appKey: await getFinicityAppKey(parameterStore)(runenv),
     };
-  }
+
   for (const record of event.Records) {
     const res = await pipe(
       decodeRawData("Committee Id")(t.string)(record.body),

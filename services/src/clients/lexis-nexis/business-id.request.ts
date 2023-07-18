@@ -6,11 +6,10 @@ import { taskEither } from "fp-ts";
 import { isLeft } from "fp-ts/Either";
 import { now } from "../../utils/time.utils";
 import { BusinessIDResponse } from "./lexis-nexis.decoder";
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 import {
   BillableEventName,
   putBillableEvent,
-} from "../../utils/model/put-billable-event.utils";
+} from "../../utils/model/billable-events/put-billable-event.utils";
 import { DynamoDB } from "aws-sdk";
 import { genTxnId } from "../../utils/gen-txn-id.utils";
 import axios from "axios";
@@ -20,7 +19,8 @@ import {
   ILexisNexisConfig,
   logPrefix,
 } from "./lexis-nexis.client";
-import { ITransaction } from "../../queries/search-transactions.decoder";
+import { ITransaction } from "../../model/transaction.type";
+import { ICommittee } from "../../model/committee.type";
 
 const formatRequest = (d: ITransaction) => {
   const streetAddress2 = d.addressLine2
@@ -94,7 +94,7 @@ const resToTxn =
         ...txn,
         businessIdRawResponse: data,
         businessIdRequestTimestamp,
-        businessIdComprehensiveVerificationScore: 0,
+        businessIdVerificationScore: "0",
       });
     } else {
       return taskEither.of({

@@ -1,0 +1,10 @@
+ExternalContribQueue:
+  Type: AWS::SQS::Queue
+  Properties:
+    QueueName: !Sub ${LambdaRunEnvironment}-${Domain}-ExternalContribQueue.fifo
+    FifoQueue: true
+    ContentBasedDeduplication: true
+    KmsMasterKeyId: alias/aws/sqs
+    RedrivePolicy:
+      deadLetterTargetArn: !Ref SQSDLQ
+      maxReceiveCount: 3

@@ -2,14 +2,14 @@ import { DynamoDB } from "aws-sdk";
 import { ILexisNexisConfig } from "../clients/lexis-nexis/lexis-nexis.client";
 import { TaskEither } from "fp-ts/TaskEither";
 import { ApplicationError } from "../utils/application-error";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../model/transaction.type";
 import { pipe } from "fp-ts/function";
-import { createDisbInputToTxn } from "../utils/model/create-disbursement-input-to-transaction.utils";
+import { createDisbInputToTxn } from "../utils/model/transaction/create-disbursement-input-to-transaction.utils";
 import { taskEither as te } from "fp-ts";
 import { runBIDonTxn } from "../clients/lexis-nexis/business-id.request";
-import { ICommittee } from "../queries/get-committee-by-id.query";
-import { putTransactionAndDecode } from "../utils/model/put-transaction.utils";
+import { putTransactionAndDecode } from "../utils/model/transaction/put-transaction.utils";
 import { CreateDisbursementInput } from "../graphql/input-types/create-disbursement.input-type";
+import { ICommittee } from "../model/committee.type";
 
 export const verifyAndCreateDisb =
   (user: string) =>

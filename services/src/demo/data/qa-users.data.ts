@@ -10,4 +10,6 @@ export const qaUsers = [
   "cee2ccf2-bf66-4a0d-82db-f31ec8bcacec",
   "d973fffb-f463-40c8-8a2d-0a2a6fdafd72",
   "fc87bb25-80e9-456c-a537-0350e112501f",
+  "0e0f7983-ae16-4b52-83be-361a07069053",
+  "fdd94c46-74b9-4346-aca6-117c4345fa53",
 ];

@@ -1,0 +1,18 @@
+DynamoDBExternalDataPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  DependsOn: DynamoDBsTemplate
+  Properties:
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Effect: Allow
+          Resource:
+            - !Sub ${DynamoDBsTemplate.Outputs.TransactionsTableArn}/index/TransactionsByExternalTransactionId
+          Action:
+            - dynamodb:Scan
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:UpdateItem
+            - dynamodb:PartiQLSelect

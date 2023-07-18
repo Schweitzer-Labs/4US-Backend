@@ -1,13 +1,11 @@
-import { ITransaction } from "../queries/search-transactions.decoder";
-import {
-  getCommitteeById,
-  ICommittee,
-} from "../queries/get-committee-by-id.query";
+import { ITransaction } from "../model/transaction.type";
+import { getCommitteeById } from "../utils/model/committee/get-committee-by-id.query";
 import { SendMessageRequest } from "aws-sdk/clients/sqs";
 import { taskEither } from "fp-ts";
 import { DynamoDB, SQS } from "aws-sdk";
 import { pipe } from "fp-ts/function";
 import { sendMessage } from "../utils/send-sqs.utils";
+import { ICommittee } from "../model/committee.type";
 
 export const sendContribSuccessMsgs =
   (committeesTableName: string) =>

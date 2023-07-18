@@ -30,8 +30,6 @@ describe("Reconciliation Report", function () {
       )
     )();
 
-    console.log(res);
-
     expect(res.statusCode).to.equal(200);
   });
 });

@@ -1,7 +1,7 @@
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { genCommittee } from "../utils/gen-committee.util";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 
 dotenv.config();
 

@@ -1,19 +1,29 @@
-import { ITransaction } from "../../src/queries/search-transactions.decoder";
-import { genTransaction } from "./gen-transaction.util";
-import { Direction } from "../../src/utils/enums/direction.enum";
-import { PaymentMethod } from "../../src/utils/enums/payment-method.enum";
-import { EntityType } from "../../src/utils/enums/entity-type.enum";
+import {ITransaction} from "../../src/model/transaction.type";
+import {genTransaction} from "./gen-transaction.util";
+import {Direction} from "../../src/utils/enums/direction.enum";
+import {PaymentMethod} from "../../src/utils/enums/payment-method.enum";
+import {EntityType} from "../../src/utils/enums/entity-type.enum";
 import * as faker from "faker";
-import { TransactionType } from "../../src/utils/enums/transaction-type.enum";
-import { genTxnId } from "../../src/utils/gen-txn-id.utils";
-import { now } from "../../src/utils/time.utils";
-import { enumToValues } from "../../src/utils/enums/poly.util";
-import { State } from "../../src/utils/enums/state.enum";
+import {TransactionType} from "../../src/utils/enums/transaction-type.enum";
+import {genTxnId} from "../../src/utils/gen-txn-id.utils";
+import {now} from "../../src/utils/time.utils";
+import {enumToValues} from "../../src/utils/enums/poly.util";
+import {State} from "../../src/utils/enums/state.enum";
+import {Source} from "../../src/utils/enums/source.enum";
 
-export const genContributionRecord = (
+
+interface IGenContributionRecordArgs {
   committeeId: string,
+  source?: Source,
   donorId?: string,
-  entityType?: EntityType
+  entityType?: EntityType,
+}
+
+export const genContributionRecord = ({
+  committeeId,
+  source,
+  donorId,
+  entityType,}: IGenContributionRecordArgs
 ): ITransaction => {
   return {
     ...genTransaction({
@@ -23,6 +33,7 @@ export const genContributionRecord = (
       ruleVerified: true,
       bankVerified: false,
       paymentDate: now(),
+      source: source || Source.DASHBOARD
     }),
     transactionType: TransactionType.Contribution,
     committeeId,

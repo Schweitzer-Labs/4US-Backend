@@ -1,10 +1,12 @@
-import { ICommittee } from "../../src/queries/get-committee-by-id.query";
 import { genTxnId } from "../../src/utils/gen-txn-id.utils";
 import * as faker from "faker";
 import { Plan } from "../../src/utils/enums/plan.enum";
 import { qaUsers } from "../seed/qa-users.data";
+import { ICommittee } from "../../src/model/committee.type";
+import { IActBlueAPICredentials } from "../../src/clients/actblue/actblue.decoders";
 
 interface IGenCommitteeConfig {
+  id?: string;
   state?: string;
   scope?: string;
   officeType?: string;
@@ -24,9 +26,12 @@ interface IGenCommitteeConfig {
   efsElectionId?: number;
   efsFilerId?: number;
   members?: string[];
+  actBlueAccountId?: string;
+  actBlueAPICredentials?: IActBlueAPICredentials;
 }
 
 export const genCommittee = ({
+  id,
   state,
   scope,
   officeType,
@@ -46,11 +51,13 @@ export const genCommittee = ({
   efsElectionId,
   efsFilerId,
   members,
+  actBlueAccountId,
+  actBlueAPICredentials,
 }: IGenCommitteeConfig): ICommittee => {
   const randomFirstName = faker.name.firstName();
   const randomLastName = faker.name.lastName();
   return {
-    id: genTxnId(),
+    id: id || genTxnId(),
     committeeName: `Vote for ${candidateFirstName || randomLastName}`,
     candidateFirstName: candidateFirstName || randomFirstName,
     candidateLastName: candidateLastName || randomLastName,
@@ -72,5 +79,7 @@ export const genCommittee = ({
     bankName: "chase",
     efsElectionId: efsElectionId || faker.datatype.number(5000000),
     efsFilerId: efsFilerId || faker.datatype.number(5000000),
+    actBlueAccountId,
+    actBlueAPICredentials,
   };
 };

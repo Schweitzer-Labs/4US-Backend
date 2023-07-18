@@ -1,4 +1,3 @@
-import { ICommittee } from "../../queries/get-committee-by-id.query";
 import { dashToUnderscore } from "../../utils/dash-to-underscore.utils";
 
 export const committeeContractWithHash = (committeeId: string) => {

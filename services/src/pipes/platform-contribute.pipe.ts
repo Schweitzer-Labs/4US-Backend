@@ -12,12 +12,9 @@ import { CreateContributionInput } from "../graphql/input-types/create-contribut
 import { ApplicationError } from "../utils/application-error";
 import { DynamoDB } from "aws-sdk";
 import { Stripe } from "stripe";
-import { ITransaction } from "../queries/search-transactions.decoder";
+import { ITransaction } from "../model/transaction.type";
 import { taskEither as te } from "fp-ts";
-import {
-  getCommitteeById,
-  ICommittee,
-} from "../queries/get-committee-by-id.query";
+import { getCommitteeById } from "../utils/model/committee/get-committee-by-id.query";
 import { runRulesAndProcess } from "./run-rules-and-process.pipe";
 import { ANONYMOUS } from "../utils/tokens/users.token";
 import { eventToObject } from "../utils/event-to-object.util";
@@ -27,9 +24,8 @@ import { enumToValues } from "../utils/enums/poly.util";
 import { State } from "../utils/enums/state.enum";
 import { validateMAContrib } from "../graphql/validators/ma.validators";
 import { validateNYContrib } from "../graphql/validators/ny.validators";
-import {stringOpt, stringReq} from "../utils/joi.utils";
-
-
+import { stringOpt, stringReq } from "../utils/joi.utils";
+import { ICommittee } from "../model/committee.type";
 
 const ownerSchema = {
   firstName: Joi.string(),
@@ -93,7 +89,6 @@ const validateNonInd = (
   return right(true);
 };
 
-
 // @ToDo generalize function
 const eventToCreateContribInput = (
   event: any
@@ -139,11 +134,12 @@ export const platformContribute =
               validateMAContrib(committee)(contrib),
               te.chain(() => validateNYContrib(contrib)),
               te.chain(() =>
-                runRulesAndProcess(billableEventsTableName)(donorsTableName)(
-                  txnsTableName
-                )(rulesTableName)(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(
-                  committee
-                )(contrib)
+                runRulesAndProcess({
+                  allowInvalid: false,
+                  idVerifyEnabled: true,
+                })(billableEventsTableName)(donorsTableName)(txnsTableName)(
+                  rulesTableName
+                )(dynamoDB)(stripe)(lnConfig)(ANONYMOUS)(committee)(contrib)
               )
             )
           )

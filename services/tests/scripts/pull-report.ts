@@ -29,8 +29,6 @@ const createReportRun = async () => {
     },
   });
 
-  console.log(res);
-
   return res;
 };
 
@@ -40,8 +38,6 @@ const requestReport = async () => {
   const res = await getReport(apiKey)(
     "https://files.stripe.com/v1/files/file_1JEzOmEUhH8cxK5gn4KKyrsq/contents"
   );
-
-  console.log(res);
 
   return res;
 };

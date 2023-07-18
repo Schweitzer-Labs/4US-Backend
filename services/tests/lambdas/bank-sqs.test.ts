@@ -4,11 +4,11 @@ import * as AWS from "aws-sdk";
 import { DynamoDB } from "aws-sdk";
 import * as dotenv from "dotenv";
 import { genCommittee } from "../utils/gen-committee.util";
-import { deleteCommittee } from "../../src/utils/model/delete-committee.utils";
+import { deleteCommittee } from "../../src/utils/model/committee/delete-committee.utils";
 import bankSqs from "../../src/bank-sqs.lambda";
-import { putCommittee } from "../../src/utils/model/put-committee.utils";
+import { putCommittee } from "../../src/utils/model/committee/put-committee.utils";
 import { SQSEvent } from "aws-lambda";
-import { genSQSEvent } from "../utils/gen-sqs-event.util";
+import { genSQSEventWithStr } from "../utils/gen-sqs-event.util";
 
 dotenv.config();
 
@@ -33,7 +33,7 @@ const committee = genCommittee({
   finicityAccountId: "5016000964",
 });
 
-const sqsEvent: SQSEvent = genSQSEvent(committee.id);
+const sqsEvent: SQSEvent = genSQSEventWithStr(committee.id);
 
 describe("Processes a committee's transactions", function () {
   before(async () => {
@@ -41,7 +41,6 @@ describe("Processes a committee's transactions", function () {
   });
   it("Sync runs successfully", async () => {
     const res = await bankSqs(sqsEvent);
-    console.log(res);
 
     expect(res).to.equal(true);
   });
